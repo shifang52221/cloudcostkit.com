@@ -1,0 +1,51 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ReservedBreakEvenCalculator } from "../../components/calculators/ReservedBreakEven";
+
+const title = "Reserved vs On-demand Break-even Calculator";
+const description =
+  "Estimate the break-even usage where a committed rate beats on-demand, given hourly pricing and upfront costs. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/reserved-vs-on-demand-break-even-calculator"
+  intro="Commitments can lower hourly rates but may include upfront payments. This calculator estimates the usage point where commitments break even versus on-demand."
+  examples={[
+    "On-demand $0.12/hr vs committed $0.075/hr with $300 upfront → estimate break-even hours.",
+  ]}
+  includes={[
+    "Break-even usage estimate from hourly savings and upfront cost.",
+    "Monthly savings estimate excluding upfront (for planning).",
+  ]}
+  excludes={[
+    "Term length, discount rate, and flexibility risk (use a full ROI model for decisions).",
+    "Provider-specific commitment utilization constraints.",
+  ]}
+  how={[
+    "Hourly savings = on-demand hourly − committed hourly.",
+    "Break-even hours = upfront ÷ hourly savings (if savings > 0).",
+    "Monthly savings = hourly savings × hours per month (excluding upfront)."
+  ]}
+  faqs={[
+    {
+      q: "What if committed hourly is higher than on-demand?",
+      a: "Then there is no break-even: the commitment is not cheaper under the assumptions provided."
+    },
+    {
+      q: "Does this include partial upfront or term length?",
+      a: "No. This is a simplified break-even estimate. For a full ROI model, incorporate the term, discount rate, and flexibility risk."
+    },
+    {
+      q: "What should I use for hours per month?",
+      a: "730 is a common approximation. If you have non-24/7 workloads, use your expected billable hours."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },
+    { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
+  ]}
+>
+  <ReservedBreakEvenCalculator client:load />
+</CalculatorLayout>

@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+
+const title = `About | ${SITE.name}`;
+const description =
+  "About CloudCostKit: fast, free cloud cost and capacity calculators with transparent assumptions.";
+---
+<BaseLayout title={title} description={description} canonicalPath="/about">
+  <section class="card hero">
+    <h1>About {SITE.name}</h1>
+    <p>Fast calculators for cloud planning—egress, logs, storage, Kubernetes, and pricing break-even.</p>
+  </section>
+
+  <section class="card section prose">
+    <h2 style="margin-top:0">Principles</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Transparent assumptions: each tool explains what it does (and does not) include.</li>
+      <li>Simple by default: planning estimates first, with configurable inputs.</li>
+      <li>Privacy-friendly: calculators run in your browser.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Contact</h2>
+    <p class="muted" style="margin:0">
+      Feedback and suggestions: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </section>
+</BaseLayout>
+

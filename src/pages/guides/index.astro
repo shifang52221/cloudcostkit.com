@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Guides | ${SITE.name}`;
+const description =
+  "Practical guides for estimating cloud spend: egress, logs, storage, and Kubernetes capacity.";
+const slots = SITE.adsenseSlots;
+---
+<BaseLayout title={title} description={description} canonicalPath="/guides">
+  <section class="card hero">
+    <h1>Guides</h1>
+    <p>Short, practical notes to help you estimate spend and avoid common pitfalls.</p>
+  </section>
+
+  <section class="card section">
+    <div class="grid">
+      <a class="card2 tool col-6" href="/guides/egress-costs">
+        <div class="tool-title">Understanding egress costs</div>
+        <div class="tool-desc">How to estimate bandwidth and avoid common billing surprises.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/log-costs">
+        <div class="tool-title">Estimating log costs</div>
+        <div class="tool-desc">Ingestion vs retention, steady state modeling, and knobs that matter.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/kubernetes-requests-limits">
+        <div class="tool-title">Kubernetes requests & limits</div>
+        <div class="tool-desc">Sizing from requests, allocatable headroom, and what limits really mean.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorMid} minHeight={280} />
+  </section>
+</BaseLayout>

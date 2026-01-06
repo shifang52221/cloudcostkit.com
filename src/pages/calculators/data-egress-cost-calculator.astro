@@ -1,0 +1,63 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "Data Egress Cost Calculator";
+const description =
+  "Estimate monthly data egress cost from GB transferred and your provider’s $/GB pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/data-egress-cost-calculator"
+  intro="Data egress can be a major driver of cloud spend. Use this calculator to estimate monthly egress cost with your own pricing assumptions."
+  examples={[
+    "If you send 2,500 GB/month and your effective price is $0.09/GB, estimated cost is $225/month.",
+  ]}
+  includes={[
+    "Bandwidth-only cost estimate from transferred GB and $/GB pricing.",
+    "Works for internet egress, service egress, or any scenario where you know an effective $/GB.",
+  ]}
+  excludes={[
+    "Tiered pricing steps and free allowances (unless you reflect them in your effective $/GB).",
+    "Per-request fees and other service-specific charges.",
+  ]}
+  how={[
+    "Monthly cost = egress GB × price per GB.",
+    "Enter your provider’s effective $/GB for the region/path/tier you expect.",
+    "This page ignores free allowances, tiered steps, and rounding unless you model them in the inputs."
+  ]}
+  faqs={[
+    {
+      q: "Why does egress pricing vary so much?",
+      a: "Egress pricing often depends on destination (internet vs cross-region), tiered usage, service (CDN vs origin), and region."
+    },
+    {
+      q: "GB vs GiB: which unit should I use?",
+      a: "Cloud billing often uses decimal GB (1 GB = 1,000,000,000 bytes). Some tooling shows GiB (binary). Use the Units Converter to translate."
+    },
+    {
+      q: "Does this include request fees or CDN costs?",
+      a: "No. This tool estimates bandwidth-based egress only."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/guides/egress-costs", label: "Guide: egress costs" },
+    { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
+    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
+    { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+  ]}
+>
+  <DataEgressCostCalculator client:load />
+
+  <div class="prose" style="margin-top:16px">
+    <h2 style="margin:0 0 10px">Tips</h2>
+    <ul class="muted" style="margin:0; padding-left:18px">
+      <li>Model multiple scenarios: baseline month vs peak month.</li>
+      <li>Consider a CDN: it can reduce origin egress and shift cost structure.</li>
+      <li>Watch for tiering and minimum charges in provider pricing.</li>
+    </ul>
+  </div>
+</CalculatorLayout>

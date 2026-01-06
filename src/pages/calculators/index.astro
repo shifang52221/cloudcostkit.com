@@ -1,0 +1,182 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Tools | ${SITE.name}`;
+const description =
+  "Browse fast cloud cost and capacity calculators: egress, logs, object storage, Kubernetes requests, and pricing break-even.";
+
+const grouped = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
+  (acc[t.category] ||= []).push(t);
+  return acc;
+}, {});
+const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+const slots = SITE.adsenseSlots;
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators">
+  <section class="card hero">
+    <span class="pill">Fast • Free • No signup</span>
+    <h1>Cloud cost & capacity tools</h1>
+    <p>Estimate spend and sizing with transparent assumptions. Use results for planning and comparisons.</p>
+  </section>
+
+  <section class="card section" style="margin-top:18px" id="tools-filter">
+    <div class="form" style="align-items:end">
+      <div class="field field-3">
+        <div class="label"><label for="tools-q">Search</label></div>
+        <input id="tools-q" type="search" placeholder="egress, logs, requests, kubernetes..." autocomplete="off" />
+      </div>
+      <div class="field field-3">
+        <div class="label"><label for="tools-cat">Category</label></div>
+        <select id="tools-cat">
+          <option value="all">All categories</option>
+          {categories.map(([category]) => (
+            <option value={category}>{category}</option>
+          ))}
+        </select>
+      </div>
+      <div class="field field-6">
+        <div class="btn-row" style="justify-content:space-between; width:100%">
+          <div class="muted" id="tools-count" aria-live="polite" style="font-size:13px"></div>
+          <button class="btn" type="button" id="tools-clear">Clear</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-top:18px">
+    {categories.map(([category, tools]) => (
+      <div style="margin-bottom:16px" class="tool-group" data-category={category}>
+        <div class="pill tool-group-title" style="margin: 6px 0 10px">{category}</div>
+        <div class="grid">
+          {tools.map((t) => (
+            <a
+              class="card2 tool col-6 tool-card"
+              href={`/calculators/${t.slug}`}
+              data-category={t.category}
+              data-title={t.title}
+              data-desc={t.description}
+              data-slug={t.slug}
+            >
+              <div class="tool-title">{t.title}</div>
+              <div class="tool-desc">{t.description}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">FAQ</h2>
+    <details class="card2" style="padding:12px; margin:10px 0">
+      <summary style="cursor:pointer; font-weight:800">Do you store my inputs?</summary>
+      <div class="muted" style="margin-top:8px">
+        Calculations run in your browser. See <a href="/privacy-policy">Privacy Policy</a> and{" "}
+        <a href="/cookie-notice">Cookie Notice</a>.
+      </div>
+    </details>
+    <details class="card2" style="padding:12px; margin:10px 0">
+      <summary style="cursor:pointer; font-weight:800">Are these official quotes?</summary>
+      <div class="muted" style="margin-top:8px">
+        No. Results are simplified estimates for planning. Always verify pricing tiers, regions, free allowances, and
+        rounding rules in provider docs.
+      </div>
+    </details>
+  </section>
+
+  <script is:inline type="text/javascript">
+    (function () {
+      var filterRoot = document.getElementById("tools-filter");
+      if (!filterRoot) return;
+
+      var qEl = document.getElementById("tools-q");
+      var catEl = document.getElementById("tools-cat");
+      var countEl = document.getElementById("tools-count");
+      var clearEl = document.getElementById("tools-clear");
+      if (!qEl || !catEl || !countEl || !clearEl) return;
+
+      var cards = Array.prototype.slice.call(document.querySelectorAll(".tool-card"));
+      var groups = Array.prototype.slice.call(document.querySelectorAll(".tool-group"));
+      var total = cards.length;
+
+      function norm(s) {
+        return String(s || "").toLowerCase().trim();
+      }
+
+      function setCount(visible) {
+        countEl.textContent = "Showing " + visible + " of " + total + " tools";
+      }
+
+      function apply() {
+        var q = norm(qEl.value);
+        var cat = catEl.value || "all";
+
+        var visible = 0;
+        cards.forEach(function (card) {
+          var title = norm(card.getAttribute("data-title"));
+          var desc = norm(card.getAttribute("data-desc"));
+          var slug = norm(card.getAttribute("data-slug"));
+          var cardCat = card.getAttribute("data-category") || "";
+          var matchCat = cat === "all" ? true : cardCat === cat;
+          var matchQ = !q ? true : title.indexOf(q) !== -1 || desc.indexOf(q) !== -1 || slug.indexOf(q) !== -1;
+          var show = matchCat && matchQ;
+          card.hidden = !show;
+          if (show) visible++;
+        });
+
+        groups.forEach(function (g) {
+          var any = false;
+          var groupCards = g.querySelectorAll(".tool-card");
+          for (var i = 0; i < groupCards.length; i++) {
+            if (!groupCards[i].hidden) {
+              any = true;
+              break;
+            }
+          }
+          g.hidden = !any;
+        });
+
+        setCount(visible);
+
+        try {
+          var url = new URL(window.location.href);
+          if (q) url.searchParams.set("q", q);
+          else url.searchParams.delete("q");
+          if (cat && cat !== "all") url.searchParams.set("cat", cat);
+          else url.searchParams.delete("cat");
+          window.history.replaceState({}, "", url.toString());
+        } catch (e) {}
+      }
+
+      function initFromQuery() {
+        try {
+          var url = new URL(window.location.href);
+          var q = url.searchParams.get("q");
+          var cat = url.searchParams.get("cat");
+          if (q) qEl.value = q;
+          if (cat) catEl.value = cat;
+        } catch (e) {}
+      }
+
+      qEl.addEventListener("input", apply);
+      catEl.addEventListener("change", apply);
+      clearEl.addEventListener("click", function () {
+        qEl.value = "";
+        catEl.value = "all";
+        apply();
+        try { qEl.focus(); } catch (e) {}
+      });
+
+      initFromQuery();
+      apply();
+    })();
+  </script>
+</BaseLayout>
+

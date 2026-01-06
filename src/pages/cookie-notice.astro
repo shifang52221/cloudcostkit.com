@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+
+const title = `Cookie Notice | ${SITE.name}`;
+const description = "Cookie consent and preferences for CloudCostKit.";
+---
+<BaseLayout title={title} description={description} canonicalPath="/cookie-notice">
+  <section class="card hero">
+    <h1>Cookie notice</h1>
+    <p>Manage consent for ads and cookies.</p>
+  </section>
+
+  <section class="card section prose">
+    <p class="muted" style="margin:0">
+      We use cookies for ads and basic site functionality. Choose “Accept” for personalized ads (where allowed) or
+      “Decline” for non-personalized ads.
+    </p>
+
+    <div class="btn-row" style="margin-top:14px">
+      <button
+        class="btn btn-primary"
+        type="button"
+        onclick="(function(){try{localStorage.setItem('consent.v1','accepted')}catch(e){};try{document.documentElement.setAttribute('data-consent','accepted')}catch(e){};try{window.dispatchEvent(new CustomEvent('consentchange',{detail:{consent:'accepted'}}))}catch(e){};})()"
+      >
+        Accept
+      </button>
+      <button
+        class="btn"
+        type="button"
+        onclick="(function(){try{localStorage.setItem('consent.v1','declined')}catch(e){};try{document.documentElement.setAttribute('data-consent','declined')}catch(e){};try{window.dispatchEvent(new CustomEvent('consentchange',{detail:{consent:'declined'}}))}catch(e){};})()"
+      >
+        Decline
+      </button>
+      <button
+        class="btn"
+        type="button"
+        onclick="(function(){try{localStorage.removeItem('consent.v1')}catch(e){};try{document.documentElement.removeAttribute('data-consent')}catch(e){};try{window.dispatchEvent(new CustomEvent('consentchange',{detail:{consent:'unset'}}))}catch(e){};})()"
+      >
+        Reset
+      </button>
+    </div>
+
+    <h2 style="margin:18px 0 10px">Learn more</h2>
+    <p class="muted" style="margin:0">
+      See <a href="/privacy-policy">Privacy Policy</a> for details. Questions: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </section>
+</BaseLayout>
+

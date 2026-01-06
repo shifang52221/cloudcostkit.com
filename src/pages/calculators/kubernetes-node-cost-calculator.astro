@@ -1,0 +1,48 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { KubernetesNodeCostCalculator } from "../../components/calculators/KubernetesNodeCost";
+
+const title = "Kubernetes Node Cost Calculator";
+const description =
+  "Estimate monthly Kubernetes node cost from node count, $/hour, and expected uptime. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/kubernetes-node-cost-calculator"
+  intro="Once you know your node count and per-node hourly price, you can estimate monthly spend quickly. Use utilization and hours/day to model non‑24/7 clusters."
+  examples={[
+    "12 nodes at $0.32/hour running 24/7 → estimate monthly node spend.",
+  ]}
+  includes={[
+    "Monthly compute estimate from node count, $/hour, and billable hours.",
+    "Simple utilization model for scheduled/dev environments.",
+  ]}
+  excludes={[
+    "Load balancers, storage, bandwidth, control plane fees, and add-ons.",
+    "Autoscaling dynamics (use multiple scenarios).",
+  ]}
+  how={[
+    "Billable hours per node ≈ days per month × hours/day × utilization.",
+    "Monthly cost = nodes × billable hours per node × $/hour.",
+    "This tool estimates node compute only (not load balancers, storage, or data transfer)."
+  ]}
+  faqs={[
+    {
+      q: "Should I use on-demand or committed hourly pricing?",
+      a: "Use the effective hourly price you expect after savings plans/reservations if applicable."
+    },
+    {
+      q: "Does this include control plane fees?",
+      a: "No. Some managed Kubernetes services have control plane charges—add those separately."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/kubernetes-requests-limits-calculator", label: "Requests & limits sizing" },
+    { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },
+    { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved break-even" },
+  ]}
+>
+  <KubernetesNodeCostCalculator client:load />
+</CalculatorLayout>

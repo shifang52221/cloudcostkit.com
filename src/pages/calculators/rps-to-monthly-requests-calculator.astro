@@ -1,0 +1,49 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { RpsToMonthlyRequestsCalculator } from "../../components/calculators/RpsToMonthlyRequests";
+
+const title = "RPS to Monthly Requests Calculator";
+const description =
+  "Estimate monthly request volume from RPS, utilization, and hours per day. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/rps-to-monthly-requests-calculator"
+  intro="If you think in RPS, convert to monthly requests to estimate request-based fees and plan capacity."
+  examples={[
+    "2,500 RPS at 35% utilization, 24 hours/day → estimate monthly requests.",
+  ]}
+  includes={[
+    "Monthly request estimate from RPS, utilization, and hours/day.",
+    "Useful for request-metered services (API gateways, CDNs, serverless).",
+  ]}
+  excludes={[
+    "Seasonality, bursty peak shapes, and retries (use scenarios).",
+    "Bandwidth/egress (model separately using transfer tools).",
+  ]}
+  how={[
+    "Requests per month ≈ RPS × utilization × seconds in the period.",
+    "Seconds ≈ 30.4 days × hours/day × 3600.",
+    "This is a simplified estimate: real traffic varies by seasonality and peaks."
+  ]}
+  faqs={[
+    {
+      q: "Should I use average or peak RPS?",
+      a: "Use average RPS for cost planning, and model peak separately for capacity and scaling."
+    },
+    {
+      q: "What does utilization mean here?",
+      a: "It’s how much of the time you’re near the given RPS (e.g., 30% if you’re at peak only part of the day)."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/api-request-cost-calculator", label: "API request cost" },
+    { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
+    { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+  ]}
+>
+  <RpsToMonthlyRequestsCalculator client:load />
+</CalculatorLayout>

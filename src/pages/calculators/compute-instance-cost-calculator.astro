@@ -1,0 +1,48 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
+
+const title = "Compute Instance Cost Calculator";
+const description =
+  "Estimate monthly compute cost from instance count, $/hour, and expected uptime/utilization. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/compute-instance-cost-calculator"
+  intro="For back-of-the-napkin budgeting, instance count × hourly price × billable hours gets you most of the way. This calculator estimates monthly compute cost with simple utilization inputs."
+  examples={[
+    "6 instances at $0.18/hour running 24/7 → estimate monthly compute cost.",
+  ]}
+  includes={[
+    "Monthly compute estimate from instance count, $/hour, and billable hours.",
+    "Utilization inputs for schedules and non-24/7 environments.",
+  ]}
+  excludes={[
+    "Storage, bandwidth, managed service fees, and taxes.",
+    "Autoscaling behavior and per-second billing nuances.",
+  ]}
+  how={[
+    "Billable hours per instance ≈ days per month × hours/day × utilization.",
+    "Monthly cost = instances × billable hours per instance × $/hour.",
+    "This tool excludes storage, bandwidth, and managed service surcharges."
+  ]}
+  faqs={[
+    {
+      q: "What should I use for utilization?",
+      a: "Use 100% for always-on workloads, or a lower percentage for schedules or dev/test environments."
+    },
+    {
+      q: "How do I include committed discounts?",
+      a: "Use your effective $/hour after discounts (or model break-even using the reserved vs on-demand tool)."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved break-even" },
+    { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+  ]}
+>
+  <ComputeInstanceCostCalculator client:load />
+</CalculatorLayout>

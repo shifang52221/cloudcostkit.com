@@ -1,0 +1,48 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ApiRequestCostCalculator } from "../../components/calculators/ApiRequestCost";
+
+const title = "API Request Cost Calculator";
+const description =
+  "Estimate monthly request-based charges from request volume and price per million requests. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/api-request-cost-calculator"
+  intro="Many APIs and gateways price by request count. Use this calculator to estimate monthly request cost from your volume and per‑million pricing."
+  examples={[
+    "500,000,000 requests/month at $1.00 per 1M requests ≈ $500/month.",
+  ]}
+  includes={[
+    "Request-fee estimate from requests/month and $ per 1M requests pricing.",
+    "Useful for API gateways, serverless, and request-metered services.",
+  ]}
+  excludes={[
+    "Data transfer/bandwidth costs (model separately).",
+    "Minimums, free tiers, and tiered steps unless you reflect them in inputs.",
+  ]}
+  how={[
+    "Request cost = (requests per month ÷ 1,000,000) × price per million requests.",
+    "Use your provider’s definition of billable requests and any request classes.",
+    "This tool ignores data transfer; model bandwidth separately if relevant."
+  ]}
+  faqs={[
+    {
+      q: "Should I use total requests or only billable requests?",
+      a: "Use billable requests (some providers exclude cache hits, errors, or internal calls depending on the product)."
+    },
+    {
+      q: "How do I estimate monthly requests?",
+      a: "Convert from RPS using the RPS to Monthly Requests tool, or use your analytics."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+    { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
+  ]}
+>
+  <ApiRequestCostCalculator client:load />
+</CalculatorLayout>

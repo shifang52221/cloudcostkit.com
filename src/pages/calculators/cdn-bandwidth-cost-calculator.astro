@@ -1,0 +1,57 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "CDN Bandwidth Cost Calculator";
+const description =
+  "Estimate monthly CDN bandwidth cost from GB transferred and your provider’s $/GB pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cdn-bandwidth-cost-calculator"
+  intro="CDN bandwidth charges can dominate costs for media-heavy and global traffic. Use this calculator to estimate monthly CDN bandwidth spend using your own $/GB assumptions."
+  examples={[
+    "If your CDN serves 4,000 GB/month at $0.06/GB, estimated bandwidth cost is $240/month.",
+  ]}
+  includes={[
+    "Bandwidth-only CDN cost estimate from GB/month and $/GB pricing.",
+    "Use for planning and comparing pricing tiers/regions.",
+  ]}
+  excludes={[
+    "CDN request fees (use CDN Request Cost Calculator).",
+    "Origin egress and cache fill traffic (model separately if applicable).",
+  ]}
+  how={[
+    "Monthly cost = CDN egress GB × price per GB.",
+    "Enter your provider’s effective bandwidth $/GB (consider region/tier).",
+    "This page ignores tiered steps, free allowances, and per-request fees unless you model them separately."
+  ]}
+  faqs={[
+    {
+      q: "Is CDN bandwidth the same as origin egress?",
+      a: "Not necessarily. CDN providers bill bandwidth at the edge; origin egress may be separate if the CDN pulls from your origin."
+    },
+    {
+      q: "What about request charges?",
+      a: "Many CDNs charge per request (e.g., per 10k). This calculator is bandwidth-only."
+    },
+    {
+      q: "How do I estimate GB per month?",
+      a: "You can approximate from throughput or traffic analytics. Use the Units Converter for Mbps → GB/month estimates."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Origin egress cost" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+  ]}
+>
+  <DataEgressCostCalculator
+    transferLabel="CDN bandwidth (GB / month)"
+    priceLabel="CDN price ($ / GB)"
+    defaultGbPerMonth={4000}
+    defaultPricePerGbUsd={0.06}
+  client:load />
+</CalculatorLayout>

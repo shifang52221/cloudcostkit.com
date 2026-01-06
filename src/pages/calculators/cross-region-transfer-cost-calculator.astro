@@ -1,0 +1,53 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "Cross-region Transfer Cost Calculator";
+const description =
+  "Estimate monthly cross-region transfer cost from GB transferred and your provider’s $/GB pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cross-region-transfer-cost-calculator"
+  intro="Cross-region traffic (replication, multi-region reads, DR) can generate large bills. Use this calculator to estimate monthly cross-region transfer cost using your own $/GB assumptions."
+  examples={[
+    "If you replicate 3,000 GB/month across regions at $0.02/GB, estimated transfer cost is $60/month.",
+  ]}
+  includes={[
+    "Cross-region transfer estimate from GB/month and $/GB pricing.",
+    "Useful for replication, DR, and multi-region architectures.",
+  ]}
+  excludes={[
+    "Provider-specific free tiers, discounts, and tiered steps.",
+    "Replica storage costs (model separately).",
+  ]}
+  how={[
+    "Monthly cost = cross-region GB × price per GB.",
+    "Enter your provider’s cross-region transfer price for the source/destination regions.",
+    "This page ignores free intra-zone traffic and tiering unless you reflect it in the inputs."
+  ]}
+  faqs={[
+    {
+      q: "Is cross-region transfer the same as internet egress?",
+      a: "No. Providers often price cross-region differently than public internet egress."
+    },
+    {
+      q: "Does replication count both directions?",
+      a: "Typically replication traffic is billed on the outbound side. Confirm the billing direction for your service."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
+    { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Internet egress cost" },
+  ]}
+>
+  <DataEgressCostCalculator
+    transferLabel="Cross-region transfer (GB / month)"
+    priceLabel="Cross-region price ($ / GB)"
+    defaultGbPerMonth={3000}
+    defaultPricePerGbUsd={0.02}
+  client:load />
+</CalculatorLayout>

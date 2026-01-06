@@ -1,0 +1,47 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { MetricsTimeseriesCostCalculator } from "../../components/calculators/MetricsTimeseriesCost";
+
+const title = "Metrics Time Series Cost Calculator";
+const description =
+  "Estimate monthly metrics cost from active series and $ per series‑month pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/metrics-timeseries-cost-calculator"
+  intro="Metrics platforms often charge based on the number of active time series. This calculator estimates monthly cost from your active series count and per‑series pricing."
+  examples={[
+    "50,000 active series at $0.0005 per series-month → $25/month.",
+  ]}
+  includes={[
+    "Monthly cost estimate from active time series count and per-series pricing.",
+    "Helpful for comparing metric-label cardinality tradeoffs.",
+  ]}
+  excludes={[
+    "Ingestion bytes, retention, and query fees if your provider bills those separately.",
+    "Different series definitions across vendors—use your vendor’s definition for inputs.",
+  ]}
+  how={[
+    "Monthly cost = active series × price per series-month.",
+    "Active series definitions vary by provider (labels, churn window, etc.).",
+    "Use this tool for planning and comparisons, then validate in billing docs."
+  ]}
+  faqs={[
+    {
+      q: "What counts as a time series?",
+      a: "Typically a metric name + a unique set of labels/tags. The exact definition depends on the platform."
+    },
+    {
+      q: "How do I reduce series count?",
+      a: "Reduce high-cardinality labels, drop noisy metrics, and aggregate where possible."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
+  ]}
+>
+  <MetricsTimeseriesCostCalculator client:load />
+</CalculatorLayout>

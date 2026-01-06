@@ -1,0 +1,47 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { StorageReplicationCostCalculator } from "../../components/calculators/StorageReplicationCost";
+
+const title = "Storage Replication Cost Calculator";
+const description =
+  "Estimate monthly storage replication cost from replicated GB and price per GB. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/storage-replication-cost-calculator"
+  intro="Replication and multi-region storage can add meaningful transfer or feature charges. Use this tool to estimate monthly replication cost from replicated GB and your pricing assumption."
+  examples={[
+    "2,500 GB/month replicated at $0.02/GB → $50/month (transfer/feature fee estimate).",
+  ]}
+  includes={[
+    "Replication cost estimate from replicated GB/month and a $/GB pricing assumption.",
+    "Works for cross-region replication, backup copy traffic, or sync workloads.",
+  ]}
+  excludes={[
+    "Replica storage costs (model separately).",
+    "Provider-specific billing rules for replication direction and minimum charges.",
+  ]}
+  how={[
+    "Monthly cost = replicated GB per month × price per GB.",
+    "Replication may be billed as cross-region transfer, a per‑GB feature fee, or both depending on product.",
+    "This tool is a simplified estimate; validate billing details in provider docs."
+  ]}
+  faqs={[
+    {
+      q: "Should I use total stored GB or changed GB?",
+      a: "Use the GB that actually replicates per month (often driven by writes/changes, not the entire dataset)."
+    },
+    {
+      q: "Does this include extra storage in the replica region?",
+      a: "No. Model replica storage separately using object storage or database storage tools."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer" },
+    { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
+  ]}
+>
+  <StorageReplicationCostCalculator client:load />
+</CalculatorLayout>

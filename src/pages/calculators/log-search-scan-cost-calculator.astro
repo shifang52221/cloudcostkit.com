@@ -1,0 +1,48 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogSearchScanCostCalculator } from "../../components/calculators/LogSearchScanCost";
+
+const title = "Log Search Scan Cost Calculator";
+const description =
+  "Estimate monthly log scan charges from GB scanned per day and price per GB. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/log-search-scan-cost-calculator"
+  intro="Some log products charge for data scanned during queries. This calculator estimates monthly scan cost using your daily scanned GB and per‑GB scan price."
+  examples={[
+    "800 GB/day scanned at $0.005/GB → ~24,320 GB scanned/month and ~$122/month.",
+  ]}
+  includes={[
+    "Scan cost estimate from GB scanned per day and $/GB scan pricing.",
+    "Useful when query scans are a meaningful line item on your log bill.",
+  ]}
+  excludes={[
+    "Ingestion charges and retention storage (model separately).",
+    "Provider-specific query minimums, caching, and index behavior.",
+  ]}
+  how={[
+    "Monthly scanned GB ≈ GB scanned per day × 30.4.",
+    "Scan cost = monthly scanned GB × scan price per GB.",
+    "This tool is scan-only (not ingestion or retention)."
+  ]}
+  faqs={[
+    {
+      q: "How do I estimate GB scanned per day?",
+      a: "Use provider query/scan metrics, or approximate from typical query patterns and dataset size."
+    },
+    {
+      q: "How do I reduce scan costs?",
+      a: "Limit time ranges, reduce unstructured fields, partition logs, and index only what you query."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
+    { href: "/calculators/log-retention-storage-cost-calculator", label: "Log retention storage" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+  ]}
+>
+  <LogSearchScanCostCalculator client:load />
+</CalculatorLayout>

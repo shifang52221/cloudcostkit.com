@@ -1,0 +1,53 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ObjectStorageCostCalculator } from "../../components/calculators/ObjectStorageCost";
+
+const title = "Object Storage Cost Calculator";
+const description =
+  "Estimate monthly object storage cost from stored GB and request volume (GET/PUT) with customizable per-1k pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/object-storage-cost-calculator"
+  intro="Object storage costs usually come from stored data and request volume. Use this calculator to estimate the blended monthly cost with your workload assumptions."
+  examples={[
+    "5,000 GB stored, plus 5M GET and 500k PUT requests at your request pricing → estimate monthly cost.",
+  ]}
+  includes={[
+    "Storage cost estimate from average GB stored and $/GB-month pricing.",
+    "Request cost estimate for GET and PUT from request counts and per‑1k pricing.",
+  ]}
+  excludes={[
+    "Retrieval fees, lifecycle transitions, replication, and tiered pricing (model separately).",
+    "Bandwidth/egress charges (use Data Egress Cost Calculator).",
+  ]}
+  how={[
+    "Storage cost = average stored GB × storage price per GB-month.",
+    "Request cost = (requests ÷ 1,000) × price per 1,000 for each request type.",
+    "This simplified model excludes retrieval fees, lifecycle transitions, replication, and tiered pricing."
+  ]}
+  faqs={[
+    {
+      q: "Why use average stored GB?",
+      a: "Billing is typically per GB-month. If your storage grows over the month, use the average (midpoint) rather than the end-of-month number."
+    },
+    {
+      q: "Do egress costs belong here?",
+      a: "Not in this tool. Use the Data Egress Cost Calculator for bandwidth-based costs."
+    },
+    {
+      q: "What about different storage classes?",
+      a: "Different classes (standard, infrequent access, archive) can have different storage, request, and retrieval pricing. Model each class separately if needed."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
+    { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
+    { href: "/calculators/database-storage-growth-cost-calculator", label: "DB storage growth" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+  ]}
+>
+  <ObjectStorageCostCalculator client:load />
+</CalculatorLayout>

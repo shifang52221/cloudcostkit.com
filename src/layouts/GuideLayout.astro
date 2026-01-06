@@ -1,0 +1,47 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { SITE } from "../config/site";
+
+type Props = {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  lastUpdated: string;
+};
+
+const { title, description, canonicalPath, lastUpdated } = Astro.props;
+const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
+const canonical = new URL(canonicalPath, siteUrl).toString();
+const guideIndexUrl = new URL("/guides", siteUrl).toString();
+
+const breadcrumbSchema = {
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: new URL("/", siteUrl).toString() },
+    { "@type": "ListItem", position: 2, name: "Guides", item: guideIndexUrl },
+    { "@type": "ListItem", position: 3, name: title, item: canonical },
+  ],
+};
+
+const articleSchema = {
+  "@type": "Article",
+  headline: title,
+  description,
+  dateModified: lastUpdated,
+  mainEntityOfPage: canonical,
+  publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+};
+---
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath}>
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify({ "@context": "https://schema.org", "@graph": [breadcrumbSchema, articleSchema] })}
+  />
+  <article class="card section prose">
+    <h1 style="margin-top:0">{title}</h1>
+    <slot />
+    <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
+    <div class="muted">Last updated: {lastUpdated}</div>
+  </article>
+</BaseLayout>

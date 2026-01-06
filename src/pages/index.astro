@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+import { TOOLS } from "../lib/tools";
+import AdSlot from "../components/AdSlot.astro";
+
+const title = `${SITE.name} | Cloud cost & capacity calculators`;
+const description =
+  "Fast, free cloud calculators for egress, logs, object storage, Kubernetes requests, and commitment break-even. Transparent assumptions. No signup.";
+
+const featuredSlugs = [
+  "data-egress-cost-calculator",
+  "log-ingestion-cost-calculator",
+  "object-storage-cost-calculator",
+  "kubernetes-requests-limits-calculator",
+  "reserved-vs-on-demand-break-even-calculator",
+  "unit-converter",
+];
+
+const featured = TOOLS.filter((t) => featuredSlugs.includes(t.slug));
+const slots = SITE.adsenseSlots;
+---
+<BaseLayout title={title} description={description} canonicalPath="/">
+  <section class="card hero">
+    <span class="pill">Cloud • FinOps • DevOps</span>
+    <h1>Cloud cost & capacity calculators</h1>
+    <p>
+      Estimate egress, logs, storage, and Kubernetes capacity with clear assumptions. Use this site to compare scenarios
+      and plan budgets.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/calculators">Browse tools</a>
+      <a class="btn" href="/guides">Read guides</a>
+      <a class="btn" href="/about">About</a>
+      <a class="btn" href="/cookie-notice">Cookie preferences</a>
+    </div>
+  </section>
+
+  <section class="card section">
+    <h2 style="margin:0 0 12px">Featured tools</h2>
+    <div class="grid">
+      {featured.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+          <div class="muted" style="font-size:12px; margin-top:4px">{t.category}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <h2 style="margin:0 0 12px">Guides</h2>
+    <div class="grid">
+      <a class="card2 tool col-6" href="/guides/egress-costs">
+        <div class="tool-title">Understanding egress costs</div>
+        <div class="tool-desc">How to estimate bandwidth and avoid billing surprises.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/log-costs">
+        <div class="tool-title">Estimating log costs</div>
+        <div class="tool-desc">Ingestion vs retention, steady state, and knobs that matter.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <div class="card section prose col-6">
+      <h2 style="margin-top:0">What these tools are for</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Budgeting: get quick back-of-the-napkin estimates.</li>
+        <li>Comparisons: evaluate regions, tiers, and workload shapes.</li>
+        <li>Right-sizing: translate app requirements into capacity numbers.</li>
+      </ul>
+    </div>
+    <div class="card section prose col-6">
+      <h2 style="margin-top:0">What to verify</h2>
+      <p class="muted" style="margin:10px 0 0">
+        Provider pricing varies by region, tiers, free allowances, request classes, and rounding rules. Always confirm
+        assumptions in official docs before committing spend.
+      </p>
+      <p class="muted" style="margin:10px 0 0">
+        Questions or feedback: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.homeMid} minHeight={280} />
+  </section>
+</BaseLayout>

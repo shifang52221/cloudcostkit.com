@@ -1,0 +1,47 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { DatabaseStorageGrowthCostCalculator } from "../../components/calculators/DatabaseStorageGrowth";
+
+const title = "Database Storage Growth Cost Calculator";
+const description =
+  "Estimate database storage growth over time and the average monthly cost from starting size, daily growth, and $/GB-month pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/database-storage-growth-cost-calculator"
+  intro="If your database grows steadily, average GB over a month is often a better cost estimate than the end-of-month number. This tool estimates growth and the implied average monthly storage cost."
+  examples={[
+    "Starting 500 GB and growing 5 GB/day over 6 months → estimate ending size and average monthly cost.",
+  ]}
+  includes={[
+    "Ending size estimate using a linear growth assumption.",
+    "Average size estimate and implied average monthly storage cost.",
+  ]}
+  excludes={[
+    "Non-linear growth, compaction, and retention policies that change growth rate.",
+    "Replica/index/storage-class multipliers unless you model them in effective GB.",
+  ]}
+  how={[
+    "Ending GB ≈ starting GB + (growth GB/day × days).",
+    "Average GB ≈ (starting + ending) ÷ 2 (linear growth assumption).",
+    "Estimated monthly cost ≈ average GB × storage price per GB-month."
+  ]}
+  faqs={[
+    {
+      q: "Is growth really linear?",
+      a: "Not always. Use this as a planning approximation, and update with real metrics over time."
+    },
+    {
+      q: "Should I include indexes and replicas?",
+      a: "Yes, if your provider bills them separately. You can increase the effective storage GB or model components separately."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
+    { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
+  ]}
+>
+  <DatabaseStorageGrowthCostCalculator client:load />
+</CalculatorLayout>

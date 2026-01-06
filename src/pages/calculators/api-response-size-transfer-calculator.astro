@@ -1,0 +1,48 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ApiResponseTransferCalculator } from "../../components/calculators/ApiResponseTransfer";
+
+const title = "API Response Size Transfer Calculator";
+const description =
+  "Estimate monthly transfer volume from daily request count and average API response size. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/api-response-size-transfer-calculator"
+  intro="If you know your request volume and typical response size, you can estimate transfer and then model egress/CDN cost."
+  examples={[
+    "2,000,000 requests/day with 15 KB average responses ≈ ~870 GB/month (estimate).",
+  ]}
+  includes={[
+    "Monthly transfer estimate from requests/day and average response KB.",
+    "Useful for quick egress/CDN planning and cost comparisons.",
+  ]}
+  excludes={[
+    "Protocol overhead, retries, uploads, and request headers.",
+    "Compression differences between endpoints (model with your average KB).",
+  ]}
+  how={[
+    "Requests per month ≈ requests/day × 30.4.",
+    "Monthly transfer (GB) ≈ requests/month × average response KB ÷ 1024 ÷ 1024.",
+    "This estimate ignores protocol overhead and retries."
+  ]}
+  faqs={[
+    {
+      q: "Should I use compressed or uncompressed size?",
+      a: "Use the typical size over the wire (compressed) to better estimate bandwidth."
+    },
+    {
+      q: "Does this include uploads?",
+      a: "No. This models response payloads. If uploads are significant, model them separately."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
+    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+  ]}
+>
+  <ApiResponseTransferCalculator client:load />
+</CalculatorLayout>

@@ -1,0 +1,49 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { UnitConverterCalculator } from "../../components/calculators/UnitConverter";
+
+const title = "Cloud Units Converter";
+const description =
+  "Convert GB↔GiB and Mbps↔MB/s, plus estimate monthly transfer from throughput, utilization, and hours/day. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/unit-converter"
+  intro="Cloud pricing and dashboards mix decimal and binary units. This page converts common storage and bandwidth units and helps estimate monthly transfer from throughput."
+  examples={[
+    "1,000 GB ≈ 931.32 GiB.",
+    "100 Mbps at 30% utilization over 24h/day ≈ monthly transfer estimate (GB/month).",
+  ]}
+  includes={[
+    "GB↔GiB and Mbps↔MB/s conversions.",
+    "Throughput → monthly transfer estimate for planning.",
+  ]}
+  excludes={[
+    "Protocol overhead and peak/diurnal patterns (use scenarios).",
+    "Provider-specific billing unit rounding rules.",
+  ]}
+  how={[
+    "GB↔GiB uses 1 GiB = 1.073741824 GB.",
+    "Mbps↔MB/s uses 8 bits = 1 byte.",
+    "Monthly transfer estimate multiplies throughput by utilization and time."
+  ]}
+  faqs={[
+    {
+      q: "Do providers bill GB or GiB?",
+      a: "Many providers bill decimal GB/TB, while OS tools often show GiB/TiB. Always check the billing unit in documentation."
+    },
+    {
+      q: "Is the monthly transfer estimate exact?",
+      a: "No. It’s a simplified estimate. Real workloads vary by peak/off-peak patterns and protocol overhead."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/guides/egress-costs", label: "Guide: egress costs" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+  ]}
+>
+  <UnitConverterCalculator client:load />
+</CalculatorLayout>

@@ -1,0 +1,50 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { SITE } from "../../config/site";
+
+const title = "Understanding cloud egress costs";
+const description =
+  "A practical guide to estimating egress: units, where bandwidth shows up, and common billing pitfalls.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/egress-costs" lastUpdated="2026-01-06">
+  <p class="muted">
+    Egress is the data your cloud sends out. For many products, egress is the “silent” line item that grows with usage.
+    This guide helps you estimate egress quickly and avoid common surprises.
+  </p>
+
+  <h2>1) Identify what kind of transfer you have</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: data leaving your provider to end users.</li>
+    <li><strong>Cross-region transfer</strong>: replication, multi-region reads, DR traffic.</li>
+    <li><strong>CDN bandwidth</strong>: edge delivery (may be priced separately from origin egress).</li>
+  </ul>
+
+  <h2>2) Pick the right unit</h2>
+  <p>
+    Billing is often in decimal GB/TB, while OS tools might show GiB/TiB. Convert before estimating costs.
+    Use the <a href="/calculators/unit-converter">Units Converter</a> if you’re unsure.
+  </p>
+
+  <h2>3) Estimate GB per month (quick methods)</h2>
+  <ul>
+    <li><strong>From analytics</strong>: use your CDN/origin dashboards for “bytes sent”.</li>
+    <li><strong>From API volume</strong>: requests/day × average response KB → GB/month (use the API tool).</li>
+    <li><strong>From throughput</strong>: Mbps × utilization × time → GB/month (use Units Converter).</li>
+  </ul>
+
+  <h2>4) Model cost with simple assumptions first</h2>
+  <p>
+    Start with “GB/month × $/GB”. You can refine later for tiering and free allowances. Tools:
+    <a href="/calculators/data-egress-cost-calculator"> Egress</a>,
+    <a href="/calculators/cdn-bandwidth-cost-calculator"> CDN bandwidth</a>,
+    <a href="/calculators/cross-region-transfer-cost-calculator"> cross-region</a>.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Tiered pricing: your average $/GB changes as traffic grows.</li>
+    <li>Double counting: CDN bandwidth may not equal origin egress.</li>
+    <li>Replication direction: some services bill only outbound, others have nuances.</li>
+  </ul>
+</GuideLayout>
+

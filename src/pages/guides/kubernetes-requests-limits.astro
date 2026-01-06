@@ -1,0 +1,42 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Kubernetes requests & limits: practical sizing";
+const description =
+  "How to size clusters from requests, choose allocatable headroom, and interpret limits for burst risk.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/kubernetes-requests-limits"
+  lastUpdated="2026-01-06"
+>
+  <p class="muted">
+    Scheduling is based on <strong>requests</strong>. That’s why most capacity planning starts with requests and then
+    uses limits to reason about burst and risk.
+  </p>
+
+  <h2>1) Requests drive node count</h2>
+  <p>
+    A simple approach: total requests = pods × per-pod request. Then divide by allocatable per node. Our calculator does
+    that and takes the larger of CPU-based and memory-based counts.
+  </p>
+
+  <h2>2) Leave allocatable headroom</h2>
+  <p>
+    Nodes aren’t 100% allocatable. System overhead, daemonsets, and kubelet reservations reduce usable capacity. Planning
+    with 85–95% allocatable is common depending on your environment.
+  </p>
+
+  <h2>3) Limits matter for burst behavior</h2>
+  <ul>
+    <li>CPU limits can throttle bursts.</li>
+    <li>Memory limits can lead to OOM kills if pods exceed limits.</li>
+  </ul>
+
+  <h2>Tool</h2>
+  <p>
+    <a href="/calculators/kubernetes-requests-limits-calculator">Kubernetes requests & limits calculator</a>
+  </p>
+</GuideLayout>
+

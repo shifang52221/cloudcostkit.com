@@ -1,0 +1,63 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogIngestionCostCalculator } from "../../components/calculators/LogIngestionCost";
+
+const title = "Log Ingestion Cost Calculator";
+const description =
+  "Estimate monthly log ingestion and retention cost from GB/day, retention days, and per-GB pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/log-ingestion-cost-calculator"
+  intro="Log platforms often charge for ingestion and for retained storage. This calculator uses a simple steady-state model so you can compare scenarios and retention policies."
+  examples={[
+    "50 GB/day ingestion, 30-day retention, $0.50/GB ingest and $0.03/GB-month storage → estimate total monthly cost.",
+  ]}
+  includes={[
+    "Ingestion cost estimate from GB/day and $/GB.",
+    "Retention storage estimate via steady-state GB/day × retention days and $/GB-month pricing.",
+  ]}
+  excludes={[
+    "Indexing, compression differences, and tiered/query-specific charges (model separately).",
+    "Per-event pricing and specialized log classes.",
+  ]}
+  how={[
+    "Monthly ingestion GB ≈ GB/day × 30.4.",
+    "Ingest cost = monthly ingestion GB × ingest price per GB.",
+    "Stored volume (steady state) ≈ GB/day × retention days, then storage cost = stored GB × storage price per GB-month."
+  ]}
+  faqs={[
+    {
+      q: "Why is storage modeled as GB/day × retention?",
+      a: "In steady state with a fixed retention window, the retained dataset is roughly the last N days of logs."
+    },
+    {
+      q: "What about compression and indexing?",
+      a: "Providers may bill on compressed size, ingested size, indexed subset, or scanned bytes. Enter prices that match your provider’s billing model."
+    },
+    {
+      q: "Is 30.4 days accurate?",
+      a: "It’s an average month length. For a specific billing cycle, adjust by changing your GB/day or your per-GB assumptions."
+    }
+  ]}
+  lastUpdated="2026-01-06"
+  related={[
+    { href: "/calculators/log-retention-storage-cost-calculator", label: "Log retention storage" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
+    { href: "/calculators/metrics-timeseries-cost-calculator", label: "Metrics series cost" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+  ]}
+>
+  <LogIngestionCostCalculator client:load />
+
+  <div class="prose" style="margin-top:16px">
+    <h2 style="margin:0 0 10px">Practical knobs</h2>
+    <ul class="muted" style="margin:0; padding-left:18px">
+      <li>Reduce volume: drop debug logs, sample high-volume events, or move verbose logs to cheaper storage.</li>
+      <li>Shorten hot retention and archive cold data to object storage.</li>
+      <li>Index selectively: keep full logs, index only what you query.</li>
+    </ul>
+
+  </div>
+</CalculatorLayout>

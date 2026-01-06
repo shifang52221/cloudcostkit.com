@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+
+const title = `Contact | ${SITE.name}`;
+const description = "Contact CloudCostKit.";
+---
+<BaseLayout title={title} description={description} canonicalPath="/contact">
+  <section class="card hero">
+    <h1>Contact</h1>
+    <p>Questions, feedback, or tool requests.</p>
+  </section>
+
+  <section class="card section prose">
+    <p class="muted" style="margin:0">
+      Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+    </p>
+  </section>
+</BaseLayout>
+
