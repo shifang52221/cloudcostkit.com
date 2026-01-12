@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { SITE } from "../config/site";
+import { withTrailingSlash } from "../lib/url";
 import AdSenseScript from "../components/AdSenseScript.astro";
 import Ga4Script from "../components/Ga4Script.astro";
 import ConsentBanner from "../components/ConsentBanner.astro";
@@ -13,9 +14,10 @@ type Props = {
 
 const { title, description, canonicalPath } = Astro.props;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
-const canonical = canonicalPath ? new URL(canonicalPath, siteUrl).toString() : undefined;
+const normalizedCanonicalPath = canonicalPath ? withTrailingSlash(canonicalPath) : undefined;
+const canonical = normalizedCanonicalPath ? new URL(normalizedCanonicalPath, siteUrl).toString() : undefined;
 const ogImage = new URL("/og.svg", siteUrl).toString();
-const showConsentBanner = canonicalPath !== "/cookie-notice";
+const showConsentBanner = normalizedCanonicalPath !== "/cookie-notice/";
 ---
 <!doctype html>
 <html lang="en">
@@ -62,11 +64,11 @@ const showConsentBanner = canonicalPath !== "/cookie-notice";
             <img class="brand-logo" src="/logo.svg" alt={`${SITE.name} logo`} width="168" height="32" />
           </a>
           <nav class="nav" aria-label="Primary">
-            <a href="/calculators">Tools</a>
-            <a href="/guides">Guides</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-            <a href="/privacy-policy">Privacy</a>
+            <a href="/calculators/">Tools</a>
+            <a href="/guides/">Guides</a>
+            <a href="/about/">About</a>
+            <a href="/contact/">Contact</a>
+            <a href="/privacy-policy/">Privacy</a>
           </nav>
         </div>
       </header>
@@ -79,10 +81,10 @@ const showConsentBanner = canonicalPath !== "/cookie-notice";
         <div class="footer-inner">
           <div class="footer-meta">Educational use only. Not legal, financial, or professional advice.</div>
           <nav class="footer-links" aria-label="Footer">
-            <a href="/terms">Terms</a>
-            <a href="/privacy-policy">Privacy Policy</a>
-            <a href="/cookie-notice">Cookie Notice</a>
-            <a href="/contact">Contact</a>
+            <a href="/terms/">Terms</a>
+            <a href="/privacy-policy/">Privacy Policy</a>
+            <a href="/cookie-notice/">Cookie Notice</a>
+            <a href="/contact/">Contact</a>
           </nav>
         </div>
       </footer>

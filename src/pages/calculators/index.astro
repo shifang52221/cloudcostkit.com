@@ -54,7 +54,7 @@ const slots = SITE.adsenseSlots;
           {tools.map((t) => (
             <a
               class="card2 tool col-6 tool-card"
-              href={`/calculators/${t.slug}`}
+              href={`/calculators/${t.slug}/`}
               data-category={t.category}
               data-title={t.title}
               data-desc={t.description}
@@ -78,8 +78,8 @@ const slots = SITE.adsenseSlots;
     <details class="card2" style="padding:12px; margin:10px 0">
       <summary style="cursor:pointer; font-weight:800">Do you store my inputs?</summary>
       <div class="muted" style="margin-top:8px">
-        Calculations run in your browser. See <a href="/privacy-policy">Privacy Policy</a> and{" "}
-        <a href="/cookie-notice">Cookie Notice</a>.
+        Calculations run in your browser. See <a href="/privacy-policy/">Privacy Policy</a> and{" "}
+        <a href="/cookie-notice/">Cookie Notice</a>.
       </div>
     </details>
     <details class="card2" style="padding:12px; margin:10px 0">
@@ -179,4 +179,3 @@ const slots = SITE.adsenseSlots;
     })();
   </script>
 </BaseLayout>
-

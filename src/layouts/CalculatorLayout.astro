@@ -2,6 +2,7 @@
 import BaseLayout from "./BaseLayout.astro";
 import AdSlot from "../components/AdSlot.astro";
 import { SITE } from "../config/site";
+import { withTrailingSlash } from "../lib/url";
 
 type FAQ = { q: string; a: string };
 type RelatedLink = { href: string; label: string };
@@ -35,8 +36,9 @@ const {
 } = Astro.props;
 const slots = SITE.adsenseSlots;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
-const canonical = new URL(canonicalPath, siteUrl).toString();
-const toolIndexUrl = new URL("/calculators", siteUrl).toString();
+const normalizedCanonicalPath = withTrailingSlash(canonicalPath);
+const canonical = new URL(normalizedCanonicalPath, siteUrl).toString();
+const toolIndexUrl = new URL("/calculators/", siteUrl).toString();
 const breadcrumbSchema = {
   "@type": "BreadcrumbList",
   itemListElement: [
@@ -59,7 +61,7 @@ const faqSchema =
     : null;
 const schemas = [breadcrumbSchema, faqSchema].filter(Boolean);
 ---
-<BaseLayout title={title} description={description} canonicalPath={canonicalPath}>
+<BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath}>
   {schemas.length ? (
     <script
       type="application/ld+json"
@@ -137,7 +139,7 @@ const schemas = [breadcrumbSchema, faqSchema].filter(Boolean);
       <h2 style="margin-top:0">Related tools</h2>
       <div class="btn-row" style="margin-top:0">
         {related.map((r) => (
-          <a class="btn" href={r.href}>
+          <a class="btn" href={withTrailingSlash(r.href)}>
             {r.label}
           </a>
         ))}
