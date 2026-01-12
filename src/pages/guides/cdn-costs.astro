@@ -1,0 +1,76 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CDN Costs Explained (Bandwidth, Requests, Origin Egress)";
+const description =
+  "A practical CDN cost breakdown: what you pay for bandwidth, request fees, cache fill, and origin egress. Includes simple estimation steps and common pitfalls.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/cdn-costs" lastUpdated="2026-01-12">
+  <p>
+    CDNs are usually priced around two big buckets: <strong>bandwidth</strong> (GB delivered from edge to users) and
+    <strong>requests</strong> (how many HTTP requests your users make). Many teams underestimate the third bucket:
+    <strong>origin egress</strong> (bytes your origin sends to the CDN during cache fill and misses).
+  </p>
+
+  <h2>What to include in a CDN cost estimate</h2>
+  <ul>
+    <li><strong>Edge bandwidth (GB/month)</strong>: traffic delivered to end users.</li>
+    <li><strong>Request fees (requests/month)</strong>: billed per 10k or per million requests on some plans.</li>
+    <li><strong>Origin egress</strong>: bytes from your origin to the CDN (cache misses, fills, prefetch).</li>
+    <li><strong>Optional line items</strong>: logs/analytics, WAF/bot, image/video optimization, invalidations.</li>
+  </ul>
+
+  <h2>Fast estimation workflow (5 minutes)</h2>
+  <ol>
+    <li>
+      Estimate <strong>bandwidth GB/month</strong> from CDN analytics (best) or from throughput using the{" "}
+      <a href="/calculators/unit-converter/">Units Converter</a>.
+    </li>
+    <li>
+      Estimate <strong>requests/month</strong> from CDN analytics (best) or from RPS using{" "}
+      <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
+    </li>
+    <li>
+      Price bandwidth with the <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN Bandwidth Cost Calculator</a>.
+    </li>
+    <li>
+      Price request fees with the <a href="/calculators/cdn-request-cost-calculator/">CDN Request Cost Calculator</a>.
+    </li>
+    <li>
+      If you pay for origin egress, model it separately with{" "}
+      <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost Calculator</a>.
+    </li>
+  </ol>
+
+  <h2>Common pitfalls (why estimates are off)</h2>
+  <ul>
+    <li>
+      <strong>Cache hit rate confusion</strong>: cache hit rate reduces origin egress, but edge bandwidth to users is
+      still edge bandwidth.
+    </li>
+    <li>
+      <strong>Tiered pricing</strong>: many CDNs have tiers by region and volume. If you don't know distribution, use a
+      blended $/GB and sanity-check multiple scenarios.
+    </li>
+    <li>
+      <strong>Dynamic traffic</strong>: APIs and personalized pages can increase request fees even when bandwidth is
+      modest.
+    </li>
+    <li>
+      <strong>Large objects</strong>: video and large downloads can dominate bandwidth even with low request volume.
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
+  </div>
+
+  <p class="muted" style="margin-top:14px">
+    Educational use only. Always confirm billable units (GB vs GiB, request classes, and regional pricing) in your CDN's
+    pricing docs before making commitments.
+  </p>
+</GuideLayout>

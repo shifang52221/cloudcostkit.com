@@ -12,7 +12,8 @@ const description =
   canonicalPath="/calculators/kubernetes-requests-limits-calculator"
   intro="Requests drive scheduling. This tool converts per-pod requests into cluster totals and estimates how many nodes you need for those requests given an allocatable overhead."
   examples={[
-    "60 pods with 250m CPU and 512Mi requests → estimate total requests and node count for an 8 vCPU / 32 GiB node.",
+    "60 pods with 250m CPU and 512Mi requests -> estimate total requests and node count for an 8 vCPU / 32 GiB node.",
+    "120 pods with 100m CPU and 256Mi requests -> see whether CPU or memory is the limiting factor.",
   ]}
   includes={[
     "Totals for CPU/memory requests and limits from per-pod values and pod count.",
@@ -23,8 +24,8 @@ const description =
     "Network, storage, and control plane costs.",
   ]}
   how={[
-    "Total requests = pods × per-pod request (CPU and memory).",
-    "Allocatable per node = node capacity × allocatable percentage.",
+    "Total requests = pods x per-pod request (CPU and memory).",
+    "Allocatable per node = node capacity x allocatable percentage.",
     "Node estimate uses the larger of CPU-based and memory-based counts."
   ]}
   faqs={[
@@ -34,15 +35,24 @@ const description =
     },
     {
       q: "What should I use for allocatable %?",
-      a: "A common planning value is 85–95% depending on kubelet/system reservations, daemonsets, and headroom."
+      a: "A common planning value is 85-95% depending on kubelet/system reservations, daemonsets, and headroom."
     },
     {
       q: "Does this include per-node overhead like daemonsets?",
       a: "Not explicitly. Use a lower allocatable % or increase requests to account for overhead."
+    },
+    {
+      q: "What about cluster autoscaler and bin packing?",
+      a: "This tool is a quick estimate. Real scheduling constraints (max pods per node, affinities, daemonsets) can increase node count. Treat the result as a floor and validate with real packing."
+    },
+    {
+      q: "How do I turn this into a cost estimate?",
+      a: "Use the resulting node count with the Kubernetes Node Cost Calculator, and add control plane, load balancers, storage, and observability costs separately."
     }
   ]}
   lastUpdated="2026-01-06"
   related={[
+    { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost calculator" },
     { href: "/guides/kubernetes-requests-limits", label: "Guide: requests & limits" },
     { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },

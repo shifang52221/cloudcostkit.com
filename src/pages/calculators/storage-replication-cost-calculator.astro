@@ -12,7 +12,8 @@ const description =
   canonicalPath="/calculators/storage-replication-cost-calculator"
   intro="Replication and multi-region storage can add meaningful transfer or feature charges. Use this tool to estimate monthly replication cost from replicated GB and your pricing assumption."
   examples={[
-    "2,500 GB/month replicated at $0.02/GB → $50/month (transfer/feature fee estimate).",
+    "2,500 GB/month replicated at $0.02/GB -> $50/month (transfer/feature fee estimate).",
+    "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at $0.01/GB -> about $15/month (replication fee only).",
   ]}
   includes={[
     "Replication cost estimate from replicated GB/month and a $/GB pricing assumption.",
@@ -20,12 +21,13 @@ const description =
   ]}
   excludes={[
     "Replica storage costs (model separately).",
-    "Provider-specific billing rules for replication direction and minimum charges.",
+    "Provider-specific billing rules for replication direction, request pricing, and minimum charges.",
   ]}
   how={[
-    "Monthly cost = replicated GB per month × price per GB.",
-    "Replication may be billed as cross-region transfer, a per‑GB feature fee, or both depending on product.",
-    "This tool is a simplified estimate; validate billing details in provider docs."
+    "Monthly cost = replicated GB per month x price per GB.",
+    "Use the GB that actually changes/copies per month (often driven by writes, not the full dataset size).",
+    "Replication may be billed as cross-region transfer, a per-GB feature fee, or both depending on product.",
+    "Add replica storage, request fees, and any origin egress separately if you pay them."
   ]}
   faqs={[
     {
@@ -35,10 +37,23 @@ const description =
     {
       q: "Does this include extra storage in the replica region?",
       a: "No. Model replica storage separately using object storage or database storage tools."
+    },
+    {
+      q: "Is replication billed one-way or both ways?",
+      a: "It depends on the product. Many replication features bill for data copied out of the source region only. Check provider docs for directionality."
+    },
+    {
+      q: "Do I need to include request costs?",
+      a: "Sometimes. Replication can increase PUT/GET or list operations and those may be billed. If requests are material for your workload, estimate them in the object storage calculator."
+    },
+    {
+      q: "How can I estimate changed GB per month?",
+      a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput."
     }
   ]}
   lastUpdated="2026-01-06"
   related={[
+    { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer" },
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
   ]}

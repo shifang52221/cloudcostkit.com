@@ -12,19 +12,20 @@ const description =
   canonicalPath="/calculators/object-storage-cost-calculator"
   intro="Object storage costs usually come from stored data and request volume. Use this calculator to estimate the blended monthly cost with your workload assumptions."
   examples={[
-    "5,000 GB stored, plus 5M GET and 500k PUT requests at your request pricing → estimate monthly cost.",
+    "5,000 GB stored, plus 5M GET and 500k PUT requests at your request pricing -> estimate monthly cost.",
+    "20 TB stored with low request volume -> storage dominates; requests are usually a rounding error.",
   ]}
   includes={[
     "Storage cost estimate from average GB stored and $/GB-month pricing.",
-    "Request cost estimate for GET and PUT from request counts and per‑1k pricing.",
+    "Request cost estimate for GET and PUT from request counts and per-1k pricing.",
   ]}
   excludes={[
     "Retrieval fees, lifecycle transitions, replication, and tiered pricing (model separately).",
     "Bandwidth/egress charges (use Data Egress Cost Calculator).",
   ]}
   how={[
-    "Storage cost = average stored GB × storage price per GB-month.",
-    "Request cost = (requests ÷ 1,000) × price per 1,000 for each request type.",
+    "Storage cost = average stored GB x storage price per GB-month.",
+    "Request cost = (requests / 1,000) x price per 1,000 for each request type.",
     "This simplified model excludes retrieval fees, lifecycle transitions, replication, and tiered pricing."
   ]}
   faqs={[
@@ -39,10 +40,19 @@ const description =
     {
       q: "What about different storage classes?",
       a: "Different classes (standard, infrequent access, archive) can have different storage, request, and retrieval pricing. Model each class separately if needed."
+    },
+    {
+      q: "How do I estimate replication or cross-region copy costs?",
+      a: "Replication/copy can add per-GB and/or transfer fees, plus extra replica storage. Use the Storage Replication calculator for the replication fee and add replica storage here as another line item."
+    },
+    {
+      q: "Do small objects increase cost?",
+      a: "Many small objects often increase request volume (PUT/LIST/GET), which can increase request fees. If you store millions of small objects, request costs can become material."
     }
   ]}
   lastUpdated="2026-01-06"
   related={[
+    { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
     { href: "/calculators/database-storage-growth-cost-calculator", label: "DB storage growth" },
