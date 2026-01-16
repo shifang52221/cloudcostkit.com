@@ -38,7 +38,7 @@ const client = SITE.adsenseClient?.trim();
         if (!ins) return;
         try {
           var c = window.localStorage.getItem("consent.v1");
-          if (c === "declined") ins.setAttribute("data-npa", "1");
+          if (c !== "accepted") ins.setAttribute("data-npa", "1");
         } catch {}
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       })();

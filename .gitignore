@@ -3,6 +3,10 @@ dist/
 .astro/
 .vercel/
 
+.env
+.env.*
+!.env.example
+
 *.log
 dev.out.log
 dev.err.log

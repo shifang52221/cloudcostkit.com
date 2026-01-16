@@ -1,0 +1,4 @@
+# ads.txt for CloudCostKit
+# https://cloudcostkit.com/ads.txt
+google.com, pub-8677561632094995, DIRECT, f08c47fec0942fa0
+
