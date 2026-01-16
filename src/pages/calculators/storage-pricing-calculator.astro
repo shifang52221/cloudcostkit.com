@@ -1,0 +1,79 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ObjectStorageCostCalculator } from "../../components/calculators/ObjectStorageCost";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "Storage Pricing Calculator";
+const description =
+  "Estimate object storage pricing (S3-like) from stored GB, request volume, and optional egress assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/storage-pricing-calculator"
+  intro="Object storage pricing usually comes from three buckets: (1) stored GB (GB-month), (2) request fees (GET/PUT/LIST), and (3) data egress. This page helps you estimate the first two directly, plus a simple egress estimate if you want a fuller picture."
+  examples={[
+    "5,000 GB stored at $0.023/GB-month -> ~$115/month (storage only). Add request fees if you do millions of requests.",
+    "20 TB stored with low request volume -> storage dominates; egress may dominate if you download a lot.",
+  ]}
+  includes={[
+    "Storage estimate from average stored GB and $/GB-month pricing.",
+    "Request fees estimate for GET/PUT (and similar) using per-1k pricing.",
+    "Optional egress estimate from GB/month and $/GB pricing.",
+  ]}
+  excludes={[
+    "Lifecycle transitions, retrieval fees, and tiered/region pricing unless you model them with blended rates.",
+    "Replication costs (use Storage Replication and Cross-region Transfer calculators).",
+  ]}
+  how={[
+    "Storage cost = average stored GB x $/GB-month.",
+    "Request cost = (requests / 1,000) x $ per 1,000 (per request class).",
+    "Egress cost (optional) = GB/month downloaded x $/GB.",
+    "For tiered or regional pricing, use effective blended rates or run scenarios and sum."
+  ]}
+  faqs={[
+    {
+      q: "Why do you use average stored GB?",
+      a: "Storage is billed per GB-month. If usage grows over time, average (midpoint) is closer than end-of-month GB.",
+    },
+    {
+      q: "Do requests matter?",
+      a: "Often they're small, but at very high request volume (or many small objects), request fees can be material.",
+    },
+    {
+      q: "Is egress part of storage pricing?",
+      a: "Sometimes egress is the biggest cost. This page includes an optional egress estimate; model replication and cross-region separately.",
+    },
+  ]}
+  lastUpdated="2026-01-16"
+  related={[
+    { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
+    { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication cost" },
+    { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer cost" },
+    { href: "/guides/copy-storage-pricing", label: "Guide: copy storage pricing" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Storage + requests</h2>
+    <p class="muted" style="margin-top:8px">
+      Use this section for S3-like object storage. Enter average stored GB (GB-month) and request counts for your main
+      operations.
+    </p>
+  </div>
+  <ObjectStorageCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Optional: egress</h2>
+    <p class="muted" style="margin-top:8px">
+      If your workload downloads data out of the cloud or across regions, add an egress line item here.
+    </p>
+  </div>
+  <DataEgressCostCalculator
+    transferLabel="Egress from storage (GB / month)"
+    priceLabel="Egress price ($ / GB)"
+    defaultGbPerMonth={500}
+    defaultPricePerGbUsd={0.09}
+  client:load />
+</CalculatorLayout>
+

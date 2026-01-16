@@ -21,6 +21,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "storage-pricing-calculator",
+    title: "Storage Pricing Calculator",
+    description: "Estimate object storage pricing from GB-month, requests, and egress.",
+    category: "Storage",
+  },
+  {
     slug: "data-egress-cost-calculator",
     title: "Data Egress Cost Calculator",
     description: "Estimate monthly egress spend from GB transferred and $/GB pricing.",
