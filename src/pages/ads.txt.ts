@@ -1,4 +1,5 @@
 function getAdsensePublisherId() {
+  const fallback = "pub-8677561632094995";
   const explicit = (
     import.meta.env.ADSENSE_PUBLISHER_ID ||
     import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ||
@@ -8,7 +9,7 @@ function getAdsensePublisherId() {
 
   const client = (import.meta.env.PUBLIC_ADSENSE_CLIENT || "").trim();
   if (client.startsWith("ca-pub-")) return `pub-${client.slice("ca-pub-".length)}`;
-  return "";
+  return fallback;
 }
 
 export function GET() {
@@ -19,11 +20,7 @@ export function GET() {
     "# Set ADSENSE_PUBLISHER_ID (or PUBLIC_ADSENSE_PUBLISHER_ID) to output your AdSense record.",
   ];
 
-  if (publisherId) {
-    lines.push(`google.com, ${publisherId}, DIRECT, f08c47fec0942fa0`);
-  } else {
-    lines.push("# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0");
-  }
+  lines.push(`google.com, ${publisherId}, DIRECT, f08c47fec0942fa0`);
 
   return new Response(lines.join("\n") + "\n", {
     headers: {
