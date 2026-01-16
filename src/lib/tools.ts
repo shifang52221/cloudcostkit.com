@@ -15,6 +15,12 @@ export type Tool = {
 
 export const TOOLS: Tool[] = [
   {
+    slug: "cdn-cost-calculator",
+    title: "CDN Cost Calculator",
+    description: "Estimate total CDN cost from bandwidth and request pricing.",
+    category: "Networking",
+  },
+  {
     slug: "data-egress-cost-calculator",
     title: "Data Egress Cost Calculator",
     description: "Estimate monthly egress spend from GB transferred and $/GB pricing.",
@@ -91,6 +97,12 @@ export const TOOLS: Tool[] = [
     title: "Database Storage Growth Cost Calculator",
     description: "Estimate storage growth over time and the average monthly cost.",
     category: "Storage",
+  },
+  {
+    slug: "kubernetes-cost-calculator",
+    title: "Kubernetes Cost Calculator",
+    description: "Estimate cluster cost by sizing nodes from requests and pricing them.",
+    category: "Kubernetes",
   },
   {
     slug: "kubernetes-requests-limits-calculator",

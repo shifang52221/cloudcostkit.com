@@ -41,6 +41,10 @@ const showConsentBanner = normalizedCanonicalPath !== "/cookie-notice/";
     {description ? <meta name="twitter:description" content={description} /> : null}
     <meta name="twitter:image" content={ogImage} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      name="robots"
+      content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
+    />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0b1220" />
     <script is:inline type="text/javascript">

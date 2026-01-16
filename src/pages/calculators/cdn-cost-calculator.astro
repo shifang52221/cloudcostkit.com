@@ -1,0 +1,78 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "CDN Cost Calculator";
+const description =
+  "Estimate total CDN cost from bandwidth (GB/month) and request fees with your provider’s pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cdn-cost-calculator"
+  intro="Most CDN bills have two big line items: bandwidth and requests. This page helps you estimate both, then add them to get a total monthly CDN cost estimate."
+  examples={[
+    "Bandwidth: 4,000 GB/month at $0.06/GB -> $240/month; Requests: 300M/month at $0.0075 per 10k -> $225/month; Total -> ~$465/month.",
+    "Bandwidth dominates for large media; requests dominate for API-like traffic with small payloads.",
+  ]}
+  includes={[
+    "Bandwidth estimate from GB/month and $/GB pricing.",
+    "Request-fee estimate from requests/month and $ per 10k pricing.",
+  ]}
+  excludes={[
+    "Origin egress and cache fill costs (model separately if billed).",
+    "Tiered pricing and regional blending (use effective blended rates or run scenarios).",
+  ]}
+  how={[
+    "Total CDN cost = bandwidth cost + request fees.",
+    "Bandwidth cost = GB/month x $/GB (edge bandwidth).",
+    "Request fees = (requests/month / 10,000) x $ per 10k requests.",
+    "If your provider has tiered pricing, use a blended effective rate or run multiple scenarios and sum."
+  ]}
+  faqs={[
+    {
+      q: "What keyword should I search for in pricing pages?",
+      a: "Look for \"data transfer\", \"bandwidth\", \"requests\", and the unit (e.g., $/GB and $ per 10k requests).",
+    },
+    {
+      q: "Where do I get GB/month and requests/month?",
+      a: "Use CDN analytics if you have them. If you only have throughput or RPS, use the Units Converter and RPS-to-monthly tool to convert.",
+    },
+    {
+      q: "Does cache hit rate change the CDN bandwidth line item?",
+      a: "Edge bandwidth (to end users) is still billed as bandwidth. Cache hit rate mainly impacts origin egress and origin request volume.",
+    },
+  ]}
+  lastUpdated="2026-01-16"
+  related={[
+    { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
+    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
+    { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Bandwidth</h2>
+    <p class="muted" style="margin-top:8px">
+      Use monthly GB delivered by the CDN to end users (edge bandwidth). If you only have Mbps, convert it to GB/month
+      with the Units Converter.
+    </p>
+  </div>
+  <DataEgressCostCalculator
+    transferLabel="CDN bandwidth (GB / month)"
+    priceLabel="CDN price ($ / GB)"
+    defaultGbPerMonth={4000}
+    defaultPricePerGbUsd={0.06}
+  client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Requests</h2>
+    <p class="muted" style="margin-top:8px">
+      Some providers charge per request (often per 10k). If you have RPS, convert it to requests/month first.
+    </p>
+  </div>
+  <CdnRequestCostCalculator client:load />
+</CalculatorLayout>
+

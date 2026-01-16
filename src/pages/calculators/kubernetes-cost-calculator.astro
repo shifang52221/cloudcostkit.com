@@ -1,0 +1,67 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { KubernetesNodeCostCalculator } from "../../components/calculators/KubernetesNodeCost";
+import { KubernetesRequestsLimitsCalculator } from "../../components/calculators/KubernetesRequestsLimits";
+
+const title = "Kubernetes Cost Calculator";
+const description =
+  "Estimate Kubernetes cluster cost by sizing nodes from pod requests and applying per-node pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/kubernetes-cost-calculator"
+  intro="Kubernetes costs are mostly compute. A practical first estimate is: (1) size nodes from CPU/memory requests, then (2) multiply by a per-node hourly rate. This page walks you through both steps."
+  examples={[
+    "Start from pod requests to estimate node count; then multiply by $/hour to get a monthly estimate.",
+    "If memory limits node count, memory is the bottleneck even when CPU looks low.",
+  ]}
+  includes={[
+    "Requests/limits sizing into cluster totals and node estimate.",
+    "Node cost estimate from node count, $/hour, and expected uptime.",
+  ]}
+  excludes={[
+    "Control plane fees, load balancers, storage, observability, and egress (add separately).",
+    "Bin packing constraints (affinities, max pods per node) that can increase node count.",
+  ]}
+  how={[
+    "Step 1: Convert per-pod requests into total CPU/memory and an estimated node count.",
+    "Step 2: Estimate monthly node cost from node count and $/hour pricing.",
+    "Add separate line items for managed control plane, storage, load balancers, logs/metrics, and egress."
+  ]}
+  faqs={[
+    {
+      q: "Why estimate from requests, not limits?",
+      a: "Scheduling uses requests. Limits matter for throttling/OOM risk but aren't a good baseline for capacity planning.",
+    },
+    {
+      q: "What else should I include in a full Kubernetes cost model?",
+      a: "At minimum: control plane, load balancers, persistent volumes, container registry, logs/metrics, and data egress.",
+    },
+  ]}
+  lastUpdated="2026-01-16"
+  related={[
+    { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost checklist" },
+    { href: "/calculators/kubernetes-requests-limits-calculator", label: "Requests & limits sizing" },
+    { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
+    { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Size nodes from requests</h2>
+    <p class="muted" style="margin-top:8px">
+      Use representative requests (not peak limits). Then pick an allocatable % to leave room for kube-system and
+      headroom.
+    </p>
+  </div>
+  <KubernetesRequestsLimitsCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Apply pricing</h2>
+    <p class="muted" style="margin-top:8px">
+      Multiply node count by an hourly price (or blended on-demand/commitment rate) and expected uptime.
+    </p>
+  </div>
+  <KubernetesNodeCostCalculator client:load />
+</CalculatorLayout>
+
