@@ -9,12 +9,12 @@ const description =
   "Fast, free cloud calculators for egress, logs, object storage, Kubernetes requests, and commitment break-even. Transparent assumptions. No signup.";
 
 const featuredSlugs = [
+  "cdn-cost-calculator",
+  "kubernetes-cost-calculator",
+  "storage-pricing-calculator",
+  "storage-replication-cost-calculator",
   "data-egress-cost-calculator",
   "log-ingestion-cost-calculator",
-  "object-storage-cost-calculator",
-  "kubernetes-requests-limits-calculator",
-  "reserved-vs-on-demand-break-even-calculator",
-  "unit-converter",
 ];
 
 const featured = TOOLS.filter((t) => featuredSlugs.includes(t.slug));
@@ -67,6 +67,14 @@ const slots = SITE.adsenseSlots;
       <a class="card2 tool col-6" href="/guides/kubernetes-cost-calculator/">
         <div class="tool-title">Kubernetes cost calculator checklist</div>
         <div class="tool-desc">What to include beyond nodes: storage, egress, load balancers, and logs.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/s3-replication-cost/">
+        <div class="tool-title">S3 replication cost</div>
+        <div class="tool-desc">How to estimate replicated GB/month, replica storage, and transfer fees.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/copy-storage-pricing/">
+        <div class="tool-title">Copy storage pricing</div>
+        <div class="tool-desc">Transfer, requests, and extra storage when data moves.</div>
       </a>
     </div>
   </section>

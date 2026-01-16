@@ -32,6 +32,10 @@ const description =
     <a href="/calculators/storage-replication-cost-calculator/">Storage Replication Cost Calculator</a> and
     <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region Transfer Cost Calculator</a>.
   </p>
+  <p>
+    If you’re specifically pricing S3 replication, start with <a href="/guides/s3-replication-cost/">S3 replication cost</a>
+    and treat the “replicated GB/month” as the key input.
+  </p>
 
   <h2>2) Extra storage at the destination</h2>
   <p>
@@ -59,6 +63,12 @@ const description =
   </p>
   <p>
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost Calculator</a>.
+  </p>
+
+  <h2>5) A quick way to estimate “copied GB/month”</h2>
+  <p>
+    If you don’t know copy volume, start from write throughput (GB/day) or batch sizes (GB/job). Multiply by days/jobs
+    per month. For change-heavy datasets, copy volume is usually closer to “writes” than “total stored GB”.
   </p>
 
   <h2>Quick checklist</h2>

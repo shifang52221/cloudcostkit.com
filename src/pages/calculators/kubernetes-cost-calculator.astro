@@ -38,6 +38,18 @@ const description =
       q: "What else should I include in a full Kubernetes cost model?",
       a: "At minimum: control plane, load balancers, persistent volumes, container registry, logs/metrics, and data egress.",
     },
+    {
+      q: "Do managed control plane fees matter?",
+      a: "Often yes. Many managed Kubernetes offerings charge a fixed hourly control plane fee. Add it as a separate line item.",
+    },
+    {
+      q: "How should I think about autoscaling?",
+      a: "Use average (typical) node count for budgeting, and check peak node count for risk. A blended utilization/uptime assumption is usually more accurate than using peak 24/7.",
+    },
+    {
+      q: "Should I use on-demand, spot, or commitments?",
+      a: "Use the effective blended $/hour you actually expect to pay. If you mix on-demand + savings plans/reserved instances + spot, compute a blended rate and test sensitivity.",
+    },
   ]}
   lastUpdated="2026-01-16"
   related={[
@@ -53,6 +65,10 @@ const description =
       Use representative requests (not peak limits). Then pick an allocatable % to leave room for kube-system and
       headroom.
     </p>
+    <p class="muted" style="margin-top:8px">
+      This Kubernetes cost calculator focuses on the biggest driver: node spend. Treat the result as a baseline, then
+      add managed control plane, storage, and observability line items.
+    </p>
   </div>
   <KubernetesRequestsLimitsCalculator client:load />
 
@@ -61,7 +77,20 @@ const description =
     <p class="muted" style="margin-top:8px">
       Multiply node count by an hourly price (or blended on-demand/commitment rate) and expected uptime.
     </p>
+    <p class="muted" style="margin-top:8px">
+      If you don't have a node $/hour yet, start with a representative instance type in your target region, then refine
+      with your real bill.
+    </p>
   </div>
   <KubernetesNodeCostCalculator client:load />
-</CalculatorLayout>
 
+  <div class="prose" style="margin-top:18px">
+    <h2>3) Don’t forget these common add-ons</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Logs: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>.</li>
+      <li>Metrics: <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series cost</a>.</li>
+      <li>Storage: <a href="/calculators/storage-pricing-calculator/">Storage pricing calculator</a>.</li>
+      <li>Egress: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.</li>
+    </ul>
+  </div>
+</CalculatorLayout>

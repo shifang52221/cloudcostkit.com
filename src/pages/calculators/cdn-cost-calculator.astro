@@ -43,6 +43,18 @@ const description =
       q: "Does cache hit rate change the CDN bandwidth line item?",
       a: "Edge bandwidth (to end users) is still billed as bandwidth. Cache hit rate mainly impacts origin egress and origin request volume.",
     },
+    {
+      q: "How do I handle tiered pricing?",
+      a: "Use an effective blended $/GB and $ per 10k requests for your expected volume, or model multiple tiers/scenarios and add them up.",
+    },
+    {
+      q: "Do I need to include origin egress?",
+      a: "Sometimes. If your CDN pulls from an origin you pay for, cache fill and origin egress can be material. Model origin egress separately with the Data Egress calculator.",
+    },
+    {
+      q: "What if my provider includes free tiers or bundled requests?",
+      a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
+    },
   ]}
   lastUpdated="2026-01-16"
   related={[
@@ -59,6 +71,10 @@ const description =
       Use monthly GB delivered by the CDN to end users (edge bandwidth). If you only have Mbps, convert it to GB/month
       with the Units Converter.
     </p>
+    <p class="muted" style="margin-top:8px">
+      This CDN cost calculator is intentionally simple: plug in your own pricing assumptions, then sanity-check the
+      result against provider billing units (GB vs GiB, per-10k vs per-1M requests).
+    </p>
   </div>
   <DataEgressCostCalculator
     transferLabel="CDN bandwidth (GB / month)"
@@ -72,7 +88,20 @@ const description =
     <p class="muted" style="margin-top:8px">
       Some providers charge per request (often per 10k). If you have RPS, convert it to requests/month first.
     </p>
+    <p class="muted" style="margin-top:8px">
+      Use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a> if you start from traffic
+      charts rather than a billing export.
+    </p>
   </div>
   <CdnRequestCostCalculator client:load />
-</CalculatorLayout>
 
+  <div class="prose" style="margin-top:18px">
+    <h2>3) Common pitfalls</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Mixing GB and GiB (use <a href="/calculators/unit-converter/">Units converter</a>).</li>
+      <li>Using origin egress as a proxy for CDN edge bandwidth (they’re different line items).</li>
+      <li>Ignoring request-class pricing (static vs dynamic, cache miss vs hit) when it matters.</li>
+      <li>Forgetting cache fill traffic and origin egress when your hit rate is low.</li>
+    </ul>
+  </div>
+</CalculatorLayout>
