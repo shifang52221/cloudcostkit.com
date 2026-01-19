@@ -1,0 +1,86 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Kubernetes cost model beyond nodes: the checklist most teams miss";
+const description =
+  "A practical Kubernetes cost model checklist: control plane, load balancers, storage, logs/metrics, and egress - plus links to calculators to estimate each part.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/kubernetes-cost-model-beyond-nodes"
+  lastUpdated="2026-01-16"
+>
+  <p>
+    A <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a> often starts with node spend
+    because compute is usually the biggest line item. But for many real clusters, “everything around nodes” adds up.
+    This guide is a checklist for those missing costs so your budget is closer to reality.
+  </p>
+
+  <h2>1) Nodes (compute)</h2>
+  <p>
+    The baseline: size your node count from workload requests, then apply a blended $/hour. Tools:
+    <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; Limits</a> and{" "}
+    <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost</a>.
+  </p>
+
+  <h2>2) Managed control plane</h2>
+  <p>
+    Many managed Kubernetes products charge a fixed hourly control plane fee. It is small compared to a large cluster,
+    but it can be meaningful for small clusters (especially dev/test).
+  </p>
+
+  <h2>3) Load balancers, gateways, and ingress</h2>
+  <p>
+    External load balancers, L7 gateways, and their data processing charges can dominate certain workloads. Even if the
+    nodes are stable, traffic patterns can make this line item spiky.
+  </p>
+  <p>
+    If your traffic exits the cloud or crosses regions, model egress separately with{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a>.
+  </p>
+
+  <h2>4) Persistent storage</h2>
+  <p>
+    Persistent volumes (block storage), snapshots, and object storage buckets all have their own pricing models. For S3-
+    like object storage, use <a href="/calculators/storage-pricing-calculator/">Storage Pricing Calculator</a>. For growth
+    over time, use <a href="/calculators/database-storage-growth-cost-calculator/">DB Storage Growth</a> as a simple growth
+    estimator.
+  </p>
+
+  <h2>5) Logs and metrics</h2>
+  <p>
+    Observability is a common “surprise” cost. Logs are often billed by ingestion volume, and metrics are often billed by
+    active series. Tools:
+  </p>
+  <ul>
+    <li><a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a></li>
+    <li><a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost</a></li>
+  </ul>
+
+  <h2>6) Data egress</h2>
+  <p>
+    Outbound traffic is not only “internet egress”. It can include cross-region replication, cross-zone transfer, and
+    service-to-service data movement depending on your architecture. Model it explicitly using{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a> and{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region Transfer</a>.
+  </p>
+
+  <h2>Suggested workflow (fast but accurate enough)</h2>
+  <ol>
+    <li>Estimate node count from requests (baseline capacity).</li>
+    <li>Apply blended $/hour and uptime assumptions (average, not peak).</li>
+    <li>Add control plane fee.</li>
+    <li>Add storage (PV + object storage) and expected growth.</li>
+    <li>Add observability (logs + metrics).</li>
+    <li>Add egress and cross-region transfer if applicable.</li>
+  </ol>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>
+    <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing</a>
+  </p>
+</GuideLayout>
+

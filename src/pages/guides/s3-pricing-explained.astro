@@ -1,0 +1,83 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 pricing explained: storage vs requests vs egress";
+const description =
+  "A practical breakdown of S3-like object storage pricing: GB-month storage, request fees, and data egress - plus how to estimate each without missing hidden line items.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/s3-pricing-explained"
+  lastUpdated="2026-01-16"
+>
+  <p>
+    If you are searching for a <a href="/calculators/storage-pricing-calculator/">storage pricing calculator</a>, you are
+    usually trying to estimate S3-like object storage cost. The good news: most object storage bills can be explained by
+    three buckets: <strong>storage</strong>, <strong>requests</strong>, and <strong>egress</strong>.
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>
+    Storage is billed over time, often as “GB-month”. If your storage grows over the month, use an average stored GB
+    number, not the end-of-month peak. Tool: <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost</a>.
+  </p>
+
+  <h2>2) Request fees (GET/PUT/LIST)</h2>
+  <p>
+    Many workloads treat request fees as noise, and often they are. But request fees can become meaningful when:
+  </p>
+  <ul>
+    <li>You store millions of small objects.</li>
+    <li>You have heavy LIST operations or frequent metadata reads.</li>
+    <li>Your application pattern causes many PUT/GET operations per GB stored.</li>
+  </ul>
+  <p>
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost Calculator</a> (model requests as a
+    separate line item).
+  </p>
+
+  <h2>3) Egress (data transfer out)</h2>
+  <p>
+    Egress is often the biggest surprise. If you read large amounts of data out of storage (downloads, analytics, cross-
+    region access), the $/GB transfer charge can dominate. Tool:{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a>.
+  </p>
+
+  <h2>Hidden items to watch for</h2>
+  <ul>
+    <li>
+      <strong>Replication and cross-region copy</strong>: adds transfer/feature fees and duplicate storage. Start with{" "}
+      <a href="/guides/copy-storage-pricing/">copy storage pricing</a> and{" "}
+      <a href="/guides/s3-replication-cost/">S3 replication cost</a>.
+    </li>
+    <li>
+      <strong>Different storage classes</strong>: IA/archive tiers can introduce retrieval and transition fees.
+    </li>
+    <li>
+      <strong>Growth over time</strong>: long retention or backups can turn a small daily ingest into a large monthly
+      storage bill. Use <a href="/calculators/database-storage-growth-cost-calculator/">DB Storage Growth</a> as a simple
+      estimator if you do not have a better model yet.
+    </li>
+  </ul>
+
+  <h2>Recommended modeling approach</h2>
+  <ol>
+    <li>Estimate average stored GB.</li>
+    <li>Estimate monthly request volume (GET/PUT/LIST).</li>
+    <li>Estimate egress GB/month (if any).</li>
+    <li>Add replication/copy costs if you move data.</li>
+  </ol>
+  <p>
+    If you want a single page that ties these together, start with{" "}
+    <a href="/calculators/storage-pricing-calculator/">Storage Pricing Calculator</a>.
+  </p>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing calculator</a>
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
+    <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
+  </p>
+</GuideLayout>
+

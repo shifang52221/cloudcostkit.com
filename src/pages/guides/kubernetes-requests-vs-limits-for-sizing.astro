@@ -1,0 +1,68 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Kubernetes requests vs limits: why requests drive node count";
+const description =
+  "A practical explanation of Kubernetes requests vs limits for capacity planning and cost estimation, with common mistakes and quick sizing guidance.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/kubernetes-requests-vs-limits-for-sizing"
+  lastUpdated="2026-01-16"
+>
+  <p>
+    If you search for a <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>, you will quickly
+    see “requests” and “limits”. The short version: <strong>requests</strong> are what the scheduler uses for capacity
+    planning; <strong>limits</strong> are guardrails for bursting and safety. Mixing them up often leads to oversized
+    clusters (or under-provisioned risk).
+  </p>
+
+  <h2>Requests: the scheduling baseline</h2>
+  <p>
+    Requests are the resources a pod asks for. Kubernetes tries to ensure that capacity exists for the sum of requests on
+    each node (plus overhead). That makes requests the right baseline for “how many nodes do I need?”.
+  </p>
+
+  <h2>Limits: the ceiling</h2>
+  <p>
+    Limits cap how much a container can use. CPU limits can cause throttling; memory limits can cause OOM kills. Limits
+    affect performance and risk, but they are not used for scheduling capacity the same way requests are.
+  </p>
+
+  <h2>Common mistakes</h2>
+  <ul>
+    <li>
+      <strong>Using limits as requests</strong>: this inflates node estimates and cost. Many teams set limits to 2-4x
+      requests for burstability.
+    </li>
+    <li>
+      <strong>Ignoring overhead</strong>: kube-system, daemonsets, and headroom reduce allocatable capacity. Use a lower
+      allocatable percentage when sizing.
+    </li>
+    <li>
+      <strong>Assuming perfect packing</strong>: affinities, taints, max pods per node, and topology spread constraints
+      can increase node count beyond the “math minimum”.
+    </li>
+  </ul>
+
+  <h2>A simple sizing workflow</h2>
+  <ol>
+    <li>Pick representative requests (not peak limits).</li>
+    <li>Estimate total requests = pods × per-pod requests.</li>
+    <li>Apply allocatable % to node capacity (leave headroom).</li>
+    <li>Compute node count from CPU and memory, then take the larger number.</li>
+  </ol>
+  <p>
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes Requests &amp; Limits Calculator</a>.
+    Once you have a node count, price it with <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost</a>.
+  </p>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost</a>
+    <a class="btn" href="/guides/kubernetes-cost-model-beyond-nodes/">Cost model checklist</a>
+  </p>
+</GuideLayout>
+

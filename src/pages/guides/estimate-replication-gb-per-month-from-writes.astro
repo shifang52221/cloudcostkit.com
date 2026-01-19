@@ -1,0 +1,104 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "How to estimate replication GB/month from write volume";
+const description =
+  "Replication cost is driven by changed data, not total stored GB. Learn how to estimate replicated GB/month from write throughput and change rates for S3-like storage.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/estimate-replication-gb-per-month-from-writes"
+  lastUpdated="2026-01-16"
+>
+  <p>
+    When people search for <a href="/guides/s3-replication-cost/">S3 replication cost</a>, the hardest input is usually
+    not the price. It’s the volume: <strong>how many GB per month actually replicate?</strong> The key idea is simple:
+    replication is driven by <strong>writes and changes</strong>, not by your total stored dataset size.
+  </p>
+
+  <h2>Start with the right question</h2>
+  <p>Instead of asking “how big is my bucket?”, ask:</p>
+  <ul>
+    <li>How many GB/day are newly written or changed?</li>
+    <li>How often do objects get overwritten (churn)?</li>
+    <li>Do you replicate everything or only a prefix/tags subset?</li>
+  </ul>
+
+  <h2>Method 1: From GB/day of writes</h2>
+  <p>
+    If you can estimate or measure writes in GB/day, monthly replication volume is straightforward:
+  </p>
+  <ul>
+    <li>
+      <strong>Replicated GB/month ≈ write GB/day × 30.4 × replication coverage</strong>
+    </li>
+  </ul>
+  <p>
+    “Replication coverage” is the fraction of writes that are replicated (for example, 0.6 if only 60% of objects match
+    the replication rules).
+  </p>
+
+  <h2>Method 2: From requests and average object size</h2>
+  <p>
+    If you do not have GB/day but you know how many objects are written, approximate GB/day from request volume:
+  </p>
+  <ul>
+    <li>
+      <strong>Write GB/day ≈ PUTs/day × avg object size (MB) ÷ 1024</strong>
+    </li>
+  </ul>
+  <p>
+    This works well when your object sizes are reasonably consistent. If sizes vary a lot, break the workload into a few
+    buckets (small/medium/large) and sum.
+  </p>
+
+  <h2>Method 3: From change rate on an existing dataset</h2>
+  <p>
+    Some datasets are mostly static but have a measurable “churn rate” (percentage of data replaced per day or per week).
+    If your total dataset is S GB and churn is c% per month:
+  </p>
+  <ul>
+    <li>
+      <strong>Replicated GB/month ≈ S × (c / 100)</strong>
+    </li>
+  </ul>
+  <p>
+    Example: 100,000 GB stored with 5% churn per month implies ~5,000 GB/month replicated (plus any new data).
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>
+      <strong>Using total stored GB</strong> instead of changed GB: replication volume is usually far smaller than the
+      dataset.
+    </li>
+    <li>
+      <strong>Forgetting destination storage</strong>: replication often doubles storage for replicated objects.
+    </li>
+    <li>
+      <strong>Ignoring extra requests</strong>: replication workflows can increase PUT/GET/LIST operations.
+    </li>
+  </ul>
+
+  <h2>Turn replicated GB/month into dollars</h2>
+  <p>
+    Once you have replicated GB/month, estimate the replication line item with{" "}
+    <a href="/calculators/storage-replication-cost-calculator/">Storage Replication Cost Calculator</a>. If replication is
+    billed as cross-region transfer in your setup, price it with{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region Transfer</a>.
+  </p>
+  <p>
+    For the full picture (extra storage + requests + transfer), use the checklist in{" "}
+    <a href="/guides/copy-storage-pricing/">copy storage pricing</a> and add storage pricing with{" "}
+    <a href="/calculators/storage-pricing-calculator/">Storage Pricing Calculator</a>.
+  </p>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/guides/s3-replication-cost/">S3 replication cost</a>
+    <a class="btn" href="/calculators/storage-replication-cost-calculator/">Replication cost calculator</a>
+    <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
+  </p>
+</GuideLayout>
+

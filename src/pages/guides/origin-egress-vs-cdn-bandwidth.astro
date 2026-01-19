@@ -1,0 +1,108 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Origin egress vs CDN bandwidth: what's the difference?";
+const description =
+  "CDN bills often have two related but different bandwidth concepts: origin egress (from your origin) and CDN bandwidth (to end users). Learn how to model both without double-counting.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/origin-egress-vs-cdn-bandwidth"
+  lastUpdated="2026-01-16"
+>
+  <p>
+    If you are building a <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a> model, the easiest mistake
+    is mixing up two similar-sounding line items: <strong>origin egress</strong> and <strong>CDN bandwidth</strong>.
+    They are related, but they are not the same thing.
+  </p>
+
+  <h2>Quick definitions</h2>
+  <ul>
+    <li>
+      <strong>CDN bandwidth (edge egress)</strong>: bytes delivered from the CDN edge to end users. This is the number
+      most CDN pricing pages focus on (e.g., $/GB).
+    </li>
+    <li>
+      <strong>Origin egress</strong>: bytes transferred out of your origin (object storage, load balancer, VM, or
+      service) to the CDN or to other destinations. This is billed by your origin provider, not by the CDN (unless the
+      CDN is also your origin).
+    </li>
+  </ul>
+
+  <h2>Why they differ</h2>
+  <p>
+    The CDN serves user traffic from cache when possible. When an object is not in cache (or is expired), the CDN pulls
+    it from origin. That pull is sometimes called <em>cache fill</em>. Cache fill contributes to origin egress, but not
+    always in a 1:1 way with edge bandwidth.
+  </p>
+  <ul>
+    <li>
+      With a high cache hit rate, origin egress can be a small fraction of CDN bandwidth.
+    </li>
+    <li>
+      With a low cache hit rate (many unique objects, short TTLs, or frequent invalidations), origin egress can approach
+      CDN bandwidth.
+    </li>
+    <li>
+      Some workloads can have origin egress higher than edge bandwidth due to revalidation, multi-POP fills, or
+      inefficient caching patterns.
+    </li>
+  </ul>
+
+  <h2>A simple way to model costs (without double-counting)</h2>
+  <p>Use separate line items and separate calculators:</p>
+  <ol>
+    <li>
+      Model <strong>CDN edge bandwidth</strong> with <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN Bandwidth Cost</a>.
+    </li>
+    <li>
+      Model <strong>CDN request fees</strong> with <a href="/calculators/cdn-request-cost-calculator/">CDN Request Cost</a>.
+    </li>
+    <li>
+      If you pay for origin egress, model <strong>origin egress (cache fill)</strong> with
+      <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a> using your origin's $/GB.
+    </li>
+  </ol>
+  <p>
+    Then sum those line items to get a total. If you want a single page that bundles the two major CDN line items, start
+    with <a href="/calculators/cdn-cost-calculator/">CDN Cost Calculator</a>.
+  </p>
+
+  <h2>Estimating origin egress from edge bandwidth</h2>
+  <p>
+    If you do not have origin egress data yet, you can approximate it from expected cache hit rate:
+  </p>
+  <ul>
+    <li>
+      <strong>Origin egress (GB/month) ≈ CDN bandwidth (GB/month) × (1 − cache hit rate)</strong>
+    </li>
+  </ul>
+  <p>
+    This is a simplification. It's a good starting point for budgeting, and you can refine it later with real metrics.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>
+      <strong>Using origin egress as CDN bandwidth</strong>: the origin egress line item may be much smaller (or larger)
+      than the edge bandwidth line item.
+    </li>
+    <li>
+      <strong>Forgetting cache fill</strong>: your CDN might look cheap until you realize your origin is paying large
+      egress charges.
+    </li>
+    <li>
+      <strong>Mixing units</strong>: provider dashboards might use GiB while pricing pages use GB. Use
+      <a href="/calculators/unit-converter/">Units Converter</a> to keep units consistent.
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+  </p>
+</GuideLayout>
+
