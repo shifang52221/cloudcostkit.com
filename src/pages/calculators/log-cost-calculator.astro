@@ -1,0 +1,82 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogIngestionCostCalculator } from "../../components/calculators/LogIngestionCost";
+import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
+import { LogSearchScanCostCalculator } from "../../components/calculators/LogSearchScanCost";
+
+const title = "Log Cost Calculator";
+const description =
+  "Estimate total log costs: ingestion, retention storage, and optional scan/search charges. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/log-cost-calculator"
+  intro="Log platforms usually charge for (1) ingestion, (2) retention storage (GB-month), and sometimes (3) scan/search. This log cost calculator groups those line items so you can estimate a realistic monthly total."
+  examples={[
+    "Estimate ingestion from GB/day, then add retention storage from retention days; optionally add scan charges if you run frequent queries.",
+    "Retention increases costs linearly with days; scan costs increase with query volume and GB scanned.",
+  ]}
+  includes={[
+    "Log ingestion estimate from GB/day and $/GB pricing.",
+    "Retention storage estimate from GB/day, retention days, and $/GB-month pricing.",
+    "Optional scan/search estimate from GB scanned per day and $/GB pricing.",
+  ]}
+  excludes={[
+    "Indexing add-ons, alerting, and premium features unless you model them separately.",
+    "Provider-specific tiering (use blended effective rates or separate scenarios).",
+  ]}
+  how={[
+    "Step 1: estimate ingestion charges (GB/day × $/GB × days/month).",
+    "Step 2: estimate retained storage steady-state (GB/day × retention days) and apply $/GB-month.",
+    "Step 3 (optional): estimate scan/search charges from GB scanned and $/GB pricing.",
+    "Sum line items to get a total monthly estimate."
+  ]}
+  faqs={[
+    {
+      q: "Why do I need both ingestion and storage?",
+      a: "Many vendors bill ingestion (GB ingested) separately from storage (GB-month retained). Even if ingest is flat, long retention increases storage cost.",
+    },
+    {
+      q: "Do I always pay scan/search charges?",
+      a: "No. Some platforms include queries; others charge by GB scanned. If your vendor charges for scans, use the scan calculator to model it.",
+    },
+    {
+      q: "How can I reduce log costs quickly?",
+      a: "The fastest levers are: reduce noisy logs at source, shorten retention for low-value logs, and avoid expensive broad scans (use sampling or narrower filters).",
+    },
+  ]}
+  lastUpdated="2026-01-16"
+  related={[
+    { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
+    { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Ingestion</h2>
+    <p class="muted" style="margin-top:8px">
+      Start with GB/day ingested for the logs you send to your vendor. If you have multiple log types, model them
+      separately and add them up.
+    </p>
+  </div>
+  <LogIngestionCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Retention storage</h2>
+    <p class="muted" style="margin-top:8px">
+      Retention is usually what makes log storage costs grow. Long retention multiplies steady-state stored GB.
+    </p>
+  </div>
+  <LogRetentionStorageCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>3) Optional: scan/search</h2>
+    <p class="muted" style="margin-top:8px">
+      If your provider charges by GB scanned, estimate scan volume for typical daily query workloads.
+    </p>
+  </div>
+  <LogSearchScanCostCalculator client:load />
+</CalculatorLayout>
+

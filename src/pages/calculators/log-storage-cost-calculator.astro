@@ -1,0 +1,54 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
+
+const title = "Log Storage Cost Calculator";
+const description =
+  "Estimate log storage cost from GB/day ingested, retention days, and $/GB-month pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/log-storage-cost-calculator"
+  intro="If you’re searching for log storage costs, retention is usually the driver. This calculator estimates the steady-state retained log storage and its monthly cost from GB/day, retention days, and a $/GB-month pricing assumption."
+  examples={[
+    "50 GB/day retained for 30 days -> ~1,500 GB retained steady-state; apply $/GB-month to estimate storage cost.",
+    "High retention (90–365 days) often dominates storage cost even when daily ingest is flat.",
+  ]}
+  includes={[
+    "Retained log storage estimate from GB/day and retention days.",
+    "Monthly storage cost estimate from retained GB and $/GB-month pricing.",
+  ]}
+  excludes={[
+    "Ingestion charges (model separately if billed).",
+    "Search/scan charges and indexing add-ons (model separately).",
+  ]}
+  how={[
+    "Retained GB (steady-state) ≈ GB/day × retention days.",
+    "Monthly storage cost = retained GB × $/GB-month.",
+    "If retention varies by log type, model each type separately and sum."
+  ]}
+  faqs={[
+    {
+      q: "Why is retention the main driver?",
+      a: "Storage is billed over time (GB-month). Longer retention multiplies steady-state stored GB even when ingest is constant.",
+    },
+    {
+      q: "What if I use multiple retention tiers?",
+      a: "Split your logs into tiers (e.g., 7 days hot + 90 days archive), estimate each tier separately with different $/GB-month rates, and add them up.",
+    },
+    {
+      q: "Does compression reduce billed GB?",
+      a: "It depends on the vendor. Some bill based on compressed stored size; others bill based on ingested volume. Check your provider’s billing definition.",
+    },
+  ]}
+  lastUpdated="2026-01-16"
+  related={[
+    { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+  ]}
+>
+  <LogRetentionStorageCostCalculator client:load />
+</CalculatorLayout>
+

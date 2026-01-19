@@ -69,6 +69,18 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "log-cost-calculator",
+    title: "Log Cost Calculator",
+    description: "Estimate total log costs: ingestion, storage, and scan/search.",
+    category: "Logging",
+  },
+  {
+    slug: "log-storage-cost-calculator",
+    title: "Log Storage Cost Calculator",
+    description: "Estimate log storage cost from retention days and $/GB-month pricing.",
+    category: "Logging",
+  },
+  {
     slug: "log-retention-storage-cost-calculator",
     title: "Log Retention Storage Cost Calculator",
     description: "Estimate retained log storage cost from GB/day, retention days, and $/GB-month pricing.",
@@ -90,6 +102,12 @@ export const TOOLS: Tool[] = [
     slug: "object-storage-cost-calculator",
     title: "Object Storage Cost Calculator",
     description: "Estimate storage and request costs (GET/PUT) for S3-like object storage.",
+    category: "Storage",
+  },
+  {
+    slug: "s3-request-cost-calculator",
+    title: "S3 Request Cost Calculator",
+    description: "Estimate S3-like request costs (GET/PUT) from monthly request volume.",
     category: "Storage",
   },
   {
