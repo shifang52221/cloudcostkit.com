@@ -60,6 +60,10 @@ const description =
       <strong>Downstream services</strong>: DynamoDB/RDS/S3/SQS/SNS can dominate total cost in real workloads.
     </li>
   </ul>
+  <p class="muted" style="margin-top:10px">
+    If Lambda triggers DynamoDB heavily, model it separately using{" "}
+    <a href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost calculator</a>.
+  </p>
 
   <h2>5) Sanity-check with unit economics</h2>
   <p>
@@ -72,4 +76,3 @@ const description =
     <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
   </p>
 </GuideLayout>
-

@@ -207,6 +207,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-dynamodb-cost-calculator",
+    title: "AWS DynamoDB Cost Calculator",
+    description: "Estimate DynamoDB-style read/write request + storage costs from your inputs.",
+    category: "FinOps",
+  },
+  {
     slug: "rps-to-monthly-requests-calculator",
     title: "RPS to Monthly Requests Calculator",
     description: "Estimate monthly request volume from RPS, hours/day, and utilization.",

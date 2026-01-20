@@ -1,0 +1,67 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS DynamoDB pricing (what to include)";
+const description =
+  "A practical checklist for estimating DynamoDB costs: reads, writes, storage, and the common line items that surprise budgets.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-dynamodb-pricing"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What are the core DynamoDB cost components?",
+      a: "Read operations, write operations, and table storage. Depending on your features, backups and streams can also matter.",
+    },
+    {
+      q: "Is DynamoDB pricing per request or per capacity unit?",
+      a: "Both exist. On-demand is request-based. Provisioned is capacity-based (RCU/WCU) with autoscaling. Use the model that matches your billing mode.",
+    },
+  ]}
+>
+  <p class="muted">
+    DynamoDB is easy to start with and easy to mis-estimate. The safest approach is to break cost into three buckets:
+    reads, writes, and storage, then add any heavy features (streams/backups) as separate line items.
+  </p>
+
+  <h2>1) Start with reads and writes</h2>
+  <p>
+    Your request volume (and item size) drives most DynamoDB spend. If you only know throughput (RPS), convert first using{" "}
+    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+  </p>
+  <p>
+    Use <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a> to model read/write request
+    fees with your own effective pricing inputs.
+  </p>
+
+  <h2>2) Model storage separately</h2>
+  <p>
+    Storage is usually a steady baseline. If your dataset is growing, forecast the next 3–12 months to avoid “silent
+    growth” surprises.
+  </p>
+  <p>
+    Use <a href="/calculators/database-storage-growth-cost-calculator/">Database Storage Growth Calculator</a> to project
+    GB over time.
+  </p>
+
+  <h2>3) Common extra line items</h2>
+  <ul>
+    <li>
+      <strong>Backups/snapshots</strong>: long retention and high churn can create meaningful recurring storage spend.
+    </li>
+    <li>
+      <strong>Streams</strong>: change capture can add cost if used at scale.
+    </li>
+    <li>
+      <strong>Data transfer</strong>: model egress separately if your app serves lots of traffic.
+    </li>
+  </ul>
+
+  <p class="muted" style="margin-top:14px">
+    Related: <a href="/guides/aws-dynamodb-rcu-wcu-explained/">RCU/WCU explained</a>,{" "}
+    <a href="/guides/aws-dynamodb-cost-optimization/">DynamoDB cost optimization</a>.
+  </p>
+</GuideLayout>
+

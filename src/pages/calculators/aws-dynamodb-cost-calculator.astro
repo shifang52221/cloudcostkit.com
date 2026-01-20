@@ -1,0 +1,56 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsDynamoDbCostCalculator as AwsDynamoDbCostCalculatorComponent } from "../../components/calculators/AwsDynamoDbCost";
+
+const title = "AWS DynamoDB Cost Calculator";
+const description =
+  "Estimate DynamoDB-style monthly cost from read/write request volume and storage pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-dynamodb-cost-calculator"
+  intro="Estimate DynamoDB-style cost using a simple on-demand-like model: read requests + write requests + storage. Use your effective pricing inputs."
+  examples={[
+    "2B reads/month, 500M writes/month, 200GB storage — estimate monthly request + storage charges.",
+  ]}
+  includes={[
+    "Read request cost from reads/month × $ per 1M requests.",
+    "Write request cost from writes/month × $ per 1M requests.",
+    "Storage cost from GB-month × $/GB-month.",
+  ]}
+  excludes={[
+    "Provisioned capacity (RCU/WCU) modeling, auto scaling dynamics, and reserved capacity discounts.",
+    "Streams, backups, data transfer, and monitoring/logging unless you model separately.",
+  ]}
+  how={[
+    "Read cost = (reads per month / 1,000,000) × $ per 1M read requests.",
+    "Write cost = (writes per month / 1,000,000) × $ per 1M write requests.",
+    "Storage cost = GB-month × $ per GB-month.",
+    "Total = read cost + write cost + storage cost.",
+  ]}
+  faqs={[
+    {
+      q: "Should I use on-demand or provisioned pricing?",
+      a: "This tool is an on-demand-like model using per-request pricing inputs. If you run provisioned capacity, you can convert your effective cost into per-request equivalents or use a scenario-based estimate.",
+    },
+    {
+      q: "Does item size matter?",
+      a: "Yes. Item size affects capacity consumption and storage. This calculator assumes you already reflected those effects in your effective per-request pricing inputs.",
+    },
+    {
+      q: "What about DynamoDB Streams and backups?",
+      a: "Not included. Model those as additional line items if you use them heavily.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/guides/aws-dynamodb-pricing", label: "Guide: DynamoDB pricing (what to include)" },
+    { href: "/guides/aws-dynamodb-rcu-wcu-explained", label: "Guide: RCU/WCU explained" },
+    { href: "/guides/aws-dynamodb-cost-optimization", label: "Guide: DynamoDB cost optimization" },
+    { href: "/calculators/aws-lambda-cost-calculator", label: "Lambda cost calculator" },
+  ]}
+>
+  <AwsDynamoDbCostCalculatorComponent client:load />
+</CalculatorLayout>
+

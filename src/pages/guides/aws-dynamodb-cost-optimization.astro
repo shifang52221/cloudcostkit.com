@@ -1,0 +1,60 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS DynamoDB cost optimization (high-leverage fixes)";
+const description =
+  "A short playbook to reduce DynamoDB spend: reduce request volume, right-size items, avoid hot partitions, and keep storage and retention under control.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-dynamodb-cost-optimization"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What’s the easiest way to reduce DynamoDB cost?",
+      a: "Reduce read/write request volume (cache, batch, avoid retries) and reduce item size. These usually dominate spend at scale.",
+    },
+    {
+      q: "Can retries increase DynamoDB cost?",
+      a: "Yes. Throttling/timeouts can multiply requests. Fix hot partitions and backoff behavior to avoid bill spikes.",
+    },
+  ]}
+>
+  <p class="muted">
+    DynamoDB costs are usually controllable. The key is to focus on the levers that move the bill: request volume, item
+    size, and storage growth.
+  </p>
+
+  <h2>1) Reduce request volume (especially reads)</h2>
+  <ul>
+    <li>Cache hot reads where correctness allows.</li>
+    <li>Batch reads/writes when you can.</li>
+    <li>Fix retry loops (timeouts and throttling) that multiply requests.</li>
+  </ul>
+
+  <h2>2) Reduce item size and payloads</h2>
+  <p>
+    Large items increase read/write work and increase storage. Review item schemas and avoid storing duplicated large
+    blobs inside table items.
+  </p>
+
+  <h2>3) Avoid hot partitions</h2>
+  <p>
+    Uneven access patterns cause throttling which can trigger retries and inflate costs. If you see throttles, treat it
+    as both a performance and cost bug.
+  </p>
+
+  <h2>4) Control storage and retention</h2>
+  <p>
+    If the dataset grows steadily, forecast cost with{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">Database Storage Growth Calculator</a>.
+  </p>
+
+  <h2>5) Sanity-check with a simple calculator</h2>
+  <p>
+    Use <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a> to see whether reads, writes,
+    or storage is your dominant driver, then optimize the right lever.
+  </p>
+</GuideLayout>
+

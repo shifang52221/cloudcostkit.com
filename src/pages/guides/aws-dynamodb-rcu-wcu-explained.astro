@@ -1,0 +1,51 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "DynamoDB RCU/WCU explained (for cost estimates)";
+const description =
+  "Understand how reads/writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-dynamodb-rcu-wcu-explained"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "Why does item size matter for DynamoDB cost?",
+      a: "Capacity consumption is sensitive to item size. Larger items consume more read/write capacity and increase storage cost.",
+    },
+    {
+      q: "Do strongly consistent reads cost more?",
+      a: "They can consume more read capacity than eventually consistent reads. For estimates, model both scenarios if you aren’t sure.",
+    },
+  ]}
+>
+  <p class="muted">
+    Even if you use on-demand pricing, it helps to understand RCU/WCU because the underlying driver is still “how much
+    work” the database does. The two most common estimate breakers are item size and hot partitions.
+  </p>
+
+  <h2>1) The two drivers: read work and write work</h2>
+  <ul>
+    <li><strong>Reads</strong>: scale with request rate and item size.</li>
+    <li><strong>Writes</strong>: scale with write rate and item size.</li>
+  </ul>
+
+  <h2>2) The practical approach for budgeting</h2>
+  <p>
+    If you don’t want to model RCUs/WCUs directly, estimate monthly read/write request volume and use an effective “$ per
+    1M read requests” and “$ per 1M write requests” that matches your region and plan.
+  </p>
+  <p>
+    Use <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a> for scenario planning.
+  </p>
+
+  <h2>3) Common pitfalls that inflate cost</h2>
+  <ul>
+    <li><strong>Large items</strong>: bigger payloads increase both request cost and storage.</li>
+    <li><strong>Hot partitions</strong>: uneven access causes throttling/retries, which can multiply requests.</li>
+    <li><strong>Retries and timeouts</strong>: failures can turn 1 request into many billable attempts.</li>
+  </ul>
+</GuideLayout>
+
