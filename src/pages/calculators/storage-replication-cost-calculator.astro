@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { StorageReplicationCostCalculator } from "../../components/calculators/StorageReplicationCost";
+import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorComponent } from "../../components/calculators/StorageReplicationCost";
 
 const title = "Storage Replication Cost Calculator";
 const description =
@@ -58,5 +58,5 @@ const description =
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
   ]}
 >
-  <StorageReplicationCostCalculator client:load />
+  <StorageReplicationCostCalculatorComponent client:load />
 </CalculatorLayout>

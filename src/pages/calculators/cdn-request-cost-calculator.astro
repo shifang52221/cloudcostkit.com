@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
+import { CdnRequestCostCalculator as CdnRequestCostCalculatorComponent } from "../../components/calculators/CdnRequestCost";
 
 const title = "CDN Request Cost Calculator";
 const description =
@@ -55,5 +55,5 @@ const description =
     { href: "/calculators/api-request-cost-calculator", label: "API request cost" },
   ]}
 >
-  <CdnRequestCostCalculator client:load />
+  <CdnRequestCostCalculatorComponent client:load />
 </CalculatorLayout>

@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { ApiRequestCostCalculator } from "../../components/calculators/ApiRequestCost";
+import { ApiRequestCostCalculator as ApiRequestCostCalculatorComponent } from "../../components/calculators/ApiRequestCost";
 
 const title = "API Request Cost Calculator";
 const description =
@@ -44,5 +44,5 @@ const description =
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
   ]}
 >
-  <ApiRequestCostCalculator client:load />
+  <ApiRequestCostCalculatorComponent client:load />
 </CalculatorLayout>

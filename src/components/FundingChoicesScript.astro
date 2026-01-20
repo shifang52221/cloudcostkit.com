@@ -35,8 +35,7 @@ const bootstrap = `(function() {
 ---
 {src ? (
   <>
-    <script async src={src}></script>
+    <script async src={src} is:inline></script>
     <script is:inline type="text/javascript" set:html={bootstrap}></script>
   </>
 ) : null}
-

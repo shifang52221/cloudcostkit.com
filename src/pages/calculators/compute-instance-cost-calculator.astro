@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
+import { ComputeInstanceCostCalculator as ComputeInstanceCostCalculatorComponent } from "../../components/calculators/ComputeInstanceCost";
 
 const title = "Compute Instance Cost Calculator";
 const description =
@@ -44,5 +44,5 @@ const description =
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
   ]}
 >
-  <ComputeInstanceCostCalculator client:load />
+  <ComputeInstanceCostCalculatorComponent client:load />
 </CalculatorLayout>

@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { MetricsTimeseriesCostCalculator } from "../../components/calculators/MetricsTimeseriesCost";
+import { MetricsTimeseriesCostCalculator as MetricsTimeseriesCostCalculatorComponent } from "../../components/calculators/MetricsTimeseriesCost";
 
 const title = "Metrics Time Series Cost Calculator";
 const description =
@@ -43,5 +43,5 @@ const description =
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
   ]}
 >
-  <MetricsTimeseriesCostCalculator client:load />
+  <MetricsTimeseriesCostCalculatorComponent client:load />
 </CalculatorLayout>

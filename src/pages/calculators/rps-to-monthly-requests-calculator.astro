@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { RpsToMonthlyRequestsCalculator } from "../../components/calculators/RpsToMonthlyRequests";
+import { RpsToMonthlyRequestsCalculator as RpsToMonthlyRequestsCalculatorComponent } from "../../components/calculators/RpsToMonthlyRequests";
 
 const title = "RPS to Monthly Requests Calculator";
 const description =
@@ -45,5 +45,5 @@ const description =
     { href: "/calculators/unit-converter", label: "Units converter" },
   ]}
 >
-  <RpsToMonthlyRequestsCalculator client:load />
+  <RpsToMonthlyRequestsCalculatorComponent client:load />
 </CalculatorLayout>

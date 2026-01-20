@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { LogSearchScanCostCalculator } from "../../components/calculators/LogSearchScanCost";
+import { LogSearchScanCostCalculator as LogSearchScanCostCalculatorComponent } from "../../components/calculators/LogSearchScanCost";
 
 const title = "Log Search Scan Cost Calculator";
 const description =
@@ -44,5 +44,5 @@ const description =
     { href: "/guides/log-costs", label: "Guide: log costs" },
   ]}
 >
-  <LogSearchScanCostCalculator client:load />
+  <LogSearchScanCostCalculatorComponent client:load />
 </CalculatorLayout>

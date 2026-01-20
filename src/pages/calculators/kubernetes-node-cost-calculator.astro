@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { KubernetesNodeCostCalculator } from "../../components/calculators/KubernetesNodeCost";
+import { KubernetesNodeCostCalculator as KubernetesNodeCostCalculatorComponent } from "../../components/calculators/KubernetesNodeCost";
 
 const title = "Kubernetes Node Cost Calculator";
 const description =
@@ -50,5 +50,5 @@ const description =
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved break-even" },
   ]}
 >
-  <KubernetesNodeCostCalculator client:load />
+  <KubernetesNodeCostCalculatorComponent client:load />
 </CalculatorLayout>

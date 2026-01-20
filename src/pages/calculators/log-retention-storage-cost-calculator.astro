@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
+import { LogRetentionStorageCostCalculator as LogRetentionStorageCostCalculatorComponent } from "../../components/calculators/LogRetentionStorage";
 
 const title = "Log Retention Storage Cost Calculator";
 const description =
@@ -44,5 +44,5 @@ const description =
     { href: "/guides/log-costs", label: "Guide: log costs" },
   ]}
 >
-  <LogRetentionStorageCostCalculator client:load />
+  <LogRetentionStorageCostCalculatorComponent client:load />
 </CalculatorLayout>

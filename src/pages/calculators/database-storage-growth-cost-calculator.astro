@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { DatabaseStorageGrowthCostCalculator } from "../../components/calculators/DatabaseStorageGrowth";
+import { DatabaseStorageGrowthCostCalculator as DatabaseStorageGrowthCostCalculatorComponent } from "../../components/calculators/DatabaseStorageGrowth";
 
 const title = "Database Storage Growth Cost Calculator";
 const description =
@@ -43,5 +43,5 @@ const description =
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
   ]}
 >
-  <DatabaseStorageGrowthCostCalculator client:load />
+  <DatabaseStorageGrowthCostCalculatorComponent client:load />
 </CalculatorLayout>

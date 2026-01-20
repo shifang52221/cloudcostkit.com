@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { LogIngestionCostCalculator } from "../../components/calculators/LogIngestionCost";
+import { LogIngestionCostCalculator as LogIngestionCostCalculatorComponent } from "../../components/calculators/LogIngestionCost";
 
 const title = "Log Ingestion Cost Calculator";
 const description =
@@ -49,7 +49,7 @@ const description =
     { href: "/guides/log-costs", label: "Guide: log costs" },
   ]}
 >
-  <LogIngestionCostCalculator client:load />
+  <LogIngestionCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:16px">
     <h2 style="margin:0 0 10px">Practical knobs</h2>
