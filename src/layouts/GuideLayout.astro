@@ -8,9 +8,10 @@ type Props = {
   description: string;
   canonicalPath: string;
   lastUpdated: string;
+  faqs?: { q: string; a: string }[];
 };
 
-const { title, description, canonicalPath, lastUpdated } = Astro.props;
+const { title, description, canonicalPath, lastUpdated, faqs } = Astro.props;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
 const normalizedCanonicalPath = withTrailingSlash(canonicalPath);
 const canonical = new URL(normalizedCanonicalPath, siteUrl).toString();
@@ -33,16 +34,48 @@ const articleSchema = {
   mainEntityOfPage: canonical,
   publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
 };
+
+const faqSchema =
+  faqs && faqs.length
+    ? {
+        "@type": "FAQPage",
+        url: canonical,
+        mainEntity: faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      }
+    : null;
 ---
 <BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath}>
   <script
     type="application/ld+json"
     is:inline
-    set:html={JSON.stringify({ "@context": "https://schema.org", "@graph": [breadcrumbSchema, articleSchema] })}
+    set:html={
+      JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [breadcrumbSchema, articleSchema, faqSchema].filter(Boolean),
+      })
+    }
   />
   <article class="card section prose">
     <h1 style="margin-top:0">{title}</h1>
     <slot />
+
+    {faqs && faqs.length ? (
+      <>
+        <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
+        <h2 style="margin-top:0">FAQ</h2>
+        {faqs.map((f) => (
+          <details class="card2" style="padding:12px; margin:10px 0">
+            <summary style="cursor:pointer; font-weight:800">{f.q}</summary>
+            <div class="muted" style="margin-top:8px">{f.a}</div>
+          </details>
+        ))}
+      </>
+    ) : null}
+
     <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
     <div class="muted">Last updated: {lastUpdated}</div>
   </article>

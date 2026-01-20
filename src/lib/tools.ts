@@ -195,6 +195,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-lambda-cost-calculator",
+    title: "AWS Lambda Cost Calculator",
+    description: "Estimate Lambda-style request + GB-seconds compute cost from your inputs.",
+    category: "FinOps",
+  },
+  {
     slug: "rps-to-monthly-requests-calculator",
     title: "RPS to Monthly Requests Calculator",
     description: "Estimate monthly request volume from RPS, hours/day, and utilization.",

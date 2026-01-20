@@ -1,0 +1,56 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsLambdaCostCalculator as AwsLambdaCostCalculatorComponent } from "../../components/calculators/AwsLambdaCost";
+
+const title = "AWS Lambda Cost Calculator";
+const description =
+  "Estimate AWS Lambda-style monthly cost from invocations, duration, memory, and your pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-lambda-cost-calculator"
+  intro="Estimate Lambda-style serverless cost from request volume and GB-second compute. Use your own region/runtime pricing."
+  examples={[
+    "50M invocations/month, 120ms avg duration, 512MB memory — estimate requests + compute charges.",
+  ]}
+  includes={[
+    "Request fees from invocations/month and $ per 1M requests.",
+    "Compute fees from GB-seconds (invocations × duration × memory GB) and $/GB-second.",
+    "Optional free tier deduction (toggle).",
+  ]}
+  excludes={[
+    "Logging/metrics (e.g., CloudWatch), data transfer, and downstream service costs.",
+    "Provisioned concurrency and other add-ons unless you model them separately.",
+  ]}
+  how={[
+    "GB-seconds = invocations × (duration_ms / 1000) × (memory_MB / 1024).",
+    "Request cost = billable_invocations / 1,000,000 × $ per 1M requests.",
+    "Compute cost = billable_GB_seconds × $ per GB-second.",
+    "Total = request cost + compute cost (excluding logs, transfer, etc).",
+  ]}
+  faqs={[
+    {
+      q: "Why do I need to enter pricing?",
+      a: "Lambda pricing varies by region, architecture, and discounts. Use your effective rates for the best estimate.",
+    },
+    {
+      q: "Does this include CloudWatch logs and metrics?",
+      a: "No. Logging and metrics are usually separate line items. Add them using a logging calculator if relevant.",
+    },
+    {
+      q: "How do I estimate duration and memory?",
+      a: "Use p50/p95 duration from your monitoring and the configured memory size. Model a few scenarios if you're unsure.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/guides/aws-lambda-pricing", label: "Guide: Lambda pricing (what to include)" },
+    { href: "/guides/aws-cloudwatch-logs-pricing", label: "Guide: CloudWatch Logs pricing" },
+    { href: "/calculators/log-cost-calculator", label: "Log cost calculator" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Egress cost calculator" },
+  ]}
+>
+  <AwsLambdaCostCalculatorComponent client:load />
+</CalculatorLayout>
+

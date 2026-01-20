@@ -1,0 +1,65 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS Lambda cost optimization (high-leverage fixes)";
+const description =
+  "A short playbook for reducing Lambda-style spend: reduce duration, right-size memory, cut logs, and avoid transfer surprises.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-lambda-cost-optimization"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What’s the #1 driver of Lambda compute cost?",
+      a: "GB-seconds: invocations × duration × configured memory. Reduce any of the three to reduce compute cost.",
+    },
+    {
+      q: "Can logging dominate Lambda costs?",
+      a: "Yes. High-volume structured logs can create large ingestion + retention bills even when function compute is modest.",
+    },
+  ]}
+>
+  <p class="muted">
+    Lambda costs usually scale with usage, but a few changes can dramatically reduce spend without changing product
+    behavior.
+  </p>
+
+  <h2>1) Reduce duration first</h2>
+  <ul>
+    <li>Use connection reuse for HTTP clients and databases.</li>
+    <li>Move expensive initialization outside the handler when safe.</li>
+    <li>Cache heavy lookups when correctness allows.</li>
+  </ul>
+
+  <h2>2) Right-size memory (and measure)</h2>
+  <p>
+    Memory affects both CPU allocation and GB-seconds. Benchmark a few memory sizes; sometimes a higher memory setting
+    reduces duration enough to reduce total cost.
+  </p>
+
+  <h2>3) Treat logging as a billable product feature</h2>
+  <ul>
+    <li>Log fewer bytes (avoid huge JSON blobs and repeated fields).</li>
+    <li>Lower log level in steady state; sample noisy endpoints.</li>
+    <li>Set retention intentionally (often 7–30 days, not “forever”).</li>
+  </ul>
+  <p>
+    Use <a href="/calculators/log-cost-calculator/">Log Cost Calculator</a> to estimate ingestion + retention impact.
+  </p>
+
+  <h2>4) Avoid transfer and NAT surprises</h2>
+  <p>
+    If your function runs in a VPC, outbound traffic patterns can create extra line items (e.g., NAT gateway). Model
+    transfer early using <a href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a> and{" "}
+    <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
+  </p>
+
+  <h2>5) Always validate with a “per 1M requests” number</h2>
+  <p>
+    Convert your estimate into a unit cost to compare architectures and spot regressions quickly:
+    <a href="/calculators/aws-lambda-cost-calculator/"> Lambda cost calculator</a>.
+  </p>
+</GuideLayout>
+
