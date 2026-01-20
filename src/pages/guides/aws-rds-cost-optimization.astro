@@ -1,0 +1,65 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS RDS cost optimization (high-leverage fixes)";
+const description =
+  "A short playbook to reduce RDS cost: right-size instances, control storage growth, tune backups, and avoid expensive I/O patterns.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-rds-cost-optimization"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What’s the #1 lever for RDS cost?",
+      a: "Right-sizing compute (instance hours) and avoiding over-provisioned storage. These two usually dominate recurring spend.",
+    },
+    {
+      q: "How do backups affect monthly cost?",
+      a: "Backup GB-month can become a steady recurring cost with long retention and high churn. Treat it as a separate budget line.",
+    },
+  ]}
+>
+  <p class="muted">
+    RDS spend is often predictable. That’s good news: a few simple levers usually deliver meaningful savings without risky
+    architecture changes.
+  </p>
+
+  <h2>1) Right-size instances (and use schedules where possible)</h2>
+  <ul>
+    <li>Downsize over-provisioned instances after measuring CPU/IO/memory headroom.</li>
+    <li>Use non-prod schedules (stop/scale down) if supported by your ops model.</li>
+    <li>For stable workloads, compare on-demand vs commitments and use an effective $/hour in your budget model.</li>
+  </ul>
+
+  <h2>2) Control storage growth</h2>
+  <p>
+    Storage growth is easy to ignore until you hit a budget wall. Use{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">Database Storage Growth Calculator</a> to forecast the
+    next 3–12 months.
+  </p>
+
+  <h2>3) Treat backups as a first-class cost</h2>
+  <ul>
+    <li>Set retention intentionally (don’t default to “forever”).</li>
+    <li>Reduce churn where possible (batch writes, compaction, TTL strategies).</li>
+    <li>Review snapshot frequency—more is not always better.</li>
+  </ul>
+  <p>
+    Related: <a href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>.
+  </p>
+
+  <h2>4) Avoid expensive I/O patterns</h2>
+  <p>
+    If your storage pricing charges for I/O, optimize query patterns and indexes, and avoid full table scans. Model I/O
+    as “low / high” scenarios in the calculator to see sensitivity.
+  </p>
+
+  <h2>5) Sanity-check with a simple calculator</h2>
+  <p>
+    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> to break your budget into compute,
+    storage, backups, and I/O so you can see which lever matters most.
+  </p>
+</GuideLayout>
+

@@ -1,0 +1,58 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsRdsCostCalculator as AwsRdsCostCalculatorComponent } from "../../components/calculators/AwsRdsCost";
+
+const title = "AWS RDS Cost Calculator";
+const description =
+  "Estimate AWS RDS-style monthly cost from instance hours, storage, backups, and I/O request pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-rds-cost-calculator"
+  intro="Estimate RDS-style managed database cost with a simple model: instance hours + storage + backup storage + I/O requests."
+  examples={[
+    "1 instance at $0.20/hour running 730h/month, 200GB storage, 200GB backups, and 5B I/O requests/month.",
+  ]}
+  includes={[
+    "Compute from instances × hours/month × $/hour.",
+    "Storage from GB-month × $/GB-month.",
+    "Backup storage from GB-month × $/GB-month.",
+    "I/O requests from monthly I/O volume × $ per 1M requests.",
+  ]}
+  excludes={[
+    "Network/data transfer, monitoring/logs, licensing, taxes, and feature add-ons.",
+    "Free tiers, tiered steps, and per-engine differences unless you reflect them in pricing inputs.",
+  ]}
+  how={[
+    "Compute cost = instances × hours per month × $ per hour.",
+    "Storage cost = GB-month × $ per GB-month.",
+    "Backup cost = backup GB-month × $ per GB-month.",
+    "I/O cost = (I/O requests per month / 1,000,000) × $ per 1M I/O requests.",
+    "Total = compute + storage + backups + I/O (excluding transfer and add-ons).",
+  ]}
+  faqs={[
+    {
+      q: "Why do I need to enter pricing?",
+      a: "RDS pricing varies by engine, region, storage type, and discounts. Use your effective rates for accurate estimates.",
+    },
+    {
+      q: "Does this include Multi-AZ replicas or read replicas?",
+      a: "Not directly. Model additional instances and storage as separate line items (or increase instance count and backup/storage inputs).",
+    },
+    {
+      q: "What should I use for I/O requests?",
+      a: "Use monitoring/engine metrics or estimate from workload. If you don't have I/O pricing in your plan, set it to $0 to exclude.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/guides/aws-rds-pricing", label: "Guide: RDS pricing (what to include)" },
+    { href: "/guides/aws-rds-backups-and-snapshots", label: "Guide: backups and snapshots" },
+    { href: "/guides/aws-rds-cost-optimization", label: "Guide: RDS cost optimization" },
+    { href: "/calculators/database-storage-growth-cost-calculator", label: "DB storage growth" },
+  ]}
+>
+  <AwsRdsCostCalculatorComponent client:load />
+</CalculatorLayout>
+

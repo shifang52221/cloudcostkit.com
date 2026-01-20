@@ -201,6 +201,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-rds-cost-calculator",
+    title: "AWS RDS Cost Calculator",
+    description: "Estimate RDS-style cost from instance hours, storage, backups, and I/O assumptions.",
+    category: "FinOps",
+  },
+  {
     slug: "rps-to-monthly-requests-calculator",
     title: "RPS to Monthly Requests Calculator",
     description: "Estimate monthly request volume from RPS, hours/day, and utilization.",

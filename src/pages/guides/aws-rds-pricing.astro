@@ -1,0 +1,62 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS RDS pricing (what to include)";
+const description =
+  "A practical checklist for estimating AWS RDS costs: instances, storage, backups, I/O, and the line items that commonly surprise budgets.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-rds-pricing"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What are the core RDS cost components?",
+      a: "Compute (instance hours), database storage (GB-month), backup storage (GB-month), and sometimes I/O requests depending on storage type/engine.",
+    },
+    {
+      q: "Is Multi-AZ “free”?",
+      a: "No. High availability typically means additional instance and storage costs. Model it explicitly as more instances and/or storage where applicable.",
+    },
+  ]}
+>
+  <p class="muted">
+    RDS pricing varies by engine and storage type, but a simple cost model usually gets you close enough for planning:
+    compute + storage + backups + (optional) I/O.
+  </p>
+
+  <h2>1) Start with compute (instance hours)</h2>
+  <p>
+    For budgeting, model <strong>instances × hours/month × $/hour</strong>. If you have read replicas or Multi-AZ, model
+    them as extra instances.
+  </p>
+
+  <h2>2) Add database storage (GB-month)</h2>
+  <p>
+    Storage is typically billed per GB-month. Use your expected allocated storage (or average used storage if your plan
+    bills that way).
+  </p>
+
+  <h2>3) Model backups and snapshots</h2>
+  <p>
+    Backup storage can be a steady monthly cost, especially if you keep long retention or frequent snapshots. Use a
+    separate estimate for <strong>backup GB-month</strong>.
+  </p>
+  <p>
+    Next: <a href="/guides/aws-rds-backups-and-snapshots/">Backups & snapshots (how to estimate)</a>.
+  </p>
+
+  <h2>4) Include I/O only if your pricing model charges for it</h2>
+  <p>
+    Some storage models charge per I/O request. If you don’t have a reliable I/O estimate, run two scenarios: “low I/O”
+    and “high I/O”.
+  </p>
+
+  <h2>5) Use a calculator for fast scenario planning</h2>
+  <p>
+    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> to model instance hours + storage +
+    backups + I/O with your own pricing assumptions.
+  </p>
+</GuideLayout>
+

@@ -1,0 +1,56 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "RDS backups and snapshots (how to estimate cost)";
+const description =
+  "A practical approach to estimating RDS backup and snapshot storage: retention, growth, and the biggest planning mistakes.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-rds-backups-and-snapshots"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What’s the simplest way to estimate backup storage?",
+      a: "Use average daily change rate × retention days as a starting point, then sanity-check against real snapshot sizes if you have them.",
+    },
+    {
+      q: "Why do snapshots become expensive?",
+      a: "Long retention, frequent snapshots, and fast-changing datasets can grow backup GB-month quickly, even when primary storage is stable.",
+    },
+  ]}
+>
+  <p class="muted">
+    Backup costs often surprise teams because they grow silently with retention and data churn. Plan backups as a separate
+    storage bucket, not “part of the instance.”
+  </p>
+
+  <h2>1) Separate three concepts</h2>
+  <ul>
+    <li><strong>Primary DB storage</strong>: the allocated/used database size.</li>
+    <li><strong>Backup retention</strong>: how many days/weeks of history you keep.</li>
+    <li><strong>Churn</strong>: how much data changes each day (writes/updates).</li>
+  </ul>
+
+  <h2>2) A quick planning estimate</h2>
+  <p>
+    If you don’t have accurate snapshot sizes yet, estimate <strong>backup GB</strong> as:
+    <br />
+    <strong>backup GB ≈ daily changed GB × retention days</strong>.
+  </p>
+
+  <h2>3) Validate against reality</h2>
+  <p>
+    Use your provider dashboards to inspect snapshot sizes and growth. If churn is bursty (batch jobs), model the busy
+    weeks as a separate scenario.
+  </p>
+
+  <h2>4) Feed the estimate into the calculator</h2>
+  <p>
+    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> and set “backup storage (GB-month)” to
+    your best estimate. Combine it with storage growth modeling via{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
+  </p>
+</GuideLayout>
+
