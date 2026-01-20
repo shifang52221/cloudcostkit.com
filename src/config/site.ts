@@ -13,6 +13,11 @@ export const SITE = {
       import.meta.env.PUBLIC_ADSENSE_SLOT_DEFAULT ||
       ""
     ).trim(), // e.g. "1234567890"
+    guidesMid: (
+      import.meta.env.PUBLIC_ADSENSE_SLOT_GUIDES_MID ||
+      import.meta.env.PUBLIC_ADSENSE_SLOT_DEFAULT ||
+      ""
+    ).trim(),
     calculatorsListMid: (
       import.meta.env.PUBLIC_ADSENSE_SLOT_CALCULATORS_LIST_MID ||
       import.meta.env.PUBLIC_ADSENSE_SLOT_DEFAULT ||
