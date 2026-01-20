@@ -1,0 +1,47 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudFront pricing: a practical way to estimate bandwidth and request costs";
+const description =
+  "A practical guide to estimating CloudFront-style CDN costs using bandwidth (GB/month) and request fees, without relying on hardcoded prices.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-cloudfront-pricing" lastUpdated="2026-01-20">
+  <p>
+    CloudFront-style CDN bills usually have two primary parts: <strong>bandwidth</strong> and <strong>requests</strong>.
+    This guide explains how to estimate both in a way that stays stable as pricing changes.
+  </p>
+
+  <h2>1) Estimate bandwidth (GB/month)</h2>
+  <p>
+    Use CDN analytics if you have them. If you only have throughput charts (Mbps), convert Mbps to GB/month using the
+    <a href="/calculators/unit-converter/">Units Converter</a> or follow
+    <a href="/guides/estimate-cdn-bandwidth-gb-per-month/">this bandwidth estimation guide</a>.
+  </p>
+
+  <h2>2) Estimate request volume (requests/month)</h2>
+  <p>
+    If you have a request count from logs/analytics, use it directly. If you have RPS, convert it to monthly requests
+    with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
+  </p>
+
+  <h2>3) Apply pricing assumptions</h2>
+  <ul>
+    <li>Bandwidth line item: GB/month × $/GB (use a blended rate if pricing tiers apply).</li>
+    <li>Request line item: (requests/month ÷ 10k) × $ per 10k.</li>
+  </ul>
+
+  <h2>4) Common pitfalls</h2>
+  <ul>
+    <li>Mixing GB and GiB units across dashboards and pricing pages.</li>
+    <li>Ignoring tiered pricing (use blended rates or scenario modeling).</li>
+    <li>Forgetting origin egress/cache fill when your hit rate is low.</li>
+  </ul>
+
+  <h2>Related calculators</h2>
+  <p>
+    <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+  </p>
+</GuideLayout>
+

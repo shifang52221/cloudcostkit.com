@@ -1,0 +1,60 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogIngestionCostCalculator } from "../../components/calculators/LogIngestionCost";
+import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
+
+const title = "CloudWatch Logs Cost Calculator";
+const description =
+  "Estimate CloudWatch Logs-style costs from ingestion volume and retention storage assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cloudwatch-log-cost-calculator"
+  intro="CloudWatch Logs-style pricing is commonly driven by ingestion volume and retention. This page helps you estimate a practical monthly total by combining ingestion and retention storage line items using your own assumptions."
+  examples={[
+    "Estimate ingestion from GB/day and a $/GB rate, then estimate retained storage from retention days and $/GB-month.",
+    "Retention can dominate total cost when you keep high-volume logs for 90–365 days.",
+  ]}
+  includes={[
+    "Ingestion estimate from GB/day and $/GB assumptions.",
+    "Retention storage estimate from GB/day, retention days, and $/GB-month assumptions.",
+  ]}
+  excludes={[
+    "Query/scan charges and premium features (model separately if billed).",
+    "Region-tiered pricing unless you use blended rates or separate scenarios.",
+  ]}
+  how={[
+    "Ingestion cost = GB/day × days/month × $/GB.",
+    "Retained storage (steady-state) ≈ GB/day × retention days; apply $/GB-month.",
+    "Sum the two line items for a monthly estimate."
+  ]}
+  faqs={[
+    {
+      q: "Why does retention matter so much?",
+      a: "Storage is billed per GB-month. Longer retention multiplies the amount of stored data even if ingestion stays flat.",
+    },
+    {
+      q: "How do I reduce costs quickly?",
+      a: "Reduce noisy logs at source, shorten retention for low-value logs, and avoid retaining high-volume debug logs in hot storage.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/calculators/log-cost-calculator", label: "Log cost calculator (generic)" },
+    { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost calculator" },
+    { href: "/guides/aws-cloudwatch-logs-pricing", label: "Guide: CloudWatch Logs pricing" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Ingestion</h2>
+  </div>
+  <LogIngestionCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Retention storage</h2>
+  </div>
+  <LogRetentionStorageCostCalculator client:load />
+</CalculatorLayout>
+

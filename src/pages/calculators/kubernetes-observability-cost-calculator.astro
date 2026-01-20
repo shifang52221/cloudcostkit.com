@@ -1,0 +1,59 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogIngestionCostCalculator } from "../../components/calculators/LogIngestionCost";
+import { MetricsTimeseriesCostCalculator } from "../../components/calculators/MetricsTimeseriesCost";
+
+const title = "Kubernetes Observability Cost Calculator";
+const description =
+  "Estimate Kubernetes observability costs from log ingestion volume and metrics series assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/kubernetes-observability-cost-calculator"
+  intro="Observability is a common surprise line item for Kubernetes. This calculator estimates two typical parts: logs (GB ingested) and metrics (active series). Use it as a baseline and validate with your real data."
+  examples={[
+    "Estimate log ingestion from GB/day and a $/GB rate, then estimate metrics cost from active series and $/series-month.",
+    "High-cardinality labels and verbose logs can quickly multiply costs.",
+  ]}
+  includes={[
+    "Log ingestion cost estimate from GB/day and $/GB assumptions.",
+    "Metrics time series cost estimate from active series and $/series-month assumptions.",
+  ]}
+  excludes={[
+    "Tracing costs, long-term archive tiers, and premium features unless you model them separately.",
+    "Query/scan charges (model separately if your vendor bills them).",
+  ]}
+  how={[
+    "Logs: estimate GB/day and apply your per-GB rate.",
+    "Metrics: estimate active series and apply your per-series-month rate.",
+    "Sum line items to get a baseline monthly observability estimate."
+  ]}
+  faqs={[
+    {
+      q: "What is an 'active series'?",
+      a: "A unique metric name + label set. High-cardinality labels can create many series and increase cost.",
+    },
+    {
+      q: "How do I reduce observability cost?",
+      a: "Reduce noisy logs at source, limit high-cardinality labels, and define retention tiers based on value.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/calculators/kubernetes-cost-calculator", label: "Kubernetes cost calculator" },
+    { href: "/guides/aws-logging-cost-reduction", label: "Guide: reduce logging costs" },
+    { href: "/guides/kubernetes-cost-model-beyond-nodes", label: "K8s cost model checklist" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Logs</h2>
+  </div>
+  <LogIngestionCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Metrics</h2>
+  </div>
+  <MetricsTimeseriesCostCalculator client:load />
+</CalculatorLayout>
+

@@ -1,0 +1,43 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS cost checklist: a simple budgeting framework";
+const description =
+  "A one-page AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-cost-checklist" lastUpdated="2026-01-20">
+  <p>
+    Use this checklist when you want a “good enough” AWS budget quickly. The goal is to avoid missing the line items that
+    most often surprise teams.
+  </p>
+
+  <h2>Compute</h2>
+  <ul>
+    <li><a href="/calculators/ec2-cost-calculator/">EC2 cost</a> (instances × $/hour × uptime)</li>
+    <li><a href="/calculators/eks-cost-calculator/">EKS cost</a> (nodes + control plane)</li>
+  </ul>
+
+  <h2>Storage</h2>
+  <ul>
+    <li><a href="/calculators/s3-cost-calculator/">S3 cost</a> (storage + requests + egress)</li>
+    <li><a href="/calculators/s3-replication-cost-calculator/">S3 replication</a> (if you replicate/copy data)</li>
+  </ul>
+
+  <h2>Data transfer</h2>
+  <ul>
+    <li><a href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer</a></li>
+    <li><a href="/calculators/data-egress-cost-calculator/">Internet egress</a></li>
+  </ul>
+
+  <h2>Observability</h2>
+  <ul>
+    <li><a href="/calculators/log-cost-calculator/">Log cost</a></li>
+    <li><a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series cost</a></li>
+  </ul>
+
+  <h2>CDN</h2>
+  <ul>
+    <li><a href="/calculators/cloudfront-cost-calculator/">CloudFront cost</a></li>
+  </ul>
+</GuideLayout>
+

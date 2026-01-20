@@ -1,0 +1,36 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 storage classes: how they change cost (and when archive fees matter)";
+const description =
+  "A practical guide to S3-like storage classes: why cheaper storage can come with retrieval/transition tradeoffs, and how to model cost with simple assumptions.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-storage-classes" lastUpdated="2026-01-20">
+  <p>
+    Storage classes are a common source of confusion. “Cheaper per GB” tiers can introduce retrieval, transition, and
+    minimum storage duration effects that matter for bursty access patterns.
+  </p>
+
+  <h2>How to model storage classes safely</h2>
+  <ul>
+    <li>Split your data into a few access tiers (hot / warm / archive)</li>
+    <li>Estimate average GB stored in each tier</li>
+    <li>Estimate retrieval GB/month for colder tiers</li>
+    <li>Model transitions if you move objects between tiers regularly</li>
+  </ul>
+
+  <h2>When archive fees matter</h2>
+  <ul>
+    <li>Large restores for backfills or audits</li>
+    <li>Frequent “read after long retention” workflows</li>
+    <li>Short-lived data placed into tiers with minimum duration</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/s3-cost-calculator/">S3 cost calculator</a>
+    <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing calculator</a>
+    <a class="btn" href="/guides/aws-s3-pricing/">S3 pricing model</a>
+  </p>
+</GuideLayout>
+

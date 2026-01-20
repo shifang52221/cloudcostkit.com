@@ -1,0 +1,55 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "VPC Data Transfer Cost Calculator";
+const description =
+  "Estimate VPC-style data transfer costs from GB/month and a $/GB pricing assumption. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/vpc-data-transfer-cost-calculator"
+  intro="Data transfer is often the hardest cloud line item to predict. This VPC data transfer cost calculator helps you estimate monthly spend from GB/month and your $/GB assumptions. Use it for cross-zone, cross-region, and internet egress style modeling."
+  examples={[
+    "If you move 2,000 GB/month across boundaries at your $/GB -> estimate monthly transfer spend.",
+    "Transfer costs can exceed compute for chatty microservices or data-heavy pipelines.",
+  ]}
+  includes={[
+    "Transfer cost estimate from GB/month and $/GB pricing assumptions.",
+    "Useful for internet egress, cross-boundary transfers, and general transfer modeling.",
+  ]}
+  excludes={[
+    "Per-hour gateway fees (e.g., NAT gateway hourly) and per-connection pricing.",
+    "Provider-specific exceptions and free allowances unless you model them separately.",
+  ]}
+  how={[
+    "Monthly transfer cost = GB/month × $/GB.",
+    "If you have multiple transfer types (internet egress, cross-region, cross-zone), model each separately and sum.",
+    "If you have free allowances, subtract them before applying rates."
+  ]}
+  faqs={[
+    {
+      q: "What should I use for GB/month?",
+      a: "Start from monitoring/flow logs/billing exports. If you only have average throughput, convert Mbps to GB/month with the Units Converter.",
+    },
+    {
+      q: "Why are transfer bills surprising?",
+      a: "Because many architectures have hidden east-west traffic. Cross-zone service calls, replication, and cache fill can create large GB/month totals.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost (generic)" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+    { href: "/guides/aws-vpc-data-transfer", label: "Guide: VPC data transfer" },
+  ]}
+>
+  <DataEgressCostCalculator
+    transferLabel="Data transfer (GB / month)"
+    priceLabel="Transfer price ($ / GB)"
+    defaultGbPerMonth={2000}
+    defaultPricePerGbUsd={0.02}
+  client:load />
+</CalculatorLayout>
+

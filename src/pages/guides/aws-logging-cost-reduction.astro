@@ -1,0 +1,37 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "How to reduce logging and observability costs (without losing signal)";
+const description =
+  "Practical techniques to reduce log and metrics costs: sampling, retention tiers, label hygiene, and source-side filtering - with calculators to quantify impact.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-logging-cost-reduction"
+  lastUpdated="2026-01-20"
+>
+  <p>
+    Observability cost usually grows because volume and cardinality grow silently. The best reductions come from removing
+    low-value data before it is ingested, and keeping high-value data longer.
+  </p>
+
+  <h2>High-impact levers</h2>
+  <ul>
+    <li><strong>Source-side filtering</strong>: drop noisy logs before shipping.</li>
+    <li><strong>Sampling</strong>: keep full fidelity for errors, sample debug/info.</li>
+    <li><strong>Retention tiers</strong>: short retention for hot logs, longer retention for sparse high-value logs.</li>
+    <li><strong>Label hygiene</strong>: avoid high-cardinality labels in metrics.</li>
+  </ul>
+
+  <h2>Quantify the impact</h2>
+  <p>
+    Use these calculators to estimate savings:
+  </p>
+  <ul>
+    <li><a href="/calculators/log-cost-calculator/">Log cost calculator</a></li>
+    <li><a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost</a></li>
+    <li><a href="/calculators/kubernetes-observability-cost-calculator/">Kubernetes observability cost</a></li>
+  </ul>
+</GuideLayout>
+

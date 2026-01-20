@@ -1,0 +1,25 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Reserved vs on-demand: how to choose commitments using break-even analysis";
+const description =
+  "A practical guide to choosing commitments: use break-even utilization and sensitivity analysis to decide when reserved pricing beats on-demand.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-reserved-vs-on-demand" lastUpdated="2026-01-20">
+  <p>
+    Commitments can reduce cost, but only if you have sufficient steady utilization. Break-even analysis helps you decide
+    where commitments make sense and where on-demand flexibility is worth it.
+  </p>
+
+  <h2>Break-even intuition</h2>
+  <p>
+    Compare the effective hourly cost of a commitment to on-demand. The break-even point is the utilization where the
+    committed option becomes cheaper.
+  </p>
+
+  <h2>Use the calculator</h2>
+  <p>
+    <a class="btn" href="/calculators/reserved-vs-on-demand-break-even-calculator/">Reserved vs on-demand break-even</a>
+  </p>
+</GuideLayout>
+

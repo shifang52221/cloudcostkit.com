@@ -1,0 +1,38 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 request costs: when GET/PUT/LIST becomes meaningful";
+const description =
+  "S3 request costs are often tiny, but they can matter for workloads with many small objects or high metadata churn. Learn how to estimate request fees and when to care.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-request-costs" lastUpdated="2026-01-20">
+  <p>
+    Many teams ignore S3 request costs because storage and egress usually dominate. But requests become meaningful when
+    you have millions of small objects, frequent LIST/HEAD calls, or chatty pipelines.
+  </p>
+
+  <h2>How to estimate request fees</h2>
+  <ul>
+    <li>Collect request counts from logs/metrics/billing exports.</li>
+    <li>Convert RPS to monthly requests if needed.</li>
+    <li>Apply per-request-class pricing assumptions and sum.</li>
+  </ul>
+  <p>
+    Tool: <a href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a>.
+  </p>
+
+  <h2>Patterns that drive request spikes</h2>
+  <ul>
+    <li>Frequent LIST operations over large prefixes</li>
+    <li>Small-object workloads (higher requests per GB stored)</li>
+    <li>ETL pipelines that repeatedly scan metadata</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 request cost</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+    <a class="btn" href="/guides/aws-s3-pricing/">S3 pricing model</a>
+  </p>
+</GuideLayout>
+

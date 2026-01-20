@@ -1,0 +1,39 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "NAT gateway costs: why they spike and how to estimate them";
+const description =
+  "NAT gateways can create surprising bills because costs scale with both time and traffic. Learn a practical way to estimate and reduce NAT gateway spend.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-nat-gateway-cost" lastUpdated="2026-01-20">
+  <p>
+    NAT gateway bills are often surprising because they combine a fixed hourly component with traffic-based charges. If
+    you put high-throughput workloads behind NAT, costs can spike quickly.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>Hours/month the NAT gateway is provisioned (usually ~730 if always on)</li>
+    <li>GB/month processed through NAT (egress to the internet, software updates, external APIs)</li>
+  </ul>
+
+  <h2>How to estimate GB/month</h2>
+  <p>
+    Start from flow logs or egress monitoring. If you only have throughput charts, convert Mbps to GB/month using the
+    <a href="/calculators/unit-converter/">Units Converter</a>.
+  </p>
+
+  <h2>How to reduce NAT spend</h2>
+  <ul>
+    <li>Use VPC endpoints / private access for common services where applicable</li>
+    <li>Cache software updates and container images</li>
+    <li>Keep traffic in-region where possible</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer calculator</a>
+    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
+  </p>
+</GuideLayout>
+

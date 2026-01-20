@@ -1,0 +1,47 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 pricing: a practical model for storage, requests, egress, and replication";
+const description =
+  "A practical S3 pricing guide: what to include (GB-month, requests, egress, replication) and how to estimate the key inputs without copying price tables.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-20">
+  <p>
+    S3-like object storage pricing looks simple until you add data movement. A solid model covers four common buckets:
+    <strong>storage</strong>, <strong>requests</strong>, <strong>egress</strong>, and <strong>replication/copy</strong>.
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>
+    Use average stored GB (GB-month). If your dataset grows, average is more accurate than end-of-month GB.
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>.
+  </p>
+
+  <h2>2) Requests (GET/PUT/LIST)</h2>
+  <p>
+    Requests are often small for large-object workloads, but can be material for millions of small objects.
+    Tool: <a href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a>.
+  </p>
+
+  <h2>3) Egress (data transfer out)</h2>
+  <p>
+    Egress is the most common surprise cost. If you read lots of data out of storage, $/GB transfer can dominate.
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
+  </p>
+
+  <h2>4) Replication and cross-region copy</h2>
+  <p>
+    Replication fees are driven by <em>changed data</em> (replicated GB/month), not total stored GB. Estimate replication
+    volume from writes and churn, then apply a $/GB assumption. Tools:
+    <a href="/guides/estimate-replication-gb-per-month-from-writes/">estimate replication volume</a> and
+    <a href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a>.
+  </p>
+
+  <h2>Related calculators</h2>
+  <p>
+    <a class="btn" href="/calculators/s3-cost-calculator/">S3 cost calculator</a>
+    <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing (generic)</a>
+    <a class="btn" href="/guides/s3-pricing-explained/">S3 pricing explained</a>
+  </p>
+</GuideLayout>
+

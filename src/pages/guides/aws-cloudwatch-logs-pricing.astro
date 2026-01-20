@@ -1,0 +1,42 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudWatch Logs pricing: ingestion vs retention and the fastest levers";
+const description =
+  "A practical guide to CloudWatch Logs-style pricing: model ingestion and retention separately, and use retention/noise reduction to control cost.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-logs-pricing"
+  lastUpdated="2026-01-20"
+>
+  <p>
+    CloudWatch Logs-style pricing commonly has two major components: <strong>ingestion</strong> (GB ingested) and
+    <strong>retention/storage</strong> (GB-month). Retention is the lever that most often drives long-term cost.
+  </p>
+
+  <h2>Model the two line items separately</h2>
+  <ul>
+    <li>Ingestion: GB/day × $/GB × days/month</li>
+    <li>Retention: (GB/day × retention days) × $/GB-month</li>
+  </ul>
+  <p>
+    Calculator: <a href="/calculators/cloudwatch-log-cost-calculator/">CloudWatch Logs cost calculator</a>.
+  </p>
+
+  <h2>Fastest ways to reduce log cost</h2>
+  <ul>
+    <li>Drop noisy logs at source (debug/info floods)</li>
+    <li>Shorten retention for low-value logs</li>
+    <li>Split tiers: hot short retention + cheaper archive if needed</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>
+    <a class="btn" href="/calculators/log-storage-cost-calculator/">Log storage cost</a>
+    <a class="btn" href="/guides/log-costs/">Log costs guide</a>
+  </p>
+</GuideLayout>
+

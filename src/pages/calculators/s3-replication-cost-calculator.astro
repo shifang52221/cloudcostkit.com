@@ -1,0 +1,51 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { StorageReplicationCostCalculator } from "../../components/calculators/StorageReplicationCost";
+
+const title = "S3 Replication Cost Calculator";
+const description =
+  "Estimate S3 replication cost from replicated GB/month and a per-GB pricing assumption. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/s3-replication-cost-calculator"
+  intro="S3 replication and cross-region copies are driven by changed data volume. Use this S3 replication cost calculator to estimate monthly replication fees from replicated GB/month and your per-GB assumption."
+  examples={[
+    "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at your $/GB -> estimate replication fee.",
+    "Replication volume is often far smaller than total stored GB because it’s driven by writes and churn.",
+  ]}
+  includes={[
+    "Replication fee estimate from replicated GB/month and $/GB pricing assumptions.",
+    "Useful for cross-region replication, backup copy traffic, and sync workloads.",
+  ]}
+  excludes={[
+    "Replica storage costs (model separately).",
+    "Provider-specific billing rules and request pricing unless you add them separately.",
+  ]}
+  how={[
+    "Monthly replication fee = replicated GB/month × $/GB.",
+    "Estimate replicated GB/month from write volume and churn (changed data), not from total stored dataset size.",
+    "Add destination storage and request fees separately if applicable."
+  ]}
+  faqs={[
+    {
+      q: "How do I estimate replicated GB/month?",
+      a: "Start from write volume (GB/day) or PUTs/day × average object size, then multiply by days per month and replication coverage.",
+    },
+    {
+      q: "Does replication include destination storage?",
+      a: "No. Replication usually means storing data twice. Add destination storage as a separate line item.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
+    { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
+    { href: "/guides/copy-storage-pricing", label: "Copy storage pricing checklist" },
+    { href: "/calculators/s3-cost-calculator", label: "S3 cost calculator" },
+  ]}
+>
+  <StorageReplicationCostCalculator client:load />
+</CalculatorLayout>
+

@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudFront cache hit rate: how it changes origin egress costs";
+const description =
+  "Cache hit rate strongly influences origin egress (cache fill) and overall CDN cost. Learn a simple way to estimate origin egress from hit rate and traffic.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudfront-cache-hit-rate"
+  lastUpdated="2026-01-20"
+>
+  <p>
+    CDN pricing is usually focused on edge bandwidth and requests, but <strong>origin egress</strong> can become a major
+    hidden line item. Cache hit rate is the key knob.
+  </p>
+
+  <h2>Simple model</h2>
+  <p>
+    Start with your expected edge bandwidth (GB/month). If your cache hit rate is H (for example, 0.85), then a simple
+    approximation is:
+  </p>
+  <ul>
+    <li>
+      Origin egress (GB/month) ≈ Edge bandwidth (GB/month) × (1 − H)
+    </li>
+  </ul>
+  <p>
+    This is not perfect, but it is good enough for budgeting. Low TTLs, invalidations, and multi-region fills can raise
+    origin egress beyond this baseline.
+  </p>
+
+  <h2>How to improve hit rate (and reduce origin egress)</h2>
+  <ul>
+    <li>Use stable caching headers and longer TTLs for static assets.</li>
+    <li>Avoid unnecessary cache-busting for large files.</li>
+    <li>Reduce “unique object” patterns (e.g., per-user URLs) where possible.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+    <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
+  </p>
+</GuideLayout>
+

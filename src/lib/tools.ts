@@ -21,9 +21,27 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "cloudfront-cost-calculator",
+    title: "CloudFront Cost Calculator",
+    description: "Estimate CDN cost for CloudFront-style pricing assumptions.",
+    category: "Networking",
+  },
+  {
+    slug: "vpc-data-transfer-cost-calculator",
+    title: "VPC Data Transfer Cost Calculator",
+    description: "Estimate data transfer spend from GB/month and $/GB assumptions.",
+    category: "Networking",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
+    category: "Storage",
+  },
+  {
+    slug: "s3-cost-calculator",
+    title: "S3 Cost Calculator",
+    description: "Estimate S3-like storage costs: storage, requests, egress, replication.",
     category: "Storage",
   },
   {
@@ -81,6 +99,12 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "cloudwatch-log-cost-calculator",
+    title: "CloudWatch Logs Cost Calculator",
+    description: "Estimate CloudWatch-style log ingestion + retention costs.",
+    category: "Logging",
+  },
+  {
     slug: "log-retention-storage-cost-calculator",
     title: "Log Retention Storage Cost Calculator",
     description: "Estimate retained log storage cost from GB/day, retention days, and $/GB-month pricing.",
@@ -111,6 +135,12 @@ export const TOOLS: Tool[] = [
     category: "Storage",
   },
   {
+    slug: "s3-replication-cost-calculator",
+    title: "S3 Replication Cost Calculator",
+    description: "Estimate replication fee from replicated GB/month and $/GB assumptions.",
+    category: "Storage",
+  },
+  {
     slug: "storage-replication-cost-calculator",
     title: "Storage Replication Cost Calculator",
     description: "Estimate replication transfer/storage cost from replicated GB and $/GB pricing.",
@@ -126,6 +156,18 @@ export const TOOLS: Tool[] = [
     slug: "kubernetes-cost-calculator",
     title: "Kubernetes Cost Calculator",
     description: "Estimate cluster cost by sizing nodes from requests and pricing them.",
+    category: "Kubernetes",
+  },
+  {
+    slug: "eks-cost-calculator",
+    title: "EKS Cost Calculator",
+    description: "Estimate EKS-style cost from node sizing and pricing assumptions.",
+    category: "Kubernetes",
+  },
+  {
+    slug: "kubernetes-observability-cost-calculator",
+    title: "Kubernetes Observability Cost Calculator",
+    description: "Estimate log + metrics observability costs for Kubernetes.",
     category: "Kubernetes",
   },
   {

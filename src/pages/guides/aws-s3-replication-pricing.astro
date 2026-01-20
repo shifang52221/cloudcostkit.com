@@ -1,0 +1,38 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 replication pricing: how to estimate replicated GB/month and total impact";
+const description =
+  "A practical guide to S3 replication pricing: replication volume (changed data), extra destination storage, and transfer-like charges.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-replication-pricing"
+  lastUpdated="2026-01-20"
+>
+  <p>
+    The biggest input in S3 replication pricing is <strong>replicated GB/month</strong>. That volume is driven by writes
+    and churn, not by total stored data.
+  </p>
+
+  <h2>Estimate replication volume from writes</h2>
+  <p>
+    Use <a href="/guides/estimate-replication-gb-per-month-from-writes/">this guide</a> to estimate replicated GB/month
+    from GB/day writes or PUT counts and object size.
+  </p>
+
+  <h2>Don’t forget destination storage</h2>
+  <p>
+    Replication typically means storing the data twice. Add destination storage as a separate line item using
+    <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>.
+  </p>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a>
+    <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
+    <a class="btn" href="/guides/s3-replication-cost/">S3 replication cost</a>
+  </p>
+</GuideLayout>
+

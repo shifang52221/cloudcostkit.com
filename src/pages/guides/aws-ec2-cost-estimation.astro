@@ -1,0 +1,30 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "EC2 cost estimation: blended rates, uptime, and hidden line items";
+const description =
+  "A practical EC2 cost estimation guide: model instance hours with uptime and blended rates, and remember storage and data transfer line items.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-ec2-cost-estimation" lastUpdated="2026-01-20">
+  <p>
+    EC2 cost estimation is straightforward when you separate compute from everything around it. This guide focuses on the
+    compute line item and how to choose realistic assumptions.
+  </p>
+
+  <h2>Compute baseline</h2>
+  <ul>
+    <li>Instances × $/hour × hours/month × uptime</li>
+    <li>Use a blended $/hour if you mix on-demand and commitments</li>
+  </ul>
+  <p>
+    Calculator: <a href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>.
+  </p>
+
+  <h2>What people forget</h2>
+  <ul>
+    <li>Storage (volumes, snapshots)</li>
+    <li>Data transfer (egress, cross-zone/region)</li>
+    <li>Load balancers and NAT gateways</li>
+  </ul>
+</GuideLayout>
+

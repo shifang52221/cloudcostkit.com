@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+
+const title = `AWS calculators | ${SITE.name}`;
+const description =
+  "AWS-focused cloud cost calculators: CloudFront, EKS, EC2, S3, VPC transfer, and CloudWatch-style logging estimates.";
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/aws">
+  <section class="card hero">
+    <h1>AWS calculators</h1>
+    <p>Practical calculators for common AWS cost line items. Use your own pricing assumptions.</p>
+  </section>
+
+  <section class="card section">
+    <div class="grid">
+      <a class="card2 tool col-6" href="/calculators/cloudfront-cost-calculator/">
+        <div class="tool-title">CloudFront cost</div>
+        <div class="tool-desc">Bandwidth + requests model with your pricing assumptions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/eks-cost-calculator/">
+        <div class="tool-title">EKS cost</div>
+        <div class="tool-desc">Node sizing from requests, then apply per-node pricing.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/ec2-cost-calculator/">
+        <div class="tool-title">EC2 cost</div>
+        <div class="tool-desc">Instance count × $/hour × uptime.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/s3-cost-calculator/">
+        <div class="tool-title">S3 cost</div>
+        <div class="tool-desc">Storage + requests + optional egress + replication.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/s3-request-cost-calculator/">
+        <div class="tool-title">S3 request cost</div>
+        <div class="tool-desc">GET/PUT request fees using your per-1k assumptions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/s3-replication-cost-calculator/">
+        <div class="tool-title">S3 replication cost</div>
+        <div class="tool-desc">Replicated GB/month × $/GB.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/vpc-data-transfer-cost-calculator/">
+        <div class="tool-title">VPC data transfer cost</div>
+        <div class="tool-desc">Estimate GB/month transfer spend from $/GB.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cloudwatch-log-cost-calculator/">
+        <div class="tool-title">CloudWatch Logs cost</div>
+        <div class="tool-desc">Ingestion + retention storage baseline estimate.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Related guides</h2>
+    <p class="muted" style="margin:0">
+      For step-by-step estimation guidance and pitfalls, browse <a href="/guides/aws/">AWS cost guides</a>.
+    </p>
+  </section>
+</BaseLayout>
+

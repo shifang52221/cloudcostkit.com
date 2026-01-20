@@ -1,0 +1,46 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "EKS node sizing: requests, overhead, and why packing is never perfect";
+const description =
+  "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets, and understand why real scheduling can require more nodes than the math minimum.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-eks-node-sizing"
+  lastUpdated="2026-01-20"
+>
+  <p>
+    For EKS (and Kubernetes in general), node sizing is best done from <strong>requests</strong>. Then you adjust for
+    overhead and the reality that scheduling is not perfect.
+  </p>
+
+  <h2>Step 1: requests drive capacity</h2>
+  <p>
+    Use representative pod requests to estimate total CPU/memory, then compute node count from allocatable capacity.
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; Limits Calculator</a>.
+  </p>
+
+  <h2>Step 2: reserve headroom</h2>
+  <p>
+    Reserve capacity for kube-system, daemonsets, and operational headroom (commonly 85–95% allocatable depending on
+    workload).
+  </p>
+
+  <h2>Step 3: accept imperfect packing</h2>
+  <ul>
+    <li>Pod density limits (max pods per node)</li>
+    <li>Topology spread constraints</li>
+    <li>Affinities/anti-affinities and taints</li>
+    <li>Mixed instance types</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+    <a class="btn" href="/guides/kubernetes-requests-vs-limits-for-sizing/">Requests vs limits</a>
+    <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Node cost</a>
+  </p>
+</GuideLayout>
+

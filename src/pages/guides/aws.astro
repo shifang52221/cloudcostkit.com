@@ -1,0 +1,96 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `AWS cost guides | ${SITE.name}`;
+const description =
+  "AWS cost estimation guides for CloudFront, EKS, EC2, S3, VPC data transfer, and CloudWatch-style logging.";
+const slots = SITE.adsenseSlots;
+---
+<BaseLayout title={title} description={description} canonicalPath="/guides/aws">
+  <section class="card hero">
+    <h1>AWS cost guides</h1>
+    <p>Short, practical notes to estimate common AWS line items and avoid pricing pitfalls.</p>
+  </section>
+
+  <section class="card section">
+    <div class="grid">
+      <a class="card2 tool col-6" href="/guides/aws-cloudfront-pricing/">
+        <div class="tool-title">CloudFront pricing (how to model)</div>
+        <div class="tool-desc">Bandwidth, requests, tiers, and common pitfalls.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-cloudfront-cache-hit-rate/">
+        <div class="tool-title">Cache hit rate and origin egress</div>
+        <div class="tool-desc">Estimate origin egress from cache behavior.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-eks-pricing/">
+        <div class="tool-title">EKS pricing (what to include)</div>
+        <div class="tool-desc">Control plane, nodes, and surrounding line items.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-eks-control-plane-cost/">
+        <div class="tool-title">EKS control plane cost</div>
+        <div class="tool-desc">When it matters and how to avoid multi-cluster cost traps.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-eks-node-sizing/">
+        <div class="tool-title">EKS node sizing</div>
+        <div class="tool-desc">Requests vs limits, overhead, and packing caveats.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-s3-pricing/">
+        <div class="tool-title">S3 pricing (storage, requests, egress)</div>
+        <div class="tool-desc">A practical cost model for object storage.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-s3-storage-classes/">
+        <div class="tool-title">S3 storage classes</div>
+        <div class="tool-desc">Archive tradeoffs: retrieval, transitions, and pitfalls.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-s3-request-costs/">
+        <div class="tool-title">S3 request costs</div>
+        <div class="tool-desc">When GET/PUT/LIST becomes meaningful.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-s3-data-transfer/">
+        <div class="tool-title">S3 data transfer costs</div>
+        <div class="tool-desc">Egress, cross-region access, and surprises.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-s3-replication-pricing/">
+        <div class="tool-title">S3 replication pricing</div>
+        <div class="tool-desc">Estimate replicated GB/month and extra storage.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-vpc-data-transfer/">
+        <div class="tool-title">VPC data transfer</div>
+        <div class="tool-desc">Cross-zone/region patterns and how to estimate.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-nat-gateway-cost/">
+        <div class="tool-title">NAT gateway cost</div>
+        <div class="tool-desc">Why NAT bills spike and how to estimate traffic.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-load-balancer-cost/">
+        <div class="tool-title">Load balancer cost</div>
+        <div class="tool-desc">Hourly + traffic-based components to remember.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-logs-pricing/">
+        <div class="tool-title">CloudWatch Logs pricing</div>
+        <div class="tool-desc">Ingestion, retention, and cost-control levers.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-metrics-pricing/">
+        <div class="tool-title">CloudWatch metrics pricing</div>
+        <div class="tool-desc">High-cardinality pitfalls and series costs.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-cost-checklist/">
+        <div class="tool-title">AWS cost checklist</div>
+        <div class="tool-desc">A one-page checklist for budgeting.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.guidesMid} minHeight={280} />
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Related calculators</h2>
+    <p class="muted" style="margin:0">
+      Browse <a href="/calculators/aws/">AWS calculators</a> for hands-on estimates.
+    </p>
+  </section>
+</BaseLayout>

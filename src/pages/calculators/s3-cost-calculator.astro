@@ -1,0 +1,84 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ObjectStorageCostCalculator } from "../../components/calculators/ObjectStorageCost";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+import { StorageReplicationCostCalculator } from "../../components/calculators/StorageReplicationCost";
+
+const title = "S3 Cost Calculator";
+const description =
+  "Estimate S3-like object storage costs from GB-month storage, request volume, optional egress, and optional replication assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/s3-cost-calculator"
+  intro="S3-like storage cost usually comes from storage (GB-month), requests, and egress. Some setups also add replication and cross-region transfer costs. This page groups common line items so you can build a realistic monthly estimate."
+  examples={[
+    "Start with storage + requests, then add egress if you download data, and replication if you copy across regions.",
+    "Many workloads are storage-dominated until egress or replication is added.",
+  ]}
+  includes={[
+    "Storage + request fee estimate (GET/PUT) using your pricing assumptions.",
+    "Optional egress estimate from GB/month and $/GB.",
+    "Optional replication estimate from replicated GB/month and $/GB.",
+  ]}
+  excludes={[
+    "Retrieval and lifecycle transition fees for archive tiers (model separately).",
+    "Provider-specific tiering and region complexity unless you use blended rates or scenarios.",
+  ]}
+  how={[
+    "Step 1: estimate storage cost and request fees.",
+    "Step 2: add egress if you transfer data out of storage.",
+    "Step 3: add replication/copy line items if you move data across regions.",
+    "Sum line items to get a monthly estimate."
+  ]}
+  faqs={[
+    {
+      q: "Do request fees matter for S3?",
+      a: "They can for millions of small objects or chatty workloads. For large objects with few operations, storage or egress usually dominates.",
+    },
+    {
+      q: "What drives replication cost?",
+      a: "Replicated GB/month (changed data), not the total stored dataset size. Estimate replication volume from writes and churn.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/calculators/storage-pricing-calculator", label: "Storage pricing calculator (generic)" },
+    { href: "/calculators/s3-request-cost-calculator", label: "S3 request cost calculator" },
+    { href: "/guides/s3-pricing-explained", label: "Guide: S3 pricing explained" },
+    { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
+    { href: "/guides/copy-storage-pricing", label: "Copy storage pricing checklist" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Storage + requests</h2>
+    <p class="muted" style="margin-top:8px">
+      Use average stored GB for GB-month billing, and add monthly request counts for GET/PUT pricing assumptions.
+    </p>
+  </div>
+  <ObjectStorageCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Optional: egress</h2>
+    <p class="muted" style="margin-top:8px">
+      If you download data from storage (to the internet or another region/provider), add an egress line item here.
+    </p>
+  </div>
+  <DataEgressCostCalculator
+    transferLabel="Egress from storage (GB / month)"
+    priceLabel="Egress price ($ / GB)"
+    defaultGbPerMonth={500}
+    defaultPricePerGbUsd={0.09}
+  client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>3) Optional: replication</h2>
+    <p class="muted" style="margin-top:8px">
+      Replication fees are often driven by changed data copied per month. Estimate replicated GB/month from write volume
+      and churn, then apply your $/GB assumption.
+    </p>
+  </div>
+  <StorageReplicationCostCalculator client:load />
+</CalculatorLayout>
+

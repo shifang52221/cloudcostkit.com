@@ -1,0 +1,50 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
+
+const title = "EC2 Cost Calculator";
+const description =
+  "Estimate EC2-style compute costs from instance count, $/hour, and expected uptime. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/ec2-cost-calculator"
+  intro="This EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand and commitments."
+  examples={[
+    "10 instances at your $/hour with 100% uptime -> estimate monthly compute cost.",
+    "Use lower uptime for dev/test workloads to avoid over-budgeting.",
+  ]}
+  includes={[
+    "Compute cost estimate from instance count and $/hour pricing assumption.",
+    "Uptime modeling to reflect environments that aren’t 24/7.",
+  ]}
+  excludes={[
+    "Storage (EBS), data transfer, and load balancer costs (model separately).",
+    "Spot interruptions and autoscaling dynamics unless you use blended assumptions.",
+  ]}
+  how={[
+    "Monthly cost ≈ instances × $/hour × hours/month × uptime.",
+    "If you use commitments (Savings Plans/Reserved), use a blended effective $/hour.",
+    "Model storage and transfer as separate line items."
+  ]}
+  faqs={[
+    {
+      q: "What is a good hours/month value?",
+      a: "A common planning value is ~730 hours/month. Use your billing system’s convention if it differs.",
+    },
+    {
+      q: "How do I pick a blended $/hour?",
+      a: "Use the weighted average you expect to pay across on-demand, commitments, and spot. Validate later with your actual bill.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
+    { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
+    { href: "/guides/aws-ec2-cost-estimation", label: "Guide: EC2 cost estimation" },
+  ]}
+>
+  <ComputeInstanceCostCalculator client:load />
+</CalculatorLayout>
+

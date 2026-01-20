@@ -1,0 +1,37 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "EKS pricing: what to include in a realistic cost estimate";
+const description =
+  "A practical EKS pricing checklist: nodes, control plane, load balancers, storage, logs/metrics, and data transfer - with calculators to estimate each part.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-eks-pricing" lastUpdated="2026-01-20">
+  <p>
+    The easiest way to underestimate EKS cost is to model only nodes. Node compute is usually the biggest part, but a
+    realistic budget includes several surrounding line items.
+  </p>
+
+  <h2>Baseline: node cost</h2>
+  <p>
+    Start by sizing nodes from workload requests, then apply a blended $/hour. Tools:
+    <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits</a> and
+    <a href="/calculators/kubernetes-node-cost-calculator/">node cost</a>.
+  </p>
+
+  <h2>Common add-ons</h2>
+  <ul>
+    <li><strong>Control plane fee</strong>: fixed hourly fee in many managed Kubernetes offerings.</li>
+    <li><strong>Load balancers / gateways</strong>: can be significant for high-traffic services.</li>
+    <li><strong>Storage</strong>: PVs, snapshots, and object storage buckets.</li>
+    <li><strong>Logs and metrics</strong>: often the biggest surprise cost.</li>
+    <li><strong>Data transfer</strong>: cross-zone/region traffic and internet egress.</li>
+  </ul>
+
+  <h2>Related calculators</h2>
+  <p>
+    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+    <a class="btn" href="/calculators/kubernetes-observability-cost-calculator/">Observability cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer cost</a>
+  </p>
+</GuideLayout>
+

@@ -1,0 +1,74 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
+import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+
+const title = "CloudFront Cost Calculator";
+const description =
+  "Estimate CloudFront-style CDN costs from bandwidth (GB/month) and request fees using your pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cloudfront-cost-calculator"
+  intro="This CloudFront cost calculator helps you estimate two common CDN line items: bandwidth and requests. Plug in your own $/GB and $ per 10k assumptions, then add them to get a monthly estimate."
+  examples={[
+    "Bandwidth: 10,000 GB/month at your $/GB + Requests: 400M/month at your $ per 10k -> estimate monthly CDN cost.",
+    "If your workload has many small objects, request fees can become a meaningful part of the bill.",
+  ]}
+  includes={[
+    "Bandwidth estimate from GB/month and $/GB pricing assumptions.",
+    "Request-fee estimate from requests/month and $ per 10k pricing assumptions.",
+  ]}
+  excludes={[
+    "Origin egress and cache fill costs (model separately if billed).",
+    "Tiered pricing by region unless you use a blended rate or model scenarios.",
+  ]}
+  how={[
+    "Total = bandwidth cost + request fees.",
+    "Bandwidth cost = GB/month × $/GB.",
+    "Request fees = (requests/month ÷ 10,000) × $ per 10k.",
+    "If pricing is tiered, use a blended rate or run multiple scenarios and sum."
+  ]}
+  faqs={[
+    {
+      q: "Is this an official CloudFront quote?",
+      a: "No. It’s a planning estimate based on the assumptions you enter. Always confirm pricing tiers, regions, and units in the official documentation.",
+    },
+    {
+      q: "What inputs do I need?",
+      a: "Monthly GB delivered to users and monthly request volume. If you only have throughput or RPS, convert them using the Units Converter and RPS-to-monthly tool.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/calculators/cdn-cost-calculator", label: "CDN cost calculator (generic)" },
+    { href: "/guides/aws-cloudfront-pricing", label: "Guide: CloudFront pricing" },
+    { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin egress vs CDN bandwidth" },
+    { href: "/calculators/unit-converter", label: "Units converter" },
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+  ]}
+>
+  <div class="prose">
+    <h2 style="margin-top:0">1) Bandwidth</h2>
+    <p class="muted" style="margin-top:8px">
+      Use monthly GB delivered by the CDN edge to end users. If you start from Mbps charts, convert Mbps to GB/month
+      using the Units Converter.
+    </p>
+  </div>
+  <DataEgressCostCalculator
+    transferLabel="CDN bandwidth (GB / month)"
+    priceLabel="CDN price ($ / GB)"
+    defaultGbPerMonth={10000}
+    defaultPricePerGbUsd={0.06}
+  client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2>2) Requests</h2>
+    <p class="muted" style="margin-top:8px">
+      If your provider bills per request (often per 10k), estimate monthly requests and apply the rate.
+    </p>
+  </div>
+  <CdnRequestCostCalculator client:load />
+</CalculatorLayout>
+

@@ -1,0 +1,39 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "EKS control plane cost: how to model it and when it matters";
+const description =
+  "A practical guide to modeling EKS-style control plane costs: fixed hourly fees, multi-cluster strategy, and how to keep dev/test clusters from inflating spend.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-eks-control-plane-cost"
+  lastUpdated="2026-01-20"
+>
+  <p>
+    Managed Kubernetes control plane fees are often a fixed hourly line item. They are small for large production
+    clusters, but they can dominate costs for small dev/test clusters—especially if you run many clusters.
+  </p>
+
+  <h2>When it matters</h2>
+  <ul>
+    <li>Many small clusters (per-team or per-environment)</li>
+    <li>Always-on dev/test environments</li>
+    <li>Multi-region clusters with duplicated control planes</li>
+  </ul>
+
+  <h2>How to keep it under control</h2>
+  <ul>
+    <li>Turn off idle dev/test clusters (or schedule uptime)</li>
+    <li>Consolidate non-prod workloads into fewer shared clusters</li>
+    <li>Use namespaces and policy to isolate teams when appropriate</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+    <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing guide</a>
+  </p>
+</GuideLayout>
+

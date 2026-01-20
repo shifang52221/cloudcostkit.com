@@ -1,0 +1,34 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Load balancer costs: what to include beyond node spend";
+const description =
+  "A practical guide to load balancer costs: fixed hourly charges, traffic-based components, and common patterns that increase spend in Kubernetes and web architectures.";
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-load-balancer-cost" lastUpdated="2026-01-20">
+  <p>
+    Load balancers can become a major cost line item even when compute is stable. The typical drivers are “always-on”
+    hourly charges and traffic-based components that scale with throughput or connection patterns.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>Number of load balancers and hours/month</li>
+    <li>GB/month processed (in/out)</li>
+    <li>Request rate, connection count, and TLS overhead (depending on provider billing model)</li>
+  </ul>
+
+  <h2>Common cost patterns</h2>
+  <ul>
+    <li>One load balancer per service in Kubernetes (too many LBs)</li>
+    <li>High-throughput APIs or large downloads</li>
+    <li>Long-lived connections and chatty clients</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer calculator</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
+  </p>
+</GuideLayout>
+
