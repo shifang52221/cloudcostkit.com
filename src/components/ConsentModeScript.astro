@@ -1,0 +1,18 @@
+---
+const inline = `(function () {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  window.gtag = window.gtag || gtag;
+
+  // Consent Mode v2 defaults (CMP will update these).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    analytics_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    wait_for_update: 500
+  });
+})();`;
+---
+<script is:inline type="text/javascript" set:html={inline}></script>
+

@@ -4,7 +4,8 @@ import { SITE } from "../config/site";
 import { withTrailingSlash } from "../lib/url";
 import AdSenseScript from "../components/AdSenseScript.astro";
 import Ga4Script from "../components/Ga4Script.astro";
-import ConsentBanner from "../components/ConsentBanner.astro";
+import ConsentModeScript from "../components/ConsentModeScript.astro";
+import FundingChoicesScript from "../components/FundingChoicesScript.astro";
 
 type Props = {
   title: string;
@@ -17,7 +18,6 @@ const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
 const normalizedCanonicalPath = canonicalPath ? withTrailingSlash(canonicalPath) : undefined;
 const canonical = normalizedCanonicalPath ? new URL(normalizedCanonicalPath, siteUrl).toString() : undefined;
 const ogImage = new URL("/og.svg", siteUrl).toString();
-const showConsentBanner = normalizedCanonicalPath !== "/cookie-notice/";
 ---
 <!doctype html>
 <html lang="en">
@@ -47,16 +47,8 @@ const showConsentBanner = normalizedCanonicalPath !== "/cookie-notice/";
     />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0b1220" />
-    <script is:inline type="text/javascript">
-      (function () {
-        try {
-          var v = window.localStorage.getItem("consent.v1");
-          if (v === "accepted" || v === "declined") {
-            document.documentElement.setAttribute("data-consent", v);
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <ConsentModeScript />
+    <FundingChoicesScript />
     <AdSenseScript />
     <Ga4Script />
   </head>
@@ -93,7 +85,5 @@ const showConsentBanner = normalizedCanonicalPath !== "/cookie-notice/";
         </div>
       </footer>
     </div>
-
-    {showConsentBanner ? <ConsentBanner /> : null}
   </body>
 </html>

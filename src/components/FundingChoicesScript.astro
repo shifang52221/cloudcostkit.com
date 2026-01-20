@@ -1,0 +1,42 @@
+---
+import { SITE } from "../config/site";
+
+function getPublisherId(): string {
+  const explicit = (
+    import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ||
+    import.meta.env.ADSENSE_PUBLISHER_ID ||
+    ""
+  ).trim();
+  if (explicit) return explicit;
+
+  const client = SITE.adsenseClient?.trim() || "";
+  if (client.startsWith("ca-pub-")) return `pub-${client.slice("ca-pub-".length)}`;
+  return "";
+}
+
+const publisherId = getPublisherId();
+const src = publisherId ? `https://fundingchoicesmessages.google.com/i/${publisherId}?ers=1` : "";
+
+const bootstrap = `(function() {
+  function signalGooglefcPresent() {
+    if (!window.frames['googlefcPresent']) {
+      if (document.body) {
+        var iframe = document.createElement('iframe');
+        iframe.style = 'width: 0; height: 0; border: none; z-index: -1; left: -9999px; top: -9999px; position: absolute;';
+        iframe.name = 'googlefcPresent';
+        document.body.appendChild(iframe);
+      } else {
+        setTimeout(signalGooglefcPresent, 0);
+      }
+    }
+  }
+  signalGooglefcPresent();
+})();`;
+---
+{src ? (
+  <>
+    <script async src={src}></script>
+    <script is:inline type="text/javascript" set:html={bootstrap}></script>
+  </>
+) : null}
+
