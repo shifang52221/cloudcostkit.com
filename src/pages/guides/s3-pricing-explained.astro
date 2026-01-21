@@ -4,12 +4,27 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "S3 pricing explained: storage vs requests vs egress";
 const description =
   "A practical breakdown of S3-like object storage pricing: GB-month storage, request fees, and data egress - plus how to estimate each without missing hidden line items.";
+const faqs = [
+  {
+    q: "What are the main drivers of S3 cost?",
+    a: "Most S3-like bills come from storage (GB-month), requests (GET/PUT/LIST), and data transfer out (egress). Replication/copy can add transfer/feature fees plus duplicate storage.",
+  },
+  {
+    q: "Do request fees matter?",
+    a: "Often they're small, but at very high request volume (or many small objects), request fees can be material.",
+  },
+  {
+    q: "Why use average stored GB instead of end-of-month GB?",
+    a: "Storage is billed per GB-month. If storage grows during the month, average stored GB is a better planning input than the end-of-month peak.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/s3-pricing-explained"
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p>
     If you are searching for a <a href="/calculators/storage-pricing-calculator/">storage pricing calculator</a>, you are
@@ -19,29 +34,32 @@ const description =
 
   <h2>1) Storage (GB-month)</h2>
   <p>
-    Storage is billed over time, often as “GB-month”. If your storage grows over the month, use an average stored GB
-    number, not the end-of-month peak. Tool: <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost</a>.
+    Storage is billed over time, often as "GB-month". If your storage grows over the month, use an average stored GB
+    number, not the end-of-month peak.
+  </p>
+  <p>
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>.
   </p>
 
   <h2>2) Request fees (GET/PUT/LIST)</h2>
-  <p>
-    Many workloads treat request fees as noise, and often they are. But request fees can become meaningful when:
-  </p>
+  <p>Many workloads treat request fees as noise, and often they are. But request fees can become meaningful when:</p>
   <ul>
     <li>You store millions of small objects.</li>
     <li>You have heavy LIST operations or frequent metadata reads.</li>
     <li>Your application pattern causes many PUT/GET operations per GB stored.</li>
   </ul>
   <p>
-    Tool: <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost Calculator</a> (model requests as a
-    separate line item).
+    Tools: <a href="/calculators/s3-request-cost-calculator/">S3 request cost</a> and{" "}
+    <a href="/calculators/object-storage-cost-calculator/">object storage cost</a> (model requests as a separate line item).
   </p>
 
   <h2>3) Egress (data transfer out)</h2>
   <p>
-    Egress is often the biggest surprise. If you read large amounts of data out of storage (downloads, analytics, cross-
-    region access), the $/GB transfer charge can dominate. Tool:{" "}
-    <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a>.
+    Egress is often the biggest surprise. If you read large amounts of data out of storage (downloads, analytics,
+    cross-region access), the $/GB transfer charge can dominate.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
   </p>
 
   <h2>Hidden items to watch for</h2>
@@ -56,7 +74,7 @@ const description =
     </li>
     <li>
       <strong>Growth over time</strong>: long retention or backups can turn a small daily ingest into a large monthly
-      storage bill. Use <a href="/calculators/database-storage-growth-cost-calculator/">DB Storage Growth</a> as a simple
+      storage bill. Use <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a> as a simple
       estimator if you do not have a better model yet.
     </li>
   </ul>
@@ -70,7 +88,7 @@ const description =
   </ol>
   <p>
     If you want a single page that ties these together, start with{" "}
-    <a href="/calculators/storage-pricing-calculator/">Storage Pricing Calculator</a>.
+    <a href="/calculators/storage-pricing-calculator/">storage pricing calculator</a>.
   </p>
 
   <h2>Related tools</h2>

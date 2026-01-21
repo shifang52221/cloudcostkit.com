@@ -1,0 +1,95 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 CRR vs SRR cost: what changes (transfer, storage, requests)";
+const description =
+  "A practical cost comparison of S3 cross-region replication (CRR) vs same-region replication (SRR). Compare transfer/feature fees, extra replica storage, and request costs - with calculators.";
+const faqs = [
+  {
+    q: "Is CRR always more expensive than SRR?",
+    a: "Usually yes because CRR often adds cross-region transfer-like charges, but the real driver is replicated GB/month (changed data). Storage and request fees can dominate depending on workload.",
+  },
+  {
+    q: "What is the main input for replication cost models?",
+    a: "Replicated GB/month (changed data), not total stored GB. Estimate it from write volume and churn, then price the per-GB replication/transfer line item.",
+  },
+  {
+    q: "Do I need to include destination storage?",
+    a: "Yes. Replication typically means storing a second copy of data. Destination storage is often the largest ongoing cost.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/s3-crr-vs-srr-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    If you're choosing between <strong>cross-region replication (CRR)</strong> and <strong>same-region replication (SRR)</strong>,
+    the cost difference usually comes down to one thing: whether replicated bytes are billed like cross-region transfer.
+    This checklist helps you compare the real line items.
+  </p>
+
+  <h2>Start with the same 3 buckets</h2>
+  <ul>
+    <li><strong>Replicated data (GB/month)</strong>: the changed data copied from source to destination.</li>
+    <li><strong>Replica storage</strong>: you store (almost) the same objects twice.</li>
+    <li><strong>Extra requests</strong>: replication can increase PUT/GET/LIST/HEAD activity.</li>
+  </ul>
+
+  <h2>What changes between CRR and SRR</h2>
+  <ul>
+    <li>
+      <strong>CRR</strong>: often includes cross-region transfer-like charges (or a per-GB replication fee, or both).
+    </li>
+    <li>
+      <strong>SRR</strong>: avoids cross-region transfer, but still duplicates storage and may add request costs.
+    </li>
+  </ul>
+
+  <h2>Step 1: estimate replicated GB/month (changed data)</h2>
+  <p>
+    The biggest modeling mistake is using total bucket size. Replication volume is driven by writes and churn. Use this guide:
+    <a href="/guides/estimate-replication-gb-per-month-from-writes/"> estimate replication GB/month</a>.
+  </p>
+
+  <h2>Step 2: price the per-GB replication line item</h2>
+  <p>
+    Use a per-GB assumption based on your plan:
+  </p>
+  <ul>
+    <li>
+      <a href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a> (S3-focused)
+    </li>
+    <li>
+      <a href="/calculators/storage-replication-cost-calculator/">Storage replication cost calculator</a> (generic)
+    </li>
+    <li>
+      <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer cost</a> (if billed as transfer)
+    </li>
+  </ul>
+
+  <h2>Step 3: add replica storage</h2>
+  <p>
+    Treat replica storage as a separate ongoing line item (GB-month). Use{" "}
+    <a href="/calculators/object-storage-cost-calculator/">Object storage cost calculator</a> and add the replica stored GB
+    as another storage line item.
+  </p>
+
+  <h2>Step 4: sanity-check request fees</h2>
+  <p>
+    For millions of small objects, request fees can matter. Use{" "}
+    <a href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a> or model requests in the{" "}
+    <a href="/calculators/object-storage-cost-calculator/">Object storage cost calculator</a>.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/s3-replication-cost/">S3 replication cost</a>
+    <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
+    <a class="btn" href="/guides/s3-pricing-explained/">S3 pricing explained</a>
+  </div>
+</GuideLayout>
+

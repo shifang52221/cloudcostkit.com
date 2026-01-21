@@ -1,31 +1,61 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "S3 replication pricing: how to estimate replicated GB/month and total impact";
+const title = "S3 replication pricing: estimate replicated GB/month and total impact";
 const description =
-  "A practical guide to S3 replication pricing: replication volume (changed data), extra destination storage, and transfer-like charges.";
+  "A practical guide to S3 replication pricing: replication volume (changed data), extra destination storage, transfer-like charges, and when CRR vs SRR changes the bill.";
+const faqs = [
+  {
+    q: "What's the key input for S3 replication pricing?",
+    a: "Replicated GB/month based on changed data (writes and churn). Total bucket size is usually the wrong input unless you're doing a one-time backfill.",
+  },
+  {
+    q: "Do I need to include destination storage?",
+    a: "Yes. Replication typically means storing the data twice. Destination storage is often the biggest ongoing cost.",
+  },
+  {
+    q: "How do I compare CRR vs SRR costs?",
+    a: "CRR often adds cross-region transfer-like charges compared to SRR. Compare transfer/feature fees, replica storage, and request fees with a consistent checklist.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-replication-pricing"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p>
     The biggest input in S3 replication pricing is <strong>replicated GB/month</strong>. That volume is driven by writes
     and churn, not by total stored data.
   </p>
 
-  <h2>Estimate replication volume from writes</h2>
+  <h2>1) Estimate replication volume from writes</h2>
   <p>
     Use <a href="/guides/estimate-replication-gb-per-month-from-writes/">this guide</a> to estimate replicated GB/month
     from GB/day writes or PUT counts and object size.
   </p>
 
-  <h2>Don’t forget destination storage</h2>
+  <h2>2) Price the per-GB replication line item</h2>
   <p>
-    Replication typically means storing the data twice. Add destination storage as a separate line item using
-    <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>.
+    Use a per-GB assumption that matches your plan (feature fee, transfer-like pricing, or both):
+  </p>
+  <ul>
+    <li><a href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a></li>
+    <li><a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer cost</a></li>
+  </ul>
+
+  <h2>3) Don't forget destination storage</h2>
+  <p>
+    Replication typically means storing the data twice. Add destination storage as a separate line item using{" "}
+    <a href="/calculators/object-storage-cost-calculator/">object storage cost</a>.
+  </p>
+
+  <h2>4) CRR vs SRR: when the option changes cost</h2>
+  <p>
+    If you're deciding between cross-region replication (CRR) and same-region replication (SRR), use this checklist:{" "}
+    <a href="/guides/s3-crr-vs-srr-cost/">S3 CRR vs SRR cost</a>.
   </p>
 
   <h2>Related tools</h2>

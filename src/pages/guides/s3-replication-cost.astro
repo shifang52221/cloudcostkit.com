@@ -1,11 +1,31 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "S3 Replication Cost: How to Estimate Cross-Region Replication";
+const title = "S3 replication cost: how to estimate cross-region replication";
 const description =
   "A practical guide to estimating S3 replication cost: what data volume to count, which fees to expect, and how to model replica storage, requests, and transfer. Includes a fast checklist.";
+const faqs = [
+  {
+    q: "What volume should I use for replication cost?",
+    a: "Use replicated GB/month based on changed data (writes and churn), not total stored bucket size, unless you're doing a one-time backfill.",
+  },
+  {
+    q: "Do I need to include destination storage?",
+    a: "Yes. Replication typically means storing data twice. Destination storage is often the biggest ongoing cost.",
+  },
+  {
+    q: "Is replication billed as transfer?",
+    a: "Sometimes. Replication can be billed as a per-GB feature fee, cross-region transfer, or both depending on provider and configuration. Model the per-GB line item and validate billing directionality.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/s3-replication-cost" lastUpdated="2026-01-12">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/s3-replication-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
   <p>
     Replication is rarely "free". Even when the feature itself is simple, the bill usually combines a few different
     charges: data copied, extra replica storage, and sometimes request fees and transfer.
@@ -17,50 +37,51 @@ const description =
     If your bucket holds 20 TB but only 50 GB/day changes, your replication volume is driven by 50 GB/day (plus retries and
     overhead), not 20 TB.
   </p>
+  <p>
+    Guide: <a href="/guides/estimate-replication-gb-per-month-from-writes/">estimate replication GB/month</a>.
+  </p>
 
   <h2>Replication cost components</h2>
   <ul>
     <li><strong>Replication data (GB/month)</strong>: bytes copied from source to destination.</li>
-    <li><strong>Replica storage</strong>: you now store (almost) the same objects in a second region.</li>
+    <li><strong>Replica storage</strong>: you now store (almost) the same objects in a second location.</li>
     <li><strong>Requests</strong>: additional PUT/GET/LIST operations may be billed depending on provider/product.</li>
     <li><strong>Transfer</strong>: some setups effectively bill replication as cross-region transfer.</li>
   </ul>
 
   <h2>Fast estimation checklist</h2>
   <ol>
+    <li>Estimate changed data per day (GB/day), then multiply by ~30.4 to get <strong>GB/month</strong>.</li>
     <li>
-      Estimate changed data per day (GB/day), then multiply by ~30.4 to get <strong>GB/month</strong>.
+      Price the per-GB replication line item with{" "}
+      <a href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a> or{" "}
+      <a href="/calculators/storage-replication-cost-calculator/">storage replication cost calculator</a>.
     </li>
     <li>
-      Price the replication fee with the <a href="/calculators/storage-replication-cost-calculator/">Storage Replication Cost Calculator</a>.
-    </li>
-    <li>
-      Add replica storage with the <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost Calculator</a>.
+      Add replica storage with <a href="/calculators/object-storage-cost-calculator/">object storage cost calculator</a>.
     </li>
     <li>
       If your provider bills this as transfer, price it with{" "}
-      <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-Region Transfer Cost</a>.
+      <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer cost</a>.
     </li>
   </ol>
 
+  <h2>CRR vs SRR (when choosing an option)</h2>
+  <p>
+    Cross-region replication (CRR) often adds transfer-like charges compared to same-region replication (SRR). Use this
+    comparison checklist: <a href="/guides/s3-crr-vs-srr-cost/">S3 CRR vs SRR cost</a>.
+  </p>
+
   <h2>Common pitfalls</h2>
   <ul>
-    <li>
-      <strong>Counting the full bucket size</strong>: replication is driven by writes/changes. Use changed GB unless you
-      are doing a one-time backfill.
-    </li>
-    <li>
-      <strong>Ignoring replica storage</strong>: even if replication transfer is cheap, storing a second copy can dominate
-      monthly cost.
-    </li>
-    <li>
-      <strong>Request fees</strong>: many small objects can create high request volume. Model requests if they are a large
-      part of your workload.
-    </li>
+    <li><strong>Counting the full bucket size</strong>: replication is driven by writes/changes.</li>
+    <li><strong>Ignoring replica storage</strong>: storing a second copy can dominate monthly cost.</li>
+    <li><strong>Request fees</strong>: many small objects can create high request volume.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
+    <a class="btn" href="/calculators/s3-replication-cost-calculator/">S3 replication cost</a>
     <a class="btn" href="/calculators/storage-replication-cost-calculator/">Storage replication cost</a>
     <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
@@ -71,3 +92,4 @@ const description =
     minimums, and regional pricing). Use this as a planning framework and confirm details in official docs.
   </p>
 </GuideLayout>
+

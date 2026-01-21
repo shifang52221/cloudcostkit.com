@@ -13,7 +13,7 @@ const description =
   intro="S3 replication and cross-region copies are driven by changed data volume. Use this S3 replication cost calculator to estimate monthly replication fees from replicated GB/month and your per-GB assumption."
   examples={[
     "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at your $/GB -> estimate replication fee.",
-    "Replication volume is often far smaller than total stored GB because it’s driven by writes and churn.",
+    "Replication volume is often far smaller than total stored GB because it's driven by writes and churn.",
   ]}
   includes={[
     "Replication fee estimate from replicated GB/month and $/GB pricing assumptions.",
@@ -24,24 +24,25 @@ const description =
     "Provider-specific billing rules and request pricing unless you add them separately.",
   ]}
   how={[
-    "Monthly replication fee = replicated GB/month × $/GB.",
+    "Monthly replication fee = replicated GB/month x $/GB.",
     "Estimate replicated GB/month from write volume and churn (changed data), not from total stored dataset size.",
-    "Add destination storage and request fees separately if applicable."
+    "Add destination storage and request fees separately if applicable.",
   ]}
   faqs={[
     {
       q: "How do I estimate replicated GB/month?",
-      a: "Start from write volume (GB/day) or PUTs/day × average object size, then multiply by days per month and replication coverage.",
+      a: "Start from write volume (GB/day) or PUTs/day x average object size, then multiply by days per month and replication coverage.",
     },
     {
       q: "Does replication include destination storage?",
       a: "No. Replication usually means storing data twice. Add destination storage as a separate line item.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
+    { href: "/guides/s3-crr-vs-srr-cost", label: "S3 CRR vs SRR cost" },
     { href: "/guides/copy-storage-pricing", label: "Copy storage pricing checklist" },
     { href: "/calculators/s3-cost-calculator", label: "S3 cost calculator" },
   ]}

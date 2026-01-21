@@ -27,36 +27,39 @@ const description =
     "Monthly cost = replicated GB per month x price per GB.",
     "Use the GB that actually changes/copies per month (often driven by writes, not the full dataset size).",
     "Replication may be billed as cross-region transfer, a per-GB feature fee, or both depending on product.",
-    "Add replica storage, request fees, and any origin egress separately if you pay them."
+    "Add replica storage, request fees, and any origin egress separately if you pay them.",
   ]}
   faqs={[
     {
       q: "Should I use total stored GB or changed GB?",
-      a: "Use the GB that actually replicates per month (often driven by writes/changes, not the entire dataset)."
+      a: "Use the GB that actually replicates per month (often driven by writes/changes, not the entire dataset).",
     },
     {
       q: "Does this include extra storage in the replica region?",
-      a: "No. Model replica storage separately using object storage or database storage tools."
+      a: "No. Model replica storage separately using object storage or database storage tools.",
     },
     {
       q: "Is replication billed one-way or both ways?",
-      a: "It depends on the product. Many replication features bill for data copied out of the source region only. Check provider docs for directionality."
+      a: "It depends on the product. Many replication features bill for data copied out of the source region only. Check provider docs for directionality.",
     },
     {
       q: "Do I need to include request costs?",
-      a: "Sometimes. Replication can increase PUT/GET or list operations and those may be billed. If requests are material for your workload, estimate them in the object storage calculator."
+      a: "Sometimes. Replication can increase PUT/GET or list operations and those may be billed. If requests are material for your workload, estimate them in the object storage calculator.",
     },
     {
       q: "How can I estimate changed GB per month?",
-      a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput."
-    }
+      a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
+    },
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
+    { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
+    { href: "/guides/s3-crr-vs-srr-cost", label: "S3 CRR vs SRR cost" },
     { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer" },
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
   ]}
 >
   <StorageReplicationCostCalculatorComponent client:load />
 </CalculatorLayout>
+

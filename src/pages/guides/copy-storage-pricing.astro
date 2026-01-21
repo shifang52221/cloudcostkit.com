@@ -4,23 +4,38 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Copy storage pricing: what you pay for when data moves";
 const description =
   "A practical guide to pricing storage copy operations (cross-region copy, replication, backups) across S3-like object storage: transfer, requests, and extra storage.";
+const faqs = [
+  {
+    q: "What is the biggest cost driver when copying data?",
+    a: "Usually the destination storage you keep (GB-month). For cross-region copies, transfer-like charges can also be material.",
+  },
+  {
+    q: "Should I model based on total stored data?",
+    a: "Usually no. Ongoing replication/copy volume is typically driven by changed data (writes and churn), not the entire dataset size, unless you're doing a one-time backfill.",
+  },
+  {
+    q: "Do request fees matter?",
+    a: "They can for millions of small objects or workloads with heavy LIST/HEAD usage. For large objects with few operations, request fees are often negligible.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/copy-storage-pricing"
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p>
-    “Copying data” in cloud storage can mean many things: an intra-region copy, cross-region replication, backup copy
+    "Copying data" in cloud storage can mean many things: an intra-region copy, cross-region replication, backup copy
     traffic, or syncing objects between buckets. The costs usually fall into a few predictable buckets. This guide gives
-    you a checklist so you don’t miss a line item.
+    you a checklist so you don't miss a line item.
   </p>
 
   <h2>1) Transfer / data movement</h2>
   <p>
     If your copy moves data across regions (or out of a provider), you may pay a per-GB transfer fee. Sometimes a
-    replication feature has its own per-GB charge, sometimes it’s billed as cross-region transfer, and sometimes it’s
+    replication feature has its own per-GB charge, sometimes it's billed as cross-region transfer, and sometimes it's
     both.
   </p>
   <p>
@@ -28,23 +43,22 @@ const description =
     churn, not the total dataset size.
   </p>
   <p>
-    Tools:
-    <a href="/calculators/storage-replication-cost-calculator/">Storage Replication Cost Calculator</a> and
-    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region Transfer Cost Calculator</a>.
+    Tools: <a href="/calculators/storage-replication-cost-calculator/">Storage replication cost</a> and{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer cost</a>.
   </p>
   <p>
-    If you’re specifically pricing S3 replication, start with <a href="/guides/s3-replication-cost/">S3 replication cost</a>
-    and treat the “replicated GB/month” as the key input.
+    If you're specifically pricing S3 replication, start with <a href="/guides/s3-replication-cost/">S3 replication cost</a>
+    and treat replicated GB/month as the key input.
   </p>
 
   <h2>2) Extra storage at the destination</h2>
   <p>
-    A copy or replica usually means you’re storing the data twice. Destination storage is often the largest “hidden”
-    cost because it’s continuous (GB-month), even if the copy job runs once.
+    A copy or replica usually means you're storing the data twice. Destination storage is often the largest hidden cost
+    because it's continuous (GB-month), even if the copy job runs once.
   </p>
   <p>
-    Tool: <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost Calculator</a> (add the replica GB
-    as another line item).
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a> (add the replica stored GB as another
+    line item).
   </p>
 
   <h2>3) Request fees (PUT/GET/LIST) can matter</h2>
@@ -53,22 +67,23 @@ const description =
     operations, requests are often negligible; for millions of small objects, requests can become material.
   </p>
   <p>
-    Tool: <a href="/calculators/object-storage-cost-calculator/">Object Storage Cost Calculator</a>.
+    Tools: <a href="/calculators/s3-request-cost-calculator/">S3 request cost</a> and{" "}
+    <a href="/calculators/object-storage-cost-calculator/">object storage cost</a>.
   </p>
 
-  <h2>4) Egress and cache fill (when copying feeds another system)</h2>
+  <h2>4) Egress (when copying feeds another system)</h2>
   <p>
-    If “copy” is part of a pipeline (e.g., copy from storage into analytics, or into another cloud), egress pricing may
-    dominate. Model it explicitly if you expect significant downloads.
+    If copy is part of a pipeline (for example, copy from storage into analytics, or into another cloud), egress pricing
+    may dominate. Model it explicitly if you expect significant downloads.
   </p>
   <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost Calculator</a>.
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
   </p>
 
-  <h2>5) A quick way to estimate “copied GB/month”</h2>
+  <h2>5) A quick way to estimate copied GB/month</h2>
   <p>
-    If you don’t know copy volume, start from write throughput (GB/day) or batch sizes (GB/job). Multiply by days/jobs
-    per month. For change-heavy datasets, copy volume is usually closer to “writes” than “total stored GB”.
+    If you don't know copy volume, start from write throughput (GB/day) or batch sizes (GB/job). Multiply by days/jobs
+    per month. For change-heavy datasets, copy volume is usually closer to writes than total stored GB.
   </p>
 
   <h2>Quick checklist</h2>

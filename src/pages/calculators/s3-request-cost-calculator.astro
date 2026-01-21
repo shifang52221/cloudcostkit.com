@@ -10,7 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/s3-request-cost-calculator"
-  intro="For many storage workloads, request fees are tiny. But for millions of small objects, heavy LIST/HEAD usage, or chatty pipelines, request charges can become a real line item. Use this S3 request cost calculator to estimate request fees from monthly request volume and your provider’s per-1k prices."
+  intro="For many storage workloads, request fees are tiny. But for millions of small objects, heavy LIST/HEAD usage, or chatty pipelines, request charges can become a real line item. Use this S3 request cost calculator to estimate request fees from monthly request volume and your provider's per-1k prices."
   examples={[
     "50M GET + 5M PUT per month at your per-1k pricing -> estimate monthly request fees.",
     "Millions of small objects with frequent metadata reads can make requests non-trivial even when storage GB is modest.",
@@ -24,9 +24,9 @@ const description =
     "Egress costs and replication/copy costs (model separately).",
   ]}
   how={[
-    "Request cost = (requests / 1,000) × price per 1,000 for each request type.",
-    "If you have multiple request classes (e.g., LIST/HEAD/select), model them as separate scenarios and sum.",
-    "If your provider prices per 10k/1M instead of per 1k, convert the rate to a per-1k equivalent."
+    "Request cost = (requests / 1,000) x price per 1,000 for each request type.",
+    "If you have multiple request classes (for example, LIST/HEAD/select), model them as separate scenarios and sum.",
+    "If your provider prices per 10k/1M instead of per 1k, convert the rate to a per-1k equivalent.",
   ]}
   faqs={[
     {
@@ -42,12 +42,13 @@ const description =
       a: "Use storage access logs, metrics, or billing exports. If you only have RPS, convert it with the RPS-to-monthly requests calculator, then split by request type using observed proportions.",
     },
   ]}
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
     { href: "/guides/s3-pricing-explained", label: "Guide: S3 pricing explained" },
     { href: "/guides/copy-storage-pricing", label: "Guide: copy storage pricing" },
+    { href: "/guides/s3-crr-vs-srr-cost", label: "S3 CRR vs SRR cost" },
   ]}
 >
   <ObjectStorageCostCalculator client:load />

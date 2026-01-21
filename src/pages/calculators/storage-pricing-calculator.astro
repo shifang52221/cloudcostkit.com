@@ -29,7 +29,7 @@ const description =
     "Storage cost = average stored GB x $/GB-month.",
     "Request cost = (requests / 1,000) x $ per 1,000 (per request class).",
     "Egress cost (optional) = GB/month downloaded x $/GB.",
-    "For tiered or regional pricing, use effective blended rates or run scenarios and sum."
+    "For tiered or regional pricing, use effective blended rates or run scenarios and sum.",
   ]}
   faqs={[
     {
@@ -54,16 +54,18 @@ const description =
     },
     {
       q: "Are lifecycle transitions and retrieval fees included?",
-      a: "No. If you use infrequent access or archive tiers, retrieval and transition fees can matter—model those separately.",
+      a: "No. If you use infrequent access or archive tiers, retrieval and transition fees can matter; model those separately.",
     },
   ]}
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication cost" },
     { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer cost" },
+    { href: "/guides/s3-pricing-explained", label: "Guide: S3 pricing explained" },
     { href: "/guides/copy-storage-pricing", label: "Guide: copy storage pricing" },
+    { href: "/guides/s3-crr-vs-srr-cost", label: "S3 CRR vs SRR cost" },
   ]}
 >
   <div class="prose">
@@ -73,7 +75,7 @@ const description =
       operations.
     </p>
     <p class="muted" style="margin-top:8px">
-      If you’re searching for a “storage pricing calculator”, this section covers the core billing units most providers
+      If you're searching for a "storage pricing calculator", this section covers the core billing units most providers
       use: GB-month and request fees.
     </p>
   </div>
@@ -93,11 +95,12 @@ const description =
   client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2>3) When “copy storage pricing” matters</h2>
+    <h2>3) When copy storage pricing matters</h2>
     <p class="muted" style="margin-top:8px">
       If you replicate across regions, run backups, or copy data into another system, the biggest surprises are usually
-      (a) extra destination storage and (b) transfer/egress line items. Use the
+      (a) extra destination storage and (b) transfer/egress line items. Use the{" "}
       <a href="/guides/copy-storage-pricing/">copy storage pricing</a> checklist to avoid missing costs.
     </p>
   </div>
 </CalculatorLayout>
+
