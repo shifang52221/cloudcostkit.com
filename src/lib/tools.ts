@@ -63,6 +63,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-ecr-cost-calculator",
+    title: "AWS ECR Cost Calculator",
+    description: "Estimate ECR-style cost from stored GB-month plus data transfer assumptions.",
+    category: "Storage",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

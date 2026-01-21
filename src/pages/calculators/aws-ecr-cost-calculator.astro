@@ -1,0 +1,50 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsEcrCostCalculator as AwsEcrCostCalculatorComponent } from "../../components/calculators/AwsEcrCost";
+
+const title = "AWS ECR Cost Calculator";
+const description =
+  "Estimate ECR-style container registry cost from stored GB-month plus data transfer assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-ecr-cost-calculator"
+  intro="Estimate ECR-style costs with a simplified model: storage (GB-month) plus data transfer out. Use your effective region pricing and your real traffic path assumptions."
+  examples={[
+    "2,000 GB-month stored at $0.10/GB-month and 500 GB/month egress at $0.09/GB.",
+  ]}
+  includes={[
+    "Storage baseline: stored GB-month x $ per GB-month.",
+    "Egress estimate: GB/month transfer out x $ per GB.",
+  ]}
+  excludes={[
+    "Replication, scanning, and feature add-ons unless modeled separately.",
+    "Compute/network costs in your cluster (node egress, NAT, load balancers).",
+  ]}
+  how={[
+    "Storage cost = stored GB-month x $ per GB-month.",
+    "Transfer cost = egress GB/month x $ per GB.",
+    "Total = storage + transfer.",
+  ]}
+  faqs={[
+    {
+      q: "Do internal pulls inside AWS count as internet egress?",
+      a: "Not always. Egress depends on where images are pulled to (same region/VPC vs cross-region vs internet). Use your effective $/GB for the path that applies to your workloads.",
+    },
+    {
+      q: "How do I estimate stored GB-month?",
+      a: "Use the average stored size over the month. If you retain many tags and rebuild images frequently, stored GB-month grows quickly. Retention policies are the biggest lever.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-ecr-pricing", label: "Guide: ECR pricing" },
+    { href: "/guides/aws-ecr-estimate-storage-gb-month", label: "Guide: estimate image storage" },
+    { href: "/guides/aws-ecr-cost-optimization", label: "Guide: reduce ECR costs" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress calculator" },
+  ]}
+>
+  <AwsEcrCostCalculatorComponent client:load />
+</CalculatorLayout>
+

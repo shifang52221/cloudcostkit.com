@@ -1,0 +1,56 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ECR cost optimization (retention, smaller images, fewer pulls)";
+const description =
+  "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecr-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever to reduce ECR cost?",
+      a: "Retention policies. Deleting old tags/images usually reduces stored GB-month more than any other change.",
+    },
+    {
+      q: "How can pulls create hidden costs?",
+      a: "Frequent CI pulls and cold starts can create large transfer volume, especially across billable network paths. Reducing redundant pulls and keeping traffic in-region can help.",
+    },
+  ]}
+>
+  <p>
+    ECR cost reduction is mostly about <strong>reducing stored GB-month</strong> and avoiding unnecessary transfer. The
+    highest impact changes are operational, not micro-optimizations.
+  </p>
+
+  <h2>1) Enforce retention policies</h2>
+  <ul>
+    <li>Keep only the last N tags per repo (or last D days) for CI images.</li>
+    <li>Delete untagged images and old build artifacts.</li>
+    <li>Keep long retention only for pinned releases and rollback candidates.</li>
+  </ul>
+
+  <h2>2) Shrink images</h2>
+  <ul>
+    <li>Use multi-stage builds and slim base images.</li>
+    <li>Remove build tools and caches from runtime images.</li>
+    <li>Prefer fewer layers and avoid copying large artifacts unintentionally.</li>
+  </ul>
+
+  <h2>3) Reduce redundant pulls</h2>
+  <ul>
+    <li>Use node-level caching and avoid re-pulling identical tags unnecessarily.</li>
+    <li>Keep CI runners and clusters in the same region/account where possible.</li>
+    <li>Use immutable tags/digests to avoid accidental cache misses.</li>
+  </ul>
+
+  <h2>Quantify savings</h2>
+  <p>
+    Use <a href="/calculators/aws-ecr-cost-calculator/">AWS ECR Cost Calculator</a> to estimate savings from reducing stored
+    GB-month or egress GB/month.
+  </p>
+</GuideLayout>
+

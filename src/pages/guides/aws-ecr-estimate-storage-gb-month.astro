@@ -1,0 +1,50 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate ECR storage (GB-month) from images and retention";
+const description =
+  "How to estimate container registry storage cost: average image size, tag retention, and rebuild frequency. Includes a fast model and common pitfalls.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecr-estimate-storage-gb-month"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What is GB-month?",
+      a: "GB-month is the average stored gigabytes over a month. If you store 1,000 GB for the full month, that is 1,000 GB-month.",
+    },
+    {
+      q: "Why do registry costs grow over time?",
+      a: "Because teams keep every tag forever and rebuild images frequently. Without retention policies, old images accumulate even if no one pulls them.",
+    },
+  ]}
+>
+  <p>
+    Registry storage cost is usually driven by <strong>how many images you keep</strong> and <strong>how large they
+    are</strong>. You can get a good estimate with a simple average model.
+  </p>
+
+  <h2>Fast model</h2>
+  <ul>
+    <li>
+      <strong>Stored GB-month ≈ avg image size (GB) x images retained (count)</strong>
+    </li>
+    <li>Compute retained images per repo: tags kept x number of repos.</li>
+    <li>Adjust for multi-arch images if you store separate variants per architecture.</li>
+  </ul>
+
+  <h2>Better model (with rebuilds)</h2>
+  <ul>
+    <li>If you push N new images/day and retain D days, retained images ≈ N x D.</li>
+    <li>Multiply by average image size to get stored GB.</li>
+  </ul>
+
+  <h2>Turn storage into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-ecr-cost-calculator/">AWS ECR Cost Calculator</a> with your stored GB-month estimate and
+    your effective $/GB-month.
+  </p>
+</GuideLayout>
+

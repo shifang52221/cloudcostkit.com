@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ECR pricing: what to model (storage + transfer)";
+const description =
+  "A practical AWS ECR pricing checklist: stored GB-month, data transfer paths, and the operational patterns that create cost spikes.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecr-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What typically drives ECR cost?",
+      a: "Stored data (GB-month) plus data transfer out depending on where your workloads pull images. Storage growth from many tags is the most common driver.",
+    },
+    {
+      q: "Is image pull traffic always billable egress?",
+      a: "No. It depends on the network path (same region/VPC, cross-region, or internet). Use your effective $/GB for the traffic path that applies.",
+    },
+  ]}
+>
+  <p>
+    ECR costs are easiest to estimate with a two-part model: <strong>storage (GB-month)</strong> plus <strong>data
+    transfer</strong>. The right answer depends heavily on your retention policy and where your workloads run.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Stored GB-month</strong>: average stored image size over the month
+    </li>
+    <li>
+      <strong>Egress GB/month</strong>: bytes pulled across billable network paths
+    </li>
+    <li>
+      <strong>Operational drivers</strong>: rebuild frequency, tag retention, and multi-arch duplication
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-ecr-cost-calculator/">AWS ECR Cost Calculator</a> for a simple storage + transfer model.
+    Then refine egress based on where your clusters run and whether you replicate images across regions.
+  </p>
+</GuideLayout>
+
