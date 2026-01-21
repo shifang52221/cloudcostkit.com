@@ -53,4 +53,41 @@ const description =
   ]}
 >
   <AwsNatGatewayCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li>
+        <strong>NAT gateways</strong>: count NAT gateways per AZ (teams often run 1 per AZ for HA).
+      </li>
+      <li>
+        <strong>Hours/month</strong>: use ~730 for always-on (or your billing convention).
+      </li>
+      <li>
+        <strong>GB processed</strong>: pull from NAT metrics or VPC Flow Logs, or estimate from throughput charts (Mbps to
+        GB/month).
+      </li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Modeling only the hourly fee and ignoring GB processed (usually the bigger driver).</li>
+      <li>Forgetting that “small” downloads multiply across fleets (node bootstrap, image pulls, package updates).</li>
+      <li>Ignoring retries/timeouts that multiply outbound traffic during incidents.</li>
+      <li>Assuming endpoints automatically replace NAT without checking the traffic mix.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Watch NAT GB processed trend (it should drop if endpoints/caching are working).</li>
+      <li>Confirm you did not increase cross-AZ/cross-region transfer elsewhere.</li>
+      <li>Re-check during peak/incident windows (that’s when hidden multipliers show up).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+      <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs endpoints break-even</a>
+      <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
+    </div>
+  </div>
 </CalculatorLayout>

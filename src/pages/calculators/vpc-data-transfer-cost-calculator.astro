@@ -24,9 +24,9 @@ const description =
     "Provider-specific exceptions and free allowances unless you model them separately.",
   ]}
   how={[
-    "Monthly transfer cost = GB/month × $/GB.",
+    "Monthly transfer cost = GB/month x $/GB.",
     "If you have multiple transfer types (internet egress, cross-region, cross-zone), model each separately and sum.",
-    "If you have free allowances, subtract them before applying rates."
+    "If you have free allowances, subtract them before applying rates.",
   ]}
   faqs={[
     {
@@ -37,14 +37,19 @@ const description =
       q: "Why are transfer bills surprising?",
       a: "Because many architectures have hidden east-west traffic. Cross-zone service calls, replication, and cache fill can create large GB/month totals.",
     },
+    {
+      q: "How do I avoid underestimating cross-AZ transfer?",
+      a: "Segment by architecture: load balancer paths, service-to-service calls, and replication. Validate AZ locality (client and backend in the same AZ) and model a peak scenario.",
+    },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost (generic)" },
     { href: "/calculators/aws-nat-gateway-cost-calculator", label: "NAT gateway cost" },
     { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost" },
     { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer cost" },
     { href: "/calculators/unit-converter", label: "Units converter" },
+    { href: "/guides/aws-network-costs", label: "AWS network cost hub" },
     { href: "/guides/aws-vpc-data-transfer", label: "Guide: VPC data transfer" },
     { href: "/guides/aws-cross-az-data-transfer-cost", label: "Guide: cross-AZ transfer cost" },
   ]}
@@ -55,4 +60,31 @@ const description =
     defaultGbPerMonth={2000}
     defaultPricePerGbUsd={0.02}
   client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li>
+        <strong>GB/month</strong>: start from billing exports or flow logs; if you only have throughput charts, convert
+        Mbps to GB/month using <a href="/calculators/unit-converter/">Units converter</a>.
+      </li>
+      <li>
+        <strong>$ / GB</strong>: use your effective rate for the specific boundary (cross-AZ, cross-region, internet).
+      </li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Mixing boundaries (cross-AZ vs cross-region vs internet) and using the wrong $/GB rate.</li>
+      <li>Ignoring cache fill / origin egress (CDN) that shifts cost to another place.</li>
+      <li>Under-modeling retries/timeouts that multiply traffic during incidents.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+      <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+      <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer guide</a>
+    </div>
+  </div>
 </CalculatorLayout>

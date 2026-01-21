@@ -56,4 +56,41 @@ const description =
   ]}
 >
   <AwsVpcInterfaceEndpointCostCalculatorComponent client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li>
+        <strong>Interface endpoints</strong>: count distinct interface endpoints you plan to deploy (often by AWS service).
+      </li>
+      <li>
+        <strong>AZs per endpoint</strong>: this is the main multiplier (2 vs 3 AZs changes endpoint-hours materially).
+      </li>
+      <li>
+        <strong>GB processed</strong>: estimate how much NAT traffic to AWS services will shift to endpoints (use flow logs
+        or model scenarios).
+      </li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Forgetting that interface endpoints are per AZ (endpoint-hours scale with AZ count).</li>
+      <li>Creating endpoint sprawl across environments without ownership/lifecycle.</li>
+      <li>Moving traffic across AZ boundaries and creating transfer charges elsewhere.</li>
+    </ul>
+
+    <h2>Validate after rollout</h2>
+    <ul>
+      <li>Verify NAT GB processed decreases for the targeted destinations.</li>
+      <li>Verify endpoint-hours match your endpoint x AZ deployment.</li>
+      <li>Check cross-AZ transfer trends after routing changes.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+      <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint inputs</a>
+      <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">Endpoints optimization</a>
+    </div>
+  </div>
 </CalculatorLayout>
