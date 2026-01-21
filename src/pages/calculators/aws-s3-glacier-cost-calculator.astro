@@ -1,0 +1,56 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsS3GlacierCostCalculator as AwsS3GlacierCostCalculatorComponent } from "../../components/calculators/AwsS3GlacierCost";
+
+const title = "AWS S3 Glacier / Deep Archive Cost Calculator";
+const description =
+  "Estimate S3 Glacier-style archival storage cost from stored GB-month plus retrieval volume and request assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-s3-glacier-cost-calculator"
+  intro="Estimate archival storage costs with a simple model: storage (GB-month) plus retrieval (GB and requests). Use your effective prices for your storage class and retrieval tier."
+  examples={[
+    "10,000 GB-month stored at $0.004/GB-month with 500 GB/month retrieval at $0.01/GB and 2M retrieval requests at $0.05 per 1k.",
+  ]}
+  includes={[
+    "Storage baseline from GB-month and $/GB-month.",
+    "Retrieval data volume from GB/month and $/GB.",
+    "Retrieval request charges from requests/month and $ per 1,000 requests.",
+  ]}
+  excludes={[
+    "Minimum storage duration and early deletion fees (model separately if relevant).",
+    "Internet egress and downstream analysis costs (Athena, SIEM, etc.).",
+  ]}
+  how={[
+    "Storage cost = stored GB-month x $ per GB-month.",
+    "Retrieval GB cost = retrieval GB/month x $ per GB.",
+    "Retrieval request cost = (requests/month / 1,000) x $ per 1,000 requests.",
+    "Total = storage + retrieval GB + retrieval requests.",
+  ]}
+  faqs={[
+    {
+      q: "What is GB-month for archival storage?",
+      a: "GB-month is the average stored gigabytes over a month. If you store 10,000 GB for the full month, that is 10,000 GB-month.",
+    },
+    {
+      q: "Why is retrieval cost hard to estimate?",
+      a: "Retrieval pricing varies by storage class and retrieval tier, and your cost depends on how often you read back data and how many objects you retrieve (requests).",
+    },
+    {
+      q: "What causes unexpected Glacier/Deep Archive bills?",
+      a: "Frequent restores, large retrieval volume, many small-object retrieval requests, and early deletion fees due to minimum storage duration rules.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-s3-glacier-pricing", label: "Guide: Glacier and Deep Archive pricing" },
+    { href: "/guides/aws-s3-glacier-estimate-retrieval", label: "Guide: estimate retrieval volume" },
+    { href: "/guides/aws-s3-glacier-cost-optimization", label: "Guide: reduce archive costs" },
+    { href: "/calculators/s3-cost-calculator", label: "S3 cost calculator" },
+  ]}
+>
+  <AwsS3GlacierCostCalculatorComponent client:load />
+</CalculatorLayout>
+

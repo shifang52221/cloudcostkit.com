@@ -1,0 +1,53 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate Glacier/Deep Archive retrieval volume (GB and requests)";
+const description =
+  "How to estimate archival retrieval costs: model GB restored per month and the number of objects retrieved (requests), plus common drivers like restores, rehydration, and analytics.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-glacier-estimate-retrieval"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest way to estimate retrieval GB/month?",
+      a: "Start with expected restores per month x average restore size. If restores are triggered by analytics jobs, use job frequency x data scanned/restored.",
+    },
+    {
+      q: "How do I estimate retrieval requests?",
+      a: "Requests roughly track objects retrieved. If you retrieve 1,000,000 objects in a month, you should model about 1,000,000 retrieval requests (adjust for your tooling).",
+    },
+  ]}
+>
+  <p>
+    Retrieval cost is often the surprise with archival storage. Model both <strong>GB retrieved</strong> and <strong>request
+    count</strong> (objects retrieved).
+  </p>
+
+  <h2>Method 1: From restore events</h2>
+  <ul>
+    <li>Restores/month x average restore GB = retrieval GB/month.</li>
+    <li>Objects restored/month approximates retrieval requests/month.</li>
+  </ul>
+
+  <h2>Method 2: From analytics workflows</h2>
+  <ul>
+    <li>If you rehydrate archives for analytics, model job frequency x data restored.</li>
+    <li>Large-scale backfills can dominate a single month’s cost.</li>
+  </ul>
+
+  <h2>Sanity checks</h2>
+  <ul>
+    <li>Many small objects can create very high request counts.</li>
+    <li>Batching and packaging data into larger objects can reduce request charges.</li>
+  </ul>
+
+  <h2>Turn retrieval into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-s3-glacier-cost-calculator/">AWS S3 Glacier / Deep Archive Cost Calculator</a> with your
+    retrieval GB/month and retrieval requests/month assumptions.
+  </p>
+</GuideLayout>
+

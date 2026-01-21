@@ -75,6 +75,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-s3-glacier-cost-calculator",
+    title: "AWS S3 Glacier / Deep Archive Cost Calculator",
+    description: "Estimate archive storage cost from stored GB-month plus retrieval GB and request assumptions.",
+    category: "Storage",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

@@ -1,0 +1,52 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 Glacier and Deep Archive pricing (storage, retrieval, minimum duration)";
+const description =
+  "A practical pricing checklist for S3 Glacier/Deep Archive: storage GB-month, retrieval volume and requests, and minimum storage duration/early deletion fees.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-glacier-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What are the main cost components for archival storage?",
+      a: "Storage (GB-month) plus retrieval (GB retrieved and retrieval requests). Some classes also have minimum storage duration and early deletion fees.",
+    },
+    {
+      q: "Why do small objects increase cost?",
+      a: "Because retrieval is billed on both GB and requests. Many small-object restores can create high request counts even if total GB is modest.",
+    },
+  ]}
+>
+  <p>
+    Archive storage is cheap for data you rarely read. But total cost depends on <strong>how often you restore</strong>
+    and how your data is packaged (large objects vs many small objects).
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Stored GB-month</strong>: average stored GB over the month
+    </li>
+    <li>
+      <strong>Retrieval GB/month</strong>: how much data you restore and read back
+    </li>
+    <li>
+      <strong>Retrieval requests/month</strong>: how many objects you retrieve
+    </li>
+    <li>
+      <strong>Minimum duration / early deletion</strong>: if you delete/overwrite before the minimum duration
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-s3-glacier-cost-calculator/">AWS S3 Glacier / Deep Archive Cost Calculator</a> for a
+    storage + retrieval model. If your workload frequently deletes or replaces objects, add minimum-duration effects to
+    your estimate.
+  </p>
+</GuideLayout>
+
