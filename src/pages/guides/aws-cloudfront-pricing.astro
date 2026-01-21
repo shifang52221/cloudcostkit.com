@@ -1,47 +1,84 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CloudFront pricing: a practical way to estimate bandwidth and request costs";
+const title = "CloudFront pricing: estimate bandwidth and request costs (without hardcoding prices)";
 const description =
-  "A practical guide to estimating CloudFront-style CDN costs using bandwidth (GB/month) and request fees, without relying on hardcoded prices.";
+  "A practical way to estimate CloudFront-style CDN costs using your own bandwidth ($/GB) and request-fee ($ per 10k/1M) assumptions, plus common pitfalls like tiered pricing and origin egress.";
+const faqs = [
+  {
+    q: "Is this an official CloudFront quote?",
+    a: "No. It's a planning estimate framework. Always confirm regions, tiers, free allowances, and billable units in the official pricing docs.",
+  },
+  {
+    q: "What inputs do I need for a CloudFront cost estimate?",
+    a: "Monthly bandwidth delivered (GB/month) and monthly request volume. If you only have Mbps or RPS, convert them using the Units Converter and RPS to Monthly Requests tool.",
+  },
+  {
+    q: "How do I handle tiered pricing by region?",
+    a: "Use a blended effective rate for your expected traffic mix, or run scenarios for the main regions and sum them. For early estimates, a blended rate is usually sufficient.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-cloudfront-pricing" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudfront-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
   <p>
     CloudFront-style CDN bills usually have two primary parts: <strong>bandwidth</strong> and <strong>requests</strong>.
-    This guide explains how to estimate both in a way that stays stable as pricing changes.
+    This guide explains how to estimate both in a way that stays stable as pricing changes: you bring your own $/GB and
+    $ per 10k (or per 1M) assumptions.
   </p>
 
   <h2>1) Estimate bandwidth (GB/month)</h2>
   <p>
-    Use CDN analytics if you have them. If you only have throughput charts (Mbps), convert Mbps to GB/month using the
-    <a href="/calculators/unit-converter/">Units Converter</a> or follow
+    Use CDN analytics if you have them. If you only have throughput charts (Mbps), convert Mbps to GB/month using the{" "}
+    <a href="/calculators/unit-converter/">Units Converter</a> or follow{" "}
     <a href="/guides/estimate-cdn-bandwidth-gb-per-month/">this bandwidth estimation guide</a>.
+  </p>
+  <p>
+    Once you have GB/month, price it with{" "}
+    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN Bandwidth Cost Calculator</a>.
   </p>
 
   <h2>2) Estimate request volume (requests/month)</h2>
   <p>
-    If you have a request count from logs/analytics, use it directly. If you have RPS, convert it to monthly requests
+    If you have request count from logs/analytics, use it directly. If you have RPS, convert it to monthly requests
     with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
   </p>
+  <p>
+    Then price it with <a href="/calculators/cdn-request-cost-calculator/">CDN Request Cost Calculator</a>. If the
+    pricing page uses per-1M units, convert your rate to per-10k (or vice versa) to match your calculator inputs.
+  </p>
 
-  <h2>3) Apply pricing assumptions</h2>
+  <h2>3) Apply your pricing assumptions</h2>
   <ul>
-    <li>Bandwidth line item: GB/month × $/GB (use a blended rate if pricing tiers apply).</li>
-    <li>Request line item: (requests/month ÷ 10k) × $ per 10k.</li>
+    <li><strong>Bandwidth line item</strong>: GB/month x $/GB (use a blended rate if tiers apply).</li>
+    <li><strong>Request line item</strong>: (requests/month / 10,000) x $ per 10k (or adjust to per 1M).</li>
   </ul>
+  <p>
+    The benefit of this approach is that your model still works when prices shift; you update the two assumptions and
+    keep the traffic math.
+  </p>
 
   <h2>4) Common pitfalls</h2>
   <ul>
-    <li>Mixing GB and GiB units across dashboards and pricing pages.</li>
-    <li>Ignoring tiered pricing (use blended rates or scenario modeling).</li>
-    <li>Forgetting origin egress/cache fill when your hit rate is low.</li>
+    <li><strong>GB vs GiB</strong>: dashboards and pricing pages may use different units.</li>
+    <li><strong>Tiered pricing</strong>: if you ignore tiers, your estimate can be off at higher volumes.</li>
+    <li><strong>Origin egress/cache fill</strong>: low cache hit rates can push cost to the origin provider.</li>
   </ul>
+  <p>
+    For the origin-traffic nuance, read{" "}
+    <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+  </p>
 
   <h2>Related calculators</h2>
   <p>
     <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
     <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
-    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
   </p>
 </GuideLayout>
 

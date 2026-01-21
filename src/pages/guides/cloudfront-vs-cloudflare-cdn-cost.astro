@@ -1,0 +1,101 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudFront vs Cloudflare CDN cost: what to compare (bandwidth, requests, origin egress)";
+const description =
+  "A practical comparison checklist for CloudFront vs Cloudflare pricing. Compare bandwidth ($/GB), request fees, regions, cache fill/origin egress, and add-ons like WAF and logs.";
+const faqs = [
+  {
+    q: "Which is cheaper: CloudFront or Cloudflare?",
+    a: "It depends on traffic mix (bandwidth vs requests), regions, cache hit rate (origin egress), and add-ons (WAF/logs). Use a simple model with your own assumptions rather than relying on a single benchmark.",
+  },
+  {
+    q: "What data do I need to compare providers fairly?",
+    a: "At minimum: monthly GB delivered, monthly requests, and an estimate of cache hit rate (to approximate origin egress). If you have regional breakdown, use it.",
+  },
+  {
+    q: "Do I need to include origin egress?",
+    a: "Often yes. If your origin provider charges egress, low cache hit rate can shift cost away from the CDN and into origin egress (cache fill).",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/cloudfront-vs-cloudflare-cdn-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    People often search for <em>CloudFront vs Cloudflare pricing</em> or <em>CloudFront vs Cloudflare cost</em>. The
+    easiest way to get a useful answer is to compare the bill as a set of line items, not as one number.
+  </p>
+
+  <h2>Start with the same 3 line items</h2>
+  <ul>
+    <li><strong>Bandwidth</strong>: GB delivered from the edge to end users ($/GB).</li>
+    <li><strong>Requests</strong>: request fees (often $ per 10k or per 1M) if applicable.</li>
+    <li><strong>Origin egress (cache fill)</strong>: bytes pulled from origin to the CDN, billed by your origin provider.</li>
+  </ul>
+  <p>
+    If you model these three consistently, you can compare providers without being tripped up by marketing terms.
+  </p>
+
+  <h2>Comparison checklist</h2>
+  <ol>
+    <li>
+      <strong>Bandwidth unit and regions</strong>: pricing varies by geography. If you can, split your GB/month by the
+      main regions your users are in.
+    </li>
+    <li>
+      <strong>Request pricing and request classes</strong>: confirm whether requests are billed and in what units (per
+      10k vs per 1M). Read <a href="/guides/cdn-request-pricing/">CDN request pricing</a>.
+    </li>
+    <li>
+      <strong>Cache hit rate and origin egress</strong>: if hit rate is low, origin egress can become a major cost.
+      Read <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+    </li>
+    <li>
+      <strong>Add-ons</strong>: WAF, bot management, logs, image optimization, and edge functions can dominate total cost
+      for some workloads.
+    </li>
+    <li>
+      <strong>Commitments and bundles</strong>: discounts can change the effective $/GB, but make sure to model usage
+      realistically.
+    </li>
+  </ol>
+
+  <h2>A simple way to compare costs</h2>
+  <p>
+    Use the same traffic inputs for both providers, then swap the pricing assumptions:
+  </p>
+  <ul>
+    <li>
+      Use <a href="/calculators/cdn-cost-calculator/">CDN Cost Calculator</a> for a vendor-neutral model.
+    </li>
+    <li>
+      Use <a href="/calculators/cloudfront-cost-calculator/">CloudFront Cost Calculator</a> if you want CloudFront-style defaults and wording.
+    </li>
+  </ul>
+
+  <h2>When results are counterintuitive</h2>
+  <ul>
+    <li>
+      <strong>Requests dominate</strong>: API-heavy traffic can pay more in request fees than bandwidth.
+    </li>
+    <li>
+      <strong>Origin egress dominates</strong>: low cache hit rate shifts spend to your origin provider.
+    </li>
+    <li>
+      <strong>WAF/logs dominate</strong>: security and observability add-ons can exceed delivery cost.
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
+  </div>
+</GuideLayout>
+

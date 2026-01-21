@@ -26,24 +26,26 @@ const description =
   ]}
   how={[
     "Total = bandwidth cost + request fees.",
-    "Bandwidth cost = GB/month × $/GB.",
-    "Request fees = (requests/month ÷ 10,000) × $ per 10k.",
-    "If pricing is tiered, use a blended rate or run multiple scenarios and sum."
+    "Bandwidth cost = GB/month x $/GB.",
+    "Request fees = (requests/month / 10,000) x $ per 10k.",
+    "If pricing is tiered, use a blended rate or run multiple scenarios and sum.",
   ]}
   faqs={[
     {
       q: "Is this an official CloudFront quote?",
-      a: "No. It’s a planning estimate based on the assumptions you enter. Always confirm pricing tiers, regions, and units in the official documentation.",
+      a: "No. It's a planning estimate based on the assumptions you enter. Always confirm pricing tiers, regions, and units in the official documentation.",
     },
     {
       q: "What inputs do I need?",
       a: "Monthly GB delivered to users and monthly request volume. If you only have throughput or RPS, convert them using the Units Converter and RPS-to-monthly tool.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/cdn-cost-calculator", label: "CDN cost calculator (generic)" },
     { href: "/guides/aws-cloudfront-pricing", label: "Guide: CloudFront pricing" },
+    { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
+    { href: "/guides/cloudfront-vs-cloudflare-cdn-cost", label: "CloudFront vs Cloudflare cost" },
     { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin egress vs CDN bandwidth" },
     { href: "/calculators/unit-converter", label: "Units converter" },
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
@@ -66,7 +68,7 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2>2) Requests</h2>
     <p class="muted" style="margin-top:8px">
-      If your provider bills per request (often per 10k), estimate monthly requests and apply the rate.
+      If your provider bills per request (often per 10k or per 1M), estimate monthly requests and apply the rate.
     </p>
   </div>
   <CdnRequestCostCalculator client:load />

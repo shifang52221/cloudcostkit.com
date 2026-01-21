@@ -5,7 +5,7 @@ import { DataEgressCostCalculator } from "../../components/calculators/DataEgres
 
 const title = "CDN Cost Calculator";
 const description =
-  "Estimate total CDN cost from bandwidth (GB/month) and request fees with your provider’s pricing. Educational use only.";
+  "Estimate total CDN cost from bandwidth (GB/month) and request fees using your provider pricing assumptions. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -27,13 +27,13 @@ const description =
   how={[
     "Total CDN cost = bandwidth cost + request fees.",
     "Bandwidth cost = GB/month x $/GB (edge bandwidth).",
-    "Request fees = (requests/month / 10,000) x $ per 10k requests.",
-    "If your provider has tiered pricing, use a blended effective rate or run multiple scenarios and sum."
+    "Request fees = (requests/month / 10,000) x $ per 10k requests (or convert if pricing is per 1M).",
+    "If your provider has tiered pricing, use a blended effective rate or run multiple scenarios and sum.",
   ]}
   faqs={[
     {
       q: "What keyword should I search for in pricing pages?",
-      a: "Look for \"data transfer\", \"bandwidth\", \"requests\", and the unit (e.g., $/GB and $ per 10k requests).",
+      a: "Look for \"data transfer\" or \"bandwidth\" ($/GB) and \"requests\" ($ per 10k or per 1M). Confirm units and regions.",
     },
     {
       q: "Where do I get GB/month and requests/month?",
@@ -56,9 +56,11 @@ const description =
       a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
     },
   ]}
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
   related={[
-    { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
+    { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
+    { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
+    { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin egress vs CDN bandwidth" },
     { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
     { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
@@ -69,11 +71,11 @@ const description =
     <h2 style="margin-top:0">1) Bandwidth</h2>
     <p class="muted" style="margin-top:8px">
       Use monthly GB delivered by the CDN to end users (edge bandwidth). If you only have Mbps, convert it to GB/month
-      with the Units Converter.
+      with the Units Converter or this guide: <a href="/guides/estimate-cdn-bandwidth-gb-per-month/">estimate CDN bandwidth</a>.
     </p>
     <p class="muted" style="margin-top:8px">
-      This CDN cost calculator is intentionally simple: plug in your own pricing assumptions, then sanity-check the
-      result against provider billing units (GB vs GiB, per-10k vs per-1M requests).
+      This calculator is intentionally simple: bring your own pricing assumptions, then sanity-check the result against
+      provider billable units (GB vs GiB, per-10k vs per-1M requests, region tiers).
     </p>
   </div>
   <DataEgressCostCalculator
@@ -86,11 +88,12 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2>2) Requests</h2>
     <p class="muted" style="margin-top:8px">
-      Some providers charge per request (often per 10k). If you have RPS, convert it to requests/month first.
+      Some providers charge per request (often per 10k or per 1M). If you have RPS, convert it to requests/month first.
     </p>
     <p class="muted" style="margin-top:8px">
       Use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a> if you start from traffic
-      charts rather than a billing export.
+      charts rather than a billing export. For pricing units and conversion tips, read{" "}
+      <a href="/guides/cdn-request-pricing/">CDN request pricing</a>.
     </p>
   </div>
   <CdnRequestCostCalculator client:load />
@@ -99,9 +102,14 @@ const description =
     <h2>3) Common pitfalls</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
       <li>Mixing GB and GiB (use <a href="/calculators/unit-converter/">Units converter</a>).</li>
-      <li>Using origin egress as a proxy for CDN edge bandwidth (they’re different line items).</li>
+      <li>Using origin egress as a proxy for CDN edge bandwidth (they are different line items).</li>
       <li>Ignoring request-class pricing (static vs dynamic, cache miss vs hit) when it matters.</li>
       <li>Forgetting cache fill traffic and origin egress when your hit rate is low.</li>
     </ul>
+    <p class="muted" style="margin-top:10px">
+      If you are comparing providers, use the same traffic inputs and swap pricing assumptions. This checklist helps:
+      <a href="/guides/cloudfront-vs-cloudflare-cdn-cost/"> CloudFront vs Cloudflare CDN cost</a>.
+    </p>
   </div>
 </CalculatorLayout>
+

@@ -4,36 +4,51 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "How to estimate CDN bandwidth (GB/month) from analytics or Mbps";
 const description =
   "A practical guide to estimating CDN bandwidth per month, including conversions from Mbps and common unit pitfalls (GB vs GiB).";
+const faqs = [
+  {
+    q: "What is a good rule of thumb to convert Mbps to GB/month?",
+    a: "A common approximation is 1 Mbps sustained over a month is about 324 GB/month (using decimal GB). Use the Units Converter for exact conversions and to avoid GB vs GiB confusion.",
+  },
+  {
+    q: "Should I use average or peak Mbps?",
+    a: "Use an average over time. Peak throughput usually overstates monthly GB significantly unless your traffic is flat at the peak (rare).",
+  },
+  {
+    q: "Does a CDN always report 'GB transferred'?",
+    a: "Providers label it differently (bytes served, data transferred, edge egress). Look for total bytes delivered to end users over a window.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/estimate-cdn-bandwidth-gb-per-month"
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p>
     Most CDN pricing is expressed as <strong>$ per GB</strong>. That means your first job is to estimate{" "}
-    <strong>GB per month</strong>. This guide walks through the three most common ways to do that.
+    <strong>GB per month</strong>. This guide walks through three practical ways to do it.
   </p>
 
-  <h2>Option 1: Use your CDN analytics directly</h2>
+  <h2>Option 1: Use CDN analytics directly</h2>
   <p>
     If you already have a CDN in front of traffic, your provider usually reports bytes transferred per time window. Use
     that number and convert it to monthly GB.
   </p>
   <ul>
-    <li>Look for a metric like “bytes served”, “data transferred”, or “egress”.</li>
-    <li>Prefer a 30-day window if available; otherwise multiply a typical day by ~30.4.</li>
+    <li>Look for a metric like "bytes served", "data transferred", or "egress".</li>
+    <li>Prefer a 30-day window if available; otherwise multiply a typical day by about 30.4.</li>
     <li>
-      Keep an eye on units (GB vs GiB). If you see GiB, convert with{" "}
+      Watch units (GB vs GiB). If you see GiB, convert with{" "}
       <a href="/calculators/unit-converter/">Units Converter</a>.
     </li>
   </ul>
 
   <h2>Option 2: Convert from Mbps (throughput charts)</h2>
   <p>
-    If you only have throughput (Mbps) from monitoring or dashboards, you can convert it into GB/month. The key is to
-    use an average throughput value over time, not the peak.
+    If you only have throughput (Mbps) from monitoring or dashboards, convert it into GB/month. The key is to use an
+    average throughput value over time, not the peak.
   </p>
   <p>
     Use <a href="/calculators/unit-converter/">Units Converter</a> to convert Mbps to GB/month, or use this rule of
@@ -45,16 +60,14 @@ const description =
     </li>
   </ul>
   <p>
-    Example: if your average throughput is 50 Mbps, that’s roughly 50 × 324 ≈ 16,200 GB/month (about 16.2 TB/month).
+    Example: if your average throughput is 50 Mbps, that's roughly 50 x 324 ≈ 16,200 GB/month (about 16.2 TB/month).
   </p>
 
   <h2>Option 3: Estimate from page views and payload size</h2>
-  <p>
-    For early-stage projects without traffic history, approximate bandwidth using content size and expected views:
-  </p>
+  <p>For early-stage projects without traffic history, approximate bandwidth using content size and expected views:</p>
   <ul>
     <li>
-      <strong>GB/month ≈ views/month × average payload MB ÷ 1024</strong>
+      <strong>GB/month ≈ views/month x average payload (MB) / 1024</strong>
     </li>
   </ul>
   <p>
@@ -64,7 +77,7 @@ const description =
   <h2>What to include (and what to ignore)</h2>
   <ul>
     <li>Include: HTML, JS/CSS, images, downloads, video segments, API responses served from CDN.</li>
-    <li>Exclude: internal traffic and synthetic monitoring if it’s not representative (or model separately).</li>
+    <li>Exclude: internal traffic and synthetic monitoring if it's not representative (or model separately).</li>
   </ul>
 
   <h2>Next: turn GB/month into dollars</h2>

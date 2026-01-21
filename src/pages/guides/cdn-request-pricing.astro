@@ -1,0 +1,83 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CDN request pricing: how to estimate $ per 10k / 1M requests";
+const description =
+  "Some CDNs charge request fees in addition to bandwidth. Learn what counts as a billable request, how to estimate monthly requests, and how to model per-10k vs per-1M pricing.";
+const faqs = [
+  {
+    q: "Do all CDNs charge request fees?",
+    a: "No. Some plans bundle requests into bandwidth pricing, while others charge explicitly per request. Always check the pricing page for a requests line item.",
+  },
+  {
+    q: "How do I convert per-1M to per-10k pricing (or vice versa)?",
+    a: "Per-1M is 100x per-10k. For example, $0.75 per 1M requests equals $0.0075 per 10k requests.",
+  },
+  {
+    q: "Is every request billed the same?",
+    a: "Not always. Some providers have different prices for HTTP vs HTTPS, regional tiers, or request classes. Use the billable unit and class that matches your plan.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/cdn-request-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    When people search for <em>CDN cost</em>, they focus on bandwidth ($/GB). But for many workloads,{" "}
+    <strong>request fees</strong> can be a real part of the bill (especially API-like traffic with small payloads).
+  </p>
+
+  <h2>What is a "billable request"?</h2>
+  <p>
+    Each CDN defines billable requests slightly differently. In general, it maps to HTTP/HTTPS requests handled at the
+    edge. Some providers separate request classes (for example, cache hits vs misses, dynamic vs static, or different
+    protocols).
+  </p>
+  <p class="muted">
+    Use your provider definition as the source of truth. The goal of the model is planning accuracy, not guessing how a
+    specific vendor counts.
+  </p>
+
+  <h2>How to estimate requests/month</h2>
+  <ol>
+    <li>
+      If you have CDN analytics, take the 30-day request count and use it as requests/month.
+    </li>
+    <li>
+      If you have RPS, convert it with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
+    </li>
+    <li>
+      If you only have log samples, extrapolate carefully and validate once you have real metrics.
+    </li>
+  </ol>
+
+  <h2>How to apply per-10k / per-1M pricing</h2>
+  <p>Two common formats:</p>
+  <ul>
+    <li><strong>Per 10k requests</strong>: request fees = (requests/month / 10,000) x $ per 10k</li>
+    <li><strong>Per 1M requests</strong>: request fees = (requests/month / 1,000,000) x $ per 1M</li>
+  </ul>
+  <p>
+    If your calculator expects per-10k and you have a per-1M price, divide by 100 (and multiply by 100 to go the other
+    direction).
+  </p>
+
+  <h2>When request fees matter most</h2>
+  <ul>
+    <li><strong>API traffic</strong>: many small responses and a high request rate.</li>
+    <li><strong>Highly cacheable sites</strong>: bandwidth drops, but request volume stays.</li>
+    <li><strong>Bot spikes</strong>: request volume can jump while bandwidth barely changes.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost calculator</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
+  </div>
+</GuideLayout>
+
