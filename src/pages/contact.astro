@@ -4,7 +4,7 @@ import { SITE } from "../config/site";
 
 const title = `Contact | ${SITE.name}`;
 const description = "Contact CloudCostKit.";
-const emailB64 = Buffer.from(SITE.email, "utf8").toString("base64");
+const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/contact">
   <section class="card hero">
@@ -15,7 +15,7 @@ const emailB64 = Buffer.from(SITE.email, "utf8").toString("base64");
   <section class="card section prose">
     <p class="muted" style="margin:0">
       Email:{" "}
-      <a id="contact-email" href="#" data-email={emailB64}>
+      <a id="contact-email" href="#" data-u={emailUser} data-d={emailDomain}>
         Reveal email
       </a>
     </p>
@@ -26,14 +26,14 @@ const emailB64 = Buffer.from(SITE.email, "utf8").toString("base64");
       (function () {
         var el = document.getElementById('contact-email');
         if (!el) return;
-        var b64 = el.getAttribute('data-email') || '';
-        if (!b64) return;
-        try {
-          var email = atob(b64);
-          el.textContent = email;
-          el.setAttribute('href', 'mailto:' + email);
-          el.removeAttribute('data-email');
-        } catch (e) {}
+        var u = el.getAttribute('data-u') || '';
+        var d = el.getAttribute('data-d') || '';
+        if (!u || !d) return;
+        var email = u + '@' + d;
+        el.textContent = email;
+        el.setAttribute('href', 'mailto:' + email);
+        el.removeAttribute('data-u');
+        el.removeAttribute('data-d');
       })();
     `}
   </script>
