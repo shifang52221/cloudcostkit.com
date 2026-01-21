@@ -1,0 +1,60 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsLambdaVsFargateCostCalculator as AwsLambdaVsFargateCostCalculatorComponent } from "../../components/calculators/AwsLambdaVsFargateCost";
+
+const title = "AWS Lambda vs Fargate Cost Calculator";
+const description =
+  "Compare Lambda vs Fargate compute cost using the same workload assumptions. Estimate monthly Lambda request + GB-seconds and Fargate vCPU-hours + GB-hours. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-lambda-vs-fargate-cost-calculator"
+  intro="Compare Lambda (requests + GB-seconds) vs Fargate (vCPU-hours + GB-hours) using your own pricing inputs. This is a compute-only comparison; add logs, transfer, and load balancers for full TCO."
+  examples={[
+    "50M requests/month at 120 ms and 512 MB vs 3 tasks running 24/7 at 0.5 vCPU and 1 GB.",
+    "For steady high-throughput workloads, Fargate often wins; for bursty spiky workloads, Lambda often wins.",
+  ]}
+  includes={[
+    "Lambda request cost and compute cost (GB-seconds) with optional free tier.",
+    "Fargate vCPU-hour and memory GB-hour compute costs from average running tasks.",
+    "Side-by-side monthly totals and differences.",
+  ]}
+  excludes={[
+    "Logs/metrics costs (often meaningful for services with high volume).",
+    "Networking costs (NAT, egress, cross-AZ/cross-region transfer).",
+    "Load balancers, retries/timeouts, and ancillary services.",
+  ]}
+  how={[
+    "Lambda: request cost + (duration × memory) GB-seconds × $/GB-second (minus free tier if enabled).",
+    "Fargate: tasks × vCPU × hours × $/vCPU-hour + tasks × memory(GB) × hours × $/GB-hour.",
+    "Compare the compute-only monthly totals, then add other line items in your overall model.",
+  ]}
+  faqs={[
+    {
+      q: "Is this an official AWS quote?",
+      a: "No. This is a simplified estimate for planning. Verify region pricing, free tier, rounding rules, and service add-ons in AWS documentation.",
+    },
+    {
+      q: "Why does the winner change by workload shape?",
+      a: "Lambda pricing is execution-based and can be cheaper when traffic is bursty or idle often. Fargate pricing is capacity × time and can be cheaper for steady utilization and long-running compute.",
+    },
+    {
+      q: "What should I model next after compute?",
+      a: "Add logs, networking (egress/NAT/cross-AZ), and load balancers. For many services, these line items can be comparable to compute.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-lambda-vs-fargate-cost", label: "Guide: Lambda vs Fargate cost" },
+    { href: "/guides/aws-lambda-pricing", label: "Guide: Lambda pricing" },
+    { href: "/guides/aws-fargate-pricing", label: "Guide: Fargate pricing" },
+    { href: "/calculators/aws-lambda-cost-calculator", label: "Lambda cost calculator" },
+    { href: "/calculators/aws-fargate-cost-calculator", label: "Fargate cost calculator" },
+    { href: "/calculators/log-cost-calculator", label: "Log cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
+  ]}
+>
+  <AwsLambdaVsFargateCostCalculatorComponent client:load />
+</CalculatorLayout>
+

@@ -117,6 +117,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-lambda-vs-fargate-cost-calculator",
+    title: "AWS Lambda vs Fargate Cost Calculator",
+    description: "Compare Lambda vs Fargate compute costs side-by-side from your inputs.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
