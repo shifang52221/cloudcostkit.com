@@ -1,0 +1,48 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsCloudwatchAlarmsCostCalculator as AwsCloudwatchAlarmsCostCalculatorComponent } from "../../components/calculators/AwsCloudwatchAlarmsCost";
+
+const title = "AWS CloudWatch Alarms Cost Calculator";
+const description =
+  "Estimate CloudWatch Alarms-style costs from alarm counts and alarm-month pricing inputs. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-cloudwatch-alarms-cost-calculator"
+  intro="Estimate CloudWatch Alarms-style costs with a simple alarm-month model. Enter how many standard, high-resolution, and composite alarms you run, and your effective $/alarm-month pricing."
+  examples={[
+    "500 standard alarms, 50 high-res alarms, and 20 composite alarms with your $/alarm-month prices.",
+  ]}
+  includes={[
+    "Alarm charge estimate from alarm counts x $ per alarm-month inputs.",
+  ]}
+  excludes={[
+    "Metric ingestion/retention and high-cardinality metrics costs.",
+    "Dashboards, logs, and notifications (SNS, PagerDuty, etc.) unless modeled separately.",
+  ]}
+  how={[
+    "Alarm cost per type = alarm count x $ per alarm-month.",
+    "Total = standard + high-resolution + composite.",
+  ]}
+  faqs={[
+    {
+      q: "Do alarms include metric costs?",
+      a: "No. Metrics are typically billed separately. If you create many custom metrics or have high-cardinality labels, metrics can dominate the total observability bill.",
+    },
+    {
+      q: "What’s a common reason alarm bills grow unexpectedly?",
+      a: "Alarm sprawl: duplicated alarms across environments, per-tenant/per-pod alarms, and high-resolution alarms enabled broadly.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-cloudwatch-alarms-pricing", label: "Guide: CloudWatch Alarms pricing" },
+    { href: "/guides/aws-cloudwatch-alarms-estimate-alarm-count", label: "Guide: estimate alarm count" },
+    { href: "/guides/aws-cloudwatch-alarms-cost-optimization", label: "Guide: reduce alarms cost" },
+    { href: "/calculators/cloudwatch-metrics-cost-calculator", label: "CloudWatch Metrics cost calculator" },
+  ]}
+>
+  <AwsCloudwatchAlarmsCostCalculatorComponent client:load />
+</CalculatorLayout>
+

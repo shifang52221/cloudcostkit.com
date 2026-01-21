@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate CloudWatch alarm count (avoid alarm sprawl)";
+const description =
+  "How to estimate your CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-alarms-estimate-alarm-count"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "Why do alarm counts grow unexpectedly?",
+      a: "Alarm sprawl: teams duplicate alarms across environments, create per-service or per-tenant alarms, and forget to delete alarms when services are retired.",
+    },
+    {
+      q: "Should I model peak alarms or average alarms?",
+      a: "Model the maximum alarm count you maintain in the month (alarm-months). If alarms are created/destroyed automatically, use a representative average but validate the peak count.",
+    },
+  ]}
+>
+  <p>
+    Alarm pricing is usually per-alarm-month, so you mainly need one number: <strong>how many alarms exist</strong> by
+    type.
+  </p>
+
+  <h2>Step 1: Inventory by environment</h2>
+  <ul>
+    <li>Prod vs staging vs dev often multiplies alarm count.</li>
+    <li>Count alarms per region/account if you have multi-account structure.</li>
+  </ul>
+
+  <h2>Step 2: Look for multiplicative patterns</h2>
+  <ul>
+    <li>Per-pod or per-node alarms in Kubernetes.</li>
+    <li>Per-tenant or per-customer alarms in multi-tenant systems.</li>
+    <li>One alarm per queue/topic/table with auto-provisioned resources.</li>
+  </ul>
+
+  <h2>Step 3: Separate by alarm type</h2>
+  <ul>
+    <li>Standard vs high-resolution vs composite (pricing can differ).</li>
+    <li>Flag any high-resolution alarms that can be downgraded.</li>
+  </ul>
+
+  <h2>Turn counts into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">AWS CloudWatch Alarms Cost Calculator</a> to translate
+    counts into a monthly estimate using your $/alarm-month prices.
+  </p>
+</GuideLayout>
+

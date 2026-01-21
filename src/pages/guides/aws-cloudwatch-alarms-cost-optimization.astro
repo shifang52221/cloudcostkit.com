@@ -1,0 +1,53 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudWatch alarms cost optimization (reduce alarm sprawl)";
+const description =
+  "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-alarms-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever to reduce alarm charges?",
+      a: "Reduce the number of alarms you maintain: remove duplicates, consolidate per-service alarms, and avoid per-tenant/per-pod alarms where a higher-level SLO alarm is sufficient.",
+    },
+    {
+      q: "When do high-resolution alarms make sense?",
+      a: "Use them sparingly for the few signals that truly require fast detection. For most metrics, a 1-minute period is enough and cheaper.",
+    },
+  ]}
+>
+  <p>
+    Alarm charges are usually linear in <strong>alarm count</strong>. The best savings come from controlling alarm
+    sprawl, especially across environments and auto-scaled resources.
+  </p>
+
+  <h2>1) Reduce duplicates and dead alarms</h2>
+  <ul>
+    <li>Delete alarms for retired services and old environments.</li>
+    <li>Remove duplicate alarms across regions/accounts unless they add value.</li>
+  </ul>
+
+  <h2>2) Avoid per-entity alarms</h2>
+  <ul>
+    <li>Prefer SLO-based alarms over per-pod/per-tenant alarms where possible.</li>
+    <li>Aggregate metrics before alarming (e.g., fleet-level error rate).</li>
+  </ul>
+
+  <h2>3) Right-size high-resolution usage</h2>
+  <ul>
+    <li>Downgrade high-resolution alarms that don’t need fast evaluation.</li>
+    <li>Use composite alarms to reduce alert noise (but model their own cost).</li>
+  </ul>
+
+  <h2>Quantify the impact</h2>
+  <p>
+    Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">CloudWatch Alarms Cost Calculator</a> to estimate
+    savings from reducing alarm count or high-resolution usage.
+  </p>
+</GuideLayout>
+

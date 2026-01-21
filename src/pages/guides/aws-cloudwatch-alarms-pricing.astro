@@ -1,0 +1,51 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudWatch Alarms pricing: what to model (alarm-months)";
+const description =
+  "A practical CloudWatch Alarms pricing checklist: standard vs high-resolution vs composite alarms, and the observability line items that often dominate total cost.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-alarms-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "How are CloudWatch alarms commonly billed?",
+      a: "Often as alarm-months: how many alarms of each type exist for the month (standard, high-resolution, composite) multiplied by the $/alarm-month rate.",
+    },
+    {
+      q: "What else should I include besides alarm charges?",
+      a: "Metrics, logs, dashboards, and notification delivery. In many real systems, metrics and logs costs can exceed alarm charges.",
+    },
+  ]}
+>
+  <p>
+    CloudWatch Alarms cost modeling is straightforward: count the alarms you maintain and apply the relevant{" "}
+    <strong>$ per alarm-month</strong> rate by type.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Standard alarms</strong>: typical 1-minute evaluation period alarms
+    </li>
+    <li>
+      <strong>High-resolution alarms</strong>: shorter evaluation periods (more expensive)
+    </li>
+    <li>
+      <strong>Composite alarms</strong>: alarms built from other alarms
+    </li>
+    <li>
+      <strong>Adjacent line items</strong>: metrics, logs, dashboards, and notifications
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">AWS CloudWatch Alarms Cost Calculator</a> to estimate
+    alarm charges from counts and pricing inputs, then add metrics/logs/dashboards if needed.
+  </p>
+</GuideLayout>
+

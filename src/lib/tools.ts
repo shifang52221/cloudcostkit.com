@@ -147,6 +147,12 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "aws-cloudwatch-alarms-cost-calculator",
+    title: "AWS CloudWatch Alarms Cost Calculator",
+    description: "Estimate alarm-month charges from standard, high-resolution, and composite alarm counts.",
+    category: "Logging",
+  },
+  {
     slug: "log-retention-storage-cost-calculator",
     title: "Log Retention Storage Cost Calculator",
     description: "Estimate retained log storage cost from GB/day, retention days, and $/GB-month pricing.",
