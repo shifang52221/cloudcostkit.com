@@ -1,0 +1,60 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent } from "../../components/calculators/AwsFargateVsEc2Cost";
+
+const title = "ECS on EC2 vs ECS on Fargate Cost Calculator";
+const description =
+  "Compare ECS on EC2 vs ECS on Fargate compute costs with consistent assumptions. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator"
+  intro="Compare ECS on EC2 (instances × $/hour) vs ECS on Fargate (vCPU-hours + GB-hours) using average running capacity. This is compute-only; add load balancers, logs, and data transfer for a full ECS model."
+  examples={[
+    "ECS service: average 6 tasks at 0.5 vCPU and 1 GB running 730 hours/month vs 3 EC2 instances at $0.18/hr.",
+    "ECS on EC2 often wins when instances are packed and covered by commitments; Fargate can win when idle capacity dominates.",
+  ]}
+  includes={[
+    "Compute-only comparison: EC2 instance-hours vs Fargate vCPU-hours + GB-hours.",
+    "Side-by-side monthly totals and differences.",
+  ]}
+  excludes={[
+    "Load balancers (ALB/NLB), NAT/egress, and cross-AZ transfer.",
+    "Logs/metrics ingestion and retention.",
+    "EBS storage and snapshots (often relevant for ECS on EC2).",
+  ]}
+  how={[
+    "Fargate compute = tasks × vCPU × hours × $/vCPU-hour + tasks × memory(GB) × hours × $/GB-hour.",
+    "EC2 compute = instances × hours × $/instance-hour.",
+    "Compare compute-only totals, then add networking + logs + load balancers for full ECS TCO.",
+  ]}
+  faqs={[
+    {
+      q: "Why is this labeled compute-only?",
+      a: "For ECS workloads, ALBs/NLBs, NAT/egress, and logs can be major line items. This calculator isolates compute so you can compare the baseline first.",
+    },
+    {
+      q: "How do I choose average tasks and average instances?",
+      a: "Use monthly averages, not peak. If you only know peak, estimate an average from traffic shape and validate later with monitoring.",
+    },
+    {
+      q: "Should I use a blended EC2 $/hour?",
+      a: "Yes if you use Savings Plans/Reserved Instances. A blended effective rate makes comparisons more realistic.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-ecs-pricing", label: "Guide: ECS pricing (what to include)" },
+    { href: "/guides/aws-ecs-ec2-vs-fargate-cost", label: "Guide: ECS on EC2 vs ECS on Fargate" },
+    { href: "/calculators/aws-fargate-vs-ec2-cost-calculator", label: "Fargate vs EC2 (compare)" },
+    { href: "/calculators/aws-fargate-cost-calculator", label: "Fargate cost calculator" },
+    { href: "/calculators/ec2-cost-calculator", label: "EC2 cost calculator" },
+    { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost" },
+    { href: "/calculators/log-cost-calculator", label: "Log cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
+  ]}
+>
+  <AwsFargateVsEc2CostCalculatorComponent client:load />
+</CalculatorLayout>
+
