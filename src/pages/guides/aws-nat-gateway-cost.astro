@@ -5,7 +5,22 @@ const title = "NAT gateway costs: why they spike and how to estimate them";
 const description =
   "NAT gateways can create surprising bills because costs scale with both time and traffic. Learn a practical way to estimate and reduce NAT gateway spend.";
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-nat-gateway-cost" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-nat-gateway-cost"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What are the two NAT Gateway cost components?",
+      a: "A fixed hourly cost (gateway-hours) plus a traffic-based cost for GB processed through the NAT gateway.",
+    },
+    {
+      q: "What traffic counts as “GB processed”?",
+      a: "Traffic that traverses the NAT gateway (for example, instances in private subnets reaching the internet for updates or external APIs).",
+    },
+  ]}
+>
   <p>
     NAT gateway bills are often surprising because they combine a fixed hourly component with traffic-based charges. If
     you put high-throughput workloads behind NAT, costs can spike quickly.
@@ -22,6 +37,10 @@ const description =
     Start from flow logs or egress monitoring. If you only have throughput charts, convert Mbps to GB/month using the
     <a href="/calculators/unit-converter/">Units Converter</a>.
   </p>
+  <p class="muted" style="margin-top:10px">
+    Use <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a> to estimate the hourly +
+    traffic components using your effective pricing.
+  </p>
 
   <h2>How to reduce NAT spend</h2>
   <ul>
@@ -32,8 +51,8 @@ const description =
 
   <h2>Related tools</h2>
   <p>
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost calculator</a>
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer calculator</a>
     <a class="btn" href="/calculators/unit-converter/">Units converter</a>
   </p>
 </GuideLayout>
-

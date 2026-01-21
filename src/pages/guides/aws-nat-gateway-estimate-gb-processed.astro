@@ -1,0 +1,59 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate NAT Gateway GB processed (quick methods)";
+const description =
+  "Practical ways to estimate NAT Gateway GB processed per month: from metrics/flow logs, from Mbps charts, and from common traffic sources.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-nat-gateway-estimate-gb-processed"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the easiest way to estimate GB processed?",
+      a: "Use NAT Gateway metrics or VPC Flow Logs to sum bytes through the NAT gateway over a month.",
+    },
+    {
+      q: "Can I estimate from Mbps charts?",
+      a: "Yes. Convert average Mbps × time into GB/month using a units converter.",
+    },
+  ]}
+>
+  <p class="muted">
+    NAT Gateway costs scale with GB processed, so your budget depends on getting this number roughly right. Use one of the
+    methods below depending on what data you have.
+  </p>
+
+  <h2>1) From NAT metrics (best)</h2>
+  <p>
+    If you have NAT Gateway metrics, aggregate total bytes processed over 30 days and convert to GB. This is the most
+    reliable approach because it measures exactly what is billed as processed traffic.
+  </p>
+
+  <h2>2) From VPC Flow Logs</h2>
+  <p>
+    If you export flow logs, filter for traffic that traverses the NAT gateway ENIs and sum bytes. Convert to GB/month.
+  </p>
+
+  <h2>3) From throughput (Mbps) charts</h2>
+  <p>
+    If you only have average throughput (Mbps), convert it to GB/month. Use{" "}
+    <a href="/calculators/unit-converter/">Units Converter</a> to avoid mixing GB and GiB.
+  </p>
+
+  <h2>4) Sanity-check common sources</h2>
+  <ul>
+    <li>OS/package updates behind NAT</li>
+    <li>Container image pulls (CI/CD, scaling events)</li>
+    <li>External APIs and SaaS traffic</li>
+    <li>Log shipping to external destinations</li>
+  </ul>
+
+  <p class="muted" style="margin-top:14px">
+    Next: <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a>,{" "}
+    <a href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a>.
+  </p>
+</GuideLayout>
+

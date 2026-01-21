@@ -33,6 +33,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-nat-gateway-cost-calculator",
+    title: "AWS NAT Gateway Cost Calculator",
+    description: "Estimate NAT gateway hourly + per-GB processed costs from your inputs.",
+    category: "Networking",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

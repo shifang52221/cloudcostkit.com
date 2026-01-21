@@ -1,0 +1,54 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsNatGatewayCostCalculator as AwsNatGatewayCostCalculatorComponent } from "../../components/calculators/AwsNatGatewayCost";
+
+const title = "AWS NAT Gateway Cost Calculator";
+const description =
+  "Estimate AWS NAT Gateway-style monthly cost from gateway-hours and data processed (GB) using your pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-nat-gateway-cost-calculator"
+  intro="Estimate NAT Gateway-style cost using a simple model: hourly gateway fees + per-GB data processing. Use your effective region pricing."
+  examples={[
+    "1 NAT gateway running 730 hours/month with 2,000 GB processed — estimate hourly + traffic charges.",
+  ]}
+  includes={[
+    "Hourly component from NAT gateways × hours/month × $/hour.",
+    "Traffic component from GB processed × $/GB processed.",
+  ]}
+  excludes={[
+    "Internet egress $/GB charges (model separately if applicable).",
+    "Other transfer fees (cross-AZ/cross-region) depending on your architecture.",
+  ]}
+  how={[
+    "Hourly cost = NAT gateways × hours per month × $ per NAT gateway-hour.",
+    "Traffic cost = GB processed per month × $ per GB processed.",
+    "Total = hourly cost + traffic cost.",
+  ]}
+  faqs={[
+    {
+      q: "What is “GB processed” for NAT Gateway?",
+      a: "It’s the volume of traffic that traverses the NAT gateway. Track it via VPC Flow Logs or NAT metrics, or estimate from throughput over time.",
+    },
+    {
+      q: "Does this include internet egress charges?",
+      a: "No. NAT Gateway has its own hourly and processing fees, but you may still have separate internet egress costs depending on the destination and service.",
+    },
+    {
+      q: "Why do NAT bills spike?",
+      a: "Costs scale with both time (gateway-hours) and traffic (GB processed). High-throughput workloads, software updates, or container image pulls behind NAT can quickly increase GB processed.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-nat-gateway-cost", label: "Guide: NAT gateway cost (why it spikes)" },
+    { href: "/guides/aws-nat-gateway-estimate-gb-processed", label: "Guide: estimate NAT GB processed" },
+    { href: "/guides/aws-nat-gateway-cost-optimization", label: "Guide: NAT cost optimization" },
+    { href: "/calculators/vpc-data-transfer-cost-calculator", label: "VPC data transfer cost" },
+  ]}
+>
+  <AwsNatGatewayCostCalculatorComponent client:load />
+</CalculatorLayout>
+
