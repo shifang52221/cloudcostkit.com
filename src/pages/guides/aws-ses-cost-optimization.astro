@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "SES cost optimization (reduce volume, retries, and payload)";
+const description =
+  "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ses-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever to reduce SES cost?",
+      a: "Reduce send volume and prevent duplicates. Most SES spend is linear in email count, so avoiding unnecessary sends and retries is the highest impact.",
+    },
+    {
+      q: "How do I prevent incident-driven cost spikes?",
+      a: "Dedupe and rate-limit notifications, fix retry loops, and add circuit breakers so failures don’t trigger repeated sends.",
+    },
+  ]}
+>
+  <p>
+    SES costs usually scale with <strong>emails sent</strong>. The best savings come from preventing duplicate sends,
+    controlling retries, and reducing the payload size when you include large templates or attachments.
+  </p>
+
+  <h2>1) Reduce volume and duplicates</h2>
+  <ul>
+    <li>Send fewer notifications by batching or digesting where appropriate.</li>
+    <li>Dedupe message IDs so retries don’t generate duplicate emails.</li>
+    <li>Disable noisy non-prod email sending or route it to a sink.</li>
+  </ul>
+
+  <h2>2) Control retries</h2>
+  <ul>
+    <li>Use exponential backoff and stop retrying after a sensible limit.</li>
+    <li>Fix failure sources (timeouts, upstream dependencies) that trigger resend loops.</li>
+  </ul>
+
+  <h2>3) Reduce payload size</h2>
+  <ul>
+    <li>Keep templates lean; avoid embedding large images.</li>
+    <li>Prefer links to downloads instead of large attachments when possible.</li>
+  </ul>
+
+  <h2>Quantify changes</h2>
+  <p>
+    Use <a href="/calculators/aws-ses-cost-calculator/">SES Cost Calculator</a> to estimate savings from reduced email
+    volume or smaller payloads.
+  </p>
+</GuideLayout>
+

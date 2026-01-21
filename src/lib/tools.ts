@@ -87,6 +87,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-ses-cost-calculator",
+    title: "AWS SES Cost Calculator",
+    description: "Estimate email sending cost from volume and optional payload transfer assumptions.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "SES pricing: what to model (send volume + payload size)";
+const description =
+  "A practical AWS SES pricing checklist: emails sent, payload size (optional transfer), and common sources of cost spikes for product and marketing email.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ses-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What typically drives SES cost?",
+      a: "Email volume. Large payloads and attachments can add transfer-related costs, and dedicated IPs or add-ons can add fixed monthly charges.",
+    },
+    {
+      q: "Why do email bills spike during incidents?",
+      a: "Retry loops and alert storms. If your system retries aggressively or sends duplicate notifications, volume can multiply quickly.",
+    },
+  ]}
+>
+  <p>
+    SES cost modeling is usually straightforward: <strong>emails sent</strong> multiplied by your effective <strong>$ per
+    1,000 emails</strong>. If you send large payloads or attachments, you may also want to model transfer-like costs.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Emails/month</strong>: transactional + marketing volume
+    </li>
+    <li>
+      <strong>Average email size</strong>: templates, images, and attachments (optional)
+    </li>
+    <li>
+      <strong>Add-ons</strong>: dedicated IPs or other features you enable
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-ses-cost-calculator/">AWS SES Cost Calculator</a> to estimate send charges and optional
+    transfer from average email size.
+  </p>
+</GuideLayout>
+

@@ -1,0 +1,51 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsSesCostCalculator as AwsSesCostCalculatorComponent } from "../../components/calculators/AwsSesCost";
+
+const title = "AWS SES Cost Calculator";
+const description =
+  "Estimate SES-style email sending cost from monthly email volume plus optional email size/transfer assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-ses-cost-calculator"
+  intro="Estimate SES-style cost with a simple model: send charges (per 1,000 emails) plus optional transfer from average email size. Use your effective region pricing."
+  examples={[
+    "5M emails/month at $0.10 per 1,000 emails, average 10 KB/email, and $0.09/GB egress.",
+  ]}
+  includes={[
+    "Send charges from emails/month and $ per 1,000 emails.",
+    "Optional transfer estimate from email size and $/GB.",
+  ]}
+  excludes={[
+    "Dedicated IPs, inbound email, and other add-ons unless modeled separately.",
+    "Downstream processing and storage (Lambdas, queues, logs, analytics).",
+  ]}
+  how={[
+    "Send cost = (emails per month / 1,000) x $ per 1,000 emails.",
+    "Transfer GB/month ~= emails per month x avg email KB / 1024 / 1024.",
+    "Transfer cost = transfer GB/month x $ per GB.",
+    "Total = send + transfer.",
+  ]}
+  faqs={[
+    {
+      q: "Should I include transfer for SES?",
+      a: "It depends on your setup and what you want to approximate. If transfer is negligible or bundled for your path, set $/GB to 0 and model send charges only.",
+    },
+    {
+      q: "What drives unexpected email costs?",
+      a: "Higher volume than expected (marketing sends), retries/bounces, large templates/attachments increasing payload size, and dedicated IP/add-on usage.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-ses-pricing", label: "Guide: SES pricing" },
+    { href: "/guides/aws-ses-estimate-email-volume", label: "Guide: estimate email volume" },
+    { href: "/guides/aws-ses-cost-optimization", label: "Guide: reduce SES costs" },
+    { href: "/calculators/aws-sns-cost-calculator", label: "SNS cost calculator" },
+  ]}
+>
+  <AwsSesCostCalculatorComponent client:load />
+</CalculatorLayout>
+
