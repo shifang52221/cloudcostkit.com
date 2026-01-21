@@ -12,8 +12,8 @@ const description =
   lastUpdated="2026-01-20"
   faqs={[
     {
-      q: "What’s the simplest way to estimate backup storage?",
-      a: "Use average daily change rate × retention days as a starting point, then sanity-check against real snapshot sizes if you have them.",
+      q: "What's the simplest way to estimate backup storage?",
+      a: "Use average daily change rate x retention days as a starting point, then sanity-check against real snapshot sizes if you have them.",
     },
     {
       q: "Why do snapshots become expensive?",
@@ -23,7 +23,7 @@ const description =
 >
   <p class="muted">
     Backup costs often surprise teams because they grow silently with retention and data churn. Plan backups as a separate
-    storage bucket, not “part of the instance.”
+    storage bucket, not "part of the instance".
   </p>
 
   <h2>1) Separate three concepts</h2>
@@ -35,9 +35,9 @@ const description =
 
   <h2>2) A quick planning estimate</h2>
   <p>
-    If you don’t have accurate snapshot sizes yet, estimate <strong>backup GB</strong> as:
+    If you don't have accurate snapshot sizes yet, estimate <strong>backup GB</strong> as:
     <br />
-    <strong>backup GB ≈ daily changed GB × retention days</strong>.
+    <strong>backup GB ~ daily changed GB x retention days</strong>.
   </p>
 
   <h2>3) Validate against reality</h2>
@@ -48,9 +48,15 @@ const description =
 
   <h2>4) Feed the estimate into the calculator</h2>
   <p>
-    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> and set “backup storage (GB-month)” to
+    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> and set "backup storage (GB-month)" to
     your best estimate. Combine it with storage growth modeling via{" "}
     <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
   </p>
-</GuideLayout>
 
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
+    <a class="btn" href="/guides/aws-rds-snapshot-retention-policy-cost/">Snapshot retention policy (cost)</a>
+    <a class="btn" href="/guides/aws-rds-cost-optimization/">RDS cost optimization</a>
+  </div>
+</GuideLayout>

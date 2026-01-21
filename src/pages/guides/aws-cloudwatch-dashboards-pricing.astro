@@ -1,0 +1,68 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudWatch dashboards pricing: estimate dashboard-month costs";
+const description =
+  "A practical checklist for CloudWatch dashboards pricing: how to count dashboards, what a dashboard-month represents, and the common sources of dashboard sprawl.";
+const faqs = [
+  {
+    q: "What is a dashboard-month?",
+    a: "A dashboard-month is the unit used to bill dashboards over time. The exact definition can depend on the provider, but the practical model is: how many dashboards exist for the month.",
+  },
+  {
+    q: "What usually drives dashboard costs up?",
+    a: "Dashboard sprawl: many near-duplicate dashboards across environments, teams, tenants, or services, plus frequent refresh patterns that can add API request costs.",
+  },
+  {
+    q: "Do dashboards and metrics API calls interact?",
+    a: "Often yes. If dashboards refresh frequently or query many widgets, the metric API request line item can increase alongside dashboards.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-dashboards-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p class="muted">
+    CloudWatch-style dashboards are usually billed as a simple baseline (dashboard-month). The surprise is often not the
+    dashboard line itself, but the way dashboards contribute to sprawl and API polling.
+  </p>
+
+  <h2>What to count</h2>
+  <ul>
+    <li><strong>Dashboards</strong>: total dashboards that exist in the account (or per environment).</li>
+    <li><strong>Environments</strong>: prod + staging + dev often multiply dashboard count.</li>
+    <li><strong>Tenants/teams</strong>: per-tenant or per-team dashboards can balloon quickly.</li>
+    <li><strong>Refresh patterns</strong>: frequent refresh can increase metrics API requests.</li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p>
+    Start by counting dashboards per environment, then add the obvious multipliers (teams, tenants). If you expect rapid
+    growth, model a "future state" dashboard count rather than today's number.
+  </p>
+
+  <h2>Cost-control tips</h2>
+  <ul>
+    <li>Consolidate dashboards (service-level) instead of per-entity dashboards.</li>
+    <li>Delete old dashboards from experiments and migrations.</li>
+    <li>Prefer templated dashboards or tags over duplicating dashboards per team.</li>
+  </ul>
+
+  <h2>Quantify with a calculator</h2>
+  <p>
+    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to model
+    dashboards plus the related line items (custom metrics, alarms, and API requests).
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-pricing/">CloudWatch metrics pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics cost optimization</a>
+  </div>
+</GuideLayout>
+

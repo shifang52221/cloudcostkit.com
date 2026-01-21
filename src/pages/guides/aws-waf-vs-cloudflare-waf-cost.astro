@@ -1,0 +1,72 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS WAF vs Cloudflare WAF cost: a practical comparison checklist";
+const description =
+  "Compare AWS WAF vs Cloudflare WAF cost using a practical checklist: request-based charges, rule/policy baselines, logging/analytics costs, and what to model for your traffic shape.";
+const faqs = [
+  {
+    q: "What usually drives WAF cost in practice?",
+    a: "Request volume (especially during spikes) plus your baseline policy/rule configuration. Logging, storage, and analytics can be a second bill that rivals the WAF line item.",
+  },
+  {
+    q: "Is a cheaper WAF always the better choice?",
+    a: "Not necessarily. You also need to consider the features you need (managed rules, bot protection, rate limiting), operational workflow, and where traffic is stopped (edge vs origin).",
+  },
+  {
+    q: "What's the fastest way to compare costs fairly?",
+    a: "Use the same evaluated request volume and the same surge/attack scenario for both, then include logging/retention costs and any add-ons you actually use.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-waf-vs-cloudflare-waf-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    AWS WAF vs Cloudflare WAF comparisons often go wrong because teams compare list prices without normalizing traffic
+    shape. Use this checklist to compare apples-to-apples: baseline policies, evaluated requests, and the cost of
+    security logging and analytics.
+  </p>
+
+  <h2>1) Normalize traffic volume (including spikes)</h2>
+  <ul>
+    <li>Average requests/month (steady state)</li>
+    <li>Peak hours and attack/bot scenarios</li>
+    <li>Include blocked traffic if it is still evaluated</li>
+  </ul>
+  <p class="muted">
+    Tooling: <a href="/guides/aws-waf-estimate-requests/">estimate WAF requests</a> and model a surge scenario.
+  </p>
+
+  <h2>2) Compare baseline policy/rule costs</h2>
+  <ul>
+    <li>How many apps/environments require distinct policies?</li>
+    <li>How many rule groups (managed + custom) do you need?</li>
+    <li>Do you pay extra for bot management, rate limiting, or advanced features?</li>
+  </ul>
+
+  <h2>3) Don't ignore the second bill: logs and analytics</h2>
+  <ul>
+    <li>Log delivery and ingestion cost (GB/day)</li>
+    <li>Retention (GB-month)</li>
+    <li>Query/scan costs for dashboards and incident response</li>
+  </ul>
+
+  <h2>4) Operational and architecture constraints</h2>
+  <ul>
+    <li>Where traffic is filtered (edge vs origin) and how that affects origin egress.</li>
+    <li>How quickly you can deploy rule changes safely.</li>
+    <li>How you export events into your existing security tooling.</li>
+  </ul>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-waf-pricing/">AWS WAF pricing</a>
+    <a class="btn" href="/guides/aws-waf-cost-spikes-during-attacks/">WAF cost spikes during attacks</a>
+    <a class="btn" href="/guides/aws-waf-cost-optimization/">WAF cost optimization</a>
+  </div>
+</GuideLayout>

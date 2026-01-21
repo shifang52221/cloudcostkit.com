@@ -24,16 +24,16 @@ const description =
     "Tiered pricing steps and free allowances unless you reflect them in your pricing inputs.",
   ]}
   how={[
-    "Custom metrics cost = metric-month × $ per metric-month.",
-    "Alarm cost = alarm-month × $ per alarm-month.",
-    "Dashboard cost = dashboard-month × $ per dashboard-month.",
-    "API cost = (API requests / 1,000) × $ per 1k requests.",
+    "Custom metrics cost = metric-month x $ per metric-month.",
+    "Alarm cost = alarm-month x $ per alarm-month.",
+    "Dashboard cost = dashboard-month x $ per dashboard-month.",
+    "API cost = (API requests / 1,000) x $ per 1k requests.",
     "Total = sum of the above line items.",
   ]}
   faqs={[
     {
       q: "Is time series cardinality the same as custom metrics?",
-      a: "They are related but not identical. High-cardinality dimensions can create many unique series/metrics. Use your provider’s definition and measure your actual counts when possible.",
+      a: "They are related but not identical. High-cardinality dimensions can create many unique series/metrics. Use your provider's definition and measure your actual counts when possible.",
     },
     {
       q: "What should I use for API requests?",
@@ -48,10 +48,11 @@ const description =
   related={[
     { href: "/guides/aws-cloudwatch-metrics-pricing", label: "Guide: CloudWatch metrics pricing" },
     { href: "/guides/aws-cloudwatch-metrics-estimate-custom-metrics", label: "Guide: estimate custom metrics" },
+    { href: "/guides/aws-cloudwatch-dashboards-pricing", label: "Guide: CloudWatch dashboards pricing" },
+    { href: "/guides/aws-cloudwatch-metrics-estimate-api-requests", label: "Guide: estimate metrics API requests" },
     { href: "/guides/aws-cloudwatch-metrics-cost-optimization", label: "Guide: reduce metrics costs" },
     { href: "/calculators/metrics-timeseries-cost-calculator", label: "Time series cost (generic)" },
   ]}
 >
   <AwsCloudwatchMetricsCostCalculatorComponent client:load />
 </CalculatorLayout>
-

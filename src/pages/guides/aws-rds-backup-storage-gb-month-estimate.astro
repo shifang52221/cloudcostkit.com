@@ -1,0 +1,70 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate RDS backup storage (GB-month) from retention and churn";
+const description =
+  "A practical method to estimate RDS backup storage (GB-month): start from daily changed data, retention days, and sanity-check with snapshot sizes. Includes common mistakes that inflate backup cost.";
+const faqs = [
+  {
+    q: "What's a simple backup storage estimate?",
+    a: "A good first pass is: backup GB ~ daily changed GB x retention days. Then sanity-check against real snapshot sizes and adjust for bursty churn.",
+  },
+  {
+    q: "Why can backup storage be high even if DB size is stable?",
+    a: "Because churn (updates/writes) can be high. Frequent changes across many pages/rows can create large incremental snapshots over time, especially with long retention.",
+  },
+  {
+    q: "What inputs matter most for backups?",
+    a: "Retention, snapshot frequency (if you do manual snapshots), and daily changed data. DB size matters, but churn and retention often dominate the backup GB-month line item.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-rds-backup-storage-gb-month-estimate"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p class="muted">
+    RDS backup costs are commonly billed as <strong>backup storage (GB-month)</strong>. The hard part is not pricing - it
+    is estimating how much backup data accumulates with retention and churn.
+  </p>
+
+  <h2>Step 1: Estimate daily changed data (churn)</h2>
+  <ul>
+    <li>Use engine metrics, binlog/WAL volume, or write throughput as a proxy.</li>
+    <li>Model bursty periods (batch jobs) separately from steady state.</li>
+    <li>If unsure, estimate a low and high churn scenario.</li>
+  </ul>
+
+  <h2>Step 2: Multiply by retention</h2>
+  <p class="muted">
+    First-pass planning model: <strong>backup GB</strong> is roughly <strong>daily changed GB x retention days</strong>.
+  </p>
+  <p>
+    This is a planning approximation. Real snapshot behavior depends on engine/storage, but this model is usually
+    directionally correct for budgeting.
+  </p>
+
+  <h2>Step 3: Sanity-check with real snapshot sizes</h2>
+  <ul>
+    <li>Look at snapshot sizes and growth over time.</li>
+    <li>Confirm whether manual snapshots (long-term) are accumulating.</li>
+    <li>Check for retention differences across environments and accounts.</li>
+  </ul>
+
+  <h2>Turn GB-month into dollars</h2>
+  <p>
+    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> and set the backup storage input to
+    your estimated <strong>backup GB-month</strong>. Pair it with{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a> for multi-month scenarios.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">RDS backups and snapshots</a>
+    <a class="btn" href="/guides/aws-rds-snapshot-retention-policy-cost/">Snapshot retention policy (cost)</a>
+    <a class="btn" href="/guides/aws-rds-cost-optimization/">RDS cost optimization</a>
+  </div>
+</GuideLayout>

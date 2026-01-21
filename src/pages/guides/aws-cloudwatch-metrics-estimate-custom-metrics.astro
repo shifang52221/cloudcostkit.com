@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate CloudWatch custom metrics (quick methods)";
 const description =
-  "A practical way to estimate CloudWatch custom metrics count: start from services × metrics, then multiply dimensions carefully to avoid high-cardinality surprises.";
+  "A practical way to estimate CloudWatch custom metrics count: start from services x metrics, then multiply dimensions carefully to avoid high-cardinality surprises.";
 ---
 <GuideLayout
   title={title}
@@ -12,18 +12,18 @@ const description =
   lastUpdated="2026-01-21"
   faqs={[
     {
-      q: "What’s the fastest way to estimate custom metrics count?",
-      a: "Start from services × key metrics per service, then multiply by the dimensions you actually use (cluster/namespace/pod/etc).",
+      q: "What's the fastest way to estimate custom metrics count?",
+      a: "Start from services x key metrics per service, then multiply by the dimensions you actually use (cluster/namespace/pod/etc).",
     },
     {
-      q: "What’s the #1 mistake in metrics estimates?",
+      q: "What's the #1 mistake in metrics estimates?",
       a: "High-cardinality dimensions (like pod_id or user_id) that multiply the number of unique series/metrics.",
     },
   ]}
 >
   <p class="muted">
-    For planning, you want a reasonable estimate of “how many distinct metrics/series will I pay for?” You can get close
-    with a simple approach: base metrics × dimensions.
+    For planning, you want a reasonable estimate of "how many distinct metrics/series will I pay for?" You can get close
+    with a simple approach: base metrics x dimensions.
   </p>
 
   <h2>1) Start from services and key metrics</h2>
@@ -36,7 +36,7 @@ const description =
   <p>
     Each dimension label can multiply the number of unique series. For example:
     <br />
-    <strong>service × environment × cluster × namespace × pod</strong> can explode quickly.
+    <strong>service x environment x cluster x namespace x pod</strong> can explode quickly.
   </p>
 
   <h2>3) Validate with real counts</h2>
@@ -50,5 +50,11 @@ const description =
     Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to translate your
     custom metrics + alarms + dashboards into a monthly estimate.
   </p>
-</GuideLayout>
 
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-pricing/">CloudWatch metrics pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-dashboards-pricing/">CloudWatch dashboards pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
+  </div>
+</GuideLayout>

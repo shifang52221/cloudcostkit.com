@@ -12,7 +12,7 @@ const description =
   lastUpdated="2026-01-21"
   faqs={[
     {
-      q: "What’s the biggest lever for CloudWatch metrics cost?",
+      q: "What's the biggest lever for CloudWatch metrics cost?",
       a: "Reducing custom metrics count, especially high-cardinality dimensions that multiply the number of unique series.",
     },
     {
@@ -50,5 +50,11 @@ const description =
     Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to see which line
     item dominates (metrics, alarms, dashboards, API), then optimize the right lever.
   </p>
-</GuideLayout>
 
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-pricing/">CloudWatch metrics pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-dashboards-pricing/">CloudWatch dashboards pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
+  </div>
+</GuideLayout>

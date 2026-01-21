@@ -15,20 +15,20 @@ const description =
     "1 instance at $0.20/hour running 730h/month, 200GB storage, 200GB backups, and 5B I/O requests/month.",
   ]}
   includes={[
-    "Compute from instances × hours/month × $/hour.",
-    "Storage from GB-month × $/GB-month.",
-    "Backup storage from GB-month × $/GB-month.",
-    "I/O requests from monthly I/O volume × $ per 1M requests.",
+    "Compute from instances x hours/month x $/hour.",
+    "Storage from GB-month x $/GB-month.",
+    "Backup storage from GB-month x $/GB-month.",
+    "I/O requests from monthly I/O volume x $ per 1M requests.",
   ]}
   excludes={[
     "Network/data transfer, monitoring/logs, licensing, taxes, and feature add-ons.",
     "Free tiers, tiered steps, and per-engine differences unless you reflect them in pricing inputs.",
   ]}
   how={[
-    "Compute cost = instances × hours per month × $ per hour.",
-    "Storage cost = GB-month × $ per GB-month.",
-    "Backup cost = backup GB-month × $ per GB-month.",
-    "I/O cost = (I/O requests per month / 1,000,000) × $ per 1M I/O requests.",
+    "Compute cost = instances x hours per month x $ per hour.",
+    "Storage cost = GB-month x $ per GB-month.",
+    "Backup cost = backup GB-month x $ per GB-month.",
+    "I/O cost = (I/O requests per month / 1,000,000) x $ per 1M I/O requests.",
     "Total = compute + storage + backups + I/O (excluding transfer and add-ons).",
   ]}
   faqs={[
@@ -49,10 +49,11 @@ const description =
   related={[
     { href: "/guides/aws-rds-pricing", label: "Guide: RDS pricing (what to include)" },
     { href: "/guides/aws-rds-backups-and-snapshots", label: "Guide: backups and snapshots" },
+    { href: "/guides/aws-rds-backup-storage-gb-month-estimate", label: "Guide: estimate backup GB-month" },
+    { href: "/guides/aws-rds-snapshot-retention-policy-cost", label: "Guide: snapshot retention policy (cost)" },
     { href: "/guides/aws-rds-cost-optimization", label: "Guide: RDS cost optimization" },
     { href: "/calculators/database-storage-growth-cost-calculator", label: "DB storage growth" },
   ]}
 >
   <AwsRdsCostCalculatorComponent client:load />
 </CalculatorLayout>
-

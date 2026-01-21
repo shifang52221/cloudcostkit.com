@@ -12,7 +12,7 @@ const description =
   lastUpdated="2026-01-21"
   faqs={[
     {
-      q: "What’s the biggest lever for WAF cost?",
+      q: "What's the biggest lever for WAF cost?",
       a: "Reducing evaluated requests (especially during spikes) and controlling downstream logging volume. Baseline ACL/rule fees are usually smaller.",
     },
     {
@@ -41,7 +41,7 @@ const description =
 
   <h2>3) Control downstream logging/analysis</h2>
   <ul>
-    <li>Sample or filter logs for noisy paths if you don’t need full fidelity.</li>
+    <li>Sample or filter logs for noisy paths if you don't need full fidelity.</li>
     <li>Set retention intentionally; avoid storing everything forever.</li>
     <li>Optimize queries to avoid repeated full scans.</li>
   </ul>
@@ -51,5 +51,11 @@ const description =
     Use <a href="/calculators/aws-waf-cost-calculator/">WAF Cost Calculator</a> to estimate savings from reducing rule
     count or request volume.
   </p>
-</GuideLayout>
 
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-waf-estimate-requests/">Estimate WAF requests</a>
+    <a class="btn" href="/guides/aws-waf-cost-spikes-during-attacks/">WAF cost spikes during attacks</a>
+    <a class="btn" href="/guides/aws-waf-vs-cloudflare-waf-cost/">AWS WAF vs Cloudflare WAF cost</a>
+  </div>
+</GuideLayout>

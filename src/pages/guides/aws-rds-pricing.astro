@@ -16,7 +16,7 @@ const description =
       a: "Compute (instance hours), database storage (GB-month), backup storage (GB-month), and sometimes I/O requests depending on storage type/engine.",
     },
     {
-      q: "Is Multi-AZ “free”?",
+      q: "Is Multi-AZ \"free\"?",
       a: "No. High availability typically means additional instance and storage costs. Model it explicitly as more instances and/or storage where applicable.",
     },
   ]}
@@ -28,7 +28,7 @@ const description =
 
   <h2>1) Start with compute (instance hours)</h2>
   <p>
-    For budgeting, model <strong>instances × hours/month × $/hour</strong>. If you have read replicas or Multi-AZ, model
+    For budgeting, model <strong>instances x hours/month x $/hour</strong>. If you have read replicas or Multi-AZ, model
     them as extra instances.
   </p>
 
@@ -49,8 +49,8 @@ const description =
 
   <h2>4) Include I/O only if your pricing model charges for it</h2>
   <p>
-    Some storage models charge per I/O request. If you don’t have a reliable I/O estimate, run two scenarios: “low I/O”
-    and “high I/O”.
+    Some storage models charge per I/O request. If you don't have a reliable I/O estimate, run two scenarios: \"low
+    I/O\" and \"high I/O\".
   </p>
 
   <h2>5) Use a calculator for fast scenario planning</h2>
@@ -58,5 +58,11 @@ const description =
     Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> to model instance hours + storage +
     backups + I/O with your own pricing assumptions.
   </p>
-</GuideLayout>
 
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>
+    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
+    <a class="btn" href="/guides/aws-rds-snapshot-retention-policy-cost/">Snapshot retention policy (cost)</a>
+  </div>
+</GuideLayout>

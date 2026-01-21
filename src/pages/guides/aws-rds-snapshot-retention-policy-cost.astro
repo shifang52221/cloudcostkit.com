@@ -1,0 +1,69 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "RDS snapshot retention policy: cost model and safe defaults";
+const description =
+  "How to choose an RDS snapshot retention policy without surprise costs: model retention vs churn, avoid redundant snapshots, and set long-term retention intentionally.";
+const faqs = [
+  {
+    q: "What retention policy keeps costs predictable?",
+    a: "Use short operational retention (days to weeks) and keep long-term retention only where required. Model costs using churn x retention and validate with real snapshot growth.",
+  },
+  {
+    q: "Why do manual snapshots often create surprise bills?",
+    a: "Because they can accumulate without a lifecycle policy. Long-lived manual snapshots can quietly dominate backup GB-month over time.",
+  },
+  {
+    q: "Should every environment have the same retention?",
+    a: "Usually no. Prod often needs longer operational retention, while dev/staging can use much shorter retention to avoid paying for non-critical history.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-rds-snapshot-retention-policy-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Snapshot retention is a trade-off between recovery objectives and cost. Most cost blowups come from long retention
+    combined with high churn, plus manual snapshots that never expire.
+  </p>
+
+  <h2>1) Define what you actually need</h2>
+  <ul>
+    <li><strong>Operational recovery</strong>: typical restore windows (days to weeks).</li>
+    <li><strong>Compliance retention</strong>: long-term retention if required (months to years).</li>
+    <li><strong>RPO/RTO</strong>: how far back you must be able to restore, and how quickly.</li>
+  </ul>
+
+  <h2>2) Model cost with churn x retention</h2>
+  <p class="muted">
+    If churn is meaningful, backup storage tends to scale with <strong>daily changed GB x retention days</strong>.
+  </p>
+  <p>
+    Use a low and high churn scenario if you do not have strong measurements yet.
+  </p>
+
+  <h2>3) Avoid the common retention traps</h2>
+  <ul>
+    <li>Same retention everywhere (dev/staging backups that linger for months).</li>
+    <li>Manual snapshots without a lifecycle policy.</li>
+    <li>Frequent snapshots for fast-changing datasets without cost guardrails.</li>
+  </ul>
+
+  <h2>4) Use two tiers: short operational + targeted long-term</h2>
+  <p>
+    Keep the short tier for day-to-day recovery. Add long-term retention only where required and keep it scoped (critical
+    databases, monthly snapshots, etc.).
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
+    <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>
+    <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
+  </div>
+</GuideLayout>
+

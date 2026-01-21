@@ -26,7 +26,7 @@ const description =
     name + label combinations. This guide explains how to estimate series count and avoid the most common pitfalls.
   </p>
 
-  <h2>What is an “active series”?</h2>
+  <h2>What is an "active series"?</h2>
   <p>
     A unique metric name and label set. If you add labels like <code>pod</code>, <code>container</code>, or <code>user_id</code>,
     series count can multiply quickly.
@@ -34,8 +34,8 @@ const description =
 
   <h2>How to estimate series</h2>
   <ul>
-    <li>Start from number of services × key metrics per service.</li>
-    <li>Add multiplicative labels carefully (cluster × namespace × pod × container).</li>
+    <li>Start from number of services x key metrics per service.</li>
+    <li>Add multiplicative labels carefully (cluster x namespace x pod x container).</li>
     <li>Validate with your monitoring backend once you have real data.</li>
   </ul>
   <p>
@@ -48,7 +48,7 @@ const description =
   <h2>Cost-control tips</h2>
   <ul>
     <li>Limit high-cardinality labels.</li>
-    <li>Drop metrics you don’t use for alerts or dashboards.</li>
+    <li>Drop metrics you don't use for alerts or dashboards.</li>
     <li>Use aggregation where possible (service-level over pod-level).</li>
   </ul>
 
@@ -58,4 +58,11 @@ const description =
     <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics series cost</a>
     <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a>
   </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-custom-metrics/">Estimate custom metrics</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics cost optimization</a>
+  </div>
 </GuideLayout>

@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "WAF cost spikes during attacks: how to budget request surges";
+const description =
+  "A practical guide to WAF cost spikes during attacks: why request-based charges jump, how to model surge traffic, and how to reduce evaluated requests and logging volume safely.";
+const faqs = [
+  {
+    q: "Why do WAF bills spike during incidents?",
+    a: "Because WAF pricing often includes request-based charges. Attack traffic (even if blocked) is still evaluated and can multiply request volume and downstream logging cost.",
+  },
+  {
+    q: "Should I budget blocked requests?",
+    a: "Yes. For cost models, use evaluated requests (allowed + blocked). During bot spikes, blocked traffic can dominate request counts.",
+  },
+  {
+    q: "What's the fastest way to estimate surge cost?",
+    a: "Estimate your steady monthly requests, then model a surge scenario (for example, 10x RPS for 6 hours/day for 3 days) and convert it into additional monthly requests.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-waf-cost-spikes-during-attacks"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    WAF cost spikes are usually not caused by \"more rules\" - they're caused by <strong>more evaluated requests</strong>.
+    During attacks, blocked traffic can explode request volume and create an additional surprise: <strong>security log
+    cost</strong> can grow with it.
+  </p>
+
+  <h2>Step 1: separate steady traffic from surge traffic</h2>
+  <ul>
+    <li><strong>Steady</strong>: your typical 30-day traffic.</li>
+    <li><strong>Surge</strong>: bot spikes, credential stuffing, scraping, or DDoS-like bursts.</li>
+    <li><strong>Include blocked traffic</strong>: for billing, it's often evaluated even when blocked.</li>
+  </ul>
+
+  <h2>Step 2: convert surge RPS into added monthly requests</h2>
+  <p class="muted">
+    Simple approximation: <strong>extra requests = surge RPS x surge seconds</strong>. Then add to your steady
+    requests/month.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-waf-estimate-requests/">Estimate WAF requests</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+  </div>
+
+  <h2>Step 3: reduce evaluated requests (high leverage)</h2>
+  <ul>
+    <li><strong>Cache</strong> aggressively for cacheable routes (especially for abusive hot paths).</li>
+    <li><strong>Rate-limit</strong> early for known abusive endpoints (login, search, auth token endpoints).</li>
+    <li><strong>Block</strong> obvious bot paths and bad user agents with targeted rules.</li>
+    <li><strong>Move traffic up</strong> the stack: stop bad traffic at the CDN edge when possible.</li>
+  </ul>
+
+  <h2>Step 4: don't let security logging become the bigger bill</h2>
+  <ul>
+    <li>Sample or filter logs for high-volume endpoints where full fidelity isn't required.</li>
+    <li>Set retention intentionally for noisy logs.</li>
+    <li>Optimize queries and dashboards to avoid repeated large scans.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-waf-cost-calculator/">WAF cost calculator</a>
+    <a class="btn" href="/guides/aws-waf-pricing/">WAF pricing</a>
+    <a class="btn" href="/guides/aws-waf-cost-optimization/">WAF cost optimization</a>
+  </div>
+</GuideLayout>

@@ -1,0 +1,70 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate CloudWatch metrics API requests (dashboards and polling)";
+const description =
+  "How to estimate CloudWatch-style metrics API requests: dashboards, GetMetricData polling, exporters, and automation. Use this to avoid surprise 'API requests' line items.";
+const faqs = [
+  {
+    q: "Which actions usually create metrics API requests?",
+    a: "Dashboards, automation, exporters, and scripts that call metric APIs like GetMetricData/GetMetricStatistics. At scale, frequent polling can become a meaningful cost line item.",
+  },
+  {
+    q: "What's the simplest way to estimate API requests?",
+    a: "Start from dashboards: widgets queried per refresh x refreshes per month, then add any exporters/automation polling loops you run.",
+  },
+  {
+    q: "How do I reduce API request cost safely?",
+    a: "Increase refresh intervals, batch requests, reduce widget count, and remove unused dashboards and automation.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-metrics-estimate-api-requests"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    CloudWatch Metrics-style pricing can include an <strong>API requests</strong> line item. It tends to show up when you
+    have many dashboards, frequent refresh, and heavy polling from automation/exporters.
+  </p>
+
+  <h2>Step 1: Estimate dashboard-driven requests</h2>
+  <p class="muted">
+    Practical model: <strong>widgets queried per refresh x refreshes per month</strong>.
+  </p>
+  <ul>
+    <li>Count your dashboards and estimate widgets per dashboard.</li>
+    <li>Estimate refresh interval (for example, every 60 seconds vs every 5 minutes).</li>
+    <li>Model peak usage (incident war rooms, NOC screens) separately if it is frequent.</li>
+  </ul>
+
+  <h2>Step 2: Add exporters and automation polling</h2>
+  <ul>
+    <li>Metric scrapers/exporters (periodic GetMetricData loops)</li>
+    <li>Autoscaling and scheduled jobs that query metrics</li>
+    <li>Third-party tooling that pulls metrics across many accounts</li>
+  </ul>
+
+  <h2>Step 3: Budget a high-usage scenario</h2>
+  <p>
+    If you are unsure, build two estimates: a low-usage baseline and a high-usage scenario (more dashboards, faster
+    refresh, more services). This avoids missing the line item in forecasts.
+  </p>
+
+  <h2>Turn requests into dollars</h2>
+  <p>
+    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> and set the API
+    request pricing input to your effective $ per 1k requests.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudwatch-dashboards-pricing/">CloudWatch dashboards pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-custom-metrics/">Estimate custom metrics</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics cost optimization</a>
+  </div>
+</GuideLayout>
+
