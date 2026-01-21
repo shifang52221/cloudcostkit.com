@@ -99,6 +99,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-ssm-parameter-store-cost-calculator",
+    title: "AWS SSM Parameter Store Cost Calculator",
+    description: "Estimate Parameter Store costs from advanced parameter count and API call volume.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

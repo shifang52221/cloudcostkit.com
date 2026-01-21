@@ -1,0 +1,50 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsSsmParameterStoreCostCalculator as AwsSsmParameterStoreCostCalculatorComponent } from "../../components/calculators/AwsSsmParameterStoreCost";
+
+const title = "AWS SSM Parameter Store Cost Calculator";
+const description =
+  "Estimate Parameter Store-style costs from advanced parameter count plus API call volume. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-ssm-parameter-store-cost-calculator"
+  intro="Estimate Parameter Store-style cost with a simple model: advanced parameter-month charges plus API call charges. Use your effective region pricing and your measured API call volume."
+  examples={[
+    "200 advanced parameters at $0.05 per parameter-month and 200M API calls/month at $0.05 per 10k calls.",
+  ]}
+  includes={[
+    "Advanced parameter-month estimate from advanced parameter count and $/parameter-month.",
+    "API call estimate from API calls/month and $ per 10k calls.",
+  ]}
+  excludes={[
+    "Free-tier nuances, add-on features, and downstream costs unless modeled separately.",
+    "Secrets Manager-specific costs (model separately if you store secrets there).",
+  ]}
+  how={[
+    "Advanced parameter cost = advanced parameters x $ per parameter-month.",
+    "API cost = (API calls per month / 10,000) x $ per 10k calls.",
+    "Total = advanced parameters + API calls.",
+  ]}
+  faqs={[
+    {
+      q: "Why do Parameter Store costs spike?",
+      a: "Most spikes are request-driven: applications fetching parameters on every request, many pods starting frequently, or retry loops causing repeated GetParameter calls.",
+    },
+    {
+      q: "What’s the fastest lever to reduce cost?",
+      a: "Reduce API calls: cache parameters in memory, fetch once per process/startup, and avoid chatty polling patterns.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-ssm-parameter-store-pricing", label: "Guide: Parameter Store pricing" },
+    { href: "/guides/aws-ssm-parameter-store-estimate-api-calls", label: "Guide: estimate API calls" },
+    { href: "/guides/aws-ssm-parameter-store-cost-optimization", label: "Guide: reduce costs" },
+    { href: "/calculators/aws-kms-cost-calculator", label: "KMS cost calculator" },
+  ]}
+>
+  <AwsSsmParameterStoreCostCalculatorComponent client:load />
+</CalculatorLayout>
+

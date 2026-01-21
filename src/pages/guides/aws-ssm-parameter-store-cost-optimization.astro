@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Parameter Store cost optimization (reduce API calls safely)";
+const description =
+  "A high-leverage playbook to reduce SSM Parameter Store costs: cache parameters, reduce churn-driven fetches, and avoid per-request lookups.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ssm-parameter-store-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever for Parameter Store cost?",
+      a: "Reduce API calls. Most spend is request-driven, especially from repeated GetParameter calls in hot paths or during churn events.",
+    },
+    {
+      q: "How do I reduce calls without risking stale config?",
+      a: "Cache with a reasonable TTL, reload on deploy, and implement a safe refresh mechanism. Avoid fetching on every request unless strictly necessary.",
+    },
+  ]}
+>
+  <p>
+    Parameter Store cost reduction is mostly about reducing <strong>GetParameter</strong> volume while keeping configuration
+    handling safe and reliable.
+  </p>
+
+  <h2>1) Cache parameters</h2>
+  <ul>
+    <li>Fetch parameters once per process startup and cache in memory.</li>
+    <li>Add a TTL refresh for long-running services (minutes, not seconds).</li>
+    <li>Batch with GetParameters where possible.</li>
+  </ul>
+
+  <h2>2) Avoid per-request lookups</h2>
+  <ul>
+    <li>Do not call Parameter Store on every incoming request.</li>
+    <li>Keep config in memory and reload via deploy or refresh loop.</li>
+  </ul>
+
+  <h2>3) Reduce churn-driven fetches</h2>
+  <ul>
+    <li>Reduce pod churn and cold starts where possible.</li>
+    <li>Fix retry loops that multiply fetches during incidents.</li>
+  </ul>
+
+  <h2>Quantify impact</h2>
+  <p>
+    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store Cost Calculator</a> to estimate
+    savings from fewer API calls or fewer advanced parameters.
+  </p>
+</GuideLayout>
+

@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "SSM Parameter Store pricing: what to model (advanced params + API calls)";
+const description =
+  "A practical Parameter Store pricing checklist: standard vs advanced parameters, API call volume, and the common patterns that create request-driven cost spikes.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ssm-parameter-store-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What typically drives Parameter Store cost?",
+      a: "API call volume. Advanced parameter count can add a steady baseline, but high-frequency GetParameter calls often dominate total spend.",
+    },
+    {
+      q: "Why do costs spike in Kubernetes or serverless?",
+      a: "Because frequent cold starts or pod churn can trigger many parameter fetches. If each instance fetches multiple parameters, the request volume scales quickly.",
+    },
+  ]}
+>
+  <p>
+    Parameter Store cost is often a mix of <strong>advanced parameter-month</strong> charges plus <strong>API request</strong>
+    charges. The main risk is request-driven spend from chatty application patterns.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Standard vs advanced parameters</strong>: advanced parameters often have a monthly per-parameter charge
+    </li>
+    <li>
+      <strong>API calls/month</strong>: GetParameter(s), PutParameter, List*, and related calls
+    </li>
+    <li>
+      <strong>Caller patterns</strong>: per-request fetches vs per-startup fetches
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">AWS SSM Parameter Store Cost Calculator</a> to model
+    advanced parameters + API calls with your effective pricing.
+  </p>
+</GuideLayout>
+
