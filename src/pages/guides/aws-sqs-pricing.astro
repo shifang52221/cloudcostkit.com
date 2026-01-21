@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS SQS pricing (what to include)";
+const description =
+  "A practical checklist for estimating SQS costs: requests, retries, Receive/Delete patterns, and the common pitfalls that inflate spend.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-sqs-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What is the core SQS cost driver?",
+      a: "Request count. The dominant driver is how many Send/Receive/Delete (and retries) you execute per month.",
+    },
+    {
+      q: "Why do retries matter for cost?",
+      a: "Retries multiply billable requests. A small failure rate can create large request growth at scale.",
+    },
+  ]}
+>
+  <p class="muted">
+    SQS costs are usually predictable: estimate monthly messages, convert to monthly requests, then multiply by $ per 1M
+    requests. Most surprises come from retries and extra receive/delete activity.
+  </p>
+
+  <h2>1) Start with messages per month</h2>
+  <p>
+    If you know throughput (messages/sec), convert to monthly volume first. Use{" "}
+    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a> as a rough helper.
+  </p>
+
+  <h2>2) Convert messages into requests</h2>
+  <p>
+    A common baseline is <strong>3 requests per message</strong>: Send + Receive + Delete. Add more if you have retries,
+    visibility extensions, or receive polling behavior that increases API calls.
+  </p>
+
+  <h2>3) Price it with your effective rate</h2>
+  <p>
+    Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS Cost Calculator</a> and plug in your region/queue type
+    effective $ per 1M requests.
+  </p>
+
+  <h2>4) Common pitfalls</h2>
+  <ul>
+    <li><strong>Retry storms</strong>: timeouts, throttling, and poison messages multiplying requests.</li>
+    <li><strong>Too many receives</strong>: aggressive polling and short visibility timeouts.</li>
+    <li><strong>Ignoring downstream</strong>: Lambda, logs, or database writes can dominate total architecture cost.</li>
+  </ul>
+</GuideLayout>
+

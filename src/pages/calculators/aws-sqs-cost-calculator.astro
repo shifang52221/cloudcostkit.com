@@ -1,0 +1,55 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsSqsCostCalculator as AwsSqsCostCalculatorComponent } from "../../components/calculators/AwsSqsCost";
+
+const title = "AWS SQS Cost Calculator";
+const description =
+  "Estimate AWS SQS-style monthly request cost from messages, requests per message, and per-million request pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-sqs-cost-calculator"
+  intro="Estimate SQS-style request cost with a simple model: messages/month × requests per message × $ per 1M requests. Use your own effective price for Standard/FIFO and region."
+  examples={[
+    "200M messages/month with 3 requests per message at $0.40 per 1M requests.",
+  ]}
+  includes={[
+    "Request cost from total request count and $ per 1M requests.",
+    "A simple multiplier to account for Receive/Delete/retries (requests per message).",
+    "Optional free request allowance.",
+  ]}
+  excludes={[
+    "Data transfer, message payload size effects, and downstream service costs.",
+    "Per-feature add-ons (e.g., extended retention) unless you model them separately.",
+  ]}
+  how={[
+    "Total requests = messages per month × requests per message.",
+    "Billable requests = max(total requests − free requests, 0).",
+    "Cost = (billable requests / 1,000,000) × $ per 1M requests.",
+  ]}
+  faqs={[
+    {
+      q: "What should I use for requests per message?",
+      a: "A common baseline is 3 (Send + Receive + Delete). Increase it if you have retries, visibility timeout extensions, or extra API calls.",
+    },
+    {
+      q: "Does message size change SQS cost?",
+      a: "SQS billing is primarily request-based, but large payloads can impact retries and downstream costs. Model size-driven effects as higher requests per message or as separate line items.",
+    },
+    {
+      q: "Does this include Lambda triggers or DynamoDB writes?",
+      a: "No. This is only SQS request cost. Model downstream services separately (Lambda, DynamoDB, logs, etc).",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-sqs-pricing", label: "Guide: SQS pricing (what to include)" },
+    { href: "/guides/aws-sqs-estimate-requests", label: "Guide: estimate SQS requests" },
+    { href: "/guides/aws-sqs-cost-optimization", label: "Guide: SQS cost optimization" },
+    { href: "/calculators/aws-lambda-cost-calculator", label: "Lambda cost calculator" },
+  ]}
+>
+  <AwsSqsCostCalculatorComponent client:load />
+</CalculatorLayout>
+

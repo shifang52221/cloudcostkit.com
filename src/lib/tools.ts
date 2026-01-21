@@ -219,6 +219,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-sqs-cost-calculator",
+    title: "AWS SQS Cost Calculator",
+    description: "Estimate SQS-style request cost from messages and requests per message.",
+    category: "FinOps",
+  },
+  {
     slug: "rps-to-monthly-requests-calculator",
     title: "RPS to Monthly Requests Calculator",
     description: "Estimate monthly request volume from RPS, hours/day, and utilization.",
