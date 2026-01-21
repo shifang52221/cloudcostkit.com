@@ -1,0 +1,79 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "PrivateLink cost optimization: reduce endpoint-hours, GB processed, and operational sprawl";
+const description =
+  "A practical PrivateLink optimization playbook: minimize endpoint-hours, reduce traffic volume, avoid cross-AZ transfer surprises, and keep endpoint sprawl under control across environments.";
+const faqs = [
+  {
+    q: "What should I optimize first for PrivateLink?",
+    a: "Endpoint-hours (endpoints x AZs x hours). The most common cost driver is simply having many endpoints deployed across many AZs.",
+  },
+  {
+    q: "How do I avoid PrivateLink becoming 'another networking bill'?",
+    a: "Treat it like a product: standardize which endpoints are allowed, enforce lifecycle/ownership, and measure traffic. Without governance, endpoint sprawl can grow quietly.",
+  },
+  {
+    q: "What should I double-check after migrating from NAT to PrivateLink?",
+    a: "Cross-AZ/cross-region paths, retries/timeouts, and whether the traffic you moved actually needed private access. These can change total cost even if NAT drops.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-privatelink-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    PrivateLink is usually deployed for security and simplicity, but it can create a second networking bill if endpoint
+    sprawl grows. This guide focuses on the cost levers you can control safely.
+  </p>
+
+  <h2>1) Prevent endpoint sprawl</h2>
+  <ul>
+    <li>Define a standard set of endpoints per environment (prod vs non-prod).</li>
+    <li>Require ownership and lifecycle for each endpoint (who pays, who maintains).</li>
+    <li>Remove unused endpoints created during migrations and experiments.</li>
+  </ul>
+
+  <h2>2) Reduce endpoint-hours (the main lever)</h2>
+  <ul>
+    <li>Consolidate duplicate endpoints where it is safe.</li>
+    <li>Right-size AZ coverage (2 AZs vs 3 AZs scenarios).</li>
+    <li>Keep endpoints always-on only when required.</li>
+  </ul>
+
+  <h2>3) Reduce GB processed</h2>
+  <ul>
+    <li>Reduce retries and noisy polling.</li>
+    <li>Cache responses where safe to cut repeated calls.</li>
+    <li>Validate that only necessary traffic goes through the endpoint.</li>
+  </ul>
+
+  <h2>4) Avoid transfer boundary surprises</h2>
+  <p class="muted">
+    Private traffic can still cross AZs/regions depending on routing and service placement. Validate locality and model
+    transfer explicitly.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+  </div>
+
+  <h2>Quantify with a calculator</h2>
+  <p>
+    Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> to
+    estimate endpoint-hours + per-GB processing, then compare against NAT:
+    <a href="/calculators/aws-nat-gateway-cost-calculator/"> NAT gateway cost calculator</a>.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+  </div>
+</GuideLayout>
+

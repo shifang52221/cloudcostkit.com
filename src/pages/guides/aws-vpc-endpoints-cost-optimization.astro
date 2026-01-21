@@ -1,0 +1,79 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "VPC endpoints cost optimization: reduce endpoint-hours and avoid transfer pitfalls";
+const description =
+  "A practical playbook to reduce VPC interface endpoint costs: consolidate endpoints, right-size AZ coverage, reduce endpoint GB processed, and avoid cross-AZ transfer pitfalls.";
+const faqs = [
+  {
+    q: "What's the biggest lever for interface endpoint cost?",
+    a: "Endpoint-hours. Interface endpoints are per AZ, so 3-AZ coverage can cost ~50% more than 2-AZ, and lots of endpoints multiplies it further.",
+  },
+  {
+    q: "How do I reduce endpoint GB processed?",
+    a: "Reduce chatty traffic and large downloads: cache aggressively, avoid repeated image pulls, and keep retries under control. Also confirm which traffic actually needs to go through endpoints.",
+  },
+  {
+    q: "What's the most common hidden pitfall?",
+    a: "Accidentally increasing cross-AZ traffic. If clients in one AZ consistently talk to endpoints or backends in another AZ, transfer charges can appear even if your endpoint line item looks fine.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-vpc-endpoints-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p class="muted">
+    VPC endpoints are often deployed to reduce NAT costs and improve security. Cost optimization is mostly about reducing
+    the multipliers (endpoints x AZs) and validating your traffic path.
+  </p>
+
+  <h2>1) Consolidate endpoints (reduce endpoint count)</h2>
+  <ul>
+    <li>Inventory which services actually require interface endpoints.</li>
+    <li>Avoid duplicating endpoints across many VPCs/environments without need.</li>
+    <li>Prefer shared patterns where appropriate (with clear ownership and guardrails).</li>
+  </ul>
+
+  <h2>2) Right-size AZ coverage (reduce the AZ multiplier)</h2>
+  <ul>
+    <li>Model the cost difference between 2-AZ and 3-AZ deployments.</li>
+    <li>Only use 3 AZs when the workload's resiliency requirements justify it.</li>
+    <li>Validate that your architecture actually benefits from the extra AZ.</li>
+  </ul>
+
+  <h2>3) Reduce endpoint GB processed (the traffic lever)</h2>
+  <ul>
+    <li>Stop retry storms: timeouts and retries can multiply traffic.</li>
+    <li>Reduce repeated large downloads (package mirrors, container image caching).</li>
+    <li>Use caching to cut repeated API calls where safe.</li>
+  </ul>
+
+  <h2>4) Avoid cross-AZ transfer surprises</h2>
+  <ul>
+    <li>Keep clients and backends AZ-local where possible.</li>
+    <li>Validate load balancer target selection patterns and client routing.</li>
+    <li>Re-check after changes: some "optimizations" move traffic across boundaries.</li>
+  </ul>
+  <p class="muted">
+    Read: <a href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>.
+  </p>
+
+  <h2>5) Quantify with a calculator</h2>
+  <p>
+    Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> to
+    model endpoint-hours + per-GB processing. Run scenarios for endpoint count and AZs.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>
+    <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+  </div>
+</GuideLayout>
+

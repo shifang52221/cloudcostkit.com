@@ -1,0 +1,143 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS network cost guide: NAT, VPC endpoints, PrivateLink, and data transfer (what to model)";
+const description =
+  "A practical AWS network cost hub: how to model NAT Gateway, VPC endpoints/PrivateLink, and cross-AZ/cross-region data transfer. Includes formulas, break-even workflow, and a troubleshooting checklist.";
+const faqs = [
+  {
+    q: "What's the fastest way to model AWS network costs?",
+    a: "Break it into three buckets: (1) NAT hourly + GB processed, (2) VPC endpoints/PrivateLink endpoint-hours + GB processed, and (3) data transfer boundaries (cross-AZ/cross-region/internet). Build a baseline and a high-usage scenario.",
+  },
+  {
+    q: "Why do network bills spike unexpectedly?",
+    a: "Because network charges scale with traffic. Common causes are NAT GB processed from image pulls/updates, cross-AZ traffic from load balancers or multi-AZ clients, and log/monitoring traffic you didn't account for.",
+  },
+  {
+    q: "Do VPC endpoints always reduce NAT costs?",
+    a: "Only for compatible traffic (AWS services that support endpoints). Endpoints add their own hourly and (sometimes) per-GB charges, so you need a break-even model based on your traffic mix.",
+  },
+  {
+    q: "What should I do if I don't have perfect data yet?",
+    a: "Use scenarios: estimate NAT GB processed and model 30% / 60% / 90% of that traffic moving to endpoints. Also model 2-AZ vs 3-AZ deployments for endpoints, because AZ count is a major multiplier.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-network-costs"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    AWS networking cost modeling is simpler than it looks if you treat it as a set of consistent line items. This hub
+    gives you a practical workflow (with formulas) and links to the calculators and deep guides.
+  </p>
+
+  <h2>The 3 buckets (the mental model)</h2>
+  <ol>
+    <li>
+      <strong>NAT Gateway</strong>: hourly gateway fees + <strong>GB processed</strong>.
+    </li>
+    <li>
+      <strong>VPC endpoints / PrivateLink</strong>: <strong>endpoint-hours</strong> (per AZ) + (sometimes) <strong>GB
+      processed</strong>.
+    </li>
+    <li>
+      <strong>Transfer boundaries</strong>: cross-AZ, cross-region, and internet egress (depends on architecture).
+    </li>
+  </ol>
+
+  <h2>Core formulas (planning-safe)</h2>
+  <ul>
+    <li>
+      NAT hourly = NAT gateways x hours/month x $/gateway-hour
+    </li>
+    <li>
+      NAT traffic = NAT GB processed/month x $/GB processed
+    </li>
+    <li>
+      Interface endpoint-hours = endpoints x AZs x hours/month
+    </li>
+    <li>
+      Interface endpoint hourly = endpoint-hours x $/endpoint-hour
+    </li>
+    <li>
+      Interface endpoint traffic = endpoint GB processed/month x $/GB processed
+    </li>
+  </ul>
+
+  <h2>Break-even workflow (NAT vs endpoints)</h2>
+  <ol>
+    <li>
+      Estimate NAT GB processed today (baseline).
+    </li>
+    <li>
+      Identify the share of NAT traffic that is actually to AWS services that can move to endpoints (S3, ECR, STS, etc).
+    </li>
+    <li>
+      Model 30% / 60% / 90% traffic moved to endpoints, and compare total monthly cost.
+    </li>
+    <li>
+      Validate you didn't accidentally increase cross-AZ/cross-region transfer (common hidden pitfall).
+    </li>
+  </ol>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost calculator</a>
+    <a class="btn" href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC interface endpoint cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints (guide)</a>
+  </div>
+
+  <h2>Decision table (which lever to pull)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Symptom</th>
+          <th>Likely driver</th>
+          <th>High-leverage fix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NAT bill dominated by GB processed</td>
+          <td>Image pulls, updates, large outbound downloads</td>
+          <td>Move AWS-service traffic to endpoints; cache/package mirrors</td>
+        </tr>
+        <tr>
+          <td>Endpoint bill higher than expected</td>
+          <td>3-AZ deployment + many endpoints</td>
+          <td>Consolidate endpoints; validate which services need endpoints</td>
+        </tr>
+        <tr>
+          <td>Cross-AZ transfer surprises</td>
+          <td>Multi-AZ clients hitting single-AZ backends or LB patterns</td>
+          <td>Keep traffic AZ-local where possible; validate routing/targets</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Troubleshooting checklist (what to verify)</h2>
+  <ul>
+    <li>Top talkers behind NAT (which destinations drive GB processed)</li>
+    <li>AZ locality (client and backend in same AZ?)</li>
+    <li>Retries/timeouts during incidents (traffic multiplier)</li>
+    <li>Log/monitoring traffic you forgot (steady background costs)</li>
+  </ul>
+
+  <h2>Deep guides (recommended reading order)</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate NAT GB processed</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>
+    <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints cost optimization</a>
+    <a class="btn" href="/guides/aws-privatelink-cost-optimization/">PrivateLink cost optimization</a>
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+  </div>
+</GuideLayout>
+
