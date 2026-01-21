@@ -1,0 +1,58 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS WAF pricing: what to model (ACLs, rules, requests)";
+const description =
+  "A practical AWS WAF pricing checklist: Web ACL fees, rule fees, request charges, and the downstream costs security teams forget.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-waf-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What typically drives WAF cost?",
+      a: "Request volume plus the baseline of Web ACLs and rules you configure. During traffic spikes, request charges can dominate.",
+    },
+    {
+      q: "What costs sit downstream of WAF?",
+      a: "Logging, storage, and analysis. If you stream WAF logs into CloudWatch/S3/SIEM and run searches, those can exceed the WAF bill.",
+    },
+  ]}
+>
+  <p>
+    AWS WAF-style pricing is usually a combination of <strong>fixed monthly baselines</strong> (Web ACLs + rules) plus a{" "}
+    <strong>request-based charge</strong> that scales with total evaluated requests.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Web ACL count</strong>: how many ACLs you maintain (often per environment/app)
+    </li>
+    <li>
+      <strong>Rule count</strong>: custom rules + managed rule groups you enable (based on your pricing model)
+    </li>
+    <li>
+      <strong>Requests/month</strong>: total evaluated requests (watch out for attack traffic)
+    </li>
+    <li>
+      <strong>Downstream</strong>: log delivery, storage, search/analytics, and SIEM ingestion
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-waf-cost-calculator/">AWS WAF Cost Calculator</a> for the baseline + request model, then
+    add log/analysis and any security tooling.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Underestimating request volume during incidents (bot traffic, attacks).</li>
+    <li>Keeping many almost-identical ACLs and rules across environments.</li>
+    <li>Streaming full logs everywhere without volume controls.</li>
+  </ul>
+</GuideLayout>
+

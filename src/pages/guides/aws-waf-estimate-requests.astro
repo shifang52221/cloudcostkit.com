@@ -1,0 +1,56 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate WAF request volume (CDN/LB to monthly requests)";
+const description =
+  "How to estimate WAF request volume for cost models: from CDN/LB metrics, from logs, and what to do about bot spikes.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-waf-estimate-requests"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest way to estimate requests/month?",
+      a: "Convert average requests per second (RPS) into monthly volume: requests/month = avg RPS x 60 x 60 x 24 x days.",
+    },
+    {
+      q: "Should I include blocked requests?",
+      a: "Yes for cost models, because they are still evaluated. During attacks, blocked traffic can meaningfully increase request-based charges and logging volume.",
+    },
+  ]}
+>
+  <p>
+    WAF request charges scale with <strong>evaluated requests</strong>. A good estimate starts with your real traffic and
+    then adds a safety factor for bot spikes and incidents.
+  </p>
+
+  <h2>Method 1: From average RPS</h2>
+  <ul>
+    <li>
+      <strong>Requests/month = avg RPS x 60 x 60 x 24 x days</strong>
+    </li>
+    <li>Use an average over a representative period (e.g., 30 days).</li>
+    <li>Add a buffer if you have frequent bot spikes or peak-driven workloads.</li>
+  </ul>
+
+  <h2>Method 2: From CDN/LB metrics</h2>
+  <ul>
+    <li>Use the request count metric from your CDN or load balancer and roll it up to a month.</li>
+    <li>Segment by host/path if only some traffic is protected by WAF.</li>
+  </ul>
+
+  <h2>Method 3: From logs</h2>
+  <ul>
+    <li>Count request records per day from access logs/WAF logs, then average to monthly.</li>
+    <li>Include blocked traffic and retries; they are still evaluated.</li>
+  </ul>
+
+  <h2>Turn volume into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-waf-cost-calculator/">AWS WAF Cost Calculator</a> to translate ACLs, rules, and request
+    volume into an estimate.
+  </p>
+</GuideLayout>
+

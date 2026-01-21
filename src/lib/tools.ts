@@ -57,6 +57,12 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "aws-waf-cost-calculator",
+    title: "AWS WAF Cost Calculator",
+    description: "Estimate WAF-style costs from Web ACLs, rules, and request volume.",
+    category: "Networking",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

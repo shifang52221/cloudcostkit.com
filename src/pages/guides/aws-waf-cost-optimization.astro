@@ -1,0 +1,55 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "WAF cost optimization (reduce requests + rule sprawl)";
+const description =
+  "A practical playbook to reduce WAF spend: cut evaluated requests, keep rule count tight, and avoid downstream logging waste.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-waf-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever for WAF cost?",
+      a: "Reducing evaluated requests (especially during spikes) and controlling downstream logging volume. Baseline ACL/rule fees are usually smaller.",
+    },
+    {
+      q: "Can security logging cost more than WAF?",
+      a: "Yes. If you stream all WAF logs into log storage and run frequent searches, storage and scan/query costs can exceed the WAF line item.",
+    },
+  ]}
+>
+  <p>
+    Most WAF savings come from reducing the <strong>volume</strong> and the <strong>blast radius</strong> of evaluated
+    requests, and from avoiding rule/ACL sprawl across many apps and environments.
+  </p>
+
+  <h2>1) Reduce evaluated requests</h2>
+  <ul>
+    <li>Cache aggressively at the CDN for cacheable routes.</li>
+    <li>Rate-limit abusive traffic early (before it fans out).</li>
+    <li>Block obvious bot paths and noisy endpoints (login, search) with targeted rules.</li>
+  </ul>
+
+  <h2>2) Keep ACLs and rules tight</h2>
+  <ul>
+    <li>Consolidate similar policies; avoid duplicating ACLs per microservice without need.</li>
+    <li>Remove unused rules and overly broad managed rule sets.</li>
+  </ul>
+
+  <h2>3) Control downstream logging/analysis</h2>
+  <ul>
+    <li>Sample or filter logs for noisy paths if you don’t need full fidelity.</li>
+    <li>Set retention intentionally; avoid storing everything forever.</li>
+    <li>Optimize queries to avoid repeated full scans.</li>
+  </ul>
+
+  <h2>Quantify changes</h2>
+  <p>
+    Use <a href="/calculators/aws-waf-cost-calculator/">WAF Cost Calculator</a> to estimate savings from reducing rule
+    count or request volume.
+  </p>
+</GuideLayout>
+

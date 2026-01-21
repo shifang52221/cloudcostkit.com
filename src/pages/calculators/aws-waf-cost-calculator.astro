@@ -1,0 +1,56 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsWafCostCalculator as AwsWafCostCalculatorComponent } from "../../components/calculators/AwsWafCost";
+
+const title = "AWS WAF Cost Calculator";
+const description =
+  "Estimate AWS WAF-style costs from Web ACL count, rules, and request volume. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-waf-cost-calculator"
+  intro="Estimate AWS WAF-style costs with a simple model: Web ACL monthly fees + rule monthly fees + request charges. Use your effective pricing for your region and configuration."
+  examples={[
+    "2 Web ACLs, 20 rules, and 200M requests/month using $5/ACL, $1/rule, and $0.60 per 1M requests.",
+  ]}
+  includes={[
+    "Web ACL baseline: number of ACLs x $ per ACL-month.",
+    "Rule baseline: number of rules x $ per rule-month.",
+    "Request charges: requests/month x $ per million requests.",
+  ]}
+  excludes={[
+    "Bot control, CAPTCHA/challenge features, and managed add-ons unless modeled separately.",
+    "Log storage/analysis and downstream security tooling ingestion.",
+  ]}
+  how={[
+    "ACL cost = web ACLs x $ per ACL-month.",
+    "Rules cost = rules x $ per rule-month.",
+    "Request cost = (requests per month / 1,000,000) x $ per 1M requests.",
+    "Total = ACL + rules + requests.",
+  ]}
+  faqs={[
+    {
+      q: "What should I count as a rule?",
+      a: "Count the rules you evaluate: custom rules plus managed rule groups you enable (based on how your pricing counts them). If unsure, start with your configured total and refine.",
+    },
+    {
+      q: "Why does cost spike during an attack?",
+      a: "Because request charges scale with total requests evaluated. Spikes in traffic (legitimate or malicious) can increase request-based cost and also downstream logging/analysis costs.",
+    },
+    {
+      q: "How can I reduce WAF cost?",
+      a: "Reduce evaluated requests (CDN caching, rate limiting, blocking early) and keep rule count tight. Also control downstream logging/analysis volume.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-waf-pricing", label: "Guide: WAF pricing" },
+    { href: "/guides/aws-waf-estimate-requests", label: "Guide: estimate WAF request volume" },
+    { href: "/guides/aws-waf-cost-optimization", label: "Guide: reduce WAF costs" },
+    { href: "/calculators/cloudfront-cost-calculator", label: "CloudFront cost calculator" },
+  ]}
+>
+  <AwsWafCostCalculatorComponent client:load />
+</CalculatorLayout>
+
