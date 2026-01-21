@@ -81,6 +81,12 @@ export const TOOLS: Tool[] = [
     category: "Storage",
   },
   {
+    slug: "aws-sns-cost-calculator",
+    title: "AWS SNS Cost Calculator",
+    description: "Estimate messaging cost from publish volume, delivery volume, and optional payload transfer.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

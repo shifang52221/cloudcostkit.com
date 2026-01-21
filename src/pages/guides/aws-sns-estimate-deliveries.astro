@@ -1,0 +1,56 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate SNS deliveries per month (messages x subscribers)";
+const description =
+  "How to estimate SNS delivery volume for cost models: from message counts, subscriber fan-out, filter policies, and retries.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-sns-estimate-deliveries"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest way to estimate deliveries?",
+      a: "Deliveries/month ≈ publishes/month x average subscribers per message. Reduce the subscriber count by filter-policy match rate if only some messages deliver to each subscription.",
+    },
+    {
+      q: "How do retries affect deliveries?",
+      a: "Retries increase delivery attempts. If endpoints are slow or erroring, the same message can be attempted multiple times, increasing effective deliveries and downstream costs.",
+    },
+  ]}
+>
+  <p>
+    For SNS pricing, <strong>deliveries</strong> (messages delivered to endpoints) are usually the main driver. A simple
+    fan-out model gets you close quickly.
+  </p>
+
+  <h2>Method 1: From publishes and fan-out</h2>
+  <ul>
+    <li>
+      <strong>Deliveries/month ≈ publishes/month x avg subscribers per message</strong>
+    </li>
+    <li>Adjust fan-out by filter match rate (if filters drop most messages).</li>
+    <li>Segment by topic: a few large topics often dominate total deliveries.</li>
+  </ul>
+
+  <h2>Method 2: From metrics and logs</h2>
+  <ul>
+    <li>Use SNS delivery metrics per topic/subscription if available.</li>
+    <li>Track failure rate; high failure increases retries and cost.</li>
+  </ul>
+
+  <h2>Method 3: From downstream consumers</h2>
+  <ul>
+    <li>For SQS subscriptions, queue message ingress can approximate deliveries.</li>
+    <li>For HTTP endpoints, request logs can approximate deliveries (plus retries).</li>
+  </ul>
+
+  <h2>Turn volume into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS Cost Calculator</a> with publishes/month, deliveries/month,
+    and your effective per-1M pricing inputs.
+  </p>
+</GuideLayout>
+

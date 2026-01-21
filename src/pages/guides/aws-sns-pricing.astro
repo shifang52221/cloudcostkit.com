@@ -1,0 +1,51 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "SNS pricing: what to model (publishes, deliveries, fan-out)";
+const description =
+  "A practical SNS pricing checklist: publish requests, delivery requests by protocol mix, fan-out, and incident-driven retry spikes.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-sns-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What typically drives SNS cost?",
+      a: "Delivery volume. Fan-out (messages x subscribers) can make deliveries much larger than publishes. Protocol mix also matters for effective pricing.",
+    },
+    {
+      q: "Why do costs spike during incidents?",
+      a: "Alert storms and retries. More publishes plus repeated delivery attempts can multiply deliveries, especially for high fan-out topics.",
+    },
+  ]}
+>
+  <p>
+    SNS-style costs are easiest to model as <strong>publishes</strong> plus <strong>deliveries</strong>. The key is that
+    deliveries can be much larger than publishes when topics have many subscribers.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Publishes/month</strong>: how many messages you publish to topics
+    </li>
+    <li>
+      <strong>Deliveries/month</strong>: messages delivered to subscription endpoints
+    </li>
+    <li>
+      <strong>Fan-out</strong>: average subscribers per message (after filter policies)
+    </li>
+    <li>
+      <strong>Protocol mix</strong>: use an effective blended $ per 1M deliveries
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS Cost Calculator</a> to estimate publish + delivery charges
+    (plus optional transfer). Then refine deliveries with measurements and fan-out assumptions.
+  </p>
+</GuideLayout>
+

@@ -1,0 +1,57 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsSnsCostCalculator as AwsSnsCostCalculatorComponent } from "../../components/calculators/AwsSnsCost";
+
+const title = "AWS SNS Cost Calculator";
+const description =
+  "Estimate SNS-style cost from publish volume, delivery volume, and optional payload transfer assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-sns-cost-calculator"
+  intro="Estimate SNS-style cost with a simple model: publish request charges + delivery request charges + optional payload transfer. Use your effective prices for your region and protocol mix."
+  examples={[
+    "200M publishes/month and 800M deliveries/month with small payloads and your effective $ per 1M pricing inputs.",
+  ]}
+  includes={[
+    "Publish cost from publishes/month and $ per 1M publishes.",
+    "Delivery cost from deliveries/month and $ per 1M deliveries (protocol mix).",
+    "Optional transfer estimate from deliveries x average payload size (KB) and $/GB.",
+  ]}
+  excludes={[
+    "Downstream costs (Lambda, SQS, HTTP endpoints, retries) unless modeled separately.",
+    "Per-protocol pricing nuances; use your effective blended rates.",
+  ]}
+  how={[
+    "Publish cost = (publishes per month / 1,000,000) x $ per 1M publishes.",
+    "Delivery cost = (deliveries per month / 1,000,000) x $ per 1M deliveries.",
+    "Transfer GB/month ~= deliveries per month x avg payload KB / 1024 / 1024.",
+    "Transfer cost = transfer GB/month x $ per GB.",
+    "Total = publish + delivery + transfer.",
+  ]}
+  faqs={[
+    {
+      q: "What counts as a delivery?",
+      a: "A delivery is typically one message sent to one subscription endpoint. If a topic has N subscribers, one published message can create up to N deliveries (after filtering).",
+    },
+    {
+      q: "Why can SNS costs spike during incidents?",
+      a: "Incidents can increase publish volume (alerts) and delivery retries. High fan-out topics can multiply deliveries quickly.",
+    },
+    {
+      q: "Should I include payload transfer?",
+      a: "If you deliver to internet endpoints or across billable network paths, transfer can matter. If your traffic path has negligible transfer charges, set $/GB to 0 for a request-only estimate.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-sns-pricing", label: "Guide: SNS pricing" },
+    { href: "/guides/aws-sns-estimate-deliveries", label: "Guide: estimate SNS deliveries" },
+    { href: "/guides/aws-sns-cost-optimization", label: "Guide: reduce SNS costs" },
+    { href: "/calculators/aws-sqs-cost-calculator", label: "SQS cost calculator" },
+  ]}
+>
+  <AwsSnsCostCalculatorComponent client:load />
+</CalculatorLayout>
+

@@ -1,0 +1,55 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "SNS cost optimization (reduce deliveries and retries)";
+const description =
+  "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-sns-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever for SNS cost?",
+      a: "Reduce deliveries: lower fan-out, use filter policies, and avoid broadcasting to many endpoints when only a subset needs the message.",
+    },
+    {
+      q: "How do I prevent incident-driven SNS cost spikes?",
+      a: "Control alert storms (dedupe, rate limit) and fix delivery failures that trigger retries. Treat high retry volume as both a reliability and cost incident.",
+    },
+  ]}
+>
+  <p>
+    SNS costs scale mainly with <strong>deliveries</strong>. The best savings come from reducing unnecessary fan-out and
+    preventing retries during failures.
+  </p>
+
+  <h2>1) Reduce fan-out and unnecessary deliveries</h2>
+  <ul>
+    <li>Use filter policies so subscribers receive only relevant messages.</li>
+    <li>Split high-fan-out topics into narrower topics by event type.</li>
+    <li>Avoid sending large payloads to many subscribers; use pointers to objects when appropriate.</li>
+  </ul>
+
+  <h2>2) Reduce retries and failures</h2>
+  <ul>
+    <li>Fix slow/erroring HTTP endpoints that cause repeated delivery attempts.</li>
+    <li>Use dead-letter queues and backoff patterns to avoid retry storms.</li>
+    <li>Monitor delivery success rates and latency.</li>
+  </ul>
+
+  <h2>3) Control alert storms</h2>
+  <ul>
+    <li>Dedupe and rate-limit alerts at the source.</li>
+    <li>Group alerts by incident window instead of per-event notifications.</li>
+  </ul>
+
+  <h2>Quantify changes</h2>
+  <p>
+    Use <a href="/calculators/aws-sns-cost-calculator/">SNS Cost Calculator</a> to estimate savings from reduced publishes,
+    deliveries, or payload sizes.
+  </p>
+</GuideLayout>
+
