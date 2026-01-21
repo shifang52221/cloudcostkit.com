@@ -46,9 +46,12 @@ const faqs = [
     For Fargate-style services, cost is closer to "capacity x hours": vCPU-hours and memory-hours. If traffic is steady,
     you typically pay continuously.
   </p>
+  <p>
+    Tool: <a href="/calculators/aws-fargate-cost-calculator/">AWS Fargate cost calculator</a>.
+  </p>
   <p class="muted">
-    If you don't have an exact Fargate model here yet, you can approximate steady compute with an instance hourly rate
-    using <a href="/calculators/compute-instance-cost-calculator/">compute instance cost</a> and treat it as a baseline.
+    If you prefer an approximation, you can also model steady compute with an instance hourly rate using{" "}
+    <a href="/calculators/compute-instance-cost-calculator/">compute instance cost</a> and treat it as a baseline.
   </p>
 
   <h2>Step 3: add the line items that usually decide the winner</h2>
@@ -62,8 +65,9 @@ const faqs = [
   <h2>Related guides</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-lambda-pricing/">Lambda pricing</a>
+    <a class="btn" href="/guides/aws-fargate-pricing/">Fargate pricing</a>
+    <a class="btn" href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS cost</a>
     <a class="btn" href="/guides/aws-lambda-concurrency-and-cold-starts/">Concurrency & cold starts</a>
     <a class="btn" href="/guides/aws-lambda-cost-optimization/">Lambda cost optimization</a>
   </div>
 </GuideLayout>
-

@@ -1,0 +1,83 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Fargate vs EKS cost: what usually decides the winner";
+const description =
+  "Compare Fargate vs EKS cost with a practical checklist: compute unit economics, control plane and platform overhead, scaling behavior, and the line items that often dominate (logs, load balancers, data transfer).";
+const faqs = [
+  {
+    q: "When is Fargate cheaper than EKS?",
+    a: "Fargate can win for smaller fleets, spiky usage, or teams that would otherwise run underutilized nodes. Paying per task-hour can be cheaper than paying for idle EC2 capacity.",
+  },
+  {
+    q: "When is EKS cheaper than Fargate?",
+    a: "EKS often wins at steady high utilization because you can pack workloads efficiently on nodes, use commitments, and amortize overhead across many services.",
+  },
+  {
+    q: "What’s the fastest way to compare them?",
+    a: "Model the same workload as (1) Fargate: vCPU-hours + GB-hours and (2) EKS: nodes × $/hour (plus control plane). Then add load balancers, logs, and transfer to both models.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-fargate-vs-eks-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    The real question in “Fargate vs EKS cost” is usually: <strong>how much idle capacity do you pay for</strong>, and{" "}
+    <strong>how much operational overhead do you want</strong>? Use the checklist below to compare apples-to-apples.
+  </p>
+
+  <h2>Step 1: normalize the workload</h2>
+  <ul>
+    <li>Average running replicas/tasks over the month (not peak).</li>
+    <li>Typical CPU and memory usage (not requests in a vacuum).</li>
+    <li>Traffic shape: steady, bursty, or scheduled.</li>
+  </ul>
+
+  <h2>Step 2: model compute</h2>
+  <ul>
+    <li>
+      <strong>Fargate</strong>: vCPU-hours + memory GB-hours (tasks × size × hours).
+    </li>
+    <li>
+      <strong>EKS</strong>: nodes × $/hour (from requests-based sizing) + control plane and add-ons.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+  </div>
+
+  <h2>Step 3: add the line items that dominate at scale</h2>
+  <ul>
+    <li>
+      <strong>Load balancers</strong>: multiple services behind ALBs/NLBs can drive a large baseline.
+    </li>
+    <li>
+      <strong>Logs and metrics</strong>: ingestion + retention (and scan/search) can exceed compute for noisy services.
+    </li>
+    <li>
+      <strong>Networking</strong>: NAT gateway processed traffic, internet egress, and cross-AZ transfer.
+    </li>
+  </ul>
+
+  <h2>Practical guidance</h2>
+  <ul>
+    <li>Start with Fargate for speed/simplicity when the fleet is small or uncertain.</li>
+    <li>Move high-throughput steady services to EKS when utilization and packing efficiency matter.</li>
+    <li>Re-evaluate after measuring real average utilization and traffic; don’t decide from list prices alone.</li>
+  </ul>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-fargate-pricing/">Fargate pricing</a>
+    <a class="btn" href="/guides/aws-fargate-cost-optimization/">Fargate cost optimization</a>
+    <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing</a>
+    <a class="btn" href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate</a>
+  </div>
+</GuideLayout>
+

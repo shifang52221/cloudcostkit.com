@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Fargate cost optimization (high-leverage fixes)";
+const description =
+  "A practical Fargate cost optimization checklist: rightsize tasks, scale on real signals, reduce idle capacity, and avoid hidden networking and logging costs.";
+const faqs = [
+  {
+    q: "What’s the fastest way to reduce Fargate cost?",
+    a: "Reduce average running tasks and rightsize vCPU/memory. For many services, cutting idle capacity beats micro-optimizing request paths.",
+  },
+  {
+    q: "Why do logs matter for container services?",
+    a: "Log ingestion and retention can become a major line item for high-traffic services or verbose logging. Reducing log volume often saves more than small compute tweaks.",
+  },
+  {
+    q: "How do I avoid accidental networking costs?",
+    a: "Watch for NAT gateway processed traffic, cross-AZ chatter, and internet egress. Keep traffic private where possible and model transfer explicitly.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-fargate-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p class="muted">
+    Fargate cost optimization is usually about <strong>reducing idle capacity</strong> and{" "}
+    <strong>not paying for hidden line items</strong> (logs and networking). Use this checklist to find the biggest
+    levers first.
+  </p>
+
+  <h2>1) Rightsize vCPU and memory</h2>
+  <ul>
+    <li>Measure steady CPU and memory usage and trim oversizing.</li>
+    <li>Prefer smaller tasks with more replicas when it improves utilization (within latency constraints).</li>
+  </ul>
+
+  <h2>2) Scale on real signals (and validate average tasks)</h2>
+  <ul>
+    <li>Use request/queue depth signals, not just CPU percent.</li>
+    <li>Estimate average running tasks per month and compare it to peak.</li>
+  </ul>
+
+  <h2>3) Reduce logging costs</h2>
+  <ul>
+    <li>Drop noisy debug logs in production.</li>
+    <li>Sample high-volume access logs where acceptable.</li>
+    <li>Set retention intentionally; don’t keep everything forever.</li>
+  </ul>
+
+  <h2>4) Reduce networking surprises</h2>
+  <ul>
+    <li>Avoid routing AWS-service traffic through NAT when endpoints/private access makes sense.</li>
+    <li>Watch cross-AZ chatter for chatty microservices and service discovery patterns.</li>
+    <li>Model internet egress explicitly for public APIs and downloads.</li>
+  </ul>
+
+  <h2>Validate with calculators</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer</a>
+  </div>
+
+  <p class="muted" style="margin-top:14px">
+    Next: <a href="/guides/aws-fargate-pricing/">Fargate pricing guide</a>,{" "}
+    <a href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS cost</a>.
+  </p>
+</GuideLayout>
+

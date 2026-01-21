@@ -1,0 +1,89 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Fargate pricing (what to include in your cost model)";
+const description =
+  "A practical Fargate pricing guide: what drives compute cost (vCPU-hours + GB-hours), how to estimate running tasks, and the hidden line items that usually matter (logs, load balancers, data transfer).";
+const faqs = [
+  {
+    q: "What are the main Fargate cost drivers?",
+    a: "Compute is driven by vCPU-hours and memory GB-hours for running tasks. Your effective cost depends on average running tasks over time and your region pricing.",
+  },
+  {
+    q: "Why do Fargate bills surprise teams?",
+    a: "The compute line item is often only part of the bill. Load balancers, data transfer/NAT, and logs/metrics can add meaningful cost, especially for chatty services or verbose logging.",
+  },
+  {
+    q: "How do I estimate running tasks for autoscaling services?",
+    a: "Use an average. If you only know peak tasks, estimate average tasks from traffic shape (for example, peak × 0.3–0.7) and validate later with metrics.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-fargate-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Fargate pricing is easiest to model as <strong>capacity × time</strong>: you pay for vCPU-hours and memory GB-hours
+    for your running tasks. The hard part is estimating the <em>average</em> running tasks over the month and not
+    forgetting the non-compute line items that show up on the bill.
+  </p>
+
+  <h2>What to model (minimum viable cost model)</h2>
+  <ul>
+    <li>
+      <strong>Compute</strong>: vCPU-hours + memory GB-hours for running tasks.
+    </li>
+    <li>
+      <strong>Load balancer</strong>: ALB/NLB hourly + LCU/NLCU if you front services with a managed load balancer.
+    </li>
+    <li>
+      <strong>Logs</strong>: ingestion + retention baseline (and query scan costs if applicable).
+    </li>
+    <li>
+      <strong>Data transfer</strong>: internet egress, cross-AZ, cross-region, and NAT gateway processed traffic.
+    </li>
+  </ul>
+
+  <h2>How to estimate compute cost</h2>
+  <ol>
+    <li>Estimate average running tasks over the month.</li>
+    <li>Pick vCPU and memory per task (or use current task definitions).</li>
+    <li>Multiply by hours/month (often ~730 for always-on services).</li>
+    <li>Apply your region pricing for $/vCPU-hour and $/GB-hour.</li>
+  </ol>
+  <p>
+    Tool: <a href="/calculators/aws-fargate-cost-calculator/">AWS Fargate cost calculator</a>.
+  </p>
+
+  <h2>Common cost pitfalls</h2>
+  <ul>
+    <li>
+      <strong>Using peak tasks</strong> instead of average tasks (over-budgets the compute line item).
+    </li>
+    <li>
+      <strong>Ignoring networking</strong> (NAT + egress + cross-AZ) for services that call external APIs or pull images
+      frequently.
+    </li>
+    <li>
+      <strong>Verbose logging</strong> that turns into large ingestion + retention costs.
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>
+  </div>
+
+  <p class="muted" style="margin-top:14px">
+    Related comparisons: <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate</a>,{" "}
+    <a href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS</a>.
+  </p>
+</GuideLayout>
+

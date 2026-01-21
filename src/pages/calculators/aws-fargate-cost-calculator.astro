@@ -1,0 +1,60 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsFargateCostCalculator as AwsFargateCostCalculatorComponent } from "../../components/calculators/AwsFargateCost";
+
+const title = "AWS Fargate Cost Calculator";
+const description =
+  "Estimate AWS Fargate-style monthly compute costs from running tasks, vCPU-hours, and memory GB-hours using your pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-fargate-cost-calculator"
+  intro="Estimate Fargate-style compute cost from average running tasks, vCPU per task, memory per task, and hours per month. Enter your region pricing to get a planning estimate."
+  examples={[
+    "3 tasks running 730 hours/month at 0.5 vCPU and 1 GB each — estimate vCPU-hours + GB-hours charges.",
+    "For autoscaling services, use average running tasks, not peak.",
+  ]}
+  includes={[
+    "vCPU-hour and memory GB-hour compute charges (modeled with your $/unit inputs).",
+    "A simple steady-state model for average running tasks over a month.",
+  ]}
+  excludes={[
+    "Load balancers, data transfer/egress, NAT, and private link costs (model separately).",
+    "Logs/metrics ingestion and retention costs (model separately).",
+    "Tiering, discounts, and rounding rules unless you reflect them in inputs.",
+  ]}
+  how={[
+    "vCPU-hours = tasks × vCPU per task × hours per month.",
+    "GB-hours = tasks × memory (GB) per task × hours per month.",
+    "Total = (vCPU-hours × $/vCPU-hour) + (GB-hours × $/GB-hour).",
+  ]}
+  faqs={[
+    {
+      q: "What should I use for hours per month?",
+      a: "A common planning value is ~730 hours/month for 24/7 services. If you schedule down, use fewer hours or use an average running-tasks value.",
+    },
+    {
+      q: "How do I model autoscaling?",
+      a: "Use average running tasks over the month. If you only know peak tasks, estimate an average (for example, peak × 0.3 to 0.7 depending on traffic shape).",
+    },
+    {
+      q: "Does this include data transfer and logs?",
+      a: "No. Fargate compute is only part of the bill. For many services, transfer (egress/NAT) and logging can be significant separate line items.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-fargate-pricing", label: "Guide: Fargate pricing (what to include)" },
+    { href: "/guides/aws-lambda-vs-fargate-cost", label: "Guide: Lambda vs Fargate cost" },
+    { href: "/guides/aws-fargate-vs-eks-cost", label: "Guide: Fargate vs EKS cost" },
+    { href: "/calculators/aws-lambda-cost-calculator", label: "Lambda cost calculator" },
+    { href: "/calculators/eks-cost-calculator", label: "EKS cost calculator" },
+    { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
+    { href: "/calculators/log-cost-calculator", label: "Log cost" },
+  ]}
+>
+  <AwsFargateCostCalculatorComponent client:load />
+</CalculatorLayout>
+

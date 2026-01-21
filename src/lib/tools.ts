@@ -111,6 +111,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-fargate-cost-calculator",
+    title: "AWS Fargate Cost Calculator",
+    description: "Estimate Fargate-style compute cost from vCPU-hours and memory GB-hours.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
