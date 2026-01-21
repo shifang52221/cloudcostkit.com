@@ -1,0 +1,71 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ALB vs NLB cost: how to choose and estimate (LCU vs NLCU)";
+const description =
+  "Compare ALB vs NLB cost with a practical checklist: fixed hourly fees, LCU vs NLCU drivers, traffic patterns, and when each tends to win.";
+const faqs = [
+  {
+    q: "What’s the big cost difference between ALB and NLB?",
+    a: "Both usually have a fixed hourly fee plus capacity-unit billing, but ALB uses LCU drivers (including rule evaluations) while NLB uses NLCU-style drivers focused on connections and bytes processed.",
+  },
+  {
+    q: "When is ALB cheaper than NLB?",
+    a: "ALB can be cheaper when connection rates are moderate and you benefit from Layer 7 features without triggering high rule-evaluation or throughput drivers.",
+  },
+  {
+    q: "When is NLB cheaper than ALB?",
+    a: "NLB can be cheaper for high connection volume patterns and simpler Layer 4 forwarding, but you must still model bytes processed and peak connection behavior.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-alb-vs-nlb-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    ALB vs NLB cost comparisons are easiest when you break the bill into two pieces: <strong>fixed hourly</strong> and{" "}
+    <strong>capacity-unit usage</strong> (LCU for ALB, NLCU for NLB). The winner is usually driven by your traffic
+    pattern: connections, bytes processed, and (for ALB) rule evaluations.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>LB-hours (how many load balancers, how many hours/month)</li>
+    <li>Capacity units per hour (average and peak)</li>
+    <li>Bytes processed and connection patterns (often the biggest drivers)</li>
+  </ul>
+
+  <h2>Step 1: estimate LCU/NLCU from metrics</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">ALB LCU / NLB NLCU calculator</a>
+    <a class="btn" href="/guides/aws-load-balancer-estimate-lcu/">Estimate LCU from metrics</a>
+  </div>
+
+  <h2>Step 2: estimate monthly cost</h2>
+  <p>
+    Once you have average units/hour, plug it into a cost calculator with your region pricing.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a>
+    <a class="btn" href="/guides/aws-load-balancer-cost/">Load balancer cost guide</a>
+  </div>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Ignoring peak hours (a small number of peak hours can dominate).</li>
+    <li>Using request count but forgetting payload size (bytes processed).</li>
+    <li>For ALB, forgetting rule evaluations for complex routing setups.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+  </div>
+</GuideLayout>
+

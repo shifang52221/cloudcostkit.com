@@ -1,0 +1,70 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate ALB LCU (and NLB NLCU) from metrics: quick methods";
+const description =
+  "A practical guide to estimate ALB LCU and NLB NLCU from load balancer metrics: new connections, active connections, bytes processed, and rule evaluations. Includes a calculator workflow.";
+const faqs = [
+  {
+    q: "What do I need to estimate LCU/NLCU?",
+    a: "You need average new connections/sec, average active connections, and bytes processed per hour. For ALB, rule evaluations can be an extra driver.",
+  },
+  {
+    q: "Should I use average or peak metrics?",
+    a: "Use averages for budgeting and add a peak scenario for safety. Many bills are driven by a small number of peak hours.",
+  },
+  {
+    q: "What’s the fastest workflow?",
+    a: "Extract the metrics, estimate capacity units (LCU/NLCU) with a calculator, then plug units/hour into the load balancer cost calculator with your pricing.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-load-balancer-estimate-lcu"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    LCU/NLCU bills are hard to predict if you don’t translate metrics into <strong>capacity units per hour</strong>.
+    This guide shows a simple workflow to estimate average units/hour (and a peak scenario) for budgeting.
+  </p>
+
+  <h2>Step 1: collect the key metrics</h2>
+  <ul>
+    <li><strong>New connections per second</strong> (average)</li>
+    <li><strong>Active connections</strong> (average concurrent)</li>
+    <li><strong>Bytes processed per hour</strong> (convert to GB/hour)</li>
+    <li><strong>Rule evaluations per second</strong> (ALB only, if applicable)</li>
+  </ul>
+  <p class="muted">
+    If you only have bytes/day or bytes/month, convert to GB/hour with <a href="/calculators/unit-converter/">Units converter</a>.
+  </p>
+
+  <h2>Step 2: estimate capacity units (LCU/NLCU)</h2>
+  <p>
+    Use an estimator to compute each driver’s units and take the maximum.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">ALB LCU / NLB NLCU calculator</a>
+    <a class="btn" href="/guides/aws-load-balancer-lcu-explained/">LCU/NLCU explained</a>
+  </div>
+
+  <h2>Step 3: convert units/hour into dollars</h2>
+  <p>
+    Plug your average units/hour into the cost calculator along with the fixed hourly LB fee and your $/unit-hour.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a>
+    <a class="btn" href="/guides/aws-load-balancer-cost/">Load balancer cost guide</a>
+  </div>
+
+  <h2>Step 4: add a peak scenario</h2>
+  <ul>
+    <li>Use p95/p99 or “top hour of the day” metrics to estimate peak units/hour.</li>
+    <li>Validate whether peak hours are frequent (daily) or rare (incidents/batch jobs).</li>
+    <li>Many budgets fail because the peak is ignored.</li>
+  </ul>
+</GuideLayout>
+

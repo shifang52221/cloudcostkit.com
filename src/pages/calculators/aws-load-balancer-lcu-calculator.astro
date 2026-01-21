@@ -1,0 +1,56 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsLoadBalancerCapacityUnitsCalculator as AwsLoadBalancerCapacityUnitsCalculatorComponent } from "../../components/calculators/AwsLoadBalancerCapacityUnits";
+
+const title = "AWS ALB LCU / NLB NLCU Calculator";
+const description =
+  "Estimate ALB LCU or NLB NLCU capacity units per hour from connection rates, active connections, and bytes processed. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-load-balancer-lcu-calculator"
+  intro="Estimate average ALB LCU (or NLB NLCU) from the common billing drivers: new connections, active connections, bytes processed, and (for ALB) rule evaluations."
+  examples={[
+    "If you have 40 new connections/sec, 2,000 active connections, and 0.8 GB/hour processed -> estimate average LCU/NLCU.",
+    "Use this to convert metrics into \"capacity units per hour\" for the load balancer cost calculator.",
+  ]}
+  includes={[
+    "LCU/NLCU units estimate from inputs (drivers).",
+    "Shows which driver dominates (max of drivers).",
+  ]}
+  excludes={[
+    "Actual pricing (use the load balancer cost calculator after you estimate units/hour).",
+    "Provider-specific exceptions, rounding rules, and tiering unless you reflect them elsewhere.",
+  ]}
+  how={[
+    "Compute each driver’s units as (measured value / driver threshold).",
+    "Capacity units per hour = max(driver units).",
+    "Use the result as \"capacity units (avg per hour)\" for a monthly cost estimate.",
+  ]}
+  faqs={[
+    {
+      q: "Why does this take the max of drivers?",
+      a: "LCU/NLCU billing is commonly based on the maximum of several usage dimensions (connections, bytes processed, and for ALB, rule evaluations).",
+    },
+    {
+      q: "Where do I get these inputs?",
+      a: "Use load balancer metrics for new connections, active connections, and bytes processed. If you don’t have rule evaluation metrics, approximate from request rate and routing rules.",
+    },
+    {
+      q: "How do I turn LCU/NLCU into dollars?",
+      a: "Plug \"capacity units (avg per hour)\" into the load balancer cost calculator along with your $/unit-hour pricing.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost calculator" },
+    { href: "/guides/aws-load-balancer-lcu-explained", label: "Guide: LCU/NLCU explained" },
+    { href: "/guides/aws-load-balancer-cost", label: "Guide: load balancer cost" },
+    { href: "/guides/aws-alb-vs-nlb-cost", label: "Guide: ALB vs NLB cost" },
+    { href: "/guides/aws-load-balancer-estimate-lcu", label: "Guide: estimate LCU from metrics" },
+  ]}
+>
+  <AwsLoadBalancerCapacityUnitsCalculatorComponent client:load />
+</CalculatorLayout>
+

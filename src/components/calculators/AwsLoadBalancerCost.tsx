@@ -70,7 +70,7 @@ export function AwsLoadBalancerCostCalculator() {
               onChange={(e) => setCapacityUnitsPerHour(+e.target.value)}
             />
             <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-              Use LCU-hours (ALB) or NLCU-hours (NLB) as your “capacity unit”. Enter the average units per hour.
+              Use LCU-hours (ALB) or NLCU-hours (NLB) as your capacity unit. Enter the average units per hour.
             </div>
           </div>
           <div className="field field-3">
@@ -129,4 +129,3 @@ export function AwsLoadBalancerCostCalculator() {
     </div>
   );
 }
-

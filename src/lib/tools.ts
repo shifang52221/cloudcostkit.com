@@ -189,6 +189,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-load-balancer-lcu-calculator",
+    title: "AWS ALB LCU / NLB NLCU Calculator",
+    description: "Estimate LCU/NLCU capacity units per hour from connections and bytes processed.",
+    category: "Networking",
+  },
+  {
     slug: "log-ingestion-cost-calculator",
     title: "Log Ingestion Cost Calculator",
     description: "Estimate monthly log ingestion and retention cost from GB/day and retention days.",
