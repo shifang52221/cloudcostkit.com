@@ -1,0 +1,105 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ECS cost model beyond compute: the checklist that prevents surprise bills";
+const description =
+  "A practical ECS cost model checklist beyond compute: load balancers, logs/metrics, NAT/egress, cross-AZ transfer, and storage. Use it to avoid underestimating ECS total cost.";
+const faqs = [
+  {
+    q: "Why is compute-only a bad ECS estimate?",
+    a: "Because ECS bills often include large non-compute line items: ALB/NLB baseline and capacity units, log ingestion and retention, NAT gateway processed traffic, and internet egress.",
+  },
+  {
+    q: "What line item is most commonly underestimated?",
+    a: "Logs and networking. Verbose services can generate large ingestion + retention costs, and container fleets can generate substantial NAT processed traffic (image pulls, updates, external APIs).",
+  },
+  {
+    q: "What’s the fastest way to build an ECS TCO model?",
+    a: "Start with compute (tasks or instances), then add load balancers, logs, and data transfer. Use calculators to estimate each line item and sum.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecs-cost-model-beyond-compute"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    ECS cost surprises usually happen when teams budget only for compute (EC2 instance-hours or Fargate vCPU/GB-hours).
+    In real services, the big costs often come from <strong>load balancers</strong>, <strong>logs</strong>, and{" "}
+    <strong>networking</strong>. Use this checklist to build a more accurate model.
+  </p>
+
+  <h2>1) Compute (baseline)</h2>
+  <ul>
+    <li><strong>ECS on Fargate</strong>: vCPU-hours + memory GB-hours.</li>
+    <li><strong>ECS on EC2</strong>: instance-hours (plus EBS if used).</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost</a>
+    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost</a>
+    <a class="btn" href="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator/">ECS EC2 vs Fargate (compare)</a>
+    <a class="btn" href="/calculators/aws-ecs-task-sizing-calculator/">ECS task sizing</a>
+  </div>
+
+  <h2>2) Load balancers (baseline + capacity)</h2>
+  <ul>
+    <li>ALB/NLB hourly baseline per load balancer.</li>
+    <li>Capacity units (LCU/NLCU) driven by connections, new connections, throughput, and rule evaluations.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/guides/aws-load-balancer-cost/">Load balancer cost guide</a>
+  </div>
+
+  <h2>3) Logs and metrics (often bigger than compute)</h2>
+  <ul>
+    <li>Log ingestion is proportional to request volume and verbosity.</li>
+    <li>Retention creates a steady GB-month storage baseline.</li>
+    <li>Query scan costs can add an extra variable component.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/guides/log-costs/">Log cost guide</a>
+  </div>
+
+  <h2>4) Networking (NAT, egress, cross-AZ)</h2>
+  <ul>
+    <li><strong>NAT gateway</strong>: hourly + GB processed can spike for fleets pulling images/updates behind NAT.</li>
+    <li><strong>Internet egress</strong>: downloads, APIs, and public traffic.</li>
+    <li><strong>Cross-AZ transfer</strong>: chatty microservices, load balancer routing patterns, and multi-AZ replication.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
+  </div>
+
+  <h2>5) Storage (if you run on EC2 or attach volumes)</h2>
+  <ul>
+    <li>EBS volumes and snapshots (plus IOPS/throughput for some volume types).</li>
+    <li>Database storage growth and backups for stateful services.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
+    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing guide</a>
+  </div>
+
+  <h2>6) Put it together (sum line items)</h2>
+  <ol>
+    <li>Pick the compute model (Fargate vs EC2) and estimate average monthly capacity.</li>
+    <li>Add load balancer baseline and estimate capacity units.</li>
+    <li>Add logs (ingestion + retention) and validate verbosity assumptions.</li>
+    <li>Add networking (NAT/egress/cross-AZ) for the real traffic paths.</li>
+    <li>Add storage where applicable (EBS and snapshots).</li>
+  </ol>
+
+  <p class="muted" style="margin-top:14px">
+    Related: <a href="/guides/aws-ecs-pricing/">ECS pricing</a>,{" "}
+    <a href="/guides/aws-ecs-autoscaling-cost-pitfalls/">ECS autoscaling cost pitfalls</a>.
+  </p>
+</GuideLayout>
+
