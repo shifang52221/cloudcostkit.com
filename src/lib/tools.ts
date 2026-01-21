@@ -93,6 +93,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-kms-cost-calculator",
+    title: "AWS KMS Cost Calculator",
+    description: "Estimate KMS costs from key-months and request volume.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

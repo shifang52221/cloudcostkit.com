@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "KMS cost optimization (reduce request volume safely)";
+const description =
+  "A practical playbook to reduce AWS KMS costs: reduce request volume in hot paths, fix retry loops, and keep crypto patterns safe.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-kms-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever to reduce KMS cost?",
+      a: "Reduce request volume. Key-month charges are usually stable; request charges scale with how often you call KMS operations like Encrypt/Decrypt/GenerateDataKey.",
+    },
+    {
+      q: "How do I reduce KMS calls without weakening security?",
+      a: "Use envelope encryption patterns appropriately, cache decrypted values briefly where safe, and avoid decrypting secrets on every request. Always validate with your security requirements.",
+    },
+  ]}
+>
+  <p>
+    Most KMS savings come from reducing <strong>requests</strong> without breaking security guarantees. Treat big KMS request
+    spikes as both a cost issue and a reliability signal.
+  </p>
+
+  <h2>1) Reduce KMS calls in hot paths</h2>
+  <ul>
+    <li>Avoid decrypting secrets on every request; prefer short-lived caching where safe.</li>
+    <li>Use envelope encryption so bulk data encryption happens locally after a data key is generated.</li>
+    <li>Don’t re-encrypt or rotate more frequently than required.</li>
+  </ul>
+
+  <h2>2) Fix retry loops</h2>
+  <ul>
+    <li>Time-outs and transient errors can cause retry storms and multiply KMS calls.</li>
+    <li>Add backoff and circuit breakers to protect both cost and reliability.</li>
+  </ul>
+
+  <h2>3) Reduce key sprawl</h2>
+  <ul>
+    <li>Use fewer keys when separate keys don’t add meaningful isolation.</li>
+    <li>Retire unused keys from old environments and test accounts.</li>
+  </ul>
+
+  <h2>Quantify changes</h2>
+  <p>
+    Use <a href="/calculators/aws-kms-cost-calculator/">KMS Cost Calculator</a> to estimate savings from fewer keys or fewer
+    requests/month.
+  </p>
+</GuideLayout>
+

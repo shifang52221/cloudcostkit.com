@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "KMS pricing: what to model (keys + requests)";
+const description =
+  "A practical AWS KMS pricing checklist: key-months, request volume, and the services and patterns that generate surprise KMS request bills.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-kms-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What typically drives KMS cost?",
+      a: "Request volume. Key-month charges are usually small unless you create many keys, but request charges can grow quickly with high-frequency workloads.",
+    },
+    {
+      q: "Which services commonly generate KMS requests?",
+      a: "Storage and secrets patterns: encrypted object storage, encrypted volumes, databases with encryption enabled, and applications frequently accessing encrypted secrets or performing crypto operations.",
+    },
+  ]}
+>
+  <p>
+    KMS-style pricing is usually a combination of <strong>key-month</strong> charges and <strong>request</strong> charges.
+    The hardest part is attributing request volume across services that use KMS under the hood.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Customer managed keys</strong>: how many keys you maintain (often per environment/account)
+    </li>
+    <li>
+      <strong>Requests/month</strong>: Encrypt/Decrypt/GenerateDataKey/etc. volume across all callers
+    </li>
+    <li>
+      <strong>Request mix</strong>: use an effective blended $ per 10k requests for your workloads
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-kms-cost-calculator/">AWS KMS Cost Calculator</a> for a quick key + request estimate, then
+    refine with measured request volume and caller breakdown.
+  </p>
+</GuideLayout>
+

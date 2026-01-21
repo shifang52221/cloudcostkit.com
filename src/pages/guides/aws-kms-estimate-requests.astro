@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate KMS requests per month (where they come from)";
+const description =
+  "How to estimate AWS KMS request volume for cost models: from metrics and logs, and how to identify the biggest request drivers across services.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-kms-estimate-requests"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "Why is KMS request estimation tricky?",
+      a: "Because many services generate KMS requests indirectly. Your app may not call KMS directly, but encrypted storage, databases, or secrets access can still generate significant KMS traffic.",
+    },
+    {
+      q: "What’s the fastest path to a number?",
+      a: "Use a measured baseline: capture total KMS requests over a representative window and scale to monthly. Then break it down by top callers and operations.",
+    },
+  ]}
+>
+  <p>
+    The biggest driver of KMS cost is usually <strong>request volume</strong>. Start with a measured total, then find the
+    biggest call sites.
+  </p>
+
+  <h2>Method 1: Measure and scale</h2>
+  <ul>
+    <li>Measure total KMS requests over 7/30 days and scale to monthly.</li>
+    <li>Separate by account/region if you have multiple deployments.</li>
+  </ul>
+
+  <h2>Method 2: Break down by caller</h2>
+  <ul>
+    <li>Identify top callers (applications, services, or roles) and their request rates.</li>
+    <li>Look for hot paths: per-request crypto, secrets fetched on every request, or frequent re-encryption operations.</li>
+  </ul>
+
+  <h2>Method 3: Sanity checks</h2>
+  <ul>
+    <li>Retry loops and timeouts can multiply KMS calls.</li>
+    <li>High QPS services calling Decrypt frequently can dominate total requests.</li>
+    <li>Per-object or per-record encryption in tight loops creates large request volume.</li>
+  </ul>
+
+  <h2>Turn requests into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-kms-cost-calculator/">AWS KMS Cost Calculator</a> with your measured requests/month and
+    effective $ per 10k requests.
+  </p>
+</GuideLayout>
+
