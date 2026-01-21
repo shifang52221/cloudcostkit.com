@@ -1,0 +1,68 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ECS pricing (what to include in your cost model)";
+const description =
+  "A practical ECS pricing guide: how costs differ between EC2 launch type and Fargate launch type, and what line items you must include (compute, load balancers, logs, data transfer, storage).";
+const faqs = [
+  {
+    q: "Does ECS itself have a separate charge?",
+    a: "ECS control plane pricing depends on your setup and environment, but most ECS bills are dominated by underlying compute (EC2 or Fargate) plus networking and logs.",
+  },
+  {
+    q: "What’s the biggest mistake when modeling ECS cost?",
+    a: "Comparing only compute list prices while ignoring load balancers, NAT/egress, and log ingestion/retention. These line items often dominate for real services.",
+  },
+  {
+    q: "How do I choose between ECS on EC2 vs ECS on Fargate?",
+    a: "Start with workload shape and utilization. If you can keep EC2 packed and apply commitments, EC2 can be cheaper. If utilization is spiky or uncertain, Fargate can be simpler and sometimes cheaper.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecs-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    ECS cost is mainly the cost of the <strong>compute you run on</strong> plus the infrastructure around it. The two
+    common models are ECS on <strong>EC2 launch type</strong> (you pay for instances) and ECS on <strong>Fargate</strong>
+    (you pay for vCPU-hours + memory GB-hours per running task).
+  </p>
+
+  <h2>What to include (minimum viable ECS model)</h2>
+  <ul>
+    <li><strong>Compute</strong>: EC2 instance-hours or Fargate vCPU/GB-hours.</li>
+    <li><strong>Load balancers</strong>: ALB/NLB baseline + LCU/NLCU.</li>
+    <li><strong>Logs</strong>: ingestion + retention baseline (and query scan if applicable).</li>
+    <li><strong>Networking</strong>: egress/NAT, cross-AZ traffic, and cross-region if you replicate.</li>
+    <li><strong>Storage</strong>: EBS (for EC2) and snapshots; task volumes where relevant.</li>
+  </ul>
+
+  <h2>Compute modeling shortcuts</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
+    <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 cost calculator</a>
+  </div>
+
+  <h2>Don’t ignore the hidden winners</h2>
+  <ul>
+    <li>Verbose logging can exceed compute cost.</li>
+    <li>NAT gateway processed traffic can surprise container fleets (image pulls and package updates).</li>
+    <li>Multiple ALBs/NLBs create a large baseline even when services are quiet.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
+  </div>
+
+  <p class="muted" style="margin-top:14px">
+    Comparisons: <a href="/guides/aws-fargate-vs-ec2-cost/">Fargate vs EC2</a>,{" "}
+    <a href="/guides/aws-ecs-vs-eks-cost/">ECS vs EKS</a>.
+  </p>
+</GuideLayout>
+

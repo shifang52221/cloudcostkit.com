@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ECS vs EKS cost: a practical checklist (compute, overhead, and add-ons)";
+const description =
+  "Compare ECS vs EKS cost with a consistent checklist: compute model, platform overhead, scaling behavior, and the line items that often dominate (load balancers, logs, data transfer).";
+const faqs = [
+  {
+    q: "Is ECS always cheaper than EKS?",
+    a: "No. The winner depends on utilization and how you run the platform. EKS can be cost-effective when you pack workloads well and amortize overhead; ECS can be simpler and reduce operational costs.",
+  },
+  {
+    q: "What’s the fastest way to compare ECS vs EKS cost?",
+    a: "Use the same workload assumptions (average capacity and traffic shape). Compare compute first, then add load balancers, logs, and networking to both models.",
+  },
+  {
+    q: "What line items do teams forget in both models?",
+    a: "Logs (ingestion + retention), NAT/egress, cross-AZ traffic, and the baseline cost of multiple load balancers.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecs-vs-eks-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    ECS vs EKS cost comparisons go wrong when you compare “service A is cheaper than service B” without modeling the
+    surrounding infrastructure. Use this checklist to compare consistently.
+  </p>
+
+  <h2>Step 1: choose the compute model for ECS</h2>
+  <ul>
+    <li><strong>ECS on EC2</strong>: pay for instance-hours (and EBS if used).</li>
+    <li><strong>ECS on Fargate</strong>: pay for vCPU-hours + memory GB-hours per task.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-ecs-pricing/">ECS pricing guide</a>
+    <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 calculator</a>
+  </div>
+
+  <h2>Step 2: model EKS baseline and scaling</h2>
+  <ul>
+    <li>Control plane cost and cluster sprawl.</li>
+    <li>Node sizing and packing efficiency (requests vs limits).</li>
+    <li>Add-ons and observability overhead.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+    <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing</a>
+    <a class="btn" href="/guides/kubernetes-requests-vs-limits-for-sizing/">Requests vs limits</a>
+  </div>
+
+  <h2>Step 3: add the line items that dominate both</h2>
+  <ul>
+    <li><strong>Load balancers</strong>: hourly + LCU/NLCU baseline for each LB.</li>
+    <li><strong>Logs</strong>: ingestion + retention (and scan/search).</li>
+    <li><strong>Networking</strong>: NAT gateway processed traffic, internet egress, cross-AZ transfer.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
+  </div>
+
+  <p class="muted" style="margin-top:14px">
+    Related: <a href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS</a>,{" "}
+    <a href="/guides/aws-fargate-cost-optimization/">Fargate cost optimization</a>.
+  </p>
+</GuideLayout>
+
