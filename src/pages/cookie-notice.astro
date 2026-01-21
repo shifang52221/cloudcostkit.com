@@ -6,7 +6,7 @@ const title = `Cookie Notice | ${SITE.name}`;
 const description = "Cookie consent and preferences for CloudCostKit.";
 const [emailUser, emailDomain] = SITE.email.split("@");
 ---
-<BaseLayout title={title} description={description} canonicalPath="/cookie-notice">
+<BaseLayout title={title} description={description} canonicalPath="/cookie-notice" robots="noindex,follow">
   <section class="card hero">
     <h1>Cookie notice</h1>
     <p>Manage consent for ads and cookies.</p>

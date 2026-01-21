@@ -11,13 +11,15 @@ type Props = {
   title: string;
   description?: string;
   canonicalPath?: string;
+  robots?: string;
 };
 
-const { title, description, canonicalPath } = Astro.props;
+const { title, description, canonicalPath, robots } = Astro.props;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
 const normalizedCanonicalPath = canonicalPath ? withTrailingSlash(canonicalPath) : undefined;
 const canonical = normalizedCanonicalPath ? new URL(normalizedCanonicalPath, siteUrl).toString() : undefined;
 const ogImage = new URL("/og.svg", siteUrl).toString();
+const robotsValue = robots ?? "index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1";
 ---
 <!doctype html>
 <html lang="en">
@@ -41,10 +43,7 @@ const ogImage = new URL("/og.svg", siteUrl).toString();
     {description ? <meta name="twitter:description" content={description} /> : null}
     <meta name="twitter:image" content={ogImage} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta
-      name="robots"
-      content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
-    />
+    <meta name="robots" content={robotsValue} />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0b1220" />
     <ConsentModeScript />

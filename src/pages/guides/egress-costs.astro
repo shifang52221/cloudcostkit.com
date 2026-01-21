@@ -3,12 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Understanding cloud egress costs";
 const description =
-  "A practical guide to estimating egress: units, where bandwidth shows up, and common billing pitfalls.";
+  "A practical guide to estimating egress: units, where bandwidth shows up, quick estimation formulas, and common billing pitfalls.";
+const faqs = [
+  {
+    q: "What counts as egress?",
+    a: "Any data leaving a billing boundary: internet egress to users, cross-region transfers, and sometimes cross-AZ traffic depending on the service and architecture.",
+  },
+  {
+    q: "Why do egress bills spike?",
+    a: "Because egress scales with traffic. Common causes are CDN cache miss/origin egress, cross-AZ chatty microservices, replication, and retries/timeouts during incidents.",
+  },
+  {
+    q: "How do I estimate GB/month quickly?",
+    a: "Use one of three methods: (1) measured bytes from billing/metrics, (2) throughput (Mbps) to GB/month, or (3) requests/day x average response size to GB/month.",
+  },
+  {
+    q: "Does CDN bandwidth equal origin egress?",
+    a: "Not necessarily. CDN bandwidth is edge-to-user delivery. Origin egress (cache fill) is origin-to-CDN traffic and is often billed separately by the origin provider.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/egress-costs" lastUpdated="2026-01-06">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/egress-costs"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
   <p class="muted">
-    Egress is the data your cloud sends out. For many products, egress is the “silent” line item that grows with usage.
-    This guide helps you estimate egress quickly and avoid common surprises.
+    Egress is the data your cloud sends out. For many products, egress is the "silent" line item that grows with usage.
+    This guide helps you estimate egress quickly, pick the right unit, and avoid common double-counting traps.
   </p>
 
   <h2>1) Identify what kind of transfer you have</h2>
@@ -16,33 +40,61 @@ const description =
     <li><strong>Internet egress</strong>: data leaving your provider to end users.</li>
     <li><strong>Cross-region transfer</strong>: replication, multi-region reads, DR traffic.</li>
     <li><strong>CDN bandwidth</strong>: edge delivery (may be priced separately from origin egress).</li>
+    <li><strong>Cross-AZ transfer</strong>: east-west traffic across Availability Zones (often a surprise).</li>
   </ul>
 
-  <h2>2) Pick the right unit</h2>
+  <h2>2) Pick the right unit (GB vs GiB)</h2>
   <p>
-    Billing is often in decimal GB/TB, while OS tools might show GiB/TiB. Convert before estimating costs.
-    Use the <a href="/calculators/unit-converter/">Units Converter</a> if you’re unsure.
+    Billing is often in decimal GB/TB, while OS tools might show GiB/TiB. Convert before estimating costs. Use the{" "}
+    <a href="/calculators/unit-converter/">Units Converter</a> if you're unsure.
   </p>
 
   <h2>3) Estimate GB per month (quick methods)</h2>
   <ul>
-    <li><strong>From analytics</strong>: use your CDN/origin dashboards for “bytes sent”.</li>
-    <li><strong>From API volume</strong>: requests/day × average response KB → GB/month (use the API tool).</li>
-    <li><strong>From throughput</strong>: Mbps × utilization × time → GB/month (use Units Converter).</li>
+    <li><strong>From billing/metrics</strong>: use measured bytes sent or transfer GB in billing exports.</li>
+    <li>
+      <strong>From API volume</strong>: requests/day x average response KB -&gt; GB/month (use{" "}
+      <a href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>).
+    </li>
+    <li>
+      <strong>From throughput</strong>: Mbps x utilization x time -&gt; GB/month (use{" "}
+      <a href="/calculators/unit-converter/">Units Converter</a>).
+    </li>
   </ul>
 
   <h2>4) Model cost with simple assumptions first</h2>
   <p>
-    Start with “GB/month × $/GB”. You can refine later for tiering and free allowances. Tools:
-    <a href="/calculators/data-egress-cost-calculator/"> Egress</a>,
-    <a href="/calculators/cdn-bandwidth-cost-calculator/"> CDN bandwidth</a>,
-    <a href="/calculators/cross-region-transfer-cost-calculator/"> cross-region</a>.
+    Start with "GB/month x $/GB". You can refine later for tiering and free allowances. Tools:{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress</a>,{" "}
+    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>,{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>.
   </p>
+
+  <h2>5) Validate (avoid double counting)</h2>
+  <ul>
+    <li>
+      Separate <strong>CDN edge bandwidth</strong> from <strong>origin egress</strong> (cache fill).
+    </li>
+    <li>
+      Separate <strong>cross-AZ</strong> from <strong>internet egress</strong> (they are different boundaries).
+    </li>
+    <li>Re-check during incident windows: retries/timeouts can multiply traffic and create spikes.</li>
+  </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
     <li>Tiered pricing: your average $/GB changes as traffic grows.</li>
     <li>Double counting: CDN bandwidth may not equal origin egress.</li>
     <li>Replication direction: some services bill only outbound, others have nuances.</li>
+    <li>Cross-AZ traffic: load balancers and multi-AZ clients can create steady east-west transfer.</li>
   </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+  </div>
 </GuideLayout>
+

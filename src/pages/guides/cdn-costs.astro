@@ -76,13 +76,26 @@ const faqs = [
   </p>
   <ul>
     <li>
-      <strong>Origin egress (GB/month) ≈ CDN bandwidth (GB/month) x (1 - cache hit rate)</strong>
+      <strong>Origin egress (GB/month) ~ CDN bandwidth (GB/month) x (1 - cache hit rate)</strong>
     </li>
   </ul>
   <p>
     For a deeper explanation (and common double-counting mistakes), see{" "}
     <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
   </p>
+
+  <h2>Validate your estimate (before you trust the number)</h2>
+  <ul>
+    <li>
+      Confirm whether your origin provider bills <strong>origin-to-CDN</strong> traffic as internet egress, inter-region
+      transfer, or a special CDN integration line item.
+    </li>
+    <li>
+      If you use multiple origins (API + static assets), estimate origin egress per origin (they often have different
+      $/GB).
+    </li>
+    <li>Sanity check with logs/metrics: cache hit rate, origin request rate, and bytes served from origin.</li>
+  </ul>
 
   <h2>Other line items that can matter</h2>
   <ul>
@@ -119,4 +132,3 @@ const faqs = [
     pricing in your provider documentation.
   </p>
 </GuideLayout>
-
