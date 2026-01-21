@@ -69,6 +69,12 @@ export const TOOLS: Tool[] = [
     category: "Storage",
   },
   {
+    slug: "aws-route-53-cost-calculator",
+    title: "AWS Route 53 Cost Calculator",
+    description: "Estimate DNS costs from hosted zones, query volume, and health checks.",
+    category: "Networking",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

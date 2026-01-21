@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Route 53 pricing: what to model (zones, queries, health checks)";
+const description =
+  "A practical Route 53 pricing checklist: hosted zones, DNS query volume, health checks, and the patterns that create surprise query bills.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-route-53-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What usually drives Route 53 cost?",
+      a: "DNS query volume is the most common driver, followed by hosted zone count. Health checks can add a steady baseline if you use many of them.",
+    },
+    {
+      q: "Why do query charges grow over time?",
+      a: "Low TTLs, service growth (more pods/instances), and resolver behavior can increase query volume. Incident-driven retries can also create sudden spikes.",
+    },
+  ]}
+>
+  <p>
+    Route 53-style costs are typically a combination of <strong>hosted zone fees</strong> plus <strong>DNS query charges</strong>
+    and (optionally) <strong>health checks</strong>. The best cost model starts with measured query volume.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Hosted zones</strong>: how many zones you maintain across environments/accounts
+    </li>
+    <li>
+      <strong>Standard queries/month</strong>: your actual DNS query volume
+    </li>
+    <li>
+      <strong>Health checks</strong>: if you use DNS-level health checks or endpoint monitoring
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-route-53-cost-calculator/">AWS Route 53 Cost Calculator</a> for a simple zones + queries + health checks model.
+    Then refine query volume using metrics/logs from a representative time window.
+  </p>
+</GuideLayout>
+

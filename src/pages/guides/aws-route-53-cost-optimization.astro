@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Route 53 cost optimization (reduce query volume and zone sprawl)";
+const description =
+  "A practical playbook to reduce Route 53 costs: reduce DNS query volume, fix low TTL defaults, and avoid zone sprawl across environments.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-route-53-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest lever to reduce Route 53 cost?",
+      a: "Reduce DNS query volume by using appropriate TTLs and avoiding chatty lookup patterns. Then consolidate unused zones and records.",
+    },
+    {
+      q: "Should I always increase TTL?",
+      a: "Not always. Higher TTL improves caching but slows down propagation for changes. Use higher TTLs for stable records and keep lower TTLs only where you need fast failover.",
+    },
+  ]}
+>
+  <p>
+    Route 53 savings are usually about <strong>reducing query volume</strong> and controlling <strong>zone sprawl</strong>.
+    Query spikes often indicate misconfiguration or an incident that also impacts reliability.
+  </p>
+
+  <h2>1) Use sane TTLs</h2>
+  <ul>
+    <li>Increase TTLs for stable records to improve cache hit rate.</li>
+    <li>Keep low TTL only for records that require fast changes (failover/blue-green).</li>
+  </ul>
+
+  <h2>2) Reduce chatty DNS patterns</h2>
+  <ul>
+    <li>Fix retry loops and timeouts that trigger repeated lookups.</li>
+    <li>Cache service discovery results where appropriate.</li>
+    <li>Audit Kubernetes/CoreDNS behavior if you see very high lookup rates.</li>
+  </ul>
+
+  <h2>3) Reduce zone and record sprawl</h2>
+  <ul>
+    <li>Delete unused hosted zones and old environment domains.</li>
+    <li>Consolidate duplicate records across accounts where possible.</li>
+  </ul>
+
+  <h2>Quantify impact</h2>
+  <p>
+    Use <a href="/calculators/aws-route-53-cost-calculator/">Route 53 Cost Calculator</a> to estimate savings from reduced
+    query volume or fewer zones/health checks.
+  </p>
+</GuideLayout>
+
