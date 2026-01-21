@@ -1,0 +1,67 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate VPC endpoint cost inputs: endpoint-hours and GB processed";
+const description =
+  "How to estimate VPC interface endpoint (PrivateLink) cost inputs: count endpoints across AZs, estimate monthly hours, and estimate GB processed from NAT metrics, flow logs, or scenario models.";
+const faqs = [
+  {
+    q: "How do I count endpoint-hours quickly?",
+    a: "Endpoint-hours are approximately endpoints x AZs per endpoint x hours/month. If you run 3 endpoints across 3 AZs for a full month, that's roughly 3 x 3 x 730 endpoint-hours.",
+  },
+  {
+    q: "Where do I get GB processed for endpoints?",
+    a: "Use flow logs, endpoint/traffic metrics, or estimate from the traffic you currently send through NAT to AWS services and model how much will shift to endpoints.",
+  },
+  {
+    q: "What if I don't know yet?",
+    a: "Build scenarios. Model low/medium/high traffic (GB/month) and 2-AZ vs 3-AZ deployments. The goal is to avoid under-budgeting and find the NAT break-even point.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-vpc-endpoints-estimate-hours-and-gb"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Most endpoint cost models require two inputs: <strong>endpoint-hours</strong> and <strong>GB processed</strong>. This
+    guide shows quick ways to estimate both without perfect data.
+  </p>
+
+  <h2>1) Estimate endpoint-hours</h2>
+  <ul>
+    <li>Count how many distinct interface endpoints you plan to deploy.</li>
+    <li>Count how many AZs each endpoint will attach to (commonly 2 or 3).</li>
+    <li>Use 730 hours/month for always-on infrastructure (or adjust for partial months).</li>
+  </ul>
+  <p class="muted">
+    Endpoint-hours = endpoints x AZs per endpoint x hours/month.
+  </p>
+
+  <h2>2) Estimate GB processed</h2>
+  <ul>
+    <li>
+      From NAT: identify which NAT traffic is actually AWS-service traffic that can move to endpoints (S3, ECR, STS, etc).
+    </li>
+    <li>From flow logs: roll up bytes for the relevant destinations and convert to GB/month.</li>
+    <li>From scenarios: start with 30% / 60% / 90% of NAT GB processed as a sensitivity model.</li>
+  </ul>
+
+  <h2>3) Turn inputs into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> for
+    endpoint-hours + per-GB processing, and compare against{" "}
+    <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
+    <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
+  </div>
+</GuideLayout>
+

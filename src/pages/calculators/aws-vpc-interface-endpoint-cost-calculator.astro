@@ -1,0 +1,57 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsVpcInterfaceEndpointCostCalculator as AwsVpcInterfaceEndpointCostCalculatorComponent } from "../../components/calculators/AwsVpcInterfaceEndpointCost";
+
+const title = "VPC Interface Endpoint Cost Calculator (PrivateLink)";
+const description =
+  "Estimate AWS VPC Interface Endpoint (PrivateLink) monthly cost from endpoint-hours and data processed (GB) using your pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-vpc-interface-endpoint-cost-calculator"
+  intro="Estimate VPC Interface Endpoint (PrivateLink) cost using a simple model: endpoint-hours (endpoints x AZs x hours) + data processed (GB). Use your effective region pricing."
+  examples={[
+    "3 interface endpoints across 2 AZs running 730 hours/month, processing 2,000 GB/month.",
+  ]}
+  includes={[
+    "Endpoint-hours from endpoints x AZs x hours/month x $ per endpoint-hour.",
+    "Data processing from GB/month x $ per GB processed.",
+  ]}
+  excludes={[
+    "Other VPC data transfer line items (cross-AZ/cross-region) depending on your path.",
+    "Service-specific pricing differences and tiered steps unless you reflect them in your inputs.",
+  ]}
+  how={[
+    "Endpoint-hours = endpoints x AZs per endpoint x hours/month.",
+    "Hourly cost = endpoint-hours x $ per endpoint-hour.",
+    "Data processing cost = GB processed/month x $ per GB processed.",
+    "Total = hourly cost + data processing cost.",
+  ]}
+  faqs={[
+    {
+      q: "What should I use for AZs per endpoint?",
+      a: "Use the number of Availability Zones where you attach the endpoint. Many teams deploy in 2 or 3 AZs for resiliency, which multiplies endpoint-hours.",
+    },
+    {
+      q: "How do I estimate data processed (GB)?",
+      a: "Start from the traffic you currently send through NAT to AWS services and estimate how much will move to endpoints. Use flow logs/metrics when possible, or model a few scenarios.",
+    },
+    {
+      q: "Does this replace the NAT bill?",
+      a: "Not automatically. Endpoints can reduce NAT GB processed for compatible services, but you should model both before and after to find the break-even point.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-vpc-endpoints-pricing", label: "Guide: VPC endpoints pricing" },
+    { href: "/guides/aws-privatelink-pricing", label: "Guide: PrivateLink pricing" },
+    { href: "/guides/aws-vpc-endpoints-estimate-hours-and-gb", label: "Guide: estimate endpoint-hours and GB" },
+    { href: "/guides/aws-nat-gateway-vs-vpc-endpoints-cost", label: "Guide: NAT vs VPC endpoints (cost)" },
+    { href: "/calculators/aws-nat-gateway-cost-calculator", label: "NAT gateway cost calculator" },
+    { href: "/calculators/vpc-data-transfer-cost-calculator", label: "VPC data transfer cost" },
+  ]}
+>
+  <AwsVpcInterfaceEndpointCostCalculatorComponent client:load />
+</CalculatorLayout>
+

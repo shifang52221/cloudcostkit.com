@@ -1,0 +1,60 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS PrivateLink pricing: what to model (consumer vs provider)";
+const description =
+  "A practical PrivateLink pricing checklist: interface endpoint-hours, per-GB processing, and provider-side considerations. Includes the transfer pitfalls that cause surprise bills.";
+const faqs = [
+  {
+    q: "What is PrivateLink in cost terms?",
+    a: "Treat PrivateLink as interface endpoint usage: endpoint-hours plus data processed (GB). The cost depends on how many endpoints you deploy (and in how many AZs) and how much traffic flows through them.",
+  },
+  {
+    q: "Why does PrivateLink cost vary so much between teams?",
+    a: "Because the workload shape varies. Some teams use a few endpoints with modest traffic. Others deploy many endpoints across multiple AZs and push high GB/month, which multiplies both components.",
+  },
+  {
+    q: "Is PrivateLink always cheaper than NAT?",
+    a: "Not always, but it often wins when you have high NAT GB processed to AWS services that can be accessed privately. You need to compare both using your traffic mix.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-privatelink-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    PrivateLink helps keep service traffic private. Cost modeling is straightforward if you separate: endpoint-hours,
+    data processed, and any transfer boundaries in your design (cross-AZ/cross-region).
+  </p>
+
+  <h2>1) Model the consumer side (interface endpoints)</h2>
+  <ul>
+    <li>How many endpoints you deploy (per service).</li>
+    <li>How many AZs you attach per endpoint.</li>
+    <li>How much data (GB/month) flows through the endpoints.</li>
+  </ul>
+
+  <h2>2) Model provider-side implications (if you publish an endpoint service)</h2>
+  <p class="muted">
+    If you are the service provider, the key is to understand traffic scale and the downstream infrastructure required to
+    serve it (load balancers, targets, logs, and monitoring).
+  </p>
+
+  <h2>3) Compare against NAT and internet egress</h2>
+  <p>
+    PrivateLink frequently competes with NAT or public endpoints. Use the same traffic assumptions and compare:
+    endpoint-hours + per-GB processing vs NAT gateway-hours + NAT GB processed (plus any egress where applicable).
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>
+    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>
+  </div>
+</GuideLayout>
+

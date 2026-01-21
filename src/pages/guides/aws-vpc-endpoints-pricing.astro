@@ -1,0 +1,68 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "VPC endpoints pricing: what to model (interface vs gateway endpoints)";
+const description =
+  "A practical VPC endpoints pricing checklist: interface endpoint hours, per-GB processing, gateway endpoint differences, and the transfer pitfalls that cause surprises.";
+const faqs = [
+  {
+    q: "Do VPC endpoints always save money?",
+    a: "Not always. Endpoints add their own hourly fees (and sometimes per-GB processing), but they can reduce NAT GB processed and improve security by keeping traffic private. Model your traffic mix to find break-even.",
+  },
+  {
+    q: "What's the biggest multiplier for endpoint cost?",
+    a: "Availability Zones. Interface endpoints are deployed per AZ. If you attach endpoints in 3 AZs, your endpoint-hours are roughly 3x compared to 1 AZ.",
+  },
+  {
+    q: "Are gateway endpoints billed the same way as interface endpoints?",
+    a: "No. Gateway endpoints differ by service and can have a different cost model. The key is to treat endpoints as their own line items and model your actual traffic path.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-vpc-endpoints-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    VPC endpoints are a common way to reduce NAT Gateway traffic and keep AWS-service access private. Cost modeling is
+    simple if you separate two concepts: <strong>endpoint-hours</strong> and <strong>data processed (GB)</strong>, plus
+    any data transfer boundaries in your architecture.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Interface endpoints</strong>: endpoint-hours (endpoints x AZs x hours) and sometimes a per-GB processing fee.
+    </li>
+    <li>
+      <strong>Gateway endpoints</strong>: a different cost model depending on service; treat them separately.
+    </li>
+    <li>
+      <strong>Transfer boundaries</strong>: cross-AZ/cross-region paths can create separate transfer line items.
+    </li>
+  </ul>
+
+  <h2>Fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> for a
+    first-pass estimate of endpoint-hours + per-GB processing.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Forgetting that interface endpoints scale with the number of AZs you use.</li>
+    <li>Moving traffic across AZs or regions and creating new transfer charges.</li>
+    <li>Assuming endpoints replace NAT costs without validating the traffic mix.</li>
+  </ul>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>
+    <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
+    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>
+  </div>
+</GuideLayout>
+
