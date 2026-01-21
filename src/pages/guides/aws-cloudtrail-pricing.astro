@@ -1,0 +1,58 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudTrail pricing: what to model (management vs data events)";
+const description =
+  "A practical CloudTrail pricing checklist: management events, data events, optional Insights, and the costs that sit downstream of audit logs.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudtrail-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What usually drives CloudTrail spend?",
+      a: "Event volume. Data events can be extremely high volume compared to management events, so they often dominate if enabled broadly.",
+    },
+    {
+      q: "What should I include besides event charges?",
+      a: "Downstream costs: storage, analysis, and SIEM ingestion. Audit logs are frequently forwarded to S3 and then queried or shipped into another tool.",
+    },
+  ]}
+>
+  <p>
+    CloudTrail-style costs are easiest to estimate when you separate <strong>event volume</strong> by type and then apply
+    your effective per-event pricing. The most important split is management vs data events.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>
+      <strong>Management events</strong>: control-plane actions (API calls that create/modify resources)
+    </li>
+    <li>
+      <strong>Data events</strong>: high-volume data-plane operations (can grow rapidly)
+    </li>
+    <li>
+      <strong>Insights events</strong> (if enabled): additional detection signals with their own pricing
+    </li>
+    <li>
+      <strong>Downstream</strong>: storage + query + external ingest costs
+    </li>
+  </ul>
+
+  <h2>A fast estimate</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-cloudtrail-cost-calculator/">AWS CloudTrail Cost Calculator</a> for a quick event-only
+    estimate, then add downstream storage/analysis and any security tool ingestion.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Enabling data events broadly without a volume estimate.</li>
+    <li>Retry storms and automated tooling inflating API call volume.</li>
+    <li>Forgetting downstream costs (S3 storage, Athena queries, SIEM ingestion).</li>
+  </ul>
+</GuideLayout>
+

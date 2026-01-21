@@ -1,0 +1,50 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsCloudTrailCostCalculator as AwsCloudTrailCostCalculatorComponent } from "../../components/calculators/AwsCloudTrailCost";
+
+const title = "AWS CloudTrail Cost Calculator";
+const description =
+  "Estimate CloudTrail-style event costs from event volume and per-100k pricing inputs. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-cloudtrail-cost-calculator"
+  intro="Estimate CloudTrail-style costs from event volume: management events, data events, and (optional) Insights events. Use your effective per-100k prices for your region and configuration."
+  examples={[
+    "50M management + 10M data + 1M insights events/month with your per-100k pricing inputs.",
+  ]}
+  includes={[
+    "Management events cost estimate from events/month and $ per 100k.",
+    "Data events cost estimate from events/month and $ per 100k.",
+    "Insights events cost estimate from events/month and $ per 100k (if applicable).",
+  ]}
+  excludes={[
+    "Storage, analysis, and downstream costs (S3 storage, Athena, SIEM, etc).",
+    "Alternate products or features billed on different units (model separately).",
+  ]}
+  how={[
+    "Cost per event type = (events per month / 100,000) x price per 100k.",
+    "Total = management + data + insights.",
+  ]}
+  faqs={[
+    {
+      q: "What’s the difference between management events and data events?",
+      a: "Management events are control-plane actions (e.g., API calls that change resources). Data events cover high-volume data-plane activity (often much higher volume).",
+    },
+    {
+      q: "Why is my bill higher than this estimate?",
+      a: "Pricing can vary by region and configuration, and your total cost may include storage/analysis and downstream systems. Use your effective prices and add other line items you rely on.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-cloudtrail-pricing", label: "Guide: CloudTrail pricing" },
+    { href: "/guides/aws-cloudtrail-estimate-events", label: "Guide: estimate CloudTrail events" },
+    { href: "/guides/aws-cloudtrail-cost-optimization", label: "Guide: reduce CloudTrail costs" },
+    { href: "/calculators/cloudwatch-log-cost-calculator", label: "CloudWatch Logs cost" },
+  ]}
+>
+  <AwsCloudTrailCostCalculatorComponent client:load />
+</CalculatorLayout>
+

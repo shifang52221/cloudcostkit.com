@@ -1,0 +1,49 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate CloudTrail events per month (fast methods)";
+const description =
+  "How to estimate CloudTrail event volume for cost models: from logs and metrics, and how to separate management vs data events.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudtrail-estimate-events"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "Why should I separate management and data events?",
+      a: "They often differ by orders of magnitude. Data events can explode in volume for busy services, so treating them as a single bucket can hide the true driver.",
+    },
+    {
+      q: "What if I can’t measure events yet?",
+      a: "Estimate from API call rates and automated job frequency, then validate with a short measurement window once logging is enabled.",
+    },
+  ]}
+>
+  <p>
+    For an audit-log cost model, you mainly need one number: <strong>events per month</strong>. The best estimates break
+    it down by event type so you can see what actually drives cost.
+  </p>
+
+  <h2>Method 1: Count events from stored logs</h2>
+  <ul>
+    <li>Count records/day from your CloudTrail delivery location.</li>
+    <li>Separate by event type (management vs data) if possible.</li>
+    <li>Use a representative time window (at least a week for spiky workloads).</li>
+  </ul>
+
+  <h2>Method 2: Estimate from automated activity</h2>
+  <ul>
+    <li>CI/CD, infrastructure automation, and autoscaling can generate many management events.</li>
+    <li>High-volume data services can create far more data events than expected.</li>
+    <li>Account for retries (they are real events).</li>
+  </ul>
+
+  <h2>Turn volume into a cost estimate</h2>
+  <p>
+    Use <a href="/calculators/aws-cloudtrail-cost-calculator/">AWS CloudTrail Cost Calculator</a> to translate monthly
+    event volume into an estimate using your per-100k prices.
+  </p>
+</GuideLayout>
+

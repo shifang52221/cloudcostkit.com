@@ -1,0 +1,55 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudTrail cost optimization (reduce high-volume drivers)";
+const description =
+  "A short playbook to reduce CloudTrail costs: control data event scope, reduce automated churn, and avoid downstream analysis waste.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudtrail-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever for CloudTrail cost?",
+      a: "Data event scope. Data events can be very high volume, so enabling them broadly can dominate your bill.",
+    },
+    {
+      q: "Can downstream analysis cost more than the logs themselves?",
+      a: "Yes. Storage, queries, and SIEM ingestion can exceed event charges if you retain a lot of data or run frequent queries.",
+    },
+  ]}
+>
+  <p>
+    CloudTrail costs are typically driven by <strong>event volume</strong> plus <strong>downstream</strong> storage and
+    analysis. Most savings come from reducing or narrowing the highest-volume event streams and preventing analysis
+    sprawl.
+  </p>
+
+  <h2>1) Control data event scope</h2>
+  <ul>
+    <li>Enable data events only for the resources that truly need audit visibility.</li>
+    <li>Start with a short measurement window to quantify volume before scaling up.</li>
+  </ul>
+
+  <h2>2) Reduce automated churn</h2>
+  <ul>
+    <li>Fix retry storms and timeouts that amplify API calls.</li>
+    <li>Reduce noisy scheduled jobs and overly chatty automation where possible.</li>
+  </ul>
+
+  <h2>3) Reduce downstream waste</h2>
+  <ul>
+    <li>Set retention intentionally; avoid keeping everything forever by default.</li>
+    <li>Query efficiently and avoid repeated broad scans.</li>
+    <li>Filter/route logs so expensive tooling ingests only what it needs.</li>
+  </ul>
+
+  <h2>Validate the impact</h2>
+  <p>
+    Use <a href="/calculators/aws-cloudtrail-cost-calculator/">CloudTrail Cost Calculator</a> to estimate savings when you
+    reduce data event volume or overall event volume.
+  </p>
+</GuideLayout>
+

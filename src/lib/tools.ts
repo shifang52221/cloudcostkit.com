@@ -51,6 +51,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-cloudtrail-cost-calculator",
+    title: "AWS CloudTrail Cost Calculator",
+    description: "Estimate CloudTrail-style event costs from event volume and per-100k pricing inputs.",
+    category: "Logging",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
