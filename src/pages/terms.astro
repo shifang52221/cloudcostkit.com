@@ -4,6 +4,7 @@ import { SITE } from "../config/site";
 
 const title = `Terms | ${SITE.name}`;
 const description = "Terms of use for CloudCostKit.";
+const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/terms">
   <section class="card hero">
@@ -20,14 +21,19 @@ const description = "Terms of use for CloudCostKit.";
 
     <h2 style="margin:18px 0 10px">No warranties</h2>
     <p class="muted" style="margin:0">
-      The site is provided “as is” without warranties of any kind. We are not liable for losses arising from use of the
+      The site is provided "as is" without warranties of any kind. We are not liable for losses arising from use of the
       site.
     </p>
 
     <h2 style="margin:18px 0 10px">Contact</h2>
     <p class="muted" style="margin:0">
-      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+        Email us
+      </a>
+      <noscript>
+        {" "}
+        ({emailUser} [at] {emailDomain})
+      </noscript>
     </p>
   </section>
 </BaseLayout>
-

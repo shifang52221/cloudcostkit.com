@@ -15,26 +15,13 @@ const [emailUser, emailDomain] = SITE.email.split("@");
   <section class="card section prose">
     <p class="muted" style="margin:0">
       Email:{" "}
-      <a id="contact-email" href="#" data-u={emailUser} data-d={emailDomain}>
-        Reveal email
+      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+        Email us
       </a>
+      <noscript>
+        {" "}
+        ({emailUser} [at] {emailDomain})
+      </noscript>
     </p>
   </section>
-
-  <script is:inline>
-    {`
-      (function () {
-        var el = document.getElementById('contact-email');
-        if (!el) return;
-        var u = el.getAttribute('data-u') || '';
-        var d = el.getAttribute('data-d') || '';
-        if (!u || !d) return;
-        var email = u + '@' + d;
-        el.textContent = email;
-        el.setAttribute('href', 'mailto:' + email);
-        el.removeAttribute('data-u');
-        el.removeAttribute('data-d');
-      })();
-    `}
-  </script>
 </BaseLayout>

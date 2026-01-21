@@ -19,6 +19,7 @@ const featuredSlugs = [
 
 const featured = TOOLS.filter((t) => featuredSlugs.includes(t.slug));
 const slots = SITE.adsenseSlots;
+const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/">
   <section class="card hero">
@@ -95,7 +96,15 @@ const slots = SITE.adsenseSlots;
         assumptions in official docs before committing spend.
       </p>
       <p class="muted" style="margin:10px 0 0">
-        Questions or feedback: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+        Questions or feedback:{" "}
+        <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+          Email us
+        </a>
+        <noscript>
+          {" "}
+          ({emailUser} [at] {emailDomain})
+        </noscript>
+        .
       </p>
     </div>
   </section>

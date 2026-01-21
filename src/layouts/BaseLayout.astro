@@ -85,5 +85,27 @@ const ogImage = new URL("/og.svg", siteUrl).toString();
         </div>
       </footer>
     </div>
+
+    <script is:inline>
+      {`
+        (function () {
+          var nodes = document.querySelectorAll('[data-email-user][data-email-domain]');
+          if (!nodes || !nodes.length) return;
+
+          for (var i = 0; i < nodes.length; i++) {
+            var el = nodes[i];
+            var u = el.getAttribute('data-email-user') || '';
+            var d = el.getAttribute('data-email-domain') || '';
+            if (!u || !d) continue;
+
+            var email = u + '@' + d;
+            el.textContent = email;
+            el.setAttribute('href', 'mailto:' + email);
+            el.removeAttribute('data-email-user');
+            el.removeAttribute('data-email-domain');
+          }
+        })();
+      `}
+    </script>
   </body>
 </html>

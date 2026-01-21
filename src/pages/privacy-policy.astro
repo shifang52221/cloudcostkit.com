@@ -4,11 +4,12 @@ import { SITE } from "../config/site";
 
 const title = `Privacy Policy | ${SITE.name}`;
 const description = "Privacy Policy for CloudCostKit.";
+const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/privacy-policy">
   <section class="card hero">
     <h1>Privacy Policy</h1>
-    <p>Summary of what we collect, what we don’t, and how ads work.</p>
+    <p>Summary of what we collect, what we don't, and how ads work.</p>
   </section>
 
   <section class="card section prose">
@@ -21,7 +22,7 @@ const description = "Privacy Policy for CloudCostKit.";
     <p class="muted" style="margin:0">
       We may show ads (for example, via Google AdSense). Ads may use cookies or similar identifiers. Where required by
       law, we ask for your consent before serving personalized ads. You can change your preference on the
-      <a href="/cookie-notice"> Cookie Notice</a> page.
+      <a href="/cookie-notice/"> Cookie Notice</a> page.
     </p>
 
     <h2 style="margin:18px 0 10px">Analytics</h2>
@@ -31,8 +32,15 @@ const description = "Privacy Policy for CloudCostKit.";
 
     <h2 style="margin:18px 0 10px">Contact</h2>
     <p class="muted" style="margin:0">
-      Questions about privacy: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+      Questions about privacy:{" "}
+      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+        Email us
+      </a>
+      <noscript>
+        {" "}
+        ({emailUser} [at] {emailDomain})
+      </noscript>
+      .
     </p>
   </section>
 </BaseLayout>
-

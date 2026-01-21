@@ -5,6 +5,7 @@ import { SITE } from "../config/site";
 const title = `About | ${SITE.name}`;
 const description =
   "About CloudCostKit: fast, free cloud cost and capacity calculators with transparent assumptions.";
+const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/about">
   <section class="card hero">
@@ -22,8 +23,15 @@ const description =
 
     <h2 style="margin:18px 0 10px">Contact</h2>
     <p class="muted" style="margin:0">
-      Feedback and suggestions: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+      Feedback and suggestions:{" "}
+      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+        Email us
+      </a>
+      <noscript>
+        {" "}
+        ({emailUser} [at] {emailDomain})
+      </noscript>
+      .
     </p>
   </section>
 </BaseLayout>
-

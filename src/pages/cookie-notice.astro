@@ -4,6 +4,7 @@ import { SITE } from "../config/site";
 
 const title = `Cookie Notice | ${SITE.name}`;
 const description = "Cookie consent and preferences for CloudCostKit.";
+const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/cookie-notice">
   <section class="card hero">
@@ -18,14 +19,21 @@ const description = "Cookie consent and preferences for CloudCostKit.";
     </p>
 
     <p class="muted" style="margin:12px 0 0">
-      If you don’t see a consent message, you can try clearing site data for <code>cloudcostkit.com</code> and reloading
+      If you don't see a consent message, you can try clearing site data for <code>cloudcostkit.com</code> and reloading
       the page.
     </p>
 
     <h2 style="margin:18px 0 10px">Learn more</h2>
     <p class="muted" style="margin:0">
-      See <a href="/privacy-policy">Privacy Policy</a> for details. Questions: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+      See <a href="/privacy-policy/">Privacy Policy</a> for details. Questions:{" "}
+      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+        Email us
+      </a>
+      <noscript>
+        {" "}
+        ({emailUser} [at] {emailDomain})
+      </noscript>
+      .
     </p>
   </section>
 </BaseLayout>
-
