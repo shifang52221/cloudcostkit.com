@@ -57,4 +57,34 @@ const description =
   ]}
 >
   <AwsRdsCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Compute</strong>: instance-hours (or average serverless capacity) and a peak scenario.</li>
+      <li><strong>Storage</strong>: average GB-month plus growth over time.</li>
+      <li><strong>Backups</strong>: retention and churn (daily changed data x retention days) as a separate line item.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Ignoring backup storage and long-term retention growth.</li>
+      <li>Modeling only today’s size and missing 3–12 month growth.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare forecast vs actual storage/backup GB-month after a few weeks.</li>
+      <li>Re-check during batch jobs or backfills (churn spikes).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-rds-pricing/">Guide: RDS pricing (what to include)</a>
+      <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
+      <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">Guide: backups and snapshots</a>
+      <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Guide: estimate backup GB-month</a>
+    </div>
+  </div>
 </CalculatorLayout>

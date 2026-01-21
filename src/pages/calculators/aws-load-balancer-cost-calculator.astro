@@ -12,30 +12,30 @@ const description =
   canonicalPath="/calculators/aws-load-balancer-cost-calculator"
   intro="Estimate load balancer cost with a simple model: fixed hourly LB fees + capacity-unit hours (LCU for ALB or NLCU for NLB). Use your effective region pricing."
   examples={[
-    "2 load balancers running 730 hours/month, averaging 5 capacity units/hour — estimate fixed + usage components.",
+    "2 load balancers running 730 hours/month, averaging 5 capacity units/hour - estimate fixed + usage components.",
   ]}
   includes={[
-    "Fixed cost from load balancers × hours/month × $/LB-hour.",
-    "Usage cost from capacity unit-hours × $ per unit-hour (LCU/NLCU).",
+    "Fixed cost from load balancers x hours/month x $/LB-hour.",
+    "Usage cost from capacity unit-hours x $ per unit-hour (LCU/NLCU).",
   ]}
   excludes={[
-    "Data transfer/egress beyond what is included in your provider’s capacity unit definition.",
+    "Data transfer/egress beyond what is included in your provider's capacity unit definition.",
     "Downstream service costs (instances, NAT, logs, etc).",
   ]}
   how={[
-    "Fixed cost = load balancers × hours per month × $ per LB-hour.",
-    "Capacity unit-hours = avg capacity units per hour × hours per month.",
-    "Usage cost = capacity unit-hours × $ per capacity unit-hour.",
+    "Fixed cost = load balancers x hours per month x $ per LB-hour.",
+    "Capacity unit-hours = avg capacity units per hour x hours per month.",
+    "Usage cost = capacity unit-hours x $ per capacity unit-hour.",
     "Total = fixed cost + usage cost.",
   ]}
   faqs={[
     {
-      q: "What should I enter as “capacity units per hour”?",
+      q: 'What should I enter as "capacity units per hour"?',
       a: "Use your measured LCU-hours (ALB) or NLCU-hours (NLB) and enter the average units per hour. If you only have peak values, model both typical and peak scenarios.",
     },
     {
       q: "Does this include cross-zone or internet egress charges?",
-      a: "Not explicitly. Some architectures have separate transfer fees. Model transfer separately if it’s meaningful for your workload.",
+      a: "Not explicitly. Some architectures have separate transfer fees. Model transfer separately if it's meaningful for your workload.",
     },
     {
       q: "How do I reduce load balancer cost?",
@@ -54,4 +54,34 @@ const description =
   ]}
 >
   <AwsLoadBalancerCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-load-balancer-cost/">Guide: load balancer costs (pitfalls)</a>
+      <a class="btn" href="/guides/aws-load-balancer-lcu-explained/">Guide: LCU/NLCU explained</a>
+      <a class="btn" href="/guides/aws-load-balancer-estimate-lcu/">Guide: estimate LCU from metrics</a>
+      <a class="btn" href="/guides/aws-alb-vs-nlb-cost/">Guide: ALB vs NLB cost</a>
+    </div>
+  </div>
 </CalculatorLayout>

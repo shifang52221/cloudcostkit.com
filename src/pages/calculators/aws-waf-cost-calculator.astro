@@ -54,4 +54,34 @@ const description =
   ]}
 >
   <AwsWafCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Requests</strong>: estimate evaluated requests/month (include blocked traffic).</li>
+      <li><strong>Baselines</strong>: count ACLs and rules as billed in your pricing model.</li>
+      <li><strong>Downstream</strong>: add logging/storage/analytics volume as a second bill.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Budgeting steady traffic but ignoring attack/bot surge scenarios.</li>
+      <li>Forgetting downstream log/scan costs that can exceed the WAF line item.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Track evaluated request volume and rule/ACL sprawl over time.</li>
+      <li>Check downstream log ingestion and scan/query costs during incidents.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-waf-pricing/">Guide: WAF pricing</a>
+      <a class="btn" href="/guides/aws-waf-estimate-requests/">Guide: estimate WAF request volume</a>
+      <a class="btn" href="/guides/aws-waf-cost-optimization/">Guide: reduce WAF costs</a>
+      <a class="btn" href="/guides/aws-waf-cost-spikes-during-attacks/">Guide: WAF cost spikes during attacks</a>
+    </div>
+  </div>
 </CalculatorLayout>

@@ -12,7 +12,7 @@ const description =
   canonicalPath="/calculators/aws-fargate-cost-calculator"
   intro="Estimate Fargate-style compute cost from average running tasks, vCPU per task, memory per task, and hours per month. Enter your region pricing to get a planning estimate."
   examples={[
-    "3 tasks running 730 hours/month at 0.5 vCPU and 1 GB each — estimate vCPU-hours + GB-hours charges.",
+    "3 tasks running 730 hours/month at 0.5 vCPU and 1 GB each - estimate vCPU-hours + GB-hours charges.",
     "For autoscaling services, use average running tasks, not peak.",
   ]}
   includes={[
@@ -25,9 +25,9 @@ const description =
     "Tiering, discounts, and rounding rules unless you reflect them in inputs.",
   ]}
   how={[
-    "vCPU-hours = tasks × vCPU per task × hours per month.",
-    "GB-hours = tasks × memory (GB) per task × hours per month.",
-    "Total = (vCPU-hours × $/vCPU-hour) + (GB-hours × $/GB-hour).",
+    "vCPU-hours = tasks x vCPU per task x hours per month.",
+    "GB-hours = tasks x memory (GB) per task x hours per month.",
+    "Total = (vCPU-hours x $/vCPU-hour) + (GB-hours x $/GB-hour).",
   ]}
   faqs={[
     {
@@ -36,7 +36,7 @@ const description =
     },
     {
       q: "How do I model autoscaling?",
-      a: "Use average running tasks over the month. If you only know peak tasks, estimate an average (for example, peak × 0.3 to 0.7 depending on traffic shape).",
+      a: "Use average running tasks over the month. If you only know peak tasks, estimate an average (for example, peak x 0.3 to 0.7 depending on traffic shape).",
     },
     {
       q: "Does this include data transfer and logs?",
@@ -59,4 +59,34 @@ const description =
   ]}
 >
   <AwsFargateCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-fargate-pricing/">Guide: Fargate pricing (what to include)</a>
+      <a class="btn" href="/guides/aws-lambda-vs-fargate-cost/">Guide: Lambda vs Fargate cost</a>
+      <a class="btn" href="/guides/aws-fargate-vs-eks-cost/">Guide: Fargate vs EKS cost</a>
+      <a class="btn" href="/calculators/aws-lambda-vs-fargate-cost-calculator/">Lambda vs Fargate cost (compare)</a>
+    </div>
+  </div>
 </CalculatorLayout>

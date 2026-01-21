@@ -4,7 +4,7 @@ import { DataEgressCostCalculator } from "../../components/calculators/DataEgres
 
 const title = "Cross-region Transfer Cost Calculator";
 const description =
-  "Estimate monthly cross-region transfer cost from GB transferred and your provider’s $/GB pricing. Educational use only.";
+  "Estimate monthly cross-region transfer cost from GB transferred and your provider's $/GB pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -23,8 +23,8 @@ const description =
     "Replica storage costs (model separately).",
   ]}
   how={[
-    "Monthly cost = cross-region GB × price per GB.",
-    "Enter your provider’s cross-region transfer price for the source/destination regions.",
+    "Monthly cost = cross-region GB x price per GB.",
+    "Enter your provider's cross-region transfer price for the source/destination regions.",
     "This page ignores free intra-zone traffic and tiering unless you reflect it in the inputs."
   ]}
   faqs={[
@@ -52,4 +52,34 @@ const description =
     defaultGbPerMonth={3000}
     defaultPricePerGbUsd={0.02}
   client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
+      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
+      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
+      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
+      <li>Re-check during peak windows (that’s when hidden multipliers show up).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/storage-replication-cost-calculator/">Storage replication</a>
+      <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
+      <a class="btn" href="/calculators/data-egress-cost-calculator/">Internet egress cost</a>
+      <a class="btn" href="/guides/aws-vpc-data-transfer/">Guide: VPC data transfer</a>
+    </div>
+  </div>
 </CalculatorLayout>

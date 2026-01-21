@@ -12,7 +12,7 @@ const description =
   canonicalPath="/calculators/api-request-cost-calculator"
   intro="Many APIs and gateways price by request count. Use this calculator to estimate monthly request cost from your volume and per‑million pricing."
   examples={[
-    "500,000,000 requests/month at $1.00 per 1M requests ≈ $500/month.",
+    "500,000,000 requests/month at $1.00 per 1M requests ~ $500/month.",
   ]}
   includes={[
     "Request-fee estimate from requests/month and $ per 1M requests pricing.",
@@ -23,8 +23,8 @@ const description =
     "Minimums, free tiers, and tiered steps unless you reflect them in inputs.",
   ]}
   how={[
-    "Request cost = (requests per month ÷ 1,000,000) × price per million requests.",
-    "Use your provider’s definition of billable requests and any request classes.",
+    "Request cost = (requests per month ÷ 1,000,000) x price per million requests.",
+    "Use your provider's definition of billable requests and any request classes.",
     "This tool ignores data transfer; model bandwidth separately if relevant."
   ]}
   faqs={[
@@ -45,4 +45,33 @@ const description =
   ]}
 >
   <ApiRequestCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+      <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
+      <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+    </div>
+  </div>
 </CalculatorLayout>

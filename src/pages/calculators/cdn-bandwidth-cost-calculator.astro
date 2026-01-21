@@ -71,4 +71,34 @@ const description =
     defaultGbPerMonth={4000}
     defaultPricePerGbUsd={0.06}
   client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
+      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
+      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
+      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
+      <li>Re-check during peak windows (that’s when hidden multipliers show up).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/cdn-costs/">Guide: CDN cost breakdown</a>
+      <a class="btn" href="/guides/estimate-cdn-bandwidth-gb-per-month/">Guide: Estimate GB/month</a>
+      <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare cost</a>
+      <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
+    </div>
+  </div>
 </CalculatorLayout>

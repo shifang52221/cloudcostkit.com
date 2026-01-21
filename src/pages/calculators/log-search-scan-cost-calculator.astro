@@ -23,7 +23,7 @@ const description =
     "Provider-specific query minimums, caching, and index behavior.",
   ]}
   how={[
-    "Monthly scanned GB ≈ GB scanned per day x 30.4.",
+    "Monthly scanned GB ~ GB scanned per day x 30.4.",
     "Scan cost = monthly scanned GB x scan price per GB.",
     "This tool is scan-only (not ingestion or retention).",
   ]}
@@ -49,4 +49,34 @@ const description =
   ]}
 >
   <LogSearchScanCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
+      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
+      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
+      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Check ingestion GB/day and retention GB-month after changes.</li>
+      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
+      <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Log retention storage</a>
+      <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">CloudWatch Logs Insights scan cost</a>
+      <a class="btn" href="/guides/log-costs/">Guide: log costs</a>
+    </div>
+  </div>
 </CalculatorLayout>

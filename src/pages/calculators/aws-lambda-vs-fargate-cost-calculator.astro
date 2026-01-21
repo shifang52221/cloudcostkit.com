@@ -26,8 +26,8 @@ const description =
     "Load balancers, retries/timeouts, and ancillary services.",
   ]}
   how={[
-    "Lambda: request cost + (duration × memory) GB-seconds × $/GB-second (minus free tier if enabled).",
-    "Fargate: tasks × vCPU × hours × $/vCPU-hour + tasks × memory(GB) × hours × $/GB-hour.",
+    "Lambda: request cost + (duration x memory) GB-seconds x $/GB-second (minus free tier if enabled).",
+    "Fargate: tasks x vCPU x hours x $/vCPU-hour + tasks x memory(GB) x hours x $/GB-hour.",
     "Compare the compute-only monthly totals, then add other line items in your overall model.",
   ]}
   faqs={[
@@ -37,7 +37,7 @@ const description =
     },
     {
       q: "Why does the winner change by workload shape?",
-      a: "Lambda pricing is execution-based and can be cheaper when traffic is bursty or idle often. Fargate pricing is capacity × time and can be cheaper for steady utilization and long-running compute.",
+      a: "Lambda pricing is execution-based and can be cheaper when traffic is bursty or idle often. Fargate pricing is capacity x time and can be cheaper for steady utilization and long-running compute.",
     },
     {
       q: "What should I model next after compute?",
@@ -56,5 +56,35 @@ const description =
   ]}
 >
   <AwsLambdaVsFargateCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-lambda-vs-fargate-cost/">Guide: Lambda vs Fargate cost</a>
+      <a class="btn" href="/guides/aws-lambda-pricing/">Guide: Lambda pricing</a>
+      <a class="btn" href="/guides/aws-fargate-pricing/">Guide: Fargate pricing</a>
+      <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost calculator</a>
+    </div>
+  </div>
 </CalculatorLayout>
 

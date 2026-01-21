@@ -12,21 +12,21 @@ const description =
   canonicalPath="/calculators/aws-ebs-cost-calculator"
   intro="Estimate EBS-style block storage cost with a simple model: storage + provisioned IOPS + provisioned throughput. Use your own effective pricing for the volume type and region."
   examples={[
-    "500GB, 6,000 IOPS, 250 MB/s throughput — estimate monthly storage + performance charges.",
+    "500GB, 6,000 IOPS, 250 MB/s throughput - estimate monthly storage + performance charges.",
   ]}
   includes={[
-    "Storage cost from GB-month × $/GB-month.",
-    "IOPS cost from IOPS-month × $/IOPS-month (if your volume type charges for it).",
-    "Throughput cost from MB/s-month × $/MB/s-month (if your volume type charges for it).",
+    "Storage cost from GB-month x $/GB-month.",
+    "IOPS cost from IOPS-month x $/IOPS-month (if your volume type charges for it).",
+    "Throughput cost from MB/s-month x $/MB/s-month (if your volume type charges for it).",
   ]}
   excludes={[
     "Snapshots/backup storage, data transfer, and EC2 instance costs.",
     "Tiered pricing and per-volume-type minimums unless you reflect them in pricing inputs.",
   ]}
   how={[
-    "Storage cost = GB-month × $ per GB-month.",
-    "IOPS cost = provisioned IOPS × $ per IOPS-month (set price to 0 if not billed).",
-    "Throughput cost = provisioned MB/s × $ per MB/s-month (set price to 0 if not billed).",
+    "Storage cost = GB-month x $ per GB-month.",
+    "IOPS cost = provisioned IOPS x $ per IOPS-month (set price to 0 if not billed).",
+    "Throughput cost = provisioned MB/s x $ per MB/s-month (set price to 0 if not billed).",
     "Total = storage + IOPS + throughput.",
   ]}
   faqs={[
@@ -55,4 +55,34 @@ const description =
   ]}
 >
   <AwsEbsCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-ebs-pricing/">Guide: EBS pricing (what to include)</a>
+      <a class="btn" href="/guides/aws-ebs-gp3-iops-throughput/">Guide: gp3 IOPS and throughput</a>
+      <a class="btn" href="/guides/aws-ebs-gp2-vs-gp3-cost/">Guide: gp2 vs gp3 cost</a>
+      <a class="btn" href="/guides/aws-ebs-snapshot-cost/">Guide: EBS snapshot cost</a>
+    </div>
+  </div>
 </CalculatorLayout>

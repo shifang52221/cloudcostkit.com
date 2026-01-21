@@ -23,9 +23,9 @@ const description =
     "Data transfer, requests, and restore fees if applicable.",
   ]}
   how={[
-    "Daily changed GB = volume GB × daily change rate.",
-    "Estimated stored GB ≈ volume GB + daily changed GB × (retention days − 1).",
-    "Monthly cost ≈ stored GB × $/GB-month.",
+    "Daily changed GB = volume GB x daily change rate.",
+    "Estimated stored GB ~ volume GB + daily changed GB x (retention days − 1).",
+    "Monthly cost ~ stored GB x $/GB-month.",
   ]}
   faqs={[
     {
@@ -50,5 +50,35 @@ const description =
   ]}
 >
   <AwsEbsSnapshotCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-ebs-snapshot-cost/">Guide: EBS snapshot cost</a>
+      <a class="btn" href="/guides/aws-ebs-pricing/">Guide: EBS pricing</a>
+      <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
+      <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>
+    </div>
+  </div>
 </CalculatorLayout>
 

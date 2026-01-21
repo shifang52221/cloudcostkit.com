@@ -10,7 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/aws-sqs-cost-calculator"
-  intro="Estimate SQS-style request cost with a simple model: messages/month × requests per message × $ per 1M requests. Use your own effective price for Standard/FIFO and region."
+  intro="Estimate SQS-style request cost with a simple model: messages/month x requests per message x $ per 1M requests. Use your own effective price for Standard/FIFO and region."
   examples={[
     "200M messages/month with 3 requests per message at $0.40 per 1M requests.",
   ]}
@@ -24,9 +24,9 @@ const description =
     "Per-feature add-ons (e.g., extended retention) unless you model them separately.",
   ]}
   how={[
-    "Total requests = messages per month × requests per message.",
+    "Total requests = messages per month x requests per message.",
     "Billable requests = max(total requests − free requests, 0).",
-    "Cost = (billable requests / 1,000,000) × $ per 1M requests.",
+    "Cost = (billable requests / 1,000,000) x $ per 1M requests.",
   ]}
   faqs={[
     {
@@ -51,5 +51,35 @@ const description =
   ]}
 >
   <AwsSqsCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
+      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/incident scenarios.</li>
+      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
+      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-sqs-pricing/">Guide: SQS pricing (what to include)</a>
+      <a class="btn" href="/guides/aws-sqs-estimate-requests/">Guide: estimate SQS requests</a>
+      <a class="btn" href="/guides/aws-sqs-cost-optimization/">Guide: SQS cost optimization</a>
+      <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost calculator</a>
+    </div>
+  </div>
 </CalculatorLayout>
 

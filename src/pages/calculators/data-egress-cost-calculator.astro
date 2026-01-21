@@ -4,7 +4,7 @@ import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from ".
 
 const title = "Data Egress Cost Calculator";
 const description =
-  "Estimate monthly data egress cost from GB transferred and your provider’s $/GB pricing. Educational use only.";
+  "Estimate monthly data egress cost from GB transferred and your provider's $/GB pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -23,8 +23,8 @@ const description =
     "Per-request fees and other service-specific charges.",
   ]}
   how={[
-    "Monthly cost = egress GB × price per GB.",
-    "Enter your provider’s effective $/GB for the region/path/tier you expect.",
+    "Monthly cost = egress GB x price per GB.",
+    "Enter your provider's effective $/GB for the region/path/tier you expect.",
     "This page ignores free allowances, tiered steps, and rounding unless you model them in the inputs."
   ]}
   faqs={[
@@ -59,5 +59,35 @@ const description =
       <li>Consider a CDN: it can reduce origin egress and shift cost structure.</li>
       <li>Watch for tiering and minimum charges in provider pricing.</li>
     </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
+      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
+      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
+      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
+      <li>Re-check during peak windows (that’s when hidden multipliers show up).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
+      <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
+      <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+      <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+    </div>
   </div>
 </CalculatorLayout>

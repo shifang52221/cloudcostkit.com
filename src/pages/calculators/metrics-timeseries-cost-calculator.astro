@@ -20,10 +20,10 @@ const description =
   ]}
   excludes={[
     "Ingestion bytes, retention, and query fees if your provider bills those separately.",
-    "Different series definitions across vendors—use your vendor’s definition for inputs.",
+    "Different series definitions across vendors-use your vendor's definition for inputs.",
   ]}
   how={[
-    "Monthly cost = active series × price per series-month.",
+    "Monthly cost = active series x price per series-month.",
     "Active series definitions vary by provider (labels, churn window, etc.).",
     "Use this tool for planning and comparisons, then validate in billing docs."
   ]}
@@ -44,4 +44,32 @@ const description =
   ]}
 >
   <MetricsTimeseriesCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Counts</strong>: start from inventory (custom metrics, alarms, dashboards) per account/environment.</li>
+      <li><strong>Cardinality</strong>: model multiplicative dimensions (service x env x cluster x pod).</li>
+      <li><strong>API polling</strong>: add dashboard refresh and automation polling scenarios.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single average and ignoring peak/high-cardinality scenarios.</li>
+      <li>Forgetting API polling and dashboard refresh costs.</li>
+    </ul>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Measure actual custom metric/series counts and alarm/dashboards after rollout.</li>
+      <li>Watch API request volume trends (dashboards + automation).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
+      <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan cost</a>
+    </div>
+  </div>
 </CalculatorLayout>
