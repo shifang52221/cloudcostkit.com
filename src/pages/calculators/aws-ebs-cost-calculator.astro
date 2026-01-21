@@ -1,0 +1,56 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsEbsCostCalculator as AwsEbsCostCalculatorComponent } from "../../components/calculators/AwsEbsCost";
+
+const title = "AWS EBS Cost Calculator";
+const description =
+  "Estimate AWS EBS-style monthly cost from storage (GB-month), provisioned IOPS, and provisioned throughput pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-ebs-cost-calculator"
+  intro="Estimate EBS-style block storage cost with a simple model: storage + provisioned IOPS + provisioned throughput. Use your own effective pricing for the volume type and region."
+  examples={[
+    "500GB, 6,000 IOPS, 250 MB/s throughput — estimate monthly storage + performance charges.",
+  ]}
+  includes={[
+    "Storage cost from GB-month × $/GB-month.",
+    "IOPS cost from IOPS-month × $/IOPS-month (if your volume type charges for it).",
+    "Throughput cost from MB/s-month × $/MB/s-month (if your volume type charges for it).",
+  ]}
+  excludes={[
+    "Snapshots/backup storage, data transfer, and EC2 instance costs.",
+    "Tiered pricing and per-volume-type minimums unless you reflect them in pricing inputs.",
+  ]}
+  how={[
+    "Storage cost = GB-month × $ per GB-month.",
+    "IOPS cost = provisioned IOPS × $ per IOPS-month (set price to 0 if not billed).",
+    "Throughput cost = provisioned MB/s × $ per MB/s-month (set price to 0 if not billed).",
+    "Total = storage + IOPS + throughput.",
+  ]}
+  faqs={[
+    {
+      q: "Do all EBS volume types charge for IOPS and throughput?",
+      a: "No. Some volume types include baseline performance and only charge for storage, while others bill separately for provisioned performance. Use $0 for components that don't apply to your plan.",
+    },
+    {
+      q: "Does this include snapshots?",
+      a: "No. Snapshots are typically billed as separate storage. Model them separately if you take frequent snapshots or keep long retention.",
+    },
+    {
+      q: "How should I estimate GB-month?",
+      a: "Use the average allocated storage (or average used, depending on billing). If storage grows over time, model multiple months or scenarios.",
+    },
+  ]}
+  lastUpdated="2026-01-20"
+  related={[
+    { href: "/guides/aws-ebs-pricing", label: "Guide: EBS pricing (what to include)" },
+    { href: "/guides/aws-ebs-gp3-iops-throughput", label: "Guide: gp3 IOPS and throughput" },
+    { href: "/guides/aws-ebs-cost-optimization", label: "Guide: EBS cost optimization" },
+    { href: "/calculators/ec2-cost-calculator", label: "EC2 cost calculator" },
+  ]}
+>
+  <AwsEbsCostCalculatorComponent client:load />
+</CalculatorLayout>
+

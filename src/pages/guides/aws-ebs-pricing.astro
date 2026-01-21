@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "AWS EBS pricing (what to include)";
+const description =
+  "A practical checklist for estimating EBS costs: storage, provisioned IOPS/throughput (when applicable), snapshots, and common pitfalls.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ebs-pricing"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "What are the core EBS cost components?",
+      a: "Storage (GB-month) is the baseline. Some volume types also bill for provisioned IOPS and/or provisioned throughput. Snapshots are billed separately as snapshot storage.",
+    },
+    {
+      q: "Do snapshots count as EBS storage?",
+      a: "Snapshots are typically separate snapshot storage charges, not EBS volume GB-month. Budget them as a separate line item.",
+    },
+  ]}
+>
+  <p class="muted">
+    EBS cost estimates usually go wrong for two reasons: (1) mixing up volume storage vs snapshots, and (2) forgetting
+    performance charges when your volume type bills for IOPS/throughput.
+  </p>
+
+  <h2>1) Start with storage (GB-month)</h2>
+  <p>
+    Use the average allocated volume size (or average used if your billing model differs) and multiply by $/GB-month for
+    your region and volume type.
+  </p>
+
+  <h2>2) Add performance charges only if they apply</h2>
+  <p>
+    Some volume types include baseline performance and do not bill separately for IOPS/throughput. Others allow
+    provisioning performance with additional charges. If you’re unsure, model two scenarios: “storage-only” and
+    “storage + provisioned performance”.
+  </p>
+
+  <h2>3) Model snapshots separately</h2>
+  <p>
+    Snapshot retention and churn can create meaningful recurring storage spend. If you take frequent snapshots or keep
+    long retention, add a separate snapshot GB-month line item.
+  </p>
+
+  <h2>4) Use a calculator for scenarios</h2>
+  <p>
+    Use <a href="/calculators/aws-ebs-cost-calculator/">AWS EBS Cost Calculator</a> to estimate storage + optional
+    performance charges using your effective pricing inputs.
+  </p>
+</GuideLayout>
+

@@ -17,21 +17,21 @@ const description =
   ]}
   includes={[
     "Compute cost estimate from instance count and $/hour pricing assumption.",
-    "Uptime modeling to reflect environments that aren’t 24/7.",
+    "Uptime modeling to reflect environments that aren't 24/7.",
   ]}
   excludes={[
     "Storage (EBS), data transfer, and load balancer costs (model separately).",
     "Spot interruptions and autoscaling dynamics unless you use blended assumptions.",
   ]}
   how={[
-    "Monthly cost ≈ instances × $/hour × hours/month × uptime.",
+    "Monthly cost = instances × $/hour × hours/month × uptime.",
     "If you use commitments (Savings Plans/Reserved), use a blended effective $/hour.",
-    "Model storage and transfer as separate line items."
+    "Model storage and transfer as separate line items.",
   ]}
   faqs={[
     {
       q: "What is a good hours/month value?",
-      a: "A common planning value is ~730 hours/month. Use your billing system’s convention if it differs.",
+      a: "A common planning value is ~730 hours/month. Use your billing system's convention if it differs.",
     },
     {
       q: "How do I pick a blended $/hour?",
@@ -42,9 +42,9 @@ const description =
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
+    { href: "/calculators/aws-ebs-cost-calculator", label: "EBS cost calculator" },
     { href: "/guides/aws-ec2-cost-estimation", label: "Guide: EC2 cost estimation" },
   ]}
 >
   <ComputeInstanceCostCalculator client:load />
 </CalculatorLayout>
-

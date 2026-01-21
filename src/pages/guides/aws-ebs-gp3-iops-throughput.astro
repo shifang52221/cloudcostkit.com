@@ -1,0 +1,48 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "EBS gp3 IOPS and throughput (how to budget)";
+const description =
+  "How to think about gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and the common mistakes in estimates.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ebs-gp3-iops-throughput"
+  lastUpdated="2026-01-20"
+  faqs={[
+    {
+      q: "Should I always provision high IOPS/throughput?",
+      a: "No. Provision only what you need for the workload. Over-provisioned performance is a common source of unnecessary spend.",
+    },
+    {
+      q: "What should I do if I don't know my IOPS needs?",
+      a: "Start with a baseline estimate, then measure IOPS and throughput in production. Budget a low/high scenario to understand sensitivity.",
+    },
+  ]}
+>
+  <p class="muted">
+    gp3 makes it easy to pay for performance you don’t use. Budgeting is simpler if you treat performance as a separate
+    knob from storage.
+  </p>
+
+  <h2>1) Separate storage from performance</h2>
+  <ul>
+    <li><strong>Storage</strong>: GB-month baseline cost.</li>
+    <li><strong>IOPS</strong>: provisioned IOPS-month cost (if billed).</li>
+    <li><strong>Throughput</strong>: provisioned MB/s-month cost (if billed).</li>
+  </ul>
+
+  <h2>2) Budget with two scenarios</h2>
+  <p>
+    Create a “typical” scenario and a “peak” scenario. Peak periods (batch jobs, backups, migrations) can require higher
+    throughput and IOPS.
+  </p>
+
+  <h2>3) Use a calculator to sanity-check</h2>
+  <p>
+    Use <a href="/calculators/aws-ebs-cost-calculator/">AWS EBS Cost Calculator</a> and set IOPS/throughput prices to $0
+    if they don't apply to your chosen volume type.
+  </p>
+</GuideLayout>
+

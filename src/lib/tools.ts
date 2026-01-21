@@ -213,6 +213,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-ebs-cost-calculator",
+    title: "AWS EBS Cost Calculator",
+    description: "Estimate EBS-style storage + optional IOPS/throughput costs from your inputs.",
+    category: "FinOps",
+  },
+  {
     slug: "rps-to-monthly-requests-calculator",
     title: "RPS to Monthly Requests Calculator",
     description: "Estimate monthly request volume from RPS, hours/day, and utilization.",
