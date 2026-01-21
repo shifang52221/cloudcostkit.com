@@ -4,6 +4,7 @@ import { SITE } from "../config/site";
 
 const title = `Contact | ${SITE.name}`;
 const description = "Contact CloudCostKit.";
+const emailB64 = Buffer.from(SITE.email, "utf8").toString("base64");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/contact">
   <section class="card hero">
@@ -13,8 +14,27 @@ const description = "Contact CloudCostKit.";
 
   <section class="card section prose">
     <p class="muted" style="margin:0">
-      Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      Email:{" "}
+      <a id="contact-email" href="#" data-email={emailB64}>
+        Reveal email
+      </a>
     </p>
   </section>
-</BaseLayout>
 
+  <script is:inline>
+    {`
+      (function () {
+        var el = document.getElementById('contact-email');
+        if (!el) return;
+        var b64 = el.getAttribute('data-email') || '';
+        if (!b64) return;
+        try {
+          var email = atob(b64);
+          el.textContent = email;
+          el.setAttribute('href', 'mailto:' + email);
+          el.removeAttribute('data-email');
+        } catch (e) {}
+      })();
+    `}
+  </script>
+</BaseLayout>
