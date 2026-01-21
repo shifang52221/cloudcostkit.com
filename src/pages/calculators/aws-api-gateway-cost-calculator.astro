@@ -1,0 +1,54 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsApiGatewayCostCalculator as AwsApiGatewayCostCalculatorComponent } from "../../components/calculators/AwsApiGatewayCost";
+
+const title = "AWS API Gateway Cost Calculator";
+const description =
+  "Estimate API Gateway-style cost from request volume plus response transfer assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-api-gateway-cost-calculator"
+  intro="Estimate API Gateway-style cost with a simple model: request fees + response transfer. Use your effective region pricing and average response size."
+  examples={[
+    "300M requests/month at $3.50 per 1M requests with 15 KB avg response and $0.09/GB egress.",
+  ]}
+  includes={[
+    "Request fee estimate from requests/month and $ per 1M requests.",
+    "Transfer estimate from requests/month and average response KB (then $/GB).",
+  ]}
+  excludes={[
+    "Caching, WAF, custom domains, and other add-ons unless you model them separately.",
+    "Upstream/downstream service costs (Lambda, databases, logs, etc).",
+  ]}
+  how={[
+    "Request cost = (requests per month / 1,000,000) x $ per 1M requests.",
+    "Transfer GB/month ~= requests per month x avg response KB / 1024 / 1024.",
+    "Transfer cost = transfer GB/month x $ per GB.",
+    "Total = request cost + transfer cost.",
+  ]}
+  faqs={[
+    {
+      q: "Do I always pay egress for API Gateway responses?",
+      a: "Not always. Transfer pricing depends on where traffic goes (internet, VPC, regions) and your architecture. Use your effective transfer rate for the path that applies.",
+    },
+    {
+      q: "What should I use for average response size?",
+      a: "Use the typical compressed payload size over the wire. Large responses can make transfer dominate total cost.",
+    },
+    {
+      q: "How do I reduce API Gateway cost?",
+      a: "Reduce request volume (caching, batching), reduce response size, and use a CDN for large payloads when appropriate.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-api-gateway-pricing", label: "Guide: API Gateway pricing" },
+    { href: "/guides/aws-api-gateway-estimate-requests", label: "Guide: estimate API requests" },
+    { href: "/guides/aws-api-gateway-cost-optimization", label: "Guide: reduce API Gateway costs" },
+    { href: "/calculators/api-request-cost-calculator", label: "API request cost (generic)" },
+  ]}
+>
+  <AwsApiGatewayCostCalculatorComponent client:load />
+</CalculatorLayout>

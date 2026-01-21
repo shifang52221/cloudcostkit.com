@@ -1,0 +1,57 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate API requests per month (RPS to monthly volume)";
+const description =
+  "How to estimate API request volume for cost models: from RPS charts, from logs, and from daily traffic assumptions.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-api-gateway-estimate-requests"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "How do I convert RPS to requests per month?",
+      a: "Requests/month = average RPS x 60 x 60 x 24 x days. Use an average RPS over a representative period (and consider peaks separately for capacity).",
+    },
+    {
+      q: "Should I use peak RPS or average RPS for cost?",
+      a: "Use average for cost and peak for capacity. For cost, the bill tracks total requests and bytes, not the peak moment.",
+    },
+  ]}
+>
+  <p>
+    For request-priced services, the fastest path to a decent estimate is turning a request rate chart into a monthly
+    request count.
+  </p>
+
+  <h2>Method 1: From average RPS</h2>
+  <ul>
+    <li>
+      <strong>Requests/month = avg RPS x 60 x 60 x 24 x days</strong>
+    </li>
+    <li>Choose the avg RPS over a representative period (last 7/30/90 days).</li>
+    <li>Segment by environment if you have separate endpoints (prod vs staging).</li>
+  </ul>
+
+  <h2>Method 2: From logs</h2>
+  <ul>
+    <li>Sum request counts per day from access logs, then multiply/average to a month.</li>
+    <li>Exclude synthetic checks if they are frequent and not user-driven.</li>
+    <li>Include retries if they hit the API (they are real billable requests).</li>
+  </ul>
+
+  <h2>Method 3: From users x actions</h2>
+  <ul>
+    <li>Estimate daily active users x API calls per user per day.</li>
+    <li>Use separate estimates for heavy endpoints (search, list, export).</li>
+  </ul>
+
+  <h2>Next: turn volume into cost</h2>
+  <p>
+    Use <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway Cost Calculator</a> to translate requests
+    and response size into a monthly request + transfer estimate.
+  </p>
+</GuideLayout>
+

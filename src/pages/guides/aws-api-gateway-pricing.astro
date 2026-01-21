@@ -1,0 +1,65 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "API Gateway pricing: what to model (requests + transfer)";
+const description =
+  "A practical API Gateway pricing checklist: request charges, data transfer, and the add-ons that can show up on the bill.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-api-gateway-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What are the two biggest cost drivers for many APIs?",
+      a: "Request volume and data transfer. For high-traffic APIs with non-trivial payloads, transfer can be as large as (or larger than) request fees.",
+    },
+    {
+      q: "Does API Gateway include data transfer in the request price?",
+      a: "No. Data transfer is typically billed separately (with the exact rate depending on destination and architecture).",
+    },
+  ]}
+>
+  <p>
+    API Gateway pricing is usually dominated by <strong>request charges</strong> plus <strong>data transfer</strong>.
+    Depending on API type and features, you may also see add-ons that matter for production workloads.
+  </p>
+
+  <h2>What to include in an estimate</h2>
+  <ul>
+    <li>
+      <strong>Requests/month</strong> and your effective <strong>$ per million requests</strong>
+    </li>
+    <li>
+      <strong>Average response size</strong> and the effective <strong>egress $/GB</strong> for your traffic path
+    </li>
+    <li>
+      <strong>Logging/metrics</strong> (if enabled) and downstream costs (Lambda, databases, queues)
+    </li>
+    <li>
+      <strong>Add-ons</strong> you use (custom domains, WAF, caching, etc.)
+    </li>
+  </ul>
+
+  <h2>A fast model</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway Cost Calculator</a> for a quick request +
+    transfer estimate. Then add any feature-specific line items you rely on.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Underestimating transfer by using uncompressed payload sizes.</li>
+    <li>Retry storms (client retries, SDK retries, timeouts) inflating requests.</li>
+    <li>Large responses (lists, exports, file downloads) dominating total spend.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <p>
+    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost calculator</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost (generic)</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response size to transfer</a>
+  </p>
+</GuideLayout>
+

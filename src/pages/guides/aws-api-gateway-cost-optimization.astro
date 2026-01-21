@@ -1,0 +1,56 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "API Gateway cost optimization (high-leverage levers)";
+const description =
+  "A short playbook to reduce API Gateway spend: cut requests, cut payload sizes, and avoid retry-driven cost spikes.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-api-gateway-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest lever to reduce API Gateway cost?",
+      a: "Reduce request volume (cache, batch, avoid polling) and reduce average response size (compression, pagination).",
+    },
+    {
+      q: "Can retries make API Gateway expensive?",
+      a: "Yes. Timeouts and transient errors can cause client retries and amplify request volume. Treat elevated retries as both a reliability and cost incident.",
+    },
+  ]}
+>
+  <p>
+    API Gateway bills scale with <strong>requests</strong> and often <strong>bytes transferred</strong>. Most savings
+    come from cutting one (or both) of those drivers, and from preventing retry storms.
+  </p>
+
+  <h2>1) Reduce request volume</h2>
+  <ul>
+    <li>Cache hot reads (edge caching or application caching).</li>
+    <li>Batch small calls and avoid chatty client patterns.</li>
+    <li>Avoid aggressive polling; use events/streams when possible.</li>
+  </ul>
+
+  <h2>2) Reduce response size</h2>
+  <ul>
+    <li>Enable compression where appropriate.</li>
+    <li>Paginate list endpoints; avoid huge default payloads.</li>
+    <li>Move large downloads behind object storage/CDN instead of returning big payloads via the API.</li>
+  </ul>
+
+  <h2>3) Prevent retry-driven spikes</h2>
+  <ul>
+    <li>Instrument timeouts, 5xx rates, and client retry counts.</li>
+    <li>Fix slow upstream dependencies that trigger retries (databases, Lambda cold starts).</li>
+    <li>Use backoff and circuit breakers to avoid thundering-herd patterns.</li>
+  </ul>
+
+  <h2>Validate with a cost model</h2>
+  <p>
+    Use <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway Cost Calculator</a> to quantify savings from
+    reduced requests or smaller payload sizes.
+  </p>
+</GuideLayout>
+

@@ -45,6 +45,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-api-gateway-cost-calculator",
+    title: "AWS API Gateway Cost Calculator",
+    description: "Estimate API Gateway-style cost from request volume plus response transfer assumptions.",
+    category: "Networking",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
