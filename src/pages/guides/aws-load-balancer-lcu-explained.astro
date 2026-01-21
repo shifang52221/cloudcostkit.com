@@ -1,0 +1,46 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Load balancer LCU/NLCU explained (for cost estimates)";
+const description =
+  "A practical explanation of LCU/NLCU-style billing: what drives capacity units and how to estimate them for budgeting.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-load-balancer-lcu-explained"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What is an LCU/NLCU?",
+      a: "A capacity unit is a provider-defined measure of load balancer usage (often tied to requests, connections, bytes processed, and TLS). Billing is commonly per unit-hour.",
+    },
+    {
+      q: "How do I estimate capacity unit-hours?",
+      a: "Use load balancer metrics if you have them. Otherwise estimate from requests/sec, average payload size, and connection patterns, then validate later.",
+    },
+  ]}
+>
+  <p class="muted">
+    Many load balancers charge a fixed hourly fee plus a usage fee billed in capacity unit-hours (LCU for ALB, NLCU for
+    NLB). For budgeting, you want an approximate average units/hour and a peak scenario.
+  </p>
+
+  <h2>1) Estimate average units per hour</h2>
+  <p>
+    Start with the simplest thing you can measure: average request rate and average bytes per response. If you have long
+    lived connections or heavy TLS, include a peak scenario.
+  </p>
+
+  <h2>2) Validate with metrics when available</h2>
+  <p>
+    Once you can, use provider metrics for LCU/NLCU or the underlying drivers. Replace estimates with measured averages.
+  </p>
+
+  <h2>3) Use a calculator for scenarios</h2>
+  <p>
+    Use <a href="/calculators/aws-load-balancer-cost-calculator/">AWS Load Balancer Cost Calculator</a> and plug in your
+    effective average units/hour and $ per unit-hour.
+  </p>
+</GuideLayout>
+

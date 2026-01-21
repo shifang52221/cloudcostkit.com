@@ -5,18 +5,37 @@ const title = "Load balancer costs: what to include beyond node spend";
 const description =
   "A practical guide to load balancer costs: fixed hourly charges, traffic-based components, and common patterns that increase spend in Kubernetes and web architectures.";
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-load-balancer-cost" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-load-balancer-cost"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What are the two main load balancer cost components?",
+      a: "A fixed hourly charge per load balancer plus a usage-based component (often billed as LCU/NLCU hours).",
+    },
+    {
+      q: "Why does cost spike even when compute is stable?",
+      a: "Because load balancer cost can scale with requests, connections, bytes processed, and TLS overhead (depending on the product).",
+    },
+  ]}
+>
   <p>
-    Load balancers can become a major cost line item even when compute is stable. The typical drivers are “always-on”
+    Load balancers can become a major cost line item even when compute is stable. The typical drivers are always-on
     hourly charges and traffic-based components that scale with throughput or connection patterns.
   </p>
 
   <h2>What to model</h2>
   <ul>
     <li>Number of load balancers and hours/month</li>
-    <li>GB/month processed (in/out)</li>
+    <li>Capacity unit-hours (LCU for ALB, NLCU for NLB)</li>
     <li>Request rate, connection count, and TLS overhead (depending on provider billing model)</li>
   </ul>
+  <p class="muted" style="margin-top:10px">
+    Use <a href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a> to estimate fixed +
+    usage components using your pricing inputs.
+  </p>
 
   <h2>Common cost patterns</h2>
   <ul>
@@ -27,8 +46,8 @@ const description =
 
   <h2>Related tools</h2>
   <p>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a>
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer calculator</a>
     <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
   </p>
 </GuideLayout>
-

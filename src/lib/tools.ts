@@ -39,6 +39,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-load-balancer-cost-calculator",
+    title: "AWS Load Balancer Cost Calculator (ALB/NLB)",
+    description: "Estimate load balancer fixed + LCU/NLCU usage costs from your inputs.",
+    category: "Networking",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",

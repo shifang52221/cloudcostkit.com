@@ -1,0 +1,55 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsLoadBalancerCostCalculator as AwsLoadBalancerCostCalculatorComponent } from "../../components/calculators/AwsLoadBalancerCost";
+
+const title = "AWS Load Balancer Cost Calculator (ALB/NLB)";
+const description =
+  "Estimate AWS load balancer-style monthly cost from fixed LB-hours and capacity-unit hours (LCU/NLCU) using your pricing assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-load-balancer-cost-calculator"
+  intro="Estimate load balancer cost with a simple model: fixed hourly LB fees + capacity-unit hours (LCU for ALB or NLCU for NLB). Use your effective region pricing."
+  examples={[
+    "2 load balancers running 730 hours/month, averaging 5 capacity units/hour — estimate fixed + usage components.",
+  ]}
+  includes={[
+    "Fixed cost from load balancers × hours/month × $/LB-hour.",
+    "Usage cost from capacity unit-hours × $ per unit-hour (LCU/NLCU).",
+  ]}
+  excludes={[
+    "Data transfer/egress beyond what is included in your provider’s capacity unit definition.",
+    "Downstream service costs (instances, NAT, logs, etc).",
+  ]}
+  how={[
+    "Fixed cost = load balancers × hours per month × $ per LB-hour.",
+    "Capacity unit-hours = avg capacity units per hour × hours per month.",
+    "Usage cost = capacity unit-hours × $ per capacity unit-hour.",
+    "Total = fixed cost + usage cost.",
+  ]}
+  faqs={[
+    {
+      q: "What should I enter as “capacity units per hour”?",
+      a: "Use your measured LCU-hours (ALB) or NLCU-hours (NLB) and enter the average units per hour. If you only have peak values, model both typical and peak scenarios.",
+    },
+    {
+      q: "Does this include cross-zone or internet egress charges?",
+      a: "Not explicitly. Some architectures have separate transfer fees. Model transfer separately if it’s meaningful for your workload.",
+    },
+    {
+      q: "How do I reduce load balancer cost?",
+      a: "Reduce the number of LBs, reduce capacity units (requests/connections/bytes), and avoid architectures that create excessive east-west traffic.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-load-balancer-cost", label: "Guide: load balancer costs (pitfalls)" },
+    { href: "/guides/aws-load-balancer-lcu-explained", label: "Guide: LCU/NLCU explained" },
+    { href: "/guides/aws-load-balancer-cost-optimization", label: "Guide: load balancer cost optimization" },
+    { href: "/calculators/aws-nat-gateway-cost-calculator", label: "NAT gateway cost" },
+  ]}
+>
+  <AwsLoadBalancerCostCalculatorComponent client:load />
+</CalculatorLayout>
+
