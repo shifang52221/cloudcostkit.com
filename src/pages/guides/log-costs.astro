@@ -1,38 +1,82 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimating log costs (ingestion and retention)";
+const title = "Estimating log costs: ingestion, retention, and scan/search";
 const description =
-  "A practical guide to modeling log bills: ingestion vs retention, steady state, and volume reduction strategies.";
+  "A practical guide to modeling log bills: ingestion vs retention (GB-month), steady state, scan/search pricing, and the fastest levers to reduce cost.";
+const faqs = [
+  {
+    q: "What are the main drivers of log cost?",
+    a: "Most platforms bill for ingestion volume (GB ingested) and retention/storage (GB-month). Some also charge for query scan/search (GB scanned).",
+  },
+  {
+    q: "Why does retention cost grow even if ingestion is flat?",
+    a: "Because storage is billed per GB-month. In steady state, retained dataset size is roughly GB/day times retention days.",
+  },
+  {
+    q: "What's the fastest way to reduce log spend?",
+    a: "Reduce noisy logs at source (drop/sampling), shorten hot retention for low-value logs, and avoid expensive broad scans by narrowing queries and time ranges.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/log-costs" lastUpdated="2026-01-06">
-  <p class="muted">
-    Most log platforms charge for <strong>ingestion</strong> (GB ingested) and for <strong>retention</strong> (stored
-    data). If your bill surprised you, it’s usually because volume or retention drifted upward.
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/log-costs"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Most log platforms charge for <strong>ingestion</strong> (GB ingested), <strong>retention</strong> (stored GB-month),
+    and sometimes <strong>scan/search</strong> (GB scanned by queries). If your bill surprised you, it's usually because
+    volume, retention, or query behavior drifted upward.
   </p>
 
   <h2>1) Separate ingestion from storage</h2>
   <ul>
-    <li><strong>Ingestion</strong>: GB/day × price per GB.</li>
-    <li><strong>Retention storage</strong>: roughly GB/day × retention days (steady state) × $/GB-month.</li>
+    <li><strong>Ingestion</strong>: GB/day x price per GB x days/month.</li>
+    <li><strong>Retention storage</strong>: (GB/day x retention days) x $/GB-month (steady state).</li>
   </ul>
-
-  <h2>2) Use a steady-state model for retention</h2>
-  <p>
-    After you’ve been logging longer than your retention window, the dataset size is roughly constant: the last N days.
-    That’s why “GB/day × retention days” is a useful planning estimate.
+  <p class="muted">
+    If you want the intuition behind the storage model, read <a href="/guides/log-retention-storage-cost/">log retention storage cost</a>.
   </p>
 
-  <h2>3) The knobs that usually matter most</h2>
+  <h2>2) Estimate your inputs (GB/day and retention)</h2>
   <ul>
-    <li>Drop or sample high-volume debug logs.</li>
-    <li>Shorten hot retention; archive cold data to object storage.</li>
-    <li>Index selectively (store everything, index what you query).</li>
+    <li>
+      If you have a provider export, use it directly (best).
+    </li>
+    <li>
+      If you don't, estimate GB/day from events/sec and bytes/event. Guide:{" "}
+      <a href="/guides/estimate-log-ingestion-gb-per-day/">estimate log ingestion (GB/day)</a>.
+    </li>
+    <li>
+      Pick retention intentionally: hot troubleshooting window (7-14 days) plus longer cold/archive if required.
+    </li>
+  </ul>
+
+  <h2>3) Include scan/search if your platform charges for it</h2>
+  <p>
+    Some products charge by <strong>GB scanned</strong>. Scan costs often spike during incidents or when dashboards run
+    broad queries repeatedly. If you're on a per-scan model, estimate scanned GB/day and price it.
+  </p>
+  <p class="muted">
+    For CloudWatch Logs Insights specifically, read <a href="/guides/aws-cloudwatch-logs-insights-pricing/">Logs Insights pricing</a>.
+  </p>
+
+  <h2>4) The knobs that usually matter most</h2>
+  <ul>
+    <li><strong>Reduce volume</strong>: drop or sample high-volume debug logs.</li>
+    <li><strong>Shorten retention</strong>: keep low-value logs for fewer days; tier hot vs cold.</li>
+    <li><strong>Query smarter</strong>: narrow time ranges and filter early to reduce scanned GB.</li>
   </ul>
 
   <h2>Tools</h2>
-  <ul>
-    <li><a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost calculator</a></li>
-    <li><a href="/calculators/log-retention-storage-cost-calculator/">Log retention storage cost calculator</a></li>
-  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Log retention storage</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan/search cost</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
+  </div>
 </GuideLayout>

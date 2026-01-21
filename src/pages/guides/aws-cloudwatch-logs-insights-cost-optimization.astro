@@ -4,22 +4,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Logs Insights cost optimization (high-leverage fixes)";
 const description =
   "A short playbook to reduce Logs Insights scan costs: narrow queries, reduce refresh frequency, cut noisy logs, and avoid incident query loops.";
+const faqs = [
+  {
+    q: "What's the fastest way to cut Logs Insights cost?",
+    a: "Reduce scanned GB by narrowing time ranges, filtering early, and reducing dashboard refresh frequency.",
+  },
+  {
+    q: "Can incidents increase scan costs?",
+    a: "Yes. Re-running broad queries repeatedly during incidents can dramatically increase scanned GB/day.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-cost-optimization"
   lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest way to cut Logs Insights cost?",
-      a: "Reduce scanned GB by narrowing time ranges, filtering early, and reducing dashboard refresh frequency.",
-    },
-    {
-      q: "Can incidents increase scan costs?",
-      a: "Yes. Re-running broad queries repeatedly during incidents can dramatically increase scanned GB/day.",
-    },
-  ]}
+  faqs={faqs}
 >
   <p class="muted">
     Logs Insights spend scales with scanned bytes. Most cost wins come from reducing how much data your queries scan and
@@ -28,7 +29,7 @@ const description =
 
   <h2>1) Reduce time ranges</h2>
   <p>
-    Broad “last 7 days” queries are expensive. Default dashboards to shorter windows (15m/1h/6h) and use longer windows
+    Broad "last 7 days" queries are expensive. Default dashboards to shorter windows (15m/1h/6h) and use longer windows
     only when investigating.
   </p>
 

@@ -15,7 +15,7 @@ const description =
     "50 GB/day logs with 30-day retention → ~1,500 GB retained steady state (before compression).",
   ]}
   includes={[
-    "Steady-state retained volume estimate (GB/day × retention days).",
+    "Steady-state retained volume estimate (GB/day x retention days).",
     "Monthly storage estimate from retained GB and $/GB-month pricing.",
   ]}
   excludes={[
@@ -23,26 +23,28 @@ const description =
     "Indexing/query scan charges (use Log Search Scan Cost Calculator).",
   ]}
   how={[
-    "Retained volume (steady state) ≈ GB/day × retention days.",
-    "Monthly storage cost = retained GB × storage price per GB-month.",
-    "This is a simplified model; provider billing may differ by compression, indexing, and tiers."
+    "Retained volume (steady state) ≈ GB/day x retention days.",
+    "Monthly storage cost = retained GB x storage price per GB-month.",
+    "This is a simplified model; provider billing may differ by compression, indexing, and tiers.",
   ]}
   faqs={[
     {
       q: "Why steady state?",
-      a: "After you’ve been logging for longer than your retention window, the dataset size is roughly constant: the last N days."
+      a: "After you've been logging for longer than your retention window, the dataset size is roughly constant: the last N days.",
     },
     {
       q: "What if I have multiple log types?",
-      a: "Model each log stream separately (app logs, access logs, audit logs), then sum the results."
-    }
+      a: "Model each log stream separately (app logs, access logs, audit logs), then sum the results.",
+    },
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
     { href: "/guides/log-costs", label: "Guide: log costs" },
+    { href: "/guides/log-retention-storage-cost", label: "Guide: retention storage cost" },
   ]}
 >
   <LogRetentionStorageCostCalculatorComponent client:load />
 </CalculatorLayout>
+

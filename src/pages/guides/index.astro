@@ -24,10 +24,20 @@ const slots = SITE.adsenseSlots;
         <div class="tool-title">Understanding egress costs</div>
         <div class="tool-desc">How to estimate bandwidth and avoid common billing surprises.</div>
       </a>
+
       <a class="card2 tool col-6" href="/guides/log-costs/">
         <div class="tool-title">Estimating log costs</div>
-        <div class="tool-desc">Ingestion vs retention, steady state modeling, and knobs that matter.</div>
+        <div class="tool-desc">Ingestion, retention (GB-month), scan/search, and the fastest levers.</div>
       </a>
+      <a class="card2 tool col-6" href="/guides/estimate-log-ingestion-gb-per-day/">
+        <div class="tool-title">Estimate log ingestion (GB/day)</div>
+        <div class="tool-desc">Quick methods from events/sec, bytes, or throughput.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/log-retention-storage-cost/">
+        <div class="tool-title">Log retention storage cost</div>
+        <div class="tool-desc">Steady-state GB-month explained and retention tiers.</div>
+      </a>
+
       <a class="card2 tool col-6" href="/guides/kubernetes-requests-limits/">
         <div class="tool-title">Kubernetes requests & limits</div>
         <div class="tool-desc">Sizing from requests, allocatable headroom, and what limits really mean.</div>
@@ -37,7 +47,7 @@ const slots = SITE.adsenseSlots;
         <div class="tool-desc">Why requests drive node count and cost.</div>
       </a>
       <a class="card2 tool col-6" href="/guides/kubernetes-cost-calculator/">
-        <div class="tool-title">Kubernetes cost calculator checklist</div>
+        <div class="tool-title">Kubernetes cost checklist</div>
         <div class="tool-desc">What to include beyond nodes: storage, egress, load balancers, and logs.</div>
       </a>
       <a class="card2 tool col-6" href="/guides/kubernetes-cost-model-beyond-nodes/">
@@ -93,3 +103,4 @@ const slots = SITE.adsenseSlots;
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
 </BaseLayout>
+

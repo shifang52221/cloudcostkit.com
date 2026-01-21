@@ -1,0 +1,69 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Log retention storage cost: steady-state GB-month explained";
+const description =
+  "How log retention turns GB/day into stored GB-month cost. Learn the steady-state model, retention tiers, and the fastest levers to reduce long-term log spend.";
+const faqs = [
+  {
+    q: "Why does retention increase costs so much?",
+    a: "Storage is billed per GB-month. If ingestion stays flat, longer retention multiplies the steady-state stored dataset size.",
+  },
+  {
+    q: "What is the steady-state model for retained logs?",
+    a: "If you retain N days of logs and ingest GB/day consistently, the retained dataset is roughly GB/day x N once you've been logging longer than N days.",
+  },
+  {
+    q: "How do I reduce storage cost without losing signal?",
+    a: "Shorten hot retention for low-value logs, keep longer retention for sparse high-value logs, and archive cold logs to cheaper object storage if needed.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/log-retention-storage-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Log bills usually separate <strong>ingestion</strong> (GB ingested) from <strong>retention/storage</strong> (GB-month).
+    Retention is the lever that quietly turns a stable ingestion rate into a growing long-term cost.
+  </p>
+
+  <h2>The steady-state model (the key idea)</h2>
+  <p>
+    If you retain logs for <strong>N days</strong> and ingest roughly <strong>GB/day</strong>, then once you've been
+    logging longer than N days, the stored dataset is roughly:
+  </p>
+  <ul>
+    <li><strong>Stored GB ≈ GB/day x N</strong></li>
+  </ul>
+  <p>
+    Storage cost is then stored GB x $/GB-month (using your provider billing model).
+  </p>
+
+  <h2>Retention tiers (hot vs cold)</h2>
+  <p>
+    A common pattern is to keep a short "hot" window for interactive troubleshooting and a longer "cold" window for
+    compliance or rare investigations:
+  </p>
+  <ul>
+    <li><strong>Hot</strong>: 7-14 days at full fidelity (fast queries)</li>
+    <li><strong>Cold</strong>: 30-180 days archived or stored cheaply (slower retrieval)</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li><strong>Retention drift</strong>: default policies slowly expand across more log groups.</li>
+    <li><strong>High-volume debug logs</strong>: long retention on verbose logs dominates storage.</li>
+    <li><strong>Mixing units</strong>: GB vs GiB across dashboards and pricing tables.</li>
+  </ul>
+
+  <h2>Tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Log retention storage calculator</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion calculator</a>
+    <a class="btn" href="/guides/log-costs/">Log costs guide</a>
+  </div>
+</GuideLayout>

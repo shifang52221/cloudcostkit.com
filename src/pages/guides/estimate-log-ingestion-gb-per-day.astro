@@ -1,0 +1,81 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate log ingestion volume (GB/day): quick methods";
+const description =
+  "How to estimate log ingestion volume in GB/day from bytes, events/sec, or throughput - plus common pitfalls like compression, sampling, and verbose debug logs.";
+const faqs = [
+  {
+    q: "What's the fastest way to estimate GB/day?",
+    a: "Use your existing billing/usage export if you have one. If not, estimate from events/sec x average event size and validate with a short real sample.",
+  },
+  {
+    q: "Should I use uncompressed or compressed size?",
+    a: "Use the billable size for your provider. Some vendors bill on ingested bytes, some on stored bytes, and some on scanned bytes. If you're unsure, start with raw bytes as an upper bound and calibrate later.",
+  },
+  {
+    q: "Why is my estimate lower than the bill?",
+    a: "Common causes are verbose debug logs, duplicated logs (multiple shippers), high-cardinality logs, and unexpected sources like load balancers or VPC flow logs.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/estimate-log-ingestion-gb-per-day"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Most log pricing models start with <strong>ingestion volume</strong>: how many GB of logs you send per day. This page
+    gives quick ways to estimate GB/day when you don't have a clean export yet.
+  </p>
+
+  <h2>Method 1: From your log provider usage (best)</h2>
+  <p>
+    If you already have a bill or a usage dashboard, take the average daily ingestion over a representative window (7 or
+    30 days). This is the most accurate planning input.
+  </p>
+
+  <h2>Method 2: From events per second and average event size</h2>
+  <p>
+    If you know roughly how many log events you emit and the average size per event:
+  </p>
+  <ul>
+    <li>
+      <strong>GB/day ≈ events/sec x avg bytes/event x 86,400 / 1,000,000,000</strong>
+    </li>
+  </ul>
+  <p>
+    Tips:
+  </p>
+  <ul>
+    <li>Use a sample of real logs to estimate bytes/event (not just a guessed number).</li>
+    <li>Split by source (app logs, load balancer logs, audit logs) and add them up.</li>
+  </ul>
+
+  <h2>Method 3: From throughput (Mbps)</h2>
+  <p>
+    If you have throughput charts (for example, log shipper network usage), you can convert Mbps to GB/day with the{" "}
+    <a href="/calculators/unit-converter/">Units Converter</a>. Use an average value over time, not the peak.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li><strong>Compression and parsing</strong>: providers may bill on different byte counts.</li>
+    <li><strong>Sampling</strong>: if you sample at source, event rates can change drastically in incidents.</li>
+    <li><strong>Duplicates</strong>: shipping the same logs twice inflates ingestion.</li>
+    <li><strong>Verbose debug logs</strong>: one noisy component can dominate total GB/day.</li>
+  </ul>
+
+  <h2>Next: translate GB/day into dollars</h2>
+  <p>
+    Once you have GB/day, estimate cost with:
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost calculator</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>
+    <a class="btn" href="/guides/log-costs/">Log costs guide</a>
+  </div>
+</GuideLayout>
+

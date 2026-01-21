@@ -14,7 +14,7 @@ const description =
   intro="CloudWatch Logs-style pricing is commonly driven by ingestion volume and retention. This page helps you estimate a practical monthly total by combining ingestion and retention storage line items using your own assumptions."
   examples={[
     "Estimate ingestion from GB/day and a $/GB rate, then estimate retained storage from retention days and $/GB-month.",
-    "Retention can dominate total cost when you keep high-volume logs for 90–365 days.",
+    "Retention can dominate total cost when you keep high-volume logs for 90+ days.",
   ]}
   includes={[
     "Ingestion estimate from GB/day and $/GB assumptions.",
@@ -25,9 +25,9 @@ const description =
     "Region-tiered pricing unless you use blended rates or separate scenarios.",
   ]}
   how={[
-    "Ingestion cost = GB/day × days/month × $/GB.",
-    "Retained storage (steady-state) ≈ GB/day × retention days; apply $/GB-month.",
-    "Sum the two line items for a monthly estimate."
+    "Ingestion cost = GB/day x days/month x $/GB.",
+    "Retained storage (steady state) ≈ GB/day x retention days; apply $/GB-month.",
+    "Sum the two line items for a monthly estimate.",
   ]}
   faqs={[
     {
@@ -39,12 +39,14 @@ const description =
       a: "Reduce noisy logs at source, shorten retention for low-value logs, and avoid retaining high-volume debug logs in hot storage.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/log-cost-calculator", label: "Log cost calculator (generic)" },
     { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost calculator" },
     { href: "/calculators/cloudwatch-logs-insights-cost-calculator", label: "Logs Insights scan cost" },
     { href: "/guides/aws-cloudwatch-logs-pricing", label: "Guide: CloudWatch Logs pricing" },
+    { href: "/guides/estimate-log-ingestion-gb-per-day", label: "Guide: estimate log ingestion (GB/day)" },
+    { href: "/guides/log-retention-storage-cost", label: "Guide: log retention storage cost" },
     { href: "/guides/log-costs", label: "Guide: log costs" },
   ]}
 >
@@ -58,3 +60,4 @@ const description =
   </div>
   <LogRetentionStorageCostCalculator client:load />
 </CalculatorLayout>
+

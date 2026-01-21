@@ -4,22 +4,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Estimate Logs Insights scanned GB (quick methods)";
 const description =
   "Practical ways to estimate Logs Insights scan volume: from query metrics, from typical query patterns, and from dataset size and time ranges.";
+const faqs = [
+  {
+    q: "What's the best way to estimate scanned GB?",
+    a: "Use your provider's query metrics showing bytes scanned per query and aggregate them per day/week/month.",
+  },
+  {
+    q: "What if I don't have metrics yet?",
+    a: "Start with a scenario estimate: queries/day x time range x approximate GB/hour of logs in scope, then validate later.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb"
   lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the best way to estimate scanned GB?",
-      a: "Use your provider’s query metrics showing bytes scanned per query and aggregate them per day/week/month.",
-    },
-    {
-      q: "What if I don’t have metrics yet?",
-      a: "Start with a scenario estimate: queries/day × time range × approximate GB/hour of logs in scope, then validate later.",
-    },
-  ]}
+  faqs={faqs}
 >
   <p class="muted">
     Query scan cost depends on how many bytes your queries scan. You can estimate it from actual query metrics (best) or
@@ -28,7 +29,7 @@ const description =
 
   <h2>1) From query metrics (best)</h2>
   <p>
-    Use any available “bytes scanned” or “GB scanned” metrics per query and aggregate to a daily total. This gives you a
+    Use any available "bytes scanned" or "GB scanned" metrics per query and aggregate to a daily total. This gives you a
     direct input for the scan cost calculator.
   </p>
 
@@ -36,10 +37,10 @@ const description =
   <p>
     Estimate:
     <br />
-    <strong>scanned GB/day ≈ queries/day × (GB in scope per query)</strong>
+    <strong>scanned GB/day ≈ queries/day x (GB in scope per query)</strong>
   </p>
   <p>
-    “GB in scope” is driven by the time range and how broad your query is. Narrow filters early to reduce scope.
+    "GB in scope" is driven by the time range and how broad your query is. Narrow filters early to reduce scope.
   </p>
 
   <h2>3) Convert throughput to GB/month if needed</h2>

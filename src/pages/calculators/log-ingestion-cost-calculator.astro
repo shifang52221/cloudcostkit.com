@@ -16,37 +16,39 @@ const description =
   ]}
   includes={[
     "Ingestion cost estimate from GB/day and $/GB.",
-    "Retention storage estimate via steady-state GB/day × retention days and $/GB-month pricing.",
+    "Retention storage estimate via steady-state GB/day x retention days and $/GB-month pricing.",
   ]}
   excludes={[
     "Indexing, compression differences, and tiered/query-specific charges (model separately).",
     "Per-event pricing and specialized log classes.",
   ]}
   how={[
-    "Monthly ingestion GB ≈ GB/day × 30.4.",
-    "Ingest cost = monthly ingestion GB × ingest price per GB.",
-    "Stored volume (steady state) ≈ GB/day × retention days, then storage cost = stored GB × storage price per GB-month."
+    "Monthly ingestion GB ≈ GB/day x 30.4.",
+    "Ingest cost = monthly ingestion GB x ingest price per GB.",
+    "Stored volume (steady state) ≈ GB/day x retention days, then storage cost = stored GB x storage price per GB-month.",
   ]}
   faqs={[
     {
-      q: "Why is storage modeled as GB/day × retention?",
-      a: "In steady state with a fixed retention window, the retained dataset is roughly the last N days of logs."
+      q: "Why is storage modeled as GB/day x retention?",
+      a: "In steady state with a fixed retention window, the retained dataset is roughly the last N days of logs.",
     },
     {
       q: "What about compression and indexing?",
-      a: "Providers may bill on compressed size, ingested size, indexed subset, or scanned bytes. Enter prices that match your provider’s billing model."
+      a: "Providers may bill on compressed size, ingested size, indexed subset, or scanned bytes. Enter prices that match your provider's billing model.",
     },
     {
       q: "Is 30.4 days accurate?",
-      a: "It’s an average month length. For a specific billing cycle, adjust by changing your GB/day or your per-GB assumptions."
-    }
+      a: "It's an average month length. For a specific billing cycle, adjust by changing your GB/day or your per-GB assumptions.",
+    },
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/calculators/log-retention-storage-cost-calculator", label: "Log retention storage" },
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
     { href: "/calculators/metrics-timeseries-cost-calculator", label: "Metrics series cost" },
     { href: "/guides/log-costs", label: "Guide: log costs" },
+    { href: "/guides/estimate-log-ingestion-gb-per-day", label: "Guide: estimate log ingestion (GB/day)" },
+    { href: "/guides/log-retention-storage-cost", label: "Guide: log retention storage cost" },
   ]}
 >
   <LogIngestionCostCalculatorComponent client:load />
@@ -58,6 +60,6 @@ const description =
       <li>Shorten hot retention and archive cold data to object storage.</li>
       <li>Index selectively: keep full logs, index only what you query.</li>
     </ul>
-
   </div>
 </CalculatorLayout>
+

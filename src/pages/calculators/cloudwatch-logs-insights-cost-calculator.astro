@@ -12,7 +12,7 @@ const description =
   canonicalPath="/calculators/cloudwatch-logs-insights-cost-calculator"
   intro="Logs Insights-style pricing is often driven by how much data your queries scan. This calculator estimates monthly query scan cost from scanned GB/day and your per-GB scan price."
   examples={[
-    "800 GB/day scanned at $0.005/GB → about 24,320 GB scanned/month and ~$122/month.",
+    "800 GB/day scanned at $0.005/GB -> about 24,320 GB scanned/month and ~$122/month.",
   ]}
   includes={[
     "Query scan cost estimate from GB scanned per day and $/GB scan pricing.",
@@ -23,8 +23,8 @@ const description =
     "Provider-specific query minimums, caching, and index behavior.",
   ]}
   how={[
-    "Monthly scanned GB ≈ GB scanned per day × 30.4.",
-    "Scan cost = monthly scanned GB × scan price per GB.",
+    "Monthly scanned GB ≈ GB scanned per day x 30.4.",
+    "Scan cost = monthly scanned GB x scan price per GB.",
     "This tool estimates scan-only (not ingestion or retention).",
   ]}
   faqs={[
@@ -34,7 +34,7 @@ const description =
     },
     {
       q: "How do I reduce Logs Insights scan costs?",
-      a: "Reduce time ranges, narrow filters early, avoid querying noisy fields, and reduce total log volume at source.",
+      a: "Reduce time ranges, filter early, avoid dashboards that repeatedly run broad queries, and reduce total log volume at source.",
     },
   ]}
   lastUpdated="2026-01-21"
@@ -42,6 +42,8 @@ const description =
     { href: "/guides/aws-cloudwatch-logs-insights-pricing", label: "Guide: Logs Insights pricing" },
     { href: "/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb", label: "Guide: estimate scanned GB" },
     { href: "/guides/aws-cloudwatch-logs-insights-cost-optimization", label: "Guide: reduce scan costs" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan/search cost (generic)" },
     { href: "/calculators/cloudwatch-log-cost-calculator", label: "CloudWatch Logs cost (ingestion + retention)" },
   ]}
 >

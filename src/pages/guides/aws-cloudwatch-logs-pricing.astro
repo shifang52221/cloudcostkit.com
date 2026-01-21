@@ -4,12 +4,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "CloudWatch Logs pricing: ingestion vs retention and the fastest levers";
 const description =
   "A practical guide to CloudWatch Logs-style pricing: model ingestion and retention separately, and use retention/noise reduction to control cost.";
+const faqs = [
+  {
+    q: "What are the main CloudWatch Logs cost drivers?",
+    a: "Ingestion volume (GB ingested) and retention/storage (GB-month). If you use Logs Insights heavily, query scan (GB scanned) can be a separate line item.",
+  },
+  {
+    q: "Why does retention drive long-term cost?",
+    a: "Because storage is billed per GB-month. Longer retention multiplies the steady-state stored dataset size even if ingestion is flat.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-pricing"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p>
     CloudWatch Logs-style pricing commonly has two major components: <strong>ingestion</strong> (GB ingested) and
@@ -18,8 +29,8 @@ const description =
 
   <h2>Model the two line items separately</h2>
   <ul>
-    <li>Ingestion: GB/day × $/GB × days/month</li>
-    <li>Retention: (GB/day × retention days) × $/GB-month</li>
+    <li>Ingestion: GB/day x $/GB x days/month</li>
+    <li>Retention: (GB/day x retention days) x $/GB-month</li>
   </ul>
   <p>
     Calculator: <a href="/calculators/cloudwatch-log-cost-calculator/">CloudWatch Logs cost calculator</a>.
@@ -48,3 +59,4 @@ const description =
     <a class="btn" href="/guides/log-costs/">Log costs guide</a>
   </p>
 </GuideLayout>
+

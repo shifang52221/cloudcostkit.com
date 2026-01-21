@@ -4,22 +4,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "CloudWatch Logs Insights pricing (what to include)";
 const description =
   "A practical checklist for estimating CloudWatch Logs Insights costs: scanned bytes, query patterns, and the common pitfalls that inflate scan spend.";
+const faqs = [
+  {
+    q: "What is the core Logs Insights cost driver?",
+    a: "Data scanned by queries. If your queries scan lots of GB each day, cost rises even when ingestion is flat.",
+  },
+  {
+    q: "Why do costs spike?",
+    a: "Wide time ranges, weak filters, and repeated queries (dashboards/automation) can multiply scanned GB quickly.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-pricing"
   lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What is the core Logs Insights cost driver?",
-      a: "Data scanned by queries. If your queries scan lots of GB each day, cost rises even when ingestion is flat.",
-    },
-    {
-      q: "Why do costs spike?",
-      a: "Wide time ranges, weak filters, and repeated queries (dashboards/automation) can multiply scanned GB quickly.",
-    },
-  ]}
+  faqs={faqs}
 >
   <p class="muted">
     Logs Insights-style pricing is usually driven by how much log data your queries scan. The safest way to budget is to
@@ -47,7 +48,7 @@ const description =
   <h2>3) Common pitfalls</h2>
   <ul>
     <li>Dashboards refreshing too frequently.</li>
-    <li>Queries run across “all log groups” without narrowing first.</li>
+    <li>Queries run across all log groups without narrowing first.</li>
     <li>Incident loops that repeatedly re-run expensive queries.</li>
   </ul>
 </GuideLayout>
