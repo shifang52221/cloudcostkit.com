@@ -1,0 +1,59 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Logs Insights cost optimization (high-leverage fixes)";
+const description =
+  "A short playbook to reduce Logs Insights scan costs: narrow queries, reduce refresh frequency, cut noisy logs, and avoid incident query loops.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-logs-insights-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest way to cut Logs Insights cost?",
+      a: "Reduce scanned GB by narrowing time ranges, filtering early, and reducing dashboard refresh frequency.",
+    },
+    {
+      q: "Can incidents increase scan costs?",
+      a: "Yes. Re-running broad queries repeatedly during incidents can dramatically increase scanned GB/day.",
+    },
+  ]}
+>
+  <p class="muted">
+    Logs Insights spend scales with scanned bytes. Most cost wins come from reducing how much data your queries scan and
+    how often you run those queries.
+  </p>
+
+  <h2>1) Reduce time ranges</h2>
+  <p>
+    Broad “last 7 days” queries are expensive. Default dashboards to shorter windows (15m/1h/6h) and use longer windows
+    only when investigating.
+  </p>
+
+  <h2>2) Filter early and narrow scope</h2>
+  <ul>
+    <li>Filter on service/env first before heavy parsing or aggregation.</li>
+    <li>Avoid querying across all log groups by default.</li>
+    <li>Prefer targeted queries for high-volume log groups.</li>
+  </ul>
+
+  <h2>3) Tune dashboards and automation</h2>
+  <p>
+    Dashboard refresh frequency can drive many repeated queries. Increase refresh intervals and batch queries where
+    possible.
+  </p>
+
+  <h2>4) Reduce noisy logs at source</h2>
+  <p>
+    Less log volume means fewer bytes to scan. Remove verbose debug logs in steady state and set retention intentionally.
+  </p>
+
+  <h2>5) Validate with a calculator</h2>
+  <p>
+    Use <a href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights Cost Calculator</a> to see how reducing
+    scanned GB/day changes monthly cost.
+  </p>
+</GuideLayout>
+

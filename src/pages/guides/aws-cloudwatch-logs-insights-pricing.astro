@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudWatch Logs Insights pricing (what to include)";
+const description =
+  "A practical checklist for estimating CloudWatch Logs Insights costs: scanned bytes, query patterns, and the common pitfalls that inflate scan spend.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-logs-insights-pricing"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What is the core Logs Insights cost driver?",
+      a: "Data scanned by queries. If your queries scan lots of GB each day, cost rises even when ingestion is flat.",
+    },
+    {
+      q: "Why do costs spike?",
+      a: "Wide time ranges, weak filters, and repeated queries (dashboards/automation) can multiply scanned GB quickly.",
+    },
+  ]}
+>
+  <p class="muted">
+    Logs Insights-style pricing is usually driven by how much log data your queries scan. The safest way to budget is to
+    estimate scanned GB/day and multiply by your $/GB scan price.
+  </p>
+
+  <h2>1) Separate three log line items</h2>
+  <ul>
+    <li><strong>Ingestion</strong>: GB ingested per day.</li>
+    <li><strong>Retention</strong>: stored GB-month over your retention window.</li>
+    <li><strong>Query scan</strong>: GB scanned by queries (Insights).</li>
+  </ul>
+  <p>
+    Use <a href="/calculators/cloudwatch-log-cost-calculator/">CloudWatch Logs Cost Calculator</a> for ingestion + retention,
+    and <a href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights Cost Calculator</a> for scan costs.
+  </p>
+
+  <h2>2) What to model for query scan</h2>
+  <ul>
+    <li>Typical queries per day (dashboards + ad hoc)</li>
+    <li>Typical time range (last 15m vs last 24h matters)</li>
+    <li>How selective your filters are (narrow early vs scan everything)</li>
+  </ul>
+
+  <h2>3) Common pitfalls</h2>
+  <ul>
+    <li>Dashboards refreshing too frequently.</li>
+    <li>Queries run across “all log groups” without narrowing first.</li>
+    <li>Incident loops that repeatedly re-run expensive queries.</li>
+  </ul>
+</GuideLayout>
+

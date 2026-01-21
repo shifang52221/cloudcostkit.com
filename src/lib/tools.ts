@@ -117,6 +117,12 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "cloudwatch-logs-insights-cost-calculator",
+    title: "CloudWatch Logs Insights Cost Calculator",
+    description: "Estimate Logs Insights query scan cost from GB scanned per day and $/GB.",
+    category: "Logging",
+  },
+  {
     slug: "cloudwatch-metrics-cost-calculator",
     title: "CloudWatch Metrics Cost Calculator",
     description: "Estimate CloudWatch metrics cost from custom metrics, alarms, dashboards, and API requests.",

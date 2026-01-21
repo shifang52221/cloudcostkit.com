@@ -1,0 +1,50 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { LogSearchScanCostCalculator as LogSearchScanCostCalculatorComponent } from "../../components/calculators/LogSearchScanCost";
+
+const title = "CloudWatch Logs Insights Cost Calculator";
+const description =
+  "Estimate CloudWatch Logs Insights-style query scan cost from GB scanned per day and price per GB. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cloudwatch-logs-insights-cost-calculator"
+  intro="Logs Insights-style pricing is often driven by how much data your queries scan. This calculator estimates monthly query scan cost from scanned GB/day and your per-GB scan price."
+  examples={[
+    "800 GB/day scanned at $0.005/GB → about 24,320 GB scanned/month and ~$122/month.",
+  ]}
+  includes={[
+    "Query scan cost estimate from GB scanned per day and $/GB scan pricing.",
+    "Useful for CloudWatch Logs Insights and similar per-scan log query models.",
+  ]}
+  excludes={[
+    "Log ingestion charges and retention storage (model separately).",
+    "Provider-specific query minimums, caching, and index behavior.",
+  ]}
+  how={[
+    "Monthly scanned GB ≈ GB scanned per day × 30.4.",
+    "Scan cost = monthly scanned GB × scan price per GB.",
+    "This tool estimates scan-only (not ingestion or retention).",
+  ]}
+  faqs={[
+    {
+      q: "How do I estimate GB scanned per day?",
+      a: "Use provider query metrics (scanned bytes), or approximate from typical query time ranges and dataset size.",
+    },
+    {
+      q: "How do I reduce Logs Insights scan costs?",
+      a: "Reduce time ranges, narrow filters early, avoid querying noisy fields, and reduce total log volume at source.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-cloudwatch-logs-insights-pricing", label: "Guide: Logs Insights pricing" },
+    { href: "/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb", label: "Guide: estimate scanned GB" },
+    { href: "/guides/aws-cloudwatch-logs-insights-cost-optimization", label: "Guide: reduce scan costs" },
+    { href: "/calculators/cloudwatch-log-cost-calculator", label: "CloudWatch Logs cost (ingestion + retention)" },
+  ]}
+>
+  <LogSearchScanCostCalculatorComponent client:load />
+</CalculatorLayout>
+

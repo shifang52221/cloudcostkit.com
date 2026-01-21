@@ -32,11 +32,19 @@ const description =
     <li>Split tiers: hot short retention + cheaper archive if needed</li>
   </ul>
 
+  <h2>Logs Insights scan costs</h2>
+  <p>
+    If you use Logs Insights heavily, query scan charges can become a separate line item. Model scan cost from scanned
+    GB/day using <a href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights Cost Calculator</a> and
+    reduce scan volume with{" "}
+    <a href="/guides/aws-cloudwatch-logs-insights-cost-optimization/">scan optimization tips</a>.
+  </p>
+
   <h2>Related tools</h2>
   <p>
     <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>
     <a class="btn" href="/calculators/log-storage-cost-calculator/">Log storage cost</a>
+    <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights scan cost</a>
     <a class="btn" href="/guides/log-costs/">Log costs guide</a>
   </p>
 </GuideLayout>
-
