@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudfront-cache-hit-rate"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-21"
 >
   <p>
     CDN pricing is usually focused on edge bandwidth and requests, but <strong>origin egress</strong> can become a major
@@ -23,7 +23,7 @@ const description =
   </p>
   <ul>
     <li>
-      Origin egress (GB/month) ≈ Edge bandwidth (GB/month) × (1 − H)
+      Origin egress (GB/month) = edge bandwidth (GB/month) x (1 - H)
     </li>
   </ul>
   <p>
@@ -35,7 +35,7 @@ const description =
   <ul>
     <li>Use stable caching headers and longer TTLs for static assets.</li>
     <li>Avoid unnecessary cache-busting for large files.</li>
-    <li>Reduce “unique object” patterns (e.g., per-user URLs) where possible.</li>
+    <li>Reduce unique-object patterns (e.g., per-user URLs) where possible.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -44,5 +44,11 @@ const description =
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
     <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
   </p>
-</GuideLayout>
 
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
+    <a class="btn" href="/guides/aws-cloudfront-invalidation-pricing/">CloudFront invalidation pricing</a>
+    <a class="btn" href="/guides/aws-cloudfront-logs-cost/">CloudFront logs cost</a>
+  </div>
+</GuideLayout>

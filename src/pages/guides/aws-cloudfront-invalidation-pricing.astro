@@ -1,0 +1,62 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudFront invalidation pricing: when it matters and how to estimate";
+const description =
+  "A practical guide to CloudFront invalidation costs: what to count, why cache-busting patterns can create surprising invalidation volume, and how to reduce invalidations safely.";
+const faqs = [
+  {
+    q: "Do invalidations usually dominate CDN cost?",
+    a: "Usually no. Bandwidth and request fees are often larger. But invalidations can become a real line item if you invalidate frequently at large scale or if invalidations lower cache hit rate and increase origin egress.",
+  },
+  {
+    q: "What's the common cause of high invalidation volume?",
+    a: "Cache-busting patterns that invalidate broad wildcards (like /*) or frequent deployments that invalidate many paths repeatedly.",
+  },
+  {
+    q: "How do I reduce invalidation-related costs?",
+    a: "Prefer versioned asset URLs (content hashes) so old objects can expire naturally, narrow invalidation scope, and use longer TTLs where safe.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudfront-invalidation-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p class="muted">
+    Invalidations are part of operating a CDN. The cost impact is often indirect: aggressive invalidation reduces cache
+    hit rate and can push more traffic to the origin (cache fill / origin egress).
+  </p>
+
+  <h2>What to count</h2>
+  <ul>
+    <li>How often you invalidate (deploy frequency)</li>
+    <li>How many paths you invalidate per deploy</li>
+    <li>Whether you invalidate broad wildcards (like /*)</li>
+  </ul>
+
+  <h2>Why invalidations can increase total cost</h2>
+  <ul>
+    <li>Lower cache hit rate for popular objects</li>
+    <li>More origin requests and origin egress (cache fill)</li>
+    <li>More load on the API or origin layer during deploy windows</li>
+  </ul>
+
+  <h2>Safer patterns</h2>
+  <ul>
+    <li>Use versioned asset URLs (hash-based filenames) for static assets.</li>
+    <li>Invalidate only the paths that truly changed.</li>
+    <li>Use sensible TTLs and caching headers so you invalidate less often.</li>
+  </ul>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
+    <a class="btn" href="/guides/aws-cloudfront-cache-hit-rate/">Cache hit rate and origin egress</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+  </div>
+</GuideLayout>
+

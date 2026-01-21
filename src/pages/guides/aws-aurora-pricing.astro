@@ -1,0 +1,72 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Aurora pricing (what to include): compute, storage, I/O, and backups";
+const description =
+  "A practical checklist for estimating Aurora costs: instance hours (or ACUs), storage growth, I/O-heavy workloads, backups/retention, and the line items that commonly surprise budgets.";
+const faqs = [
+  {
+    q: "Is Aurora always cheaper than RDS?",
+    a: "Not always. Aurora can be a great fit, but costs depend on workload shape (I/O, read scaling, storage growth), region pricing, and whether you use provisioned vs serverless.",
+  },
+  {
+    q: "What do I need for a first-pass estimate?",
+    a: "Start with compute hours, average storage (GB-month), and an estimate for backups/retention. If you expect I/O-heavy patterns or frequent failovers, model a high-usage scenario too.",
+  },
+  {
+    q: "What is the biggest hidden cost driver?",
+    a: "Workload-driven usage that isn't captured by 'DB size' alone: heavy I/O patterns, rapid storage growth, and long retention can quietly dominate long-term spend.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-aurora-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p class="muted">
+    Aurora cost estimates often go wrong when teams model only compute. A complete model includes storage and retention,
+    and often benefits from a second "high-usage" scenario for I/O-heavy workloads.
+  </p>
+
+  <h2>1) Model compute (instance-hours or ACUs)</h2>
+  <p>
+    Start from how many instances you run and for how many hours per month. If you use serverless, model your average
+    capacity and add a peak scenario.
+  </p>
+
+  <h2>2) Model database storage (GB-month) and growth</h2>
+  <p>
+    Use your expected average storage (GB-month). If storage grows over time, build a multi-month forecast using{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
+  </p>
+
+  <h2>3) Model backups and retention as a separate line item</h2>
+  <p>
+    Backup storage can become a steady monthly cost with long retention and high churn. Treat it as separate from
+    primary storage.
+  </p>
+  <p class="muted">
+    Next: <a href="/guides/aws-rds-backup-storage-gb-month-estimate/">estimate backup GB-month</a>.
+  </p>
+
+  <h2>4) Add a high-usage scenario for workload-driven costs</h2>
+  <ul>
+    <li>Batch jobs that rewrite large tables</li>
+    <li>Hot partitions / high write amplification</li>
+    <li>Workloads with frequent retries and timeouts</li>
+  </ul>
+  <p>
+    Even if you cannot price every detail up front, a "high-usage" scenario prevents under-budgeting.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-aurora-serverless-v2-pricing/">Aurora Serverless v2 pricing</a>
+    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
+    <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
+  </div>
+</GuideLayout>
+

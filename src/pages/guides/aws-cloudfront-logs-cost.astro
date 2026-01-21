@@ -1,0 +1,67 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudFront logs cost: estimate storage, retention, and queries";
+const description =
+  "How to estimate CloudFront log costs: log volume (GB/day), retention (GB-month), and downstream query/scan costs in log analytics tools. Includes practical cost-control levers.";
+const faqs = [
+  {
+    q: "What is the common surprise with CDN logs?",
+    a: "The downstream bill. Storage and especially query/scan costs can exceed the CDN log delivery line item, particularly during incident response or frequent dashboards.",
+  },
+  {
+    q: "What inputs do I need to estimate log cost?",
+    a: "Average log ingestion volume (GB/day), retention days, and your query/scan habits (how often you run searches and how many GB you scan).",
+  },
+  {
+    q: "How do I reduce log costs without losing visibility?",
+    a: "Shorten retention for noisy logs, sample high-volume endpoints, and avoid repeated large scans by improving filters, partitions, and dashboards.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudfront-logs-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    CloudFront log costs are usually not "CloudFront pricing" itself. They show up as storage, analytics, and SIEM
+    ingestion. Estimate them like any other log pipeline: ingestion, retention, and scan/query.
+  </p>
+
+  <h2>1) Estimate log ingestion (GB/day)</h2>
+  <p>
+    Start from request volume and average bytes per log line if you do not have measured ingestion yet. If you already
+    ship logs into a tool, use the measured GB/day.
+  </p>
+  <p class="muted">
+    Guide: <a href="/guides/estimate-log-ingestion-gb-per-day/">estimate log ingestion (GB/day)</a>.
+  </p>
+
+  <h2>2) Convert retention into GB-month</h2>
+  <p class="muted">
+    Steady-state model: retention GB-month is approximately ingestion GB/day x retention days.
+  </p>
+  <p>
+    Guide: <a href="/guides/log-retention-storage-cost/">log retention storage cost</a>.
+  </p>
+
+  <h2>3) Add query/scan costs (the line item that can dominate)</h2>
+  <ul>
+    <li>How often you query (dashboards, incident response, scheduled jobs)</li>
+    <li>How many GB you scan per query</li>
+  </ul>
+  <p class="muted">
+    Tooling: <a href="/calculators/log-search-scan-cost-calculator/">log search scan cost</a>.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
+    <a class="btn" href="/guides/log-costs/">Estimating log costs</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
+  </div>
+</GuideLayout>
+

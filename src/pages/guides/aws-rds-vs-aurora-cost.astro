@@ -1,0 +1,79 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "RDS vs Aurora cost: what to compare (compute, storage, I/O, and retention)";
+const description =
+  "A practical RDS vs Aurora cost comparison checklist. Compare unit economics, scaling model, storage growth, backups/retention, and the workload patterns that change the answer.";
+const faqs = [
+  {
+    q: "What is the fastest way to compare RDS vs Aurora cost?",
+    a: "Normalize the same workload: hours/month, average storage, retention, and a high-usage (peak) scenario. Then compare both options using the same traffic/data assumptions.",
+  },
+  {
+    q: "When does Aurora usually win?",
+    a: "When you benefit from Aurora's scaling and architecture, or when the operational advantages reduce time/cost elsewhere. Cost depends on usage pattern and region pricing.",
+  },
+  {
+    q: "When does RDS usually win?",
+    a: "When the workload is simple and predictable and you do not need Aurora-specific capabilities. If you can right-size instances and control retention, RDS estimates can be very stable.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-rds-vs-aurora-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    RDS vs Aurora comparisons go wrong when teams compare list prices without normalizing the workload. Use this checklist
+    to compare apples-to-apples: compute hours, average storage, retention, and at least one peak scenario.
+  </p>
+
+  <h2>1) Normalize compute usage</h2>
+  <ul>
+    <li>Instances x hours/month (provisioned)</li>
+    <li>Average capacity and peak capacity (serverless)</li>
+    <li>Read replicas and HA (model as additional instances/capacity)</li>
+  </ul>
+
+  <h2>2) Normalize storage and growth</h2>
+  <p>
+    Storage growth is often the long-term cost driver. Forecast multiple months, not only today's size.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
+  </p>
+
+  <h2>3) Normalize backups/retention (the common surprise)</h2>
+  <p>
+    Treat backup storage as a separate line item and apply churn x retention. Confirm whether non-prod environments are
+    retaining history longer than needed.
+  </p>
+  <p class="muted">
+    Guides: <a href="/guides/aws-rds-backups-and-snapshots/">backups and snapshots</a> and{" "}
+    <a href="/guides/aws-rds-snapshot-retention-policy-cost/">snapshot retention policy</a>.
+  </p>
+
+  <h2>4) Include workload-driven "high usage" scenarios</h2>
+  <ul>
+    <li>Batch jobs and backfills</li>
+    <li>Retry storms during incidents</li>
+    <li>Large periodic index rebuilds / vacuum / maintenance windows</li>
+  </ul>
+
+  <h2>Practical next step</h2>
+  <p>
+    Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> for a baseline compute + storage +
+    backups model, then layer Aurora-specific scenarios on top.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-aurora-pricing/">Aurora pricing</a>
+    <a class="btn" href="/guides/aws-aurora-serverless-v2-pricing/">Aurora Serverless v2</a>
+    <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
+  </div>
+</GuideLayout>
+

@@ -1,0 +1,64 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Aurora Serverless v2 pricing: how to estimate ACUs and avoid surprise bills";
+const description =
+  "A practical way to estimate Aurora Serverless v2 costs: ACU-hours, storage GB-month, backups/retention, and how to model peaks so your estimate survives real traffic.";
+const faqs = [
+  {
+    q: "What is the #1 mistake in Serverless v2 estimates?",
+    a: "Using a single average ACU and ignoring peak periods. Costs usually track ACU-hours, so short peaks can matter when they happen frequently.",
+  },
+  {
+    q: "Should I model min and max capacity?",
+    a: "Yes. Use min capacity to estimate baseline, then model a peak scenario that reflects traffic spikes, batch jobs, or incident load.",
+  },
+  {
+    q: "What else do I need besides ACUs?",
+    a: "Storage (GB-month) and backups/retention. These can dominate long-term costs even when compute is right-sized.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-aurora-serverless-v2-pricing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Aurora Serverless v2 estimates should be built as scenarios: a baseline (typical ACUs) and at least one peak case.
+    If you model only an average, you will usually under-budget for spiky workloads.
+  </p>
+
+  <h2>Step 1: Build a baseline ACU-hours estimate</h2>
+  <ul>
+    <li>Estimate your typical ACUs during steady operation.</li>
+    <li>Convert to monthly usage: ACU-hours = avg ACU x hours/month.</li>
+    <li>Price with your effective $/ACU-hour for the region.</li>
+  </ul>
+
+  <h2>Step 2: Add a peak scenario (the part that protects the budget)</h2>
+  <p class="muted">
+    Peak model: peak ACU x peak hours per month (for example, 8 ACU for 2 hours/day).
+  </p>
+  <ul>
+    <li>Traffic spikes, launches, and incident response</li>
+    <li>Batch jobs, ETL, and large backfills</li>
+    <li>Retry storms from upstream timeouts</li>
+  </ul>
+
+  <h2>Step 3: Add storage and backups</h2>
+  <p>
+    Compute is only one part of the bill. Add storage GB-month and backup GB-month (retention + churn) as separate line
+    items.
+  </p>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-aurora-pricing/">Aurora pricing (what to include)</a>
+    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
+    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
+  </div>
+</GuideLayout>
+
