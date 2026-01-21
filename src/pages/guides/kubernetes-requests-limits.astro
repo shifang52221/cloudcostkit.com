@@ -1,41 +1,77 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Kubernetes requests & limits: practical sizing";
+const title = "Kubernetes requests & limits: practical sizing (and cost impact)";
 const description =
-  "How to size clusters from requests, choose allocatable headroom, and interpret limits for burst risk.";
+  "How to size clusters from requests, choose allocatable headroom, and use limits to reason about burst risk - with a calculator and common pitfalls.";
+const faqs = [
+  {
+    q: "Why do requests matter for cost?",
+    a: "Requests drive scheduling and therefore node count. Node count drives compute spend, which is usually the largest Kubernetes cost line item.",
+  },
+  {
+    q: "What allocatable percentage should I use?",
+    a: "A common planning range is 85–95% depending on system reservations, daemonsets, and required headroom. Start conservative and refine with real cluster metrics.",
+  },
+  {
+    q: "Should I use limits to size nodes?",
+    a: "Not as the baseline. Limits are about burst behavior and risk; sizing from limits typically overestimates capacity unless your workload frequently hits limits.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-requests-limits"
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
-  <p class="muted">
-    Scheduling is based on <strong>requests</strong>. That’s why most capacity planning starts with requests and then
+  <p>
+    Scheduling is based on <strong>requests</strong>. That's why most capacity planning starts with requests and then
     uses limits to reason about burst and risk.
   </p>
 
   <h2>1) Requests drive node count</h2>
   <p>
-    A simple approach: total requests = pods × per-pod request. Then divide by allocatable per node. Our calculator does
-    that and takes the larger of CPU-based and memory-based counts.
+    A simple approach: total requests = pods x per-pod request. Then divide by allocatable per node. Our calculator does
+    that and uses the larger of CPU-based and memory-based counts.
+  </p>
+  <p>
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes Requests &amp; Limits Calculator</a>
   </p>
 
   <h2>2) Leave allocatable headroom</h2>
   <p>
-    Nodes aren’t 100% allocatable. System overhead, daemonsets, and kubelet reservations reduce usable capacity. Planning
+    Nodes aren't 100% allocatable. System overhead, daemonsets, and kubelet reservations reduce usable capacity. Planning
     with 85–95% allocatable is common depending on your environment.
   </p>
+  <ul>
+    <li>If you run many daemonsets or have strict headroom targets, use a lower allocatable %.</li>
+    <li>If you have a stable workload and validated overhead, you can increase allocatable %.</li>
+  </ul>
 
   <h2>3) Limits matter for burst behavior</h2>
   <ul>
-    <li>CPU limits can throttle bursts.</li>
-    <li>Memory limits can lead to OOM kills if pods exceed limits.</li>
+    <li><strong>CPU limits</strong> can throttle bursts.</li>
+    <li><strong>Memory limits</strong> can lead to OOM kills if pods exceed limits.</li>
+  </ul>
+  <p class="muted">
+    Limits help you manage risk, but they are not a stable baseline for node count unless your workload frequently runs
+    at the limit.
+  </p>
+
+  <h2>Common sizing pitfalls</h2>
+  <ul>
+    <li><strong>Ignoring daemonset overhead</strong>: per-node agents eat capacity (logging, CNI, monitoring).</li>
+    <li><strong>Forgetting max pods per node</strong>: IP limits and kubelet settings can cap pods/node.</li>
+    <li><strong>Using peak traffic 24/7</strong>: budget with average usage, sanity-check with peak scenarios.</li>
   </ul>
 
-  <h2>Tool</h2>
+  <h2>Next: turn node count into dollars</h2>
   <p>
-    <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes requests & limits calculator</a>
+    After you estimate node count, price it with{" "}
+    <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost Calculator</a> and then add other line
+    items using the Kubernetes cost checklist: <a href="/guides/kubernetes-cost-calculator/">what to include</a>.
   </p>
 </GuideLayout>
+

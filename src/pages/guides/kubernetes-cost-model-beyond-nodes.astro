@@ -4,22 +4,37 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Kubernetes cost model beyond nodes: the checklist most teams miss";
 const description =
   "A practical Kubernetes cost model checklist: control plane, load balancers, storage, logs/metrics, and egress - plus links to calculators to estimate each part.";
+const faqs = [
+  {
+    q: "Why is node cost not enough for a Kubernetes estimate?",
+    a: "Nodes are usually the biggest line item, but load balancers, storage, logs/metrics, and egress can materially change the bill, especially for traffic-heavy workloads.",
+  },
+  {
+    q: "What's the most common 'hidden cost'?",
+    a: "Observability (log ingestion, retention, metrics series) and egress/cross-zone transfer often surprise teams because they scale with traffic and retention, not just pod count.",
+  },
+  {
+    q: "How do I build a quick but realistic estimate?",
+    a: "Size nodes from requests, apply a blended $/hour, then add separate monthly line items for control plane, load balancers, storage, observability, and egress.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-cost-model-beyond-nodes"
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p>
     A <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a> often starts with node spend
-    because compute is usually the biggest line item. But for many real clusters, “everything around nodes” adds up.
-    This guide is a checklist for those missing costs so your budget is closer to reality.
+    because compute is usually the biggest line item. But for many real clusters, <strong>everything around nodes</strong>{" "}
+    adds up. This guide is a checklist for those missing costs so your budget is closer to reality.
   </p>
 
   <h2>1) Nodes (compute)</h2>
   <p>
-    The baseline: size your node count from workload requests, then apply a blended $/hour. Tools:
+    The baseline: size your node count from workload requests, then apply a blended $/hour. Tools:{" "}
     <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; Limits</a> and{" "}
     <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost</a>.
   </p>
@@ -42,16 +57,16 @@ const description =
 
   <h2>4) Persistent storage</h2>
   <p>
-    Persistent volumes (block storage), snapshots, and object storage buckets all have their own pricing models. For S3-
-    like object storage, use <a href="/calculators/storage-pricing-calculator/">Storage Pricing Calculator</a>. For growth
-    over time, use <a href="/calculators/database-storage-growth-cost-calculator/">DB Storage Growth</a> as a simple growth
-    estimator.
+    Persistent volumes (block storage), snapshots, and object storage buckets all have their own pricing models. For
+    S3-like object storage, use <a href="/calculators/storage-pricing-calculator/">Storage Pricing Calculator</a>. For
+    growth over time, use <a href="/calculators/database-storage-growth-cost-calculator/">DB Storage Growth</a> as a
+    simple estimator.
   </p>
 
   <h2>5) Logs and metrics</h2>
   <p>
-    Observability is a common “surprise” cost. Logs are often billed by ingestion volume, and metrics are often billed by
-    active series. Tools:
+    Observability is a common "surprise" cost. Logs are often billed by ingestion volume, and metrics are often billed
+    by active series. Tools:
   </p>
   <ul>
     <li><a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a></li>
@@ -60,7 +75,7 @@ const description =
 
   <h2>6) Data egress</h2>
   <p>
-    Outbound traffic is not only “internet egress”. It can include cross-region replication, cross-zone transfer, and
+    Outbound traffic is not only "internet egress". It can include cross-region replication, cross-zone transfer, and
     service-to-service data movement depending on your architecture. Model it explicitly using{" "}
     <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a> and{" "}
     <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region Transfer</a>.
@@ -75,6 +90,12 @@ const description =
     <li>Add observability (logs + metrics).</li>
     <li>Add egress and cross-region transfer if applicable.</li>
   </ol>
+
+  <h2>Compare managed Kubernetes services</h2>
+  <p>
+    If you're deciding between providers, compare the same line items and swap assumptions:
+    <a href="/guides/eks-vs-gke-vs-aks-cost/"> EKS vs GKE vs AKS cost comparison</a>.
+  </p>
 
   <h2>Related tools</h2>
   <p>

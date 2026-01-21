@@ -27,7 +27,7 @@ const description =
   how={[
     "Step 1: Convert per-pod requests into total CPU/memory and an estimated node count.",
     "Step 2: Estimate monthly node cost from node count and $/hour pricing.",
-    "Add separate line items for managed control plane, storage, load balancers, logs/metrics, and egress."
+    "Add separate line items for managed control plane, storage, load balancers, logs/metrics, and egress.",
   ]}
   faqs={[
     {
@@ -48,12 +48,15 @@ const description =
     },
     {
       q: "Should I use on-demand, spot, or commitments?",
-      a: "Use the effective blended $/hour you actually expect to pay. If you mix on-demand + savings plans/reserved instances + spot, compute a blended rate and test sensitivity.",
+      a: "Use the effective blended $/hour you actually expect to pay. If you mix on-demand + commitments + spot, compute a blended rate and test sensitivity.",
     },
   ]}
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-21"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost checklist" },
+    { href: "/guides/kubernetes-cost-model-beyond-nodes", label: "Guide: cost model beyond nodes" },
+    { href: "/guides/kubernetes-requests-limits", label: "Guide: requests & limits" },
+    { href: "/guides/eks-vs-gke-vs-aks-cost", label: "EKS vs GKE vs AKS cost" },
     { href: "/calculators/kubernetes-requests-limits-calculator", label: "Requests & limits sizing" },
     { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },
@@ -85,7 +88,7 @@ const description =
   <KubernetesNodeCostCalculator client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2>3) Don’t forget these common add-ons</h2>
+    <h2>3) Don't forget these common add-ons</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
       <li>Logs: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>.</li>
       <li>Metrics: <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series cost</a>.</li>
@@ -94,3 +97,4 @@ const description =
     </ul>
   </div>
 </CalculatorLayout>
+

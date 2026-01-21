@@ -1,13 +1,33 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Kubernetes Cost Calculator: What to Include (Nodes, Storage, Egress)";
+const title = "Kubernetes Cost Calculator: what to include (nodes, storage, egress, observability)";
 const description =
   "A practical checklist for estimating Kubernetes costs: node compute, control plane, load balancers, storage, egress, and observability. Includes a fast workflow and common pitfalls.";
+const faqs = [
+  {
+    q: "What is the biggest driver of Kubernetes cost?",
+    a: "For most clusters, worker node compute is the largest line item. But storage, load balancers, logs/metrics, and egress can be significant depending on workload.",
+  },
+  {
+    q: "Why do Kubernetes cost estimates miss the real bill?",
+    a: "Most estimates only model node compute. Real bills include control plane fees (managed services), load balancers, persistent storage, observability, and egress/cross-zone transfer.",
+  },
+  {
+    q: "Should I size from requests or limits?",
+    a: "Size from requests for capacity planning. Scheduling uses requests; limits are for throttling/OOM risk and are not a stable baseline for node count.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/kubernetes-cost-calculator" lastUpdated="2026-01-12">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/kubernetes-cost-calculator"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
   <p>
-    When people search for a "Kubernetes cost calculator", they usually want more than node hourly price. A useful
+    When people search for a "Kubernetes cost calculator", they usually want more than a node hourly price. A useful
     estimate combines <strong>capacity planning</strong> (how many nodes you need) with <strong>line items</strong> that
     show up on the bill (load balancers, storage, egress, logs).
   </p>
@@ -16,7 +36,7 @@ const description =
   <ul>
     <li><strong>Worker nodes</strong>: instance hourly price x node count x billable hours.</li>
     <li><strong>Control plane</strong>: some managed services charge a flat hourly fee.</li>
-    <li><strong>Load balancers</strong>: per-LB hourly + data processed in some products.</li>
+    <li><strong>Load balancers / ingress</strong>: per-LB hourly + data processed in some products.</li>
     <li><strong>Persistent storage</strong>: volumes, snapshots, and IOPS/throughput where applicable.</li>
     <li><strong>Egress</strong>: NAT/Internet egress and cross-zone/region traffic.</li>
     <li><strong>Observability</strong>: logs, metrics, traces (often a surprise line item).</li>
@@ -26,12 +46,12 @@ const description =
   <ol>
     <li>
       Convert per-pod requests into totals and node count with{" "}
-      <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes Requests & Limits</a>.
+      <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes Requests &amp; Limits</a>.
     </li>
     <li>
       Turn node count into compute spend with{" "}
       <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost</a> (or{" "}
-      <a href="/calculators/compute-instance-cost-calculator/">Compute Instance Cost</a> if you prefer).
+      <a href="/calculators/compute-instance-cost-calculator/">Compute Instance Cost</a>).
     </li>
     <li>
       Add egress as a separate line item with <a href="/calculators/data-egress-cost-calculator/">Data Egress Cost</a>.
@@ -41,7 +61,10 @@ const description =
       <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a> and{" "}
       <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>).
     </li>
-    <li>Finally, add load balancer + control plane + storage as fixed monthly line items for your cluster.</li>
+    <li>
+      Finally, add load balancer + control plane + storage as fixed monthly line items for your cluster (then refine with
+      real metrics).
+    </li>
   </ol>
 
   <h2>Common pitfalls</h2>
@@ -61,9 +84,16 @@ const description =
     </li>
   </ul>
 
+  <h2>Compare managed services</h2>
+  <p>
+    If you're choosing between managed Kubernetes offerings, use a consistent set of line items and the same traffic
+    inputs, then swap provider assumptions:
+    <a href="/guides/eks-vs-gke-vs-aks-cost/"> EKS vs GKE vs AKS cost comparison</a>.
+  </p>
+
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests & limits sizing</a>
+    <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits sizing</a>
     <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Kubernetes node cost</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>
     <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
@@ -74,3 +104,4 @@ const description =
     as a planning baseline and validate with real usage after deployment.
   </p>
 </GuideLayout>
+
