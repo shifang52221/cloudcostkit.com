@@ -1,0 +1,76 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "ECS task sizing: how to pick CPU and memory (and estimate task count)";
+const description =
+  "A practical ECS task sizing guide: how to choose task CPU/memory, estimate average resource demand, pick utilization targets, and avoid common autoscaling and cost pitfalls.";
+const faqs = [
+  {
+    q: "What’s the fastest way to size ECS tasks?",
+    a: "Start from measured averages: total vCPU and memory used by the service over time. Choose per-task vCPU/memory, target 60–80% utilization, and estimate required tasks with a sizing calculator.",
+  },
+  {
+    q: "Should I size from peak usage?",
+    a: "Not usually. Peak-only sizing often overprovisions. Use peak (p95/p99) to set headroom and autoscaling limits, but plan monthly cost from average capacity.",
+  },
+  {
+    q: "What mistakes cause ECS cost spikes?",
+    a: "Overprovisioning task size, scaling on noisy metrics, and ignoring non-compute costs like load balancers, log ingestion, and NAT/egress.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ecs-task-sizing"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    ECS task sizing is a balancing act: too small and you thrash (restarts, latency, throttling), too large and you pay
+    for idle capacity. The best approach is to size from <strong>measured averages</strong> and keep headroom with a
+    sensible utilization target.
+  </p>
+
+  <h2>Step 1: measure average demand</h2>
+  <ul>
+    <li>Average vCPU used by the service over time (and p95 for bursts).</li>
+    <li>Average memory used (and p95, plus growth during deploys and cache warm-up).</li>
+    <li>Traffic shape: steady, bursty, scheduled down.</li>
+  </ul>
+
+  <h2>Step 2: pick per-task CPU and memory</h2>
+  <ul>
+    <li>Use the smallest task size that meets latency and stability requirements.</li>
+    <li>Prefer scaling out (more tasks) over oversizing a single task when it improves utilization.</li>
+    <li>Leave memory headroom for spikes, GC, and temporary buffers.</li>
+  </ul>
+
+  <h2>Step 3: estimate task count</h2>
+  <p>
+    Use average vCPU/memory demand and a utilization target (often 60–80%) to estimate required tasks.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ecs-task-sizing-calculator/">ECS task sizing calculator</a>
+    <a class="btn" href="/guides/aws-ecs-pricing/">ECS pricing</a>
+  </div>
+
+  <h2>Step 4: convert tasks into cost</h2>
+  <ul>
+    <li><strong>ECS on Fargate</strong>: cost scales with vCPU-hours + memory GB-hours.</li>
+    <li><strong>ECS on EC2</strong>: cost scales with instance-hours (and EBS for volumes).</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
+    <a class="btn" href="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator/">ECS EC2 vs Fargate (compare)</a>
+  </div>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Scaling on noisy CPU% without smoothing can cause oscillations and cost spikes.</li>
+    <li>Verbose logs can dominate cost; model ingestion + retention.</li>
+    <li>NAT processed traffic (image pulls, updates) can surprise container fleets.</li>
+  </ul>
+</GuideLayout>
+

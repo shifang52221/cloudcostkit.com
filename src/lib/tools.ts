@@ -135,6 +135,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-ecs-task-sizing-calculator",
+    title: "ECS Task Sizing Calculator",
+    description: "Estimate required ECS task count from vCPU/memory demand and per-task sizing.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
