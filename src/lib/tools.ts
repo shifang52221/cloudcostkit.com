@@ -105,6 +105,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-secrets-manager-cost-calculator",
+    title: "AWS Secrets Manager Cost Calculator",
+    description: "Estimate Secrets Manager costs from secret-months and API call volume.",
+    category: "FinOps",
+  },
+  {
     slug: "storage-pricing-calculator",
     title: "Storage Pricing Calculator",
     description: "Estimate object storage pricing from GB-month, requests, and egress.",
