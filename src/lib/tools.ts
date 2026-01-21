@@ -117,6 +117,12 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "cloudwatch-metrics-cost-calculator",
+    title: "CloudWatch Metrics Cost Calculator",
+    description: "Estimate CloudWatch metrics cost from custom metrics, alarms, dashboards, and API requests.",
+    category: "Logging",
+  },
+  {
     slug: "log-retention-storage-cost-calculator",
     title: "Log Retention Storage Cost Calculator",
     description: "Estimate retained log storage cost from GB/day, retention days, and $/GB-month pricing.",

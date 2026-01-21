@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CloudWatch metrics cost optimization (high-leverage fixes)";
+const description =
+  "A short playbook to reduce CloudWatch metrics spend: reduce high-cardinality dimensions, remove unused alarms/dashboards, and cut API polling.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-metrics-cost-optimization"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the biggest lever for CloudWatch metrics cost?",
+      a: "Reducing custom metrics count, especially high-cardinality dimensions that multiply the number of unique series.",
+    },
+    {
+      q: "Can API polling inflate costs?",
+      a: "Yes. Frequent queries (dashboards, automation, GetMetricData loops) can add meaningful API request costs at scale.",
+    },
+  ]}
+>
+  <p class="muted">
+    CloudWatch metrics costs usually come from too many unique series/metrics, too many alarms/dashboards, or excessive
+    API polling. Fixing any one of these can reduce spend quickly.
+  </p>
+
+  <h2>1) Remove high-cardinality dimensions</h2>
+  <ul>
+    <li>Avoid per-pod or per-user labels unless they are required.</li>
+    <li>Aggregate to service-level metrics when possible.</li>
+    <li>Drop noisy, unused metrics.</li>
+  </ul>
+
+  <h2>2) Clean up alarms and dashboards</h2>
+  <p>
+    Old experiments and migrated services often leave behind alarms and dashboards. Remove unused ones and consolidate
+    dashboards where possible.
+  </p>
+
+  <h2>3) Reduce API polling/query frequency</h2>
+  <p>
+    If automation or dashboards fetch metrics frequently, tune refresh intervals and batch queries to reduce API request
+    volume.
+  </p>
+
+  <h2>4) Validate with a calculator</h2>
+  <p>
+    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to see which line
+    item dominates (metrics, alarms, dashboards, API), then optimize the right lever.
+  </p>
+</GuideLayout>
+

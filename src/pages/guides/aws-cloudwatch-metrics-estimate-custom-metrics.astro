@@ -1,0 +1,54 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Estimate CloudWatch custom metrics (quick methods)";
+const description =
+  "A practical way to estimate CloudWatch custom metrics count: start from services × metrics, then multiply dimensions carefully to avoid high-cardinality surprises.";
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cloudwatch-metrics-estimate-custom-metrics"
+  lastUpdated="2026-01-21"
+  faqs={[
+    {
+      q: "What’s the fastest way to estimate custom metrics count?",
+      a: "Start from services × key metrics per service, then multiply by the dimensions you actually use (cluster/namespace/pod/etc).",
+    },
+    {
+      q: "What’s the #1 mistake in metrics estimates?",
+      a: "High-cardinality dimensions (like pod_id or user_id) that multiply the number of unique series/metrics.",
+    },
+  ]}
+>
+  <p class="muted">
+    For planning, you want a reasonable estimate of “how many distinct metrics/series will I pay for?” You can get close
+    with a simple approach: base metrics × dimensions.
+  </p>
+
+  <h2>1) Start from services and key metrics</h2>
+  <p>
+    List your services (or teams) and the key metrics you actually alert on or dashboard. Start small; avoid counting
+    every default metric.
+  </p>
+
+  <h2>2) Multiply dimensions carefully</h2>
+  <p>
+    Each dimension label can multiply the number of unique series. For example:
+    <br />
+    <strong>service × environment × cluster × namespace × pod</strong> can explode quickly.
+  </p>
+
+  <h2>3) Validate with real counts</h2>
+  <p>
+    When you have metrics, validate the actual number of custom metrics/active series in your billing/monitoring view and
+    update your model.
+  </p>
+
+  <h2>4) Use a calculator for monthly cost</h2>
+  <p>
+    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to translate your
+    custom metrics + alarms + dashboards into a monthly estimate.
+  </p>
+</GuideLayout>
+

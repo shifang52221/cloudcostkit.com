@@ -1,0 +1,57 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsCloudwatchMetricsCostCalculator as AwsCloudwatchMetricsCostCalculatorComponent } from "../../components/calculators/AwsCloudwatchMetricsCost";
+
+const title = "CloudWatch Metrics Cost Calculator";
+const description =
+  "Estimate CloudWatch Metrics-style monthly cost from custom metrics, alarms, dashboards, and API request assumptions. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cloudwatch-metrics-cost-calculator"
+  intro="Estimate CloudWatch Metrics-style cost with a simple model: custom metrics + alarms + dashboards + API requests. Use your effective region pricing."
+  examples={[
+    "2,000 custom metrics, 150 alarms, 5 dashboards, and 10M API requests per month.",
+  ]}
+  includes={[
+    "Custom metrics (metric-month) estimate.",
+    "Alarm-month and dashboard-month estimates.",
+    "API request estimate using $ per 1k requests.",
+  ]}
+  excludes={[
+    "Logs, traces, and other observability products billed separately.",
+    "Tiered pricing steps and free allowances unless you reflect them in your pricing inputs.",
+  ]}
+  how={[
+    "Custom metrics cost = metric-month × $ per metric-month.",
+    "Alarm cost = alarm-month × $ per alarm-month.",
+    "Dashboard cost = dashboard-month × $ per dashboard-month.",
+    "API cost = (API requests / 1,000) × $ per 1k requests.",
+    "Total = sum of the above line items.",
+  ]}
+  faqs={[
+    {
+      q: "Is time series cardinality the same as custom metrics?",
+      a: "They are related but not identical. High-cardinality dimensions can create many unique series/metrics. Use your provider’s definition and measure your actual counts when possible.",
+    },
+    {
+      q: "What should I use for API requests?",
+      a: "Use your monitoring/export workload (GetMetricData, GetMetricStatistics, dashboards, and automation). If you don't know yet, start with a small value and model a high-usage scenario.",
+    },
+    {
+      q: "How do I reduce CloudWatch Metrics costs?",
+      a: "Reduce custom metric count (especially high-cardinality dimensions), delete unused alarms and dashboards, and reduce API polling/query frequency.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-cloudwatch-metrics-pricing", label: "Guide: CloudWatch metrics pricing" },
+    { href: "/guides/aws-cloudwatch-metrics-estimate-custom-metrics", label: "Guide: estimate custom metrics" },
+    { href: "/guides/aws-cloudwatch-metrics-cost-optimization", label: "Guide: reduce metrics costs" },
+    { href: "/calculators/metrics-timeseries-cost-calculator", label: "Time series cost (generic)" },
+  ]}
+>
+  <AwsCloudwatchMetricsCostCalculatorComponent client:load />
+</CalculatorLayout>
+
