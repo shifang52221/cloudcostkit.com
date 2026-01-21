@@ -1,0 +1,67 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "SQS vs SNS cost: how to compare messaging unit economics";
+const description =
+  "Compare SQS vs SNS cost with a practical checklist: request types, retries, fan-out, payload transfer, and the usage patterns that decide the bill.";
+const faqs = [
+  {
+    q: "Is SQS cheaper than SNS?",
+    a: "It depends. SQS cost is driven by request volume (and sometimes payload size), while SNS cost depends on publish and delivery volume (fan-out can multiply deliveries). Compare at the same message flow.",
+  },
+  {
+    q: "What’s the fastest way to compare?",
+    a: "Start from messages published per month and expected delivery fan-out. Convert into request units (SQS) and delivery units (SNS), then model retries and payload size separately.",
+  },
+  {
+    q: "What’s the biggest cost pitfall?",
+    a: "Retries. Redeliveries and failed processing can multiply request and delivery counts quickly.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-sqs-vs-sns-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    SQS vs SNS cost comparisons go wrong when you compare list prices without normalizing the workload. The winner is
+    usually decided by <strong>how many deliveries happen</strong>, <strong>how many requests per message you create</strong>,
+    and whether <strong>retries</strong> are controlled.
+  </p>
+
+  <h2>What to model</h2>
+  <ul>
+    <li>Messages per month</li>
+    <li>Fan-out (subscribers per message) for SNS</li>
+    <li>Requests per message (receive, delete, visibility timeouts) for SQS</li>
+    <li>Retries and failure rate</li>
+    <li>Payload size and any transfer fees</li>
+  </ul>
+
+  <h2>Use calculators for a baseline</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-sqs-cost-calculator/">SQS cost calculator</a>
+    <a class="btn" href="/calculators/aws-sns-cost-calculator/">SNS cost calculator</a>
+  </div>
+
+  <h2>When SNS costs spike</h2>
+  <ul>
+    <li>High fan-out: deliveries multiply fast.</li>
+    <li>Retries/redelivery loops: failures multiply deliveries.</li>
+  </ul>
+
+  <h2>When SQS costs spike</h2>
+  <ul>
+    <li>Multiple receives per message due to timeouts and visibility settings.</li>
+    <li>High retry counts and poison-message loops.</li>
+  </ul>
+
+  <p class="muted" style="margin-top:14px">
+    Next: <a href="/guides/aws-sqs-estimate-requests/">Estimate SQS requests</a>,{" "}
+    <a href="/guides/aws-sns-estimate-deliveries/">Estimate SNS deliveries</a>.
+  </p>
+</GuideLayout>
+

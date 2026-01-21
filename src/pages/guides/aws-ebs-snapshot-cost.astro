@@ -1,0 +1,71 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "EBS snapshot cost: how to estimate storage from daily change rate";
+const description =
+  "A practical guide to estimate EBS snapshot cost: incremental snapshots, daily change rate, retention windows, and a calculator workflow to avoid under-budgeting.";
+const faqs = [
+  {
+    q: "What drives EBS snapshot storage cost?",
+    a: "Snapshot storage is incremental, so the main driver is how much data changes over time (daily change rate) and how long you retain snapshots.",
+  },
+  {
+    q: "How do I estimate daily change rate?",
+    a: "Start from measured writes/churn if available. If not, model scenarios (1%, 2%, 5%, 10%) and validate later with real metrics and billing data.",
+  },
+  {
+    q: "What’s the fastest way to estimate monthly cost?",
+    a: "Use a simplified model (volume + daily deltas over retention) to get a planning estimate, then validate with your provider’s billing details.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-ebs-snapshot-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    EBS snapshot storage is incremental, which makes it tricky to budget. You typically pay for the data that changes
+    over time, retained across your snapshot retention window. A simple planning model is usually enough to avoid
+    surprise bills.
+  </p>
+
+  <h2>Step 1: define the baseline volume size</h2>
+  <p>
+    Start with the provisioned volume size in GB. For large fleets, use an average volume size and count, or model a few
+    representative volume classes.
+  </p>
+
+  <h2>Step 2: estimate daily change rate</h2>
+  <ul>
+    <li>Low-churn volumes: 0.5%–2% per day</li>
+    <li>Moderate churn: 2%–5% per day</li>
+    <li>High churn: 5%–15%+ per day</li>
+  </ul>
+  <p class="muted">
+    Use scenarios if you’re uncertain; the goal is to understand sensitivity to churn and retention.
+  </p>
+
+  <h2>Step 3: model retention</h2>
+  <p>
+    Longer retention multiplies stored deltas. The retained “steady state” storage can be approximated as:
+    <strong> volume + daily deltas × (retention days − 1)</strong>.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost calculator</a>
+    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
+  </div>
+
+  <h2>How to reduce snapshot cost safely</h2>
+  <ul>
+    <li>Shorten retention for noisy/low-value snapshots.</li>
+    <li>Reduce churn (move temp files, cache directories, and logs off the volume if possible).</li>
+    <li>Use fewer backup copies where policies allow.</li>
+  </ul>
+  <p class="muted" style="margin-top:14px">
+    Validate later with billing data; snapshot behavior can differ by provider and storage implementation.
+  </p>
+</GuideLayout>
+

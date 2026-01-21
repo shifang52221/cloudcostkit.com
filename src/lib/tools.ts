@@ -57,6 +57,12 @@ export const TOOLS: Tool[] = [
     category: "Logging",
   },
   {
+    slug: "aws-api-gateway-access-log-cost-calculator",
+    title: "API Gateway Access Log Cost Calculator",
+    description: "Estimate access log ingestion + retention cost from request volume and log size.",
+    category: "Logging",
+  },
+  {
     slug: "aws-waf-cost-calculator",
     title: "AWS WAF Cost Calculator",
     description: "Estimate WAF-style costs from Web ACLs, rules, and request volume.",
@@ -66,6 +72,12 @@ export const TOOLS: Tool[] = [
     slug: "aws-ecr-cost-calculator",
     title: "AWS ECR Cost Calculator",
     description: "Estimate ECR-style cost from stored GB-month plus data transfer assumptions.",
+    category: "Storage",
+  },
+  {
+    slug: "aws-ebs-snapshot-cost-calculator",
+    title: "AWS EBS Snapshot Cost Calculator",
+    description: "Estimate snapshot storage cost from volume size, churn, and retention.",
     category: "Storage",
   },
   {

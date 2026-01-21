@@ -1,0 +1,75 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "API Gateway access logs cost: how to estimate ingestion and retention";
+const description =
+  "A practical guide to estimate API Gateway access logs cost: how to estimate average log bytes per request, convert to GB/day, model retention (GB-month), and reduce log spend safely.";
+const faqs = [
+  {
+    q: "What drives API Gateway access log cost?",
+    a: "Access log cost is driven by ingestion volume (GB/day) and retention (GB-month). The biggest driver is usually how verbose your log format is and your request volume.",
+  },
+  {
+    q: "How do I estimate average log size?",
+    a: "Sample 100–1000 log lines from production and compute average bytes per line. Include headers/fields you actually log because they can change size materially.",
+  },
+  {
+    q: "What’s the fastest way to estimate monthly cost?",
+    a: "Convert requests/month × bytes/log into GB/day, then price ingestion and retention. Use a calculator to avoid mistakes with units and retention math.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-api-gateway-access-logs-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    API Gateway access logs are often treated as “just a logging setting”, but at high request volume they can become a
+    real line item. The key is estimating two numbers: <strong>GB ingested per day</strong> and{" "}
+    <strong>retained GB-month</strong>.
+  </p>
+
+  <h2>Step 1: estimate average bytes per log line</h2>
+  <ul>
+    <li>Export a sample of access logs (100–1000 lines).</li>
+    <li>Compute average bytes per line (or median + p95 if you have big variance).</li>
+    <li>Be careful: logging headers, JWT claims, and long user agents can inflate size.</li>
+  </ul>
+
+  <h2>Step 2: convert requests/month into GB/day</h2>
+  <p>
+    Approximation: <strong>GB/day ≈ (requests/month ÷ 30.4) × bytes/log ÷ 1e9</strong>.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-api-gateway-access-log-cost-calculator/">Access log cost calculator</a>
+    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
+  </div>
+
+  <h2>Step 3: model retention (GB-month)</h2>
+  <p>
+    Retention creates a steady storage baseline. If you ingest 10 GB/day and retain 30 days, steady-state stored volume
+    is roughly 300 GB.
+  </p>
+  <p class="muted">
+    If you run queries (scan/search), model query scan costs separately.
+  </p>
+
+  <h2>How to reduce access log cost</h2>
+  <ul>
+    <li>Log fewer fields (drop large headers and unnecessary payload details).</li>
+    <li>Sample logs for high-volume endpoints (keep full logs for errors/security signals).</li>
+    <li>Reduce retention for noisy logs; keep long retention only where required.</li>
+    <li>Fix retries/timeouts that multiply request volume and log volume.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
+    <a class="btn" href="/guides/log-costs/">Log cost guide</a>
+  </div>
+</GuideLayout>
+

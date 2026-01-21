@@ -1,0 +1,54 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsApiGatewayAccessLogCostCalculator as AwsApiGatewayAccessLogCostCalculatorComponent } from "../../components/calculators/AwsApiGatewayAccessLogCost";
+
+const title = "API Gateway Access Log Cost Calculator (CloudWatch Logs)";
+const description =
+  "Estimate API Gateway access log ingestion and retention cost from request volume and average log size. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-api-gateway-access-log-cost-calculator"
+  intro="Estimate API Gateway access log cost by converting requests/month × bytes/log into GB/day, then pricing ingestion and retention."
+  examples={[
+    "50M requests/month with 1.5 KB average access log line -> estimate GB/day and monthly ingestion + retention cost.",
+  ]}
+  includes={[
+    "Estimated ingestion volume (GB/day) from request volume and average log bytes.",
+    "Ingestion and retention storage cost estimate from your pricing inputs.",
+  ]}
+  excludes={[
+    "API Gateway request pricing and response transfer pricing.",
+    "Logs Insights query scan/search costs (model separately if needed).",
+  ]}
+  how={[
+    "GB/day ≈ (requests/month ÷ 30.4) × bytes/log ÷ 1e9.",
+    "Monthly ingestion cost ≈ (GB/day × 30.4) × $/GB.",
+    "Retention storage cost uses a steady-state GB-month model for the retention window.",
+  ]}
+  faqs={[
+    {
+      q: "How do I estimate average log bytes per request?",
+      a: "Sample your access log output (100–1000 lines) and compute average bytes per line. Log format fields and headers can change size materially.",
+    },
+    {
+      q: "Does this include API Gateway request charges?",
+      a: "No. Use an API Gateway cost calculator for request and transfer charges. This focuses only on access logs stored in a logging system.",
+    },
+    {
+      q: "What levers reduce access log cost?",
+      a: "Reduce log verbosity/fields, sample logs for high-volume endpoints, and shorten retention for noisy logs.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-api-gateway-access-logs-cost", label: "Guide: API Gateway access logs cost" },
+    { href: "/calculators/aws-api-gateway-cost-calculator", label: "API Gateway cost calculator" },
+    { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost (generic)" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
+  ]}
+>
+  <AwsApiGatewayAccessLogCostCalculatorComponent client:load />
+</CalculatorLayout>
+

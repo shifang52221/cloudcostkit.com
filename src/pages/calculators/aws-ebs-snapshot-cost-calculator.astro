@@ -1,0 +1,54 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsEbsSnapshotCostCalculator as AwsEbsSnapshotCostCalculatorComponent } from "../../components/calculators/AwsEbsSnapshotCost";
+
+const title = "AWS EBS Snapshot Cost Calculator";
+const description =
+  "Estimate EBS snapshot storage cost from volume size, daily change rate, retention days, and $/GB-month pricing. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-ebs-snapshot-cost-calculator"
+  intro="Estimate EBS snapshot storage cost using a simplified steady-state model: full volume + daily changed data retained over the retention window."
+  examples={[
+    "1,000 GB volume, 2% daily changes, 30-day retention -> estimate stored GB and monthly cost.",
+  ]}
+  includes={[
+    "Snapshot stored volume estimate (steady state) from volume + change rate + retention.",
+    "Monthly snapshot storage cost estimate from stored GB and $/GB-month.",
+  ]}
+  excludes={[
+    "Provider-specific snapshot optimizations, rounding rules, and compression behavior.",
+    "Data transfer, requests, and restore fees if applicable.",
+  ]}
+  how={[
+    "Daily changed GB = volume GB × daily change rate.",
+    "Estimated stored GB ≈ volume GB + daily changed GB × (retention days − 1).",
+    "Monthly cost ≈ stored GB × $/GB-month.",
+  ]}
+  faqs={[
+    {
+      q: "Is this exact?",
+      a: "No. Snapshot storage is incremental and depends on real change patterns. This is a planning estimate to avoid under-budgeting.",
+    },
+    {
+      q: "What daily change rate should I use?",
+      a: "Start with measured churn (writes) if you have it. If unsure, model scenarios (1%, 2%, 5%, 10%) and validate later.",
+    },
+    {
+      q: "What else should I model for EBS?",
+      a: "EBS volume storage plus performance add-ons (IOPS/throughput on some types), plus snapshot storage and retention policy.",
+    },
+  ]}
+  lastUpdated="2026-01-21"
+  related={[
+    { href: "/guides/aws-ebs-snapshot-cost", label: "Guide: EBS snapshot cost" },
+    { href: "/guides/aws-ebs-pricing", label: "Guide: EBS pricing" },
+    { href: "/calculators/aws-ebs-cost-calculator", label: "EBS cost calculator" },
+    { href: "/calculators/database-storage-growth-cost-calculator", label: "Database storage growth" },
+  ]}
+>
+  <AwsEbsSnapshotCostCalculatorComponent client:load />
+</CalculatorLayout>
+
