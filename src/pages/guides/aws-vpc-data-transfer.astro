@@ -4,8 +4,28 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "VPC data transfer: how to estimate cross-zone, cross-region, and egress costs";
 const description =
   "A practical guide to VPC data transfer: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.";
+const faqs = [
+  {
+    q: "What creates VPC data transfer costs?",
+    a: "Cross-AZ traffic, cross-region traffic, and internet egress are the most common drivers. Many architectures generate unexpected east-west traffic (service calls, replication, cache fill).",
+  },
+  {
+    q: "How can I estimate GB/month reliably?",
+    a: "Use billing exports, VPC Flow Logs, or service metrics where possible. If you only have throughput charts, convert Mbps to GB/month and sanity-check the share that crosses pricing boundaries.",
+  },
+  {
+    q: "What’s a high-leverage way to reduce transfer spend?",
+    a: "Reduce accidental cross-AZ traffic (placement/routing), keep data locality where possible, and avoid sending AWS-service traffic through NAT by using VPC endpoints when it makes sense.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-vpc-data-transfer" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-vpc-data-transfer"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
   <p>
     VPC data transfer costs often show up as “small” per-GB rates that become large at scale. The hard part is usually
     estimating total GB/month across all the places data crosses pricing boundaries.
@@ -25,10 +45,12 @@ const description =
     Mbps to GB/month using the <a href="/calculators/unit-converter/">Units Converter</a>.
   </p>
 
-  <h2>Related calculator</h2>
-  <p>
+  <h2>Related tools</h2>
+  <div class="btn-row">
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer cost calculator</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer calculator</a>
+    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints (cost)</a>
     <a class="btn" href="/guides/estimate-cdn-bandwidth-gb-per-month/">Estimate GB/month</a>
-  </p>
+  </div>
 </GuideLayout>
-

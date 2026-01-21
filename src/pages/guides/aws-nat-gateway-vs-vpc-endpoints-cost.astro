@@ -1,0 +1,87 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "NAT Gateway vs VPC endpoints cost: when PrivateLink wins";
+const description =
+  "Compare NAT Gateway vs VPC endpoints (Interface/Gateway endpoints) cost. Learn when endpoint fees beat NAT GB processed, and how to model both without missing transfer line items.";
+const faqs = [
+  {
+    q: "Why are NAT Gateway bills so high?",
+    a: "NAT cost has two drivers: gateway-hours and GB processed. Large recurring downloads, container image pulls, and chatty outbound traffic can drive GB processed quickly.",
+  },
+  {
+    q: "Do VPC endpoints always reduce cost?",
+    a: "Not always. Endpoints add their own hourly charges (and sometimes per-GB), but they can reduce or eliminate NAT GB processed for common services. You need to model your traffic mix.",
+  },
+  {
+    q: "What's the fastest way to decide?",
+    a: "List the top destinations behind NAT (S3, ECR, STS, package repos, external APIs). If most traffic is to AWS services that support endpoints, endpoints often reduce NAT GB processed materially.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-nat-gateway-vs-vpc-endpoints-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    NAT Gateway is often the first surprise "networking bill" teams see. A common fix is to keep traffic private with
+    VPC endpoints (Interface endpoints / PrivateLink, or Gateway endpoints where supported). This guide shows how to
+    compare the costs in a practical way.
+  </p>
+
+  <h2>What you're comparing</h2>
+  <ul>
+    <li>
+      <strong>NAT Gateway</strong>: hourly gateway cost + traffic-based GB processed.
+    </li>
+    <li>
+      <strong>VPC endpoints</strong>: endpoint hourly cost (and sometimes per-GB), plus whatever data transfer applies for
+      your path.
+    </li>
+  </ul>
+
+  <h2>When endpoints usually win</h2>
+  <ul>
+    <li>High-volume access to AWS services from private subnets (common CI/CD and node bootstrapping traffic).</li>
+    <li>Frequent container image pulls (ECR) and package updates.</li>
+    <li>Large fleets that multiply the same outbound downloads.</li>
+  </ul>
+
+  <h2>Step 1: estimate what drives NAT GB processed</h2>
+  <p>
+    You need a rough monthly GB processed. Use metrics/flow logs when possible:
+    <a href="/guides/aws-nat-gateway-estimate-gb-processed/"> estimate NAT GB processed</a>.
+  </p>
+
+  <h2>Step 2: model NAT cost</h2>
+  <p>
+    Use <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a> for the baseline.
+  </p>
+
+  <h2>Step 3: model the endpoint alternative</h2>
+  <p>
+    For endpoints, treat it as a separate monthly line item: endpoint-hours plus any per-GB charges that apply to your
+    plan. The key is to decide how much NAT GB processed the endpoint removes.
+  </p>
+  <p class="muted">
+    Practical approach: start with a percentage reduction scenario (for example, 30%, 60%, 90%) and see the break-even.
+  </p>
+
+  <h2>Don't forget transfer boundaries</h2>
+  <p>
+    Some "savings" plans accidentally increase cross-AZ or cross-region traffic. If your architecture moves traffic across
+    boundaries, model it explicitly:
+    <a href="/guides/aws-vpc-data-transfer/"> VPC data transfer guide</a>.
+  </p>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a>
+  </div>
+</GuideLayout>
+

@@ -1,0 +1,68 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cross-AZ data transfer cost: why it shows up and how to estimate it";
+const description =
+  "Cross-AZ traffic can become a large VPC data transfer line item. Learn common sources (service calls, load balancers, multi-AZ storage), how to estimate GB/month, and how to reduce it safely.";
+const faqs = [
+  {
+    q: "What causes cross-AZ data transfer costs?",
+    a: "East-west traffic between services in different AZs, load balancer patterns, multi-AZ database/storage replication, and chatty microservices can create large cross-AZ GB/month totals.",
+  },
+  {
+    q: "How do I estimate cross-AZ GB/month?",
+    a: "Use VPC Flow Logs or service metrics when available. If you only have throughput charts, convert Mbps to GB/month and apply a reasonable split for cross-AZ traffic.",
+  },
+  {
+    q: "Is cross-AZ always bad?",
+    a: "No. Multi-AZ architectures improve availability. The goal is to avoid accidental cross-AZ traffic (for example, forcing every request to cross AZ due to placement or routing).",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cross-az-data-transfer-cost"
+  lastUpdated="2026-01-21"
+  faqs={faqs}
+>
+  <p>
+    Cross-AZ data transfer often looks like a small per-GB rate, but it scales with total traffic. In microservice and
+    data pipeline architectures, this can exceed compute for some workloads.
+  </p>
+
+  <h2>Common sources of cross-AZ traffic</h2>
+  <ul>
+    <li>Service-to-service calls between workloads placed in different AZs.</li>
+    <li>Load balancer routing patterns that send requests across AZs frequently.</li>
+    <li>Cross-AZ data replication for managed databases and storage systems.</li>
+    <li>Centralized logging/metrics pipelines pulling from multiple AZs.</li>
+  </ul>
+
+  <h2>How to estimate GB/month</h2>
+  <ol>
+    <li>Start with flow logs or service metrics to identify cross-AZ flows.</li>
+    <li>If you only have throughput charts, convert average Mbps to GB/month with the <a href="/calculators/unit-converter/">Units converter</a>.</li>
+    <li>Multiply the cross-AZ portion (percent of traffic that crosses AZ boundaries) by your effective $/GB rate.</li>
+  </ol>
+  <p>
+    Use <a href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer cost calculator</a> to model the
+    cross-AZ line item.
+  </p>
+
+  <h2>How to reduce cross-AZ spend (without losing availability)</h2>
+  <ul>
+    <li>Co-locate chatty dependencies in the same AZ when safe and supported (or use locality-aware routing).</li>
+    <li>Reduce payload sizes and call frequency (batching, caching).</li>
+    <li>Validate load balancer configuration and traffic distribution.</li>
+    <li>Measure before changing: avoid trading cost for fragility unintentionally.</li>
+  </ul>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer guide</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>
+  </div>
+</GuideLayout>
+
