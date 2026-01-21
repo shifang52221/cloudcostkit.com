@@ -4,22 +4,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "API Gateway cost optimization (high-leverage levers)";
 const description =
   "A short playbook to reduce API Gateway spend: cut requests, cut payload sizes, and avoid retry-driven cost spikes.";
+const faqs = [
+  {
+    q: "What's the fastest lever to reduce API Gateway cost?",
+    a: "Reduce request volume (cache, batch, avoid polling) and reduce average response size (compression, pagination).",
+  },
+  {
+    q: "Can retries make API Gateway expensive?",
+    a: "Yes. Timeouts and transient errors can cause client retries and amplify request volume. Treat elevated retries as both a reliability and cost incident.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-cost-optimization"
   lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest lever to reduce API Gateway cost?",
-      a: "Reduce request volume (cache, batch, avoid polling) and reduce average response size (compression, pagination).",
-    },
-    {
-      q: "Can retries make API Gateway expensive?",
-      a: "Yes. Timeouts and transient errors can cause client retries and amplify request volume. Treat elevated retries as both a reliability and cost incident.",
-    },
-  ]}
+  faqs={faqs}
 >
   <p>
     API Gateway bills scale with <strong>requests</strong> and often <strong>bytes transferred</strong>. Most savings
@@ -49,8 +50,13 @@ const description =
 
   <h2>Validate with a cost model</h2>
   <p>
-    Use <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway Cost Calculator</a> to quantify savings from
+    Use <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost calculator</a> to quantify savings from
     reduced requests or smaller payload sizes.
+  </p>
+
+  <p class="muted" style="margin-top:14px">
+    Related: <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>,{" "}
+    <a href="/guides/aws-api-gateway-vs-alb-vs-cloudfront-cost/">API Gateway vs ALB vs CloudFront cost</a>.
   </p>
 </GuideLayout>
 

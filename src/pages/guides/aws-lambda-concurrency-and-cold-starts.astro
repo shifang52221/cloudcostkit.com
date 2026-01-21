@@ -4,25 +4,30 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Lambda concurrency and cold starts (cost pitfalls)";
 const description =
   "How concurrency and cold starts affect Lambda-style cost models: tail latency, retries, and the hidden cost of noisy failures.";
+const faqs = [
+  {
+    q: "Do cold starts directly increase cost?",
+    a: "They can, if cold starts increase billed duration (or cause retries/timeouts). The bigger risk is cascading retries and extra invocations.",
+  },
+  {
+    q: "Why do retries matter for cost?",
+    a: "Retries multiply invocations and duration. A small error rate can create large cost increases at scale.",
+  },
+  {
+    q: "Is provisioned concurrency always worth it?",
+    a: "Not always. Provisioned capacity can reduce cold starts but may increase baseline cost. Model it as a separate line item and compare normal vs incident scenarios.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-lambda-concurrency-and-cold-starts"
-  lastUpdated="2026-01-20"
-  faqs={[
-    {
-      q: "Do cold starts directly increase cost?",
-      a: "They can, if cold starts increase billed duration (or cause retries/timeouts). The bigger risk is cascading retries and extra invocations.",
-    },
-    {
-      q: "Why do retries matter for cost?",
-      a: "Retries multiply invocations and duration. A small error rate can create large cost increases at scale.",
-    },
-  ]}
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p class="muted">
-    Concurrency isn’t just a performance concern—at scale it can change cost via retries, timeouts, and extra invocations.
+    Concurrency isn't just a performance concern. At scale it can change cost via retries, timeouts, and extra invocations.
   </p>
 
   <h2>1) Concurrency drives throughput (and potential retries)</h2>
@@ -37,7 +42,7 @@ const description =
     functions where initialization is a meaningful fraction of total time.
   </p>
 
-  <h2>3) Watch for “noisy failure” patterns</h2>
+  <h2>3) Watch for noisy failure patterns</h2>
   <ul>
     <li>Downstream throttling (databases/queues) leading to repeated retries.</li>
     <li>Large payloads increasing duration and sometimes transfer.</li>
@@ -46,12 +51,12 @@ const description =
 
   <h2>4) Budget with scenarios</h2>
   <p>
-    A good planning model includes at least two scenarios: “normal” and “incident/regression”. Use the same pricing inputs
+    A good planning model includes at least two scenarios: "normal" and "incident/regression". Use the same pricing inputs
     and change only invocations and duration to see how sensitive cost is.
   </p>
 
   <p class="muted" style="margin-top:14px">
-    Use <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda Cost Calculator</a> to model how invocations and
+    Use <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda cost calculator</a> to model how invocations and
     duration affect total cost.
   </p>
 </GuideLayout>

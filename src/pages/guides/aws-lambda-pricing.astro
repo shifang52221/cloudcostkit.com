@@ -3,23 +3,28 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS Lambda pricing (what to include)";
 const description =
-  "A practical checklist for estimating AWS Lambda-style costs: requests, duration × memory, logs, and common hidden line items.";
+  "A practical checklist for estimating AWS Lambda-style costs: requests, duration x memory, logs, and common hidden line items.";
+const faqs = [
+  {
+    q: "What are the two core Lambda pricing inputs?",
+    a: "Invocations (request count) and compute usage in GB-seconds (duration x memory).",
+  },
+  {
+    q: "Do logs and metrics come with Lambda?",
+    a: "Typically no. Logging and metrics are separate services (for example, CloudWatch) and should be modeled as separate line items.",
+  },
+  {
+    q: "How do I compare Lambda to containers/VMs?",
+    a: "Use unit economics: cost per 1M requests (or cost per request) for your expected duration and memory. Then compare to a steady-state monthly compute budget for containers/VMs.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-lambda-pricing"
-  lastUpdated="2026-01-20"
-  faqs={[
-    {
-      q: "What are the two core Lambda pricing inputs?",
-      a: "Invocations (request count) and compute usage in GB-seconds (duration × memory).",
-    },
-    {
-      q: "Do logs and metrics come “with Lambda”?",
-      a: "Typically no. Logging and metrics are separate services (e.g., CloudWatch) and should be modeled as separate line items.",
-    },
-  ]}
+  lastUpdated="2026-01-21"
+  faqs={faqs}
 >
   <p class="muted">
     Lambda pricing can look simple, but budgets get surprised by the surrounding line items: logging, data transfer, and
@@ -29,36 +34,30 @@ const description =
   <h2>1) Start with the two core line items</h2>
   <ul>
     <li><strong>Requests</strong>: billed per invocation (often quoted per 1M requests).</li>
-    <li><strong>Compute</strong>: billed as <strong>GB-seconds</strong> (duration × memory).</li>
+    <li><strong>Compute</strong>: billed as <strong>GB-seconds</strong> (duration x memory).</li>
   </ul>
   <p>
-    Use the <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda Cost Calculator</a> to model both with your own
+    Use the <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda cost calculator</a> to model both with your own
     pricing assumptions.
   </p>
 
   <h2>2) Model duration with a range, not a single number</h2>
   <p>
-    Duration usually has a long tail. For planning, model <strong>p50</strong> and <strong>p95</strong> (or “typical” and
-    “busy hour”) to understand sensitivity.
+    Duration usually has a long tail. For planning, model <strong>p50</strong> and <strong>p95</strong> (or "typical" and
+    "busy hour") to understand sensitivity.
   </p>
 
-  <h2>3) Don’t forget memory and over-allocation</h2>
+  <h2>3) Don't forget memory and over-allocation</h2>
   <p>
     Lambda compute scales with configured memory, even if your function rarely uses it. If you over-allocate memory,
     GB-seconds (and cost) increase directly.
   </p>
 
-  <h2>4) Common “hidden” Lambda-adjacent costs</h2>
+  <h2>4) Common hidden Lambda-adjacent costs</h2>
   <ul>
-    <li>
-      <strong>Logging</strong>: ingestion + retention storage; large JSON logs add up quickly.
-    </li>
-    <li>
-      <strong>Data transfer</strong>: internet egress and cross-AZ/region patterns depending on architecture.
-    </li>
-    <li>
-      <strong>Downstream services</strong>: DynamoDB/RDS/S3/SQS/SNS can dominate total cost in real workloads.
-    </li>
+    <li><strong>Logging</strong>: ingestion + retention storage; large JSON logs add up quickly.</li>
+    <li><strong>Data transfer</strong>: internet egress and VPC/NAT patterns depending on architecture.</li>
+    <li><strong>Downstream services</strong>: DynamoDB/RDS/S3/SQS/SNS can dominate total cost in real workloads.</li>
   </ul>
   <p class="muted" style="margin-top:10px">
     If Lambda triggers DynamoDB heavily, model it separately using{" "}
@@ -67,12 +66,14 @@ const description =
 
   <h2>5) Sanity-check with unit economics</h2>
   <p>
-    Convert to “cost per 1M requests” or “cost per request” for your expected duration and memory. This makes it easier
-    to compare serverless vs container/VM options.
+    Convert to "cost per 1M requests" (or "cost per request") for your expected duration and memory. This makes it easier
+    to compare serverless vs containers/VMs and spot regressions quickly.
   </p>
 
   <p class="muted" style="margin-top:14px">
     Related: <a href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>,{" "}
+    <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate cost</a>,{" "}
     <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
   </p>
 </GuideLayout>
+
