@@ -4,8 +4,24 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "S3 pricing: a practical model for storage, requests, egress, and replication";
 const description =
   "A practical S3 pricing guide: what to include (GB-month, requests, egress, replication) and how to estimate the key inputs without copying price tables.";
+
+const faqs = [
+  {
+    "q": "What is the main cost driver?",
+    "a": "It depends on the service, but most cloud bills scale with one or two primary drivers (requests, GB processed, GB-month, or instance-hours)."
+  },
+  {
+    "q": "How do I estimate quickly?",
+    "a": "Start with a measured baseline where possible and use a blended effective rate for planning."
+  },
+  {
+    "q": "How do I validate?",
+    "a": "Compare your estimate against a real week of metrics/billing and verify units and boundaries."
+  }
+];
+
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-20">
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-22" faqs={faqs}>
   <p>
     S3-like object storage pricing looks simple until you add data movement. A solid model covers four common buckets:
     <strong>storage</strong>, <strong>requests</strong>, <strong>egress</strong>, and <strong>replication/copy</strong>.
@@ -43,5 +59,20 @@ const description =
     <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing (generic)</a>
     <a class="btn" href="/guides/s3-pricing-explained/">S3 pricing explained</a>
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate which boundary is billed: storage, requests, egress, replication, retrieval.</li>
+    <li>Separate CDN bandwidth from origin egress (cache fill) when using a CDN.</li>
+    <li>Validate units (GB vs GiB) and request units (per 1k/10k/1M).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/s3-cost-calculator/">S3 cost</a>
+    <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 requests</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+  </div>
+
+</GuideLayout>

@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-estimate-requests"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "How do I convert RPS to requests per month?",
@@ -53,5 +53,20 @@ const description =
     Use <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway Cost Calculator</a> to translate requests
     and response size into a monthly request + transfer estimate.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate requests/month from logs or analytics; do not rely on a single peak RPS snapshot.</li>
+    <li>Validate payload sizes (response KB/MB) because transfer can dominate for large payload APIs.</li>
+    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+
+</GuideLayout>

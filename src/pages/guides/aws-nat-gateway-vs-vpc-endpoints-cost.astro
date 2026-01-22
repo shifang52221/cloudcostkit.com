@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-nat-gateway-vs-vpc-endpoints-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={faqs}
 >
   <p>
@@ -93,4 +93,20 @@ const faqs = [
     <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints cost optimization</a>
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate GB processed from NAT metrics or flow logs (representative week).</li>
+    <li>Identify the top traffic sources: images, updates, external APIs, log shipping.</li>
+    <li>After changes, confirm reduced GB processed and stable application behavior.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate GB processed</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT optimization</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network hub</a>
+  </div>
+
 </GuideLayout>

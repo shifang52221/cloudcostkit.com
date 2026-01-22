@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-pricing"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What are the core EBS cost components?",
@@ -55,4 +55,20 @@ const description =
     <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>,{" "}
     <a href="/guides/aws-ebs-snapshot-cost/">EBS snapshot cost guide</a>.
   </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate storage utilization, IOPS, throughput, and latency for a representative week.</li>
+    <li>Separate steady-state vs peak windows (backups/migrations/batch).</li>
+    <li>After changes, confirm application SLOs and storage latency remain stable.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost</a>
+    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
+    <a class="btn" href="/guides/aws-ebs-cost-optimization/">EBS optimization</a>
+  </div>
+
 </GuideLayout>

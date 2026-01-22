@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: "What’s the fastest way to estimate monthly cost?",
-    a: "Convert requests/month × bytes/log into GB/day, then price ingestion and retention. Use a calculator to avoid mistakes with units and retention math.",
+    a: "Convert requests/month x bytes/log into GB/day, then price ingestion and retention. Use a calculator to avoid mistakes with units and retention math.",
   },
 ];
 ---
@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-access-logs-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={faqs}
 >
   <p>
@@ -41,7 +41,7 @@ const faqs = [
 
   <h2>Step 2: convert requests/month into GB/day</h2>
   <p>
-    Approximation: <strong>GB/day ≈ (requests/month ÷ 30.4) × bytes/log ÷ 1e9</strong>.
+    Approximation: <strong>GB/day ≈ (requests/month ÷ 30.4) x bytes/log ÷ 1e9</strong>.
   </p>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-api-gateway-access-log-cost-calculator/">Access log cost calculator</a>
@@ -71,5 +71,20 @@ const faqs = [
     <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
     <a class="btn" href="/guides/log-costs/">Log cost guide</a>
   </div>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate requests/month from logs or analytics; do not rely on a single peak RPS snapshot.</li>
+    <li>Validate payload sizes (response KB/MB) because transfer can dominate for large payload APIs.</li>
+    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+
+</GuideLayout>

@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-replication-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={faqs}
 >
   <p>
@@ -64,5 +64,20 @@ const faqs = [
     <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
     <a class="btn" href="/guides/s3-replication-cost/">S3 replication cost</a>
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate which boundary is billed: storage, requests, egress, replication, retrieval.</li>
+    <li>Separate CDN bandwidth from origin egress (cache fill) when using a CDN.</li>
+    <li>Validate units (GB vs GiB) and request units (per 1k/10k/1M).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/s3-cost-calculator/">S3 cost</a>
+    <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 requests</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+  </div>
+
+</GuideLayout>

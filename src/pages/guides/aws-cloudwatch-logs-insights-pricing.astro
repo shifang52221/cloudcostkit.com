@@ -19,7 +19,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={faqs}
 >
   <p class="muted">
@@ -51,5 +51,20 @@ const faqs = [
     <li>Queries run across all log groups without narrowing first.</li>
     <li>Incident loops that repeatedly re-run expensive queries.</li>
   </ul>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate scanned GB/day from query metrics for a representative week.</li>
+    <li>Reduce time ranges and add filters early to prevent broad scans.</li>
+    <li>Watch for recurring dashboards that run heavy queries frequently.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights cost</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan cost</a>
+    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-insights-cost-optimization/">Reduce scan cost</a>
+  </div>
+
+</GuideLayout>

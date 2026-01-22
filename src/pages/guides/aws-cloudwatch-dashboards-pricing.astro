@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-dashboards-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={faqs}
 >
   <p class="muted">
@@ -64,5 +64,19 @@ const faqs = [
     <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
     <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics cost optimization</a>
   </div>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate the primary driver with measured usage from a representative window.</li>
+    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
+    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+
+</GuideLayout>
