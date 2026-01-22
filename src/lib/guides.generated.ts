@@ -66,13 +66,6 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-cost-checklist"
   },
   {
-    "title": "AWS cost guides | ${SITE.name}",
-    "description": "AWS cost estimation guides for CloudFront, EKS, EC2, S3, VPC data transfer, and CloudWatch-style logging.",
-    "canonicalPath": "/guides/aws",
-    "category": "AWS",
-    "slug": "aws"
-  },
-  {
     "title": "AWS DynamoDB cost optimization (high-leverage fixes)",
     "description": "A short playbook to reduce DynamoDB spend: reduce request volume, right-size items, avoid hot partitions, and keep storage and retention under control.",
     "canonicalPath": "/guides/aws-dynamodb-cost-optimization",
@@ -885,13 +878,6 @@ export const GUIDES: GuideLink[] = [
     "slug": "azure-cosmos-db-pricing"
   },
   {
-    "title": "Azure cost guides | ${SITE.name}",
-    "description": "Azure cost estimation guides for storage, networking (egress/private link), CDN/Front Door, observability/logs, and core managed services.",
-    "canonicalPath": "/guides/azure",
-    "category": "Azure",
-    "slug": "azure"
-  },
-  {
     "title": "Azure Event Hubs pricing: estimate throughput, events, and retention",
     "description": "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic and consumer replays.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
@@ -1100,13 +1086,6 @@ export const GUIDES: GuideLink[] = [
     "canonicalPath": "/guides/gcp-dataflow-pricing",
     "category": "GCP",
     "slug": "gcp-dataflow-pricing"
-  },
-  {
-    "title": "GCP cost guides | ${SITE.name}",
-    "description": "GCP cost estimation guides for storage, networking (egress/inter-zone), CDN, observability/logging, and core managed services.",
-    "canonicalPath": "/guides/gcp",
-    "category": "GCP",
-    "slug": "gcp"
   },
   {
     "title": "GCP load balancing pricing: model hours, requests, and traffic processed",

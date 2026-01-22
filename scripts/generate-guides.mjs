@@ -45,6 +45,10 @@ async function main() {
   for (const fileName of files) {
     const fullPath = path.join(guidesDir, fileName);
     const src = await readFile(fullPath, "utf8");
+
+    // Only include real "article" guides (GuideLayout pages), not category hubs (BaseLayout pages).
+    if (!src.includes("GuideLayout") || !src.includes("<GuideLayout")) continue;
+
     const canonicalPath = extractCanonicalPath(src);
     if (!canonicalPath || !canonicalPath.startsWith("/guides/")) continue;
 
