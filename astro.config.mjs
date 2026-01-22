@@ -9,6 +9,17 @@ export default defineConfig({
   output: "server",
   trailingSlash: "always",
   adapter: cloudflare(),
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => !["/404/", "/terms/", "/privacy-policy/", "/cookie-notice/"].includes(page),
+      serialize: (item) => {
+        const excluded = new Set(["/404/", "/terms/", "/privacy-policy/", "/cookie-notice/"]);
+        const pathname = item.url.startsWith("http") ? new URL(item.url).pathname : item.url;
+        if (excluded.has(pathname)) return undefined;
+        return item;
+      },
+    }),
+  ],
   prefetch: true,
 });

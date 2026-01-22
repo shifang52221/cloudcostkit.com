@@ -20,6 +20,21 @@ const normalizedCanonicalPath = canonicalPath ? withTrailingSlash(canonicalPath)
 const canonical = normalizedCanonicalPath ? new URL(normalizedCanonicalPath, siteUrl).toString() : undefined;
 const ogImage = new URL("/og.svg", siteUrl).toString();
 const robotsValue = robots ?? "index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1";
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE.name,
+  url: SITE.url,
+  logo: new URL("/logo.svg", siteUrl).toString(),
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  url: SITE.url,
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -46,6 +61,7 @@ const robotsValue = robots ?? "index,follow,max-snippet:-1,max-image-preview:lar
     <meta name="robots" content={robotsValue} />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0b1220" />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify([organizationSchema, websiteSchema])} />
     <ConsentModeScript />
     <FundingChoicesScript />
     <AdSenseScript />
