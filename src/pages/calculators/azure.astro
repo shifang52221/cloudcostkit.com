@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Azure calculators | ${SITE.name}`;
+const description =
+  "Azure-oriented budgeting workflows using fast calculators: egress, logs, storage, Kubernetes, and request-based cost drivers.";
+const slots = SITE.adsenseSlots;
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/azure">
+  <section class="card hero">
+    <h1>Azure calculators</h1>
+    <p>
+      Azure bills usually come down to drivers like GB-month, requests, and outbound transfer. These tools help you build a
+      planning estimate with transparent assumptions.
+    </p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/guides/azure/">Azure cost guides</a>
+      <a class="btn" href="/calculators/">All calculators</a>
+    </div>
+  </section>
+
+  <section class="card section">
+    <div class="grid">
+      <a class="card2 tool col-6" href="/calculators/object-storage-cost-calculator/">
+        <div class="tool-title">Object storage cost</div>
+        <div class="tool-desc">GB-month + request fees with your pricing assumptions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/data-egress-cost-calculator/">
+        <div class="tool-title">Data egress cost</div>
+        <div class="tool-desc">Outbound GB/month × $/GB for planning scenarios.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/api-request-cost-calculator/">
+        <div class="tool-title">API request cost</div>
+        <div class="tool-desc">Estimate request-based charges with per-1k assumptions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/api-response-size-transfer-calculator/">
+        <div class="tool-title">Response transfer estimator</div>
+        <div class="tool-desc">Convert RPS and payload size into GB/month transfer.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/log-cost-calculator/">
+        <div class="tool-title">Log cost</div>
+        <div class="tool-desc">Ingestion + retention + scan/query (driver-based).</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/kubernetes-cost-calculator/">
+        <div class="tool-title">Kubernetes cost</div>
+        <div class="tool-desc">Node sizing + surrounding line items checklist.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/compute-instance-cost-calculator/">
+        <div class="tool-title">Compute instance cost</div>
+        <div class="tool-desc">Instance count × $/hour × uptime.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/storage-pricing-calculator/">
+        <div class="tool-title">Storage pricing (generic)</div>
+        <div class="tool-desc">GB-month baseline for disks, volumes, and storage tiers.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next steps</h2>
+    <p class="muted" style="margin:0">
+      For step-by-step estimation checklists and pitfalls, browse <a href="/guides/azure/">Azure cost guides</a>.
+    </p>
+  </section>
+</BaseLayout>
+
