@@ -1,0 +1,90 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Network transfer costs explained (egress, cross-region, cross-AZ)";
+const description =
+  "A practical guide to network transfer costs: how to model internet egress, cross-region transfer, cross-AZ traffic, and CDN cache fill. Includes estimation steps and validation tips.";
+const faqs = [
+  {
+    q: "What transfer types usually matter most?",
+    a: "Internet egress to users and CDN bandwidth are common. Cross-AZ traffic can become a steady surprise in microservice architectures. Cross-region transfer matters for DR and replication.",
+  },
+  {
+    q: "Does CDN bandwidth equal origin egress?",
+    a: "No. CDN bandwidth is edge-to-user delivery. Origin egress is origin-to-CDN cache fill, and it's often billed by the origin provider.",
+  },
+  {
+    q: "How do I estimate GB/month without billing data?",
+    a: "Convert from throughput (Mbps) or from requests/day x average response size. Then validate with a real week of metrics once you have them.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/network-transfer-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Transfer costs are often the hardest part of a cloud bill to predict because they scale with usage and
+    architecture. Use this guide as a framework to separate the transfer types and avoid double counting.
+  </p>
+
+  <h2>1) Split transfer into clear buckets</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: data leaving your provider to end users.</li>
+    <li><strong>CDN bandwidth</strong>: delivery from CDN edge to users.</li>
+    <li><strong>Origin egress (cache fill)</strong>: origin-to-CDN bytes.</li>
+    <li><strong>Cross-AZ</strong>: east-west traffic across zones.</li>
+    <li><strong>Cross-region</strong>: replication, multi-region reads, DR.</li>
+  </ul>
+
+  <h2>2) Estimate GB/month (fast methods)</h2>
+  <ul>
+    <li>
+      <strong>From metrics</strong>: bytes sent / transfer GB in billing exports is the most accurate starting point.
+    </li>
+    <li>
+      <strong>From throughput</strong>: Mbps to GB/month using <a href="/calculators/unit-converter/">Units Converter</a>.
+    </li>
+    <li>
+      <strong>From requests</strong>: requests/day x avg response size to GB/month using{" "}
+      <a href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>.
+    </li>
+  </ul>
+
+  <h2>3) Price each bucket separately</h2>
+  <ul>
+    <li>
+      Internet egress: <a href="/calculators/data-egress-cost-calculator/">egress cost</a>
+    </li>
+    <li>
+      CDN bandwidth: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+    </li>
+    <li>
+      Cross-region: <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>
+    </li>
+  </ul>
+
+  <h2>4) Validate (avoid double counting)</h2>
+  <ul>
+    <li>
+      Separate <strong>CDN bandwidth</strong> from <strong>origin egress</strong>. Guide:{" "}
+      <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+    </li>
+    <li>
+      Separate <strong>cross-AZ</strong> from <strong>internet egress</strong> (they are different boundaries).
+    </li>
+    <li>Check incident windows: retries/timeouts can multiply transfer.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region</a>
+    <a class="btn" href="/guides/egress-costs/">Egress guide</a>
+  </div>
+</GuideLayout>
+

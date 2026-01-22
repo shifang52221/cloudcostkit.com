@@ -2,211 +2,174 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = `Guides | ${SITE.name}`;
 const description =
-  "Practical guides for estimating cloud spend: egress, logs, storage, and Kubernetes capacity.";
+  "Practical guides for estimating cloud spend: egress, logs, storage, networking, CDN, and Kubernetes capacity.";
 const slots = SITE.adsenseSlots;
+
+const grouped = GUIDES.reduce<Record<string, typeof GUIDES>>((acc, g) => {
+  (acc[g.category] ||= []).push(g);
+  return acc;
+}, {});
+const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
 ---
 <BaseLayout title={title} description={description} canonicalPath="/guides">
   <section class="card hero">
     <h1>Guides</h1>
-    <p>Short, practical notes to help you estimate spend and avoid common pitfalls.</p>
+    <p>Estimation workflows, unit pitfalls, and checklists to avoid surprise cloud bills.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">Tools</a>
+      <a class="btn" href="/guides/aws/">AWS</a>
+      <a class="btn" href="/guides/egress-costs/">Egress</a>
+      <a class="btn" href="/guides/log-costs/">Logs</a>
+      <a class="btn" href="/guides/cdn-costs/">CDN</a>
+      <a class="btn" href="/sitemap/">Sitemap</a>
+    </div>
   </section>
 
-  <section class="card section">
-    <div class="grid">
-      <a class="card2 tool col-6" href="/guides/aws/">
-        <div class="tool-title">AWS cost guides</div>
-        <div class="tool-desc">CloudFront, EKS, EC2, S3, VPC transfer, and CloudWatch-style logging.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/egress-costs/">
-        <div class="tool-title">Understanding egress costs</div>
-        <div class="tool-desc">How to estimate bandwidth and avoid common billing surprises.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/aws-vpc-data-transfer/">
-        <div class="tool-title">VPC data transfer (how to estimate)</div>
-        <div class="tool-desc">Cross-AZ, cross-region, and egress patterns in real architectures.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cross-az-data-transfer-cost/">
-        <div class="tool-title">Cross-AZ transfer cost</div>
-        <div class="tool-desc">Common sources, GB/month estimation, and safe reductions.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">
-        <div class="tool-title">NAT vs VPC endpoints (cost)</div>
-        <div class="tool-desc">When endpoints beat NAT GB processed and how to model break-even.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-network-costs/">
-        <div class="tool-title">AWS network costs (hub)</div>
-        <div class="tool-desc">NAT, endpoints/PrivateLink, and transfer: what to model.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-vpc-endpoints-pricing/">
-        <div class="tool-title">VPC endpoints pricing</div>
-        <div class="tool-desc">Interface vs gateway endpoints: what to model.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-privatelink-pricing/">
-        <div class="tool-title">PrivateLink pricing</div>
-        <div class="tool-desc">Endpoint-hours, data processed, and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-alb-vs-nlb-cost/">
-        <div class="tool-title">ALB vs NLB cost</div>
-        <div class="tool-desc">Compare LCU vs NLCU drivers and estimate capacity units.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-load-balancer-estimate-lcu/">
-        <div class="tool-title">Estimate ALB LCU / NLB NLCU</div>
-        <div class="tool-desc">A quick workflow from metrics to capacity units/hour.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-pricing/">
-        <div class="tool-title">API Gateway pricing</div>
-        <div class="tool-desc">Requests + transfer, plus the add-ons that show up on the bill.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-access-logs-cost/">
-        <div class="tool-title">API Gateway access logs cost</div>
-        <div class="tool-desc">Estimate ingestion + retention and reduce log spend.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-vs-alb-vs-cloudfront-cost/">
-        <div class="tool-title">API Gateway vs ALB vs CloudFront</div>
-        <div class="tool-desc">Compare request pricing, transfer, caching, and add-ons.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/log-costs/">
-        <div class="tool-title">Estimating log costs</div>
-        <div class="tool-desc">Ingestion, retention (GB-month), scan/search, and the fastest levers.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/estimate-log-ingestion-gb-per-day/">
-        <div class="tool-title">Estimate log ingestion (GB/day)</div>
-        <div class="tool-desc">Quick methods from events/sec, bytes, or throughput.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/log-retention-storage-cost/">
-        <div class="tool-title">Log retention storage cost</div>
-        <div class="tool-desc">Steady-state GB-month explained and retention tiers.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/aws-lambda-pricing/">
-        <div class="tool-title">Lambda pricing</div>
-        <div class="tool-desc">Requests + GB-seconds, plus logs, transfer, and hidden costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-lambda-vs-fargate-cost/">
-        <div class="tool-title">Lambda vs Fargate cost</div>
-        <div class="tool-desc">Compare unit economics and steady vs bursty workloads.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-fargate-pricing/">
-        <div class="tool-title">Fargate pricing</div>
-        <div class="tool-desc">Compute drivers (vCPU-hours + GB-hours) plus hidden line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-fargate-vs-eks-cost/">
-        <div class="tool-title">Fargate vs EKS cost</div>
-        <div class="tool-desc">A practical checklist for unit economics and overhead.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-fargate-vs-ec2-cost/">
-        <div class="tool-title">Fargate vs EC2 cost</div>
-        <div class="tool-desc">A practical checklist: idle capacity, utilization, and hidden line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-pricing/">
-        <div class="tool-title">ECS pricing</div>
-        <div class="tool-desc">ECS on EC2 vs ECS on Fargate: what to include.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-cost-model-beyond-compute/">
-        <div class="tool-title">ECS cost model (beyond compute)</div>
-        <div class="tool-desc">The checklist that prevents surprise bills.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-ec2-vs-fargate-cost/">
-        <div class="tool-title">ECS on EC2 vs Fargate cost</div>
-        <div class="tool-desc">A practical checklist for compute, utilization, and hidden costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-vs-eks-cost/">
-        <div class="tool-title">ECS vs EKS cost</div>
-        <div class="tool-desc">A consistent checklist for compute, overhead, and add-ons.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-task-sizing/">
-        <div class="tool-title">ECS task sizing</div>
-        <div class="tool-desc">Pick task CPU/memory and estimate task count with headroom.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-autoscaling-cost-pitfalls/">
-        <div class="tool-title">ECS autoscaling cost pitfalls</div>
-        <div class="tool-desc">Noisy signals, oscillation, retries, and hidden costs.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/kubernetes-requests-limits/">
-        <div class="tool-title">Kubernetes requests & limits</div>
-        <div class="tool-desc">Sizing from requests, allocatable headroom, and what limits really mean.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/kubernetes-requests-vs-limits-for-sizing/">
-        <div class="tool-title">Requests vs limits (for sizing)</div>
-        <div class="tool-desc">Why requests drive node count and cost.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/kubernetes-cost-calculator/">
-        <div class="tool-title">Kubernetes cost checklist</div>
-        <div class="tool-desc">What to include beyond nodes: storage, egress, load balancers, and logs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/kubernetes-cost-model-beyond-nodes/">
-        <div class="tool-title">Kubernetes cost model checklist</div>
-        <div class="tool-desc">Control plane, storage, logs, metrics, and egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/eks-vs-gke-vs-aks-cost/">
-        <div class="tool-title">EKS vs GKE vs AKS cost</div>
-        <div class="tool-desc">Compare managed Kubernetes costs with a consistent checklist.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/cdn-costs/">
-        <div class="tool-title">CDN cost breakdown</div>
-        <div class="tool-desc">Bandwidth, request fees, cache fill, and origin egress explained.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/cdn-request-pricing/">
-        <div class="tool-title">CDN request pricing</div>
-        <div class="tool-desc">Estimate $ per 10k/1M requests and when request fees matter.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">
-        <div class="tool-title">CloudFront vs Cloudflare cost</div>
-        <div class="tool-desc">A checklist to compare bandwidth, requests, origin egress, and add-ons.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/origin-egress-vs-cdn-bandwidth/">
-        <div class="tool-title">Origin egress vs CDN bandwidth</div>
-        <div class="tool-desc">Avoid double-counting when you model bandwidth costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/estimate-cdn-bandwidth-gb-per-month/">
-        <div class="tool-title">Estimate CDN bandwidth (GB/month)</div>
-        <div class="tool-desc">Convert from analytics or Mbps to budget $/GB pricing.</div>
-      </a>
-
-      <a class="card2 tool col-6" href="/guides/s3-replication-cost/">
-        <div class="tool-title">S3 replication cost</div>
-        <div class="tool-desc">How to estimate replication GB/month, replica storage, and transfer fees.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/s3-crr-vs-srr-cost/">
-        <div class="tool-title">S3 CRR vs SRR cost</div>
-        <div class="tool-desc">Compare cross-region vs same-region replication line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/estimate-replication-gb-per-month-from-writes/">
-        <div class="tool-title">Estimate replication GB/month</div>
-        <div class="tool-desc">Model replication volume from writes and churn, not total stored GB.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/copy-storage-pricing/">
-        <div class="tool-title">Copy storage pricing</div>
-        <div class="tool-desc">Transfer, requests, and extra storage when data moves.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/s3-pricing-explained/">
-        <div class="tool-title">S3 pricing explained</div>
-        <div class="tool-desc">Storage vs requests vs egress, and what to model.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-gp2-vs-gp3-cost/">
-        <div class="tool-title">gp2 vs gp3 cost</div>
-        <div class="tool-desc">When gp3 saves money and how to avoid paying for unused performance.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-snapshot-cost/">
-        <div class="tool-title">EBS snapshot cost</div>
-        <div class="tool-desc">Estimate snapshot storage from churn and retention.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sqs-vs-sns-cost/">
-        <div class="tool-title">SQS vs SNS cost</div>
-        <div class="tool-desc">Compare messaging unit economics and fan-out.</div>
-      </a>
+  <section class="card section" style="margin-top:18px" id="guides-filter">
+    <div class="form" style="align-items:end">
+      <div class="field field-3">
+        <div class="label"><label for="guides-q">Search</label></div>
+        <input id="guides-q" type="search" placeholder="egress, cloudfront, eks, s3..." autocomplete="off" />
+      </div>
+      <div class="field field-3">
+        <div class="label"><label for="guides-cat">Category</label></div>
+        <select id="guides-cat">
+          <option value="all">All categories</option>
+          {categories.map(([category]) => (
+            <option value={category}>{category}</option>
+          ))}
+        </select>
+      </div>
+      <div class="field field-6">
+        <div class="btn-row" style="justify-content:space-between; width:100%">
+          <div class="muted" id="guides-count" aria-live="polite" style="font-size:13px"></div>
+          <button class="btn" type="button" id="guides-clear">Clear</button>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <section style="margin-top:18px">
+    {categories.map(([category, guides]) => (
+      <div style="margin-bottom:16px" class="guide-group" data-category={category}>
+        <div class="pill guide-group-title" style="margin: 6px 0 10px">{category}</div>
+        <div class="grid">
+          {guides
+            .slice()
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .map((g) => (
+              <a
+                class="card2 tool col-6 guide-card"
+                href={withTrailingSlash(g.canonicalPath)}
+                data-category={g.category}
+                data-title={g.title}
+                data-desc={g.description}
+                data-slug={g.slug}
+              >
+                <div class="tool-title">{g.title}</div>
+                <div class="tool-desc">{g.description}</div>
+              </a>
+            ))}
+        </div>
+      </div>
+    ))}
   </section>
 
   <section class="section">
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
+
+  <script is:inline type="text/javascript">
+    (function () {
+      var filterRoot = document.getElementById("guides-filter");
+      if (!filterRoot) return;
+
+      var qEl = document.getElementById("guides-q");
+      var catEl = document.getElementById("guides-cat");
+      var countEl = document.getElementById("guides-count");
+      var clearEl = document.getElementById("guides-clear");
+      if (!qEl || !catEl || !countEl || !clearEl) return;
+
+      var cards = Array.prototype.slice.call(document.querySelectorAll(".guide-card"));
+      var groups = Array.prototype.slice.call(document.querySelectorAll(".guide-group"));
+      var total = cards.length;
+
+      function norm(s) {
+        return String(s || "").toLowerCase().trim();
+      }
+
+      function setCount(visible) {
+        countEl.textContent = "Showing " + visible + " of " + total + " guides";
+      }
+
+      function apply() {
+        var q = norm(qEl.value);
+        var cat = catEl.value || "all";
+
+        var visible = 0;
+        cards.forEach(function (card) {
+          var title = norm(card.getAttribute("data-title"));
+          var desc = norm(card.getAttribute("data-desc"));
+          var slug = norm(card.getAttribute("data-slug"));
+          var cardCat = card.getAttribute("data-category") || "";
+          var matchCat = cat === "all" ? true : cardCat === cat;
+          var matchQ = !q ? true : title.indexOf(q) !== -1 || desc.indexOf(q) !== -1 || slug.indexOf(q) !== -1;
+          var show = matchCat && matchQ;
+          card.hidden = !show;
+          if (show) visible++;
+        });
+
+        groups.forEach(function (g) {
+          var any = false;
+          var groupCards = g.querySelectorAll(".guide-card");
+          for (var i = 0; i < groupCards.length; i++) {
+            if (!groupCards[i].hidden) {
+              any = true;
+              break;
+            }
+          }
+          g.hidden = !any;
+        });
+
+        setCount(visible);
+
+        try {
+          var url = new URL(window.location.href);
+          if (q) url.searchParams.set("q", q);
+          else url.searchParams.delete("q");
+          if (cat && cat !== "all") url.searchParams.set("cat", cat);
+          else url.searchParams.delete("cat");
+          window.history.replaceState({}, "", url.toString());
+        } catch (e) {}
+      }
+
+      function initFromQuery() {
+        try {
+          var url = new URL(window.location.href);
+          var q = url.searchParams.get("q");
+          var cat = url.searchParams.get("cat");
+          if (q) qEl.value = q;
+          if (cat) catEl.value = cat;
+        } catch (e) {}
+      }
+
+      qEl.addEventListener("input", apply);
+      catEl.addEventListener("change", apply);
+      clearEl.addEventListener("click", function () {
+        qEl.value = "";
+        catEl.value = "all";
+        apply();
+        try { qEl.focus(); } catch (e) {}
+      });
+
+      initFromQuery();
+      apply();
+    })();
+  </script>
 </BaseLayout>
+

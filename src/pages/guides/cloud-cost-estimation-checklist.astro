@@ -1,0 +1,102 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud cost estimation checklist (avoid thin estimates)";
+const description =
+  "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs, and network transfer. Includes validation steps and common pitfalls.";
+const faqs = [
+  {
+    q: "Why do cloud cost estimates miss by so much?",
+    a: "Most estimates only model one line item (like compute) and miss network transfer, logs/metrics, request fees, storage growth, and retry-driven spikes. A checklist prevents surprises.",
+  },
+  {
+    q: "What is the fastest way to get a rough monthly number?",
+    a: "Start with a small set of measurable drivers (requests/month, GB/month, instance-hours, GB-month stored). Use blended rates, then refine with tiering and region mix once you have a baseline.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Compare directionality against real metrics/billing for a representative week. Validate units (GB vs GiB), request units (per 10k vs per 1M), and separate CDN bandwidth from origin egress.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/cloud-cost-estimation-checklist"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    This is the checklist we use to keep cloud cost estimates from becoming "compute-only" spreadsheets. The goal is not
+    perfect precision on day 1. The goal is to include the big line items, validate units, and build a model you can
+    refine.
+  </p>
+
+  <h2>Step 1: Choose your primary drivers (measure first)</h2>
+  <ul>
+    <li><strong>Requests/month</strong>: APIs, CDN, queue, database calls.</li>
+    <li><strong>GB/month</strong>: egress, CDN bandwidth, replication, backups.</li>
+    <li><strong>Instance-hours</strong>: VMs, managed node groups, workers.</li>
+    <li><strong>GB-month stored</strong>: object storage, block volumes, logs retained.</li>
+  </ul>
+
+  <h2>Step 2: Model the big five cost buckets</h2>
+  <ol>
+    <li>
+      <strong>Compute</strong>: instance-hours or vCPU/RAM hours (include headroom). Tool:{" "}
+      <a href="/calculators/compute-instance-cost-calculator/">compute instance cost</a>.
+    </li>
+    <li>
+      <strong>Requests</strong>: request-based services add up. Tools:{" "}
+      <a href="/calculators/api-request-cost-calculator/">API request cost</a>,{" "}
+      <a href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>, and{" "}
+      <a href="/calculators/rps-to-monthly-requests-calculator/">RPS -&gt; monthly requests</a>.
+    </li>
+    <li>
+      <strong>Network transfer</strong>: internet egress, cross-region, cross-AZ. Tools:{" "}
+      <a href="/calculators/data-egress-cost-calculator/">egress cost</a>,{" "}
+      <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>.
+    </li>
+    <li>
+      <strong>Storage</strong>: base GB-month plus growth, replicas, and request fees. Tools:{" "}
+      <a href="/calculators/object-storage-cost-calculator/">object storage cost</a>,{" "}
+      <a href="/calculators/database-storage-growth-cost-calculator/">storage growth</a>.
+    </li>
+    <li>
+      <strong>Observability</strong>: logs, metrics, traces (ingestion + retention + query/scan). Tools:{" "}
+      <a href="/calculators/log-ingestion-cost-calculator/">log ingestion</a>,{" "}
+      <a href="/calculators/log-search-scan-cost-calculator/">log scan</a>,{" "}
+      <a href="/calculators/metrics-timeseries-cost-calculator/">metrics timeseries</a>.
+    </li>
+  </ol>
+
+  <h2>Step 3: Add the missing-but-common multipliers</h2>
+  <ul>
+    <li><strong>Retries/timeouts</strong>: multiply requests and transfer during incidents.</li>
+    <li><strong>Region mix</strong>: blended rate across regions is usually more accurate than a single $/GB.</li>
+    <li><strong>Cache hit rate</strong>: affects origin egress and origin requests behind a CDN.</li>
+    <li><strong>Growth</strong>: a "flat" storage estimate is almost always wrong over time.</li>
+  </ul>
+
+  <h2>Step 4: Validate (the part most teams skip)</h2>
+  <ul>
+    <li>
+      Validate units: GB vs GiB, and request units (per 10k vs per 1M). Use{" "}
+      <a href="/calculators/unit-converter/">Units Converter</a>.
+    </li>
+    <li>
+      Separate <strong>CDN bandwidth</strong> from <strong>origin egress</strong> (cache fill). Guide:{" "}
+      <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+    </li>
+    <li>Recompute with a real week of metrics to make sure directionality matches.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/egress-costs/">Egress costs</a>
+    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN costs</a>
+    <a class="btn" href="/guides/s3-pricing-explained/">Storage pricing explained</a>
+  </div>
+</GuideLayout>
+

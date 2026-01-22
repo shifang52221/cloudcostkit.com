@@ -1,0 +1,83 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Request-based pricing explained (APIs, CDN, and messaging)";
+const description =
+  "A practical guide to request-based pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.";
+const faqs = [
+  {
+    q: "What services are usually request-priced?",
+    a: "API gateways, CDNs, queues/pubsub, key management, and many managed APIs are billed per request (sometimes with multiple request classes).",
+  },
+  {
+    q: "How do I estimate requests/month quickly?",
+    a: "Use analytics/billing if available. Otherwise convert from RPS: requests/month ~ RPS x 2,592,000 (30-day month).",
+  },
+  {
+    q: "Why do request bills spike?",
+    a: "Retries, timeouts, bots, cache misses, and traffic amplification during incidents can multiply request volume. Validate with real logs and rate limiting.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/request-based-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Request pricing looks small until volume grows. This page gives you a quick workflow to estimate requests/month,
+    translate request units correctly, and sanity check the number before you trust it.
+  </p>
+
+  <h2>1) Get or estimate requests/month</h2>
+  <ul>
+    <li><strong>Best</strong>: provider analytics, logs, or billing exports (measured request counts).</li>
+    <li>
+      <strong>Fallback</strong>: convert from RPS with{" "}
+      <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
+    </li>
+  </ul>
+
+  <h2>2) Confirm request units (per 10k vs per 1M)</h2>
+  <p>
+    Pricing pages often quote "$ per 10k" or "$ per 1M". If you multiply by the wrong unit, the estimate can be off by
+    100x.
+  </p>
+
+  <h2>3) Estimate request cost</h2>
+  <ul>
+    <li>
+      API requests: <a href="/calculators/api-request-cost-calculator/">API request cost calculator</a>
+    </li>
+    <li>
+      CDN requests: <a href="/calculators/cdn-request-cost-calculator/">CDN request cost calculator</a>
+    </li>
+    <li>
+      For CDNs, also model bandwidth with <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+    </li>
+  </ul>
+
+  <h2>4) Validate (avoid surprise multipliers)</h2>
+  <ul>
+    <li>
+      Identify retry loops and timeouts. These can multiply API request volume and add transfer.
+    </li>
+    <li>
+      Separate human traffic from bots. WAF/bot protection costs can track request spikes.
+    </li>
+    <li>
+      If you're behind a CDN, cache miss rate affects origin request volume even if CDN request counts stay high.
+    </li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cdn-costs/">CDN costs</a>
+    <a class="btn" href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>
+    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/egress-costs/">Egress costs</a>
+  </div>
+</GuideLayout>
+

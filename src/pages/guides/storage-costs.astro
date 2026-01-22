@@ -1,0 +1,102 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Storage costs explained: GB-month, requests, and replication";
+const description =
+  "A practical guide to storage cost modeling: GB-month, request fees, retention, replication, and transfer. Includes estimation steps and common pitfalls.";
+const faqs = [
+  {
+    q: "Why is storage pricing confusing?",
+    a: "Because the bill is rarely just GB-month. Many products add request fees, replication/backup copies, and transfer (egress or inter-region) on top of base storage.",
+  },
+  {
+    q: "What is GB-month?",
+    a: "GB-month is the average stored GB over the billing month. If you store 100 GB for half the month and 200 GB for half the month, your average is ~150 GB-month.",
+  },
+  {
+    q: "What usually dominates storage cost?",
+    a: "For large datasets, GB-month dominates. For many small objects, request fees can matter. For multi-region setups, replication plus transfer can dominate.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/storage-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Storage cost estimates often fail because teams only price "stored GB". This guide gives a simple framework to model
+    storage like a real bill: capacity (GB-month) plus activity (requests) plus copies (replication/backup) plus
+    transfer.
+  </p>
+
+  <h2>1) Start with stored GB-month (capacity)</h2>
+  <ul>
+    <li>Measure average stored GB (or estimate from current size and growth).</li>
+    <li>Price it with your $/GB-month rate (watch for storage class/tier changes).</li>
+    <li>
+      Tool: <a href="/calculators/object-storage-cost-calculator/">object storage cost calculator</a>
+    </li>
+  </ul>
+
+  <h2>2) Add request fees (activity)</h2>
+  <p>
+    Storage is often paired with request pricing (PUT/GET/LIST). If you store many small objects, request fees can be a
+    meaningful percentage of total cost.
+  </p>
+  <ul>
+    <li>Estimate PUT/GET counts per day, then convert to monthly.</li>
+    <li>Check request units (per 1,000 / 10,000 / 1,000,000).</li>
+  </ul>
+
+  <h2>3) Add replication and backups (copies)</h2>
+  <ul>
+    <li>
+      <strong>Replica storage</strong>: you store a second copy (often close to 1x extra GB-month).
+    </li>
+    <li>
+      <strong>Replication traffic</strong>: bytes copied may be billed as transfer depending on product.
+    </li>
+    <li>
+      Tools: <a href="/calculators/storage-replication-cost-calculator/">storage replication cost</a>,{" "}
+      <a href="/calculators/s3-replication-cost-calculator/">S3 replication cost</a>
+    </li>
+    <li>
+      Guide: <a href="/guides/s3-replication-cost/">S3 replication cost explained</a>
+    </li>
+  </ul>
+
+  <h2>4) Add egress/transfer (the common surprise)</h2>
+  <p>
+    When data leaves the storage boundary (to users, to another region, or to a CDN/origin), you may pay egress. Many
+    storage architectures are "bandwidth-shaped": the monthly bill grows with reads/deliveries.
+  </p>
+  <ul>
+    <li>
+      Tools: <a href="/calculators/data-egress-cost-calculator/">egress cost</a>,{" "}
+      <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>
+    </li>
+    <li>
+      Guide: <a href="/guides/egress-costs/">egress costs explained</a>
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Ignoring growth: GB-month changes over time, even if pricing does not.</li>
+    <li>Ignoring small-object amplification: request fees and metadata overhead.</li>
+    <li>Counting CDN bandwidth but forgetting origin egress (cache fill).</li>
+    <li>Double counting replication: both replica storage and copy traffic can be billed.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage</a>
+    <a class="btn" href="/calculators/storage-replication-cost-calculator/">Replication</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+  </div>
+</GuideLayout>
+

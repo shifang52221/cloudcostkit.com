@@ -1,0 +1,74 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+import { TOOLS } from "../lib/tools";
+import { GUIDES } from "../lib/guides.generated";
+import { withTrailingSlash } from "../lib/url";
+
+const title = `Sitemap | ${SITE.name}`;
+const description =
+  "HTML sitemap for CloudCostKit: calculators and guides for cloud cost estimation, egress, logging, storage, and Kubernetes.";
+
+const toolCategories = Object.entries(
+  TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
+    (acc[t.category] ||= []).push(t);
+    return acc;
+  }, {}),
+).sort(([a], [b]) => a.localeCompare(b));
+
+const guideCategories = Object.entries(
+  GUIDES.reduce<Record<string, typeof GUIDES>>((acc, g) => {
+    (acc[g.category] ||= []).push(g);
+    return acc;
+  }, {}),
+).sort(([a], [b]) => a.localeCompare(b));
+---
+<BaseLayout title={title} description={description} canonicalPath="/sitemap">
+  <section class="card hero">
+    <h1>Sitemap</h1>
+    <p>Browse all calculators and guides. Every link ends with a trailing slash.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">Tools</a>
+      <a class="btn" href="/guides/">Guides</a>
+    </div>
+  </section>
+
+  <section class="card section prose">
+    <h2 style="margin-top:0">Tools</h2>
+    {toolCategories.map(([category, tools]) => (
+      <div style="margin: 12px 0 16px">
+        <div class="pill" style="margin: 0 0 10px">{category}</div>
+        <ul style="margin: 0; padding-left: 18px">
+          {tools
+            .slice()
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .map((t) => (
+              <li>
+                <a href={withTrailingSlash(`/calculators/${t.slug}`)}>{t.title}</a>
+              </li>
+            ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Guides</h2>
+    {guideCategories.map(([category, guides]) => (
+      <div style="margin: 12px 0 16px">
+        <div class="pill" style="margin: 0 0 10px">{category}</div>
+        <ul style="margin: 0; padding-left: 18px">
+          {guides
+            .slice()
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .map((g) => (
+              <li>
+                <a href={withTrailingSlash(g.canonicalPath)}>{g.title}</a>
+              </li>
+            ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+</BaseLayout>
+

@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "dev:lan": "astro dev --host 0.0.0.0 --port 4321",
-    "build": "astro build",
+    "generate:guides": "node scripts/generate-guides.mjs",
+    "build": "node scripts/generate-guides.mjs && astro build",
     "preview": "astro preview",
     "preview:lan": "astro preview --host 0.0.0.0 --port 4321",
-    "check": "astro check"
+    "check": "node scripts/generate-guides.mjs && astro check"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
