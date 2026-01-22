@@ -1,0 +1,96 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Database costs explained: compute, storage growth, backups, and network";
+const description =
+  "A practical framework to estimate managed database bills: baseline compute, storage GB-month growth, backups/snapshots, and the network patterns that cause surprises.";
+
+const faqs = [
+  {
+    q: "What usually drives database cost?",
+    a: "For most managed databases, compute (instance-hours or provisioned capacity) is the anchor. Storage growth and backup retention add steady cost, and network patterns (replication, cross-region reads, egress) create surprises.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with a baseline size (GB), a monthly growth rate, and a target instance size. Then add backups/retention and sanity-check network (replication, cross-region reads, private connectivity).",
+  },
+  {
+    q: "What breaks estimates most often?",
+    a: "Underestimating growth, forgetting backups/snapshots retention, and ignoring replication or cross-zone/region data transfer patterns.",
+  },
+];
+
+const databaseGuides = GUIDES.filter((g) => (g.topics || []).includes("database") && g.canonicalPath !== "/guides/database-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/database-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Database estimates fail when you model only instance-hours. Real bills are usually: compute baseline + storage GB-month
+    + backups/snapshots retention + replication and network patterns. This hub links the most useful checklists and tools.
+  </p>
+
+  <h2>1) Compute baseline</h2>
+  <ul>
+    <li>Model instance-hours or provisioned capacity for steady state (not peak-only).</li>
+    <li>Validate CPU/memory headroom and expected peaks (autoscaling is not always available).</li>
+    <li>Watch for always-on non-prod environments (dev/test) that silently multiply the baseline.</li>
+  </ul>
+
+  <h2>2) Storage GB-month and growth</h2>
+  <ul>
+    <li>Start with current stored GB and a monthly growth rate.</li>
+    <li>Translate growth into GB-month (average stored GB over the month).</li>
+    <li>
+      Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>
+    </li>
+  </ul>
+
+  <h2>3) Backups, snapshots, and retention</h2>
+  <ul>
+    <li>Estimate backup retention days and snapshot policy (daily + weekly + monthly).</li>
+    <li>Check what is free vs billed (varies by provider and engine).</li>
+    <li>Include cross-region backups if you enable them.</li>
+  </ul>
+
+  <h2>4) Network patterns (where surprises come from)</h2>
+  <ul>
+    <li><strong>Replication</strong>: cross-AZ/region replication moves bytes continuously.</li>
+    <li><strong>Cross-region reads</strong>: multi-region apps can pay for data transfer and higher latency.</li>
+    <li><strong>Private connectivity</strong>: endpoints and data processing can add recurring cost.</li>
+    <li>
+      Tools: <a href="/calculators/data-egress-cost-calculator/">egress</a>,{" "}
+      <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+  </div>
+
+  {databaseGuides.length ? (
+    <>
+      <h2>More database guides</h2>
+      <div class="grid">
+        {databaseGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

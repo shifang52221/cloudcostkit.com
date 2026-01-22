@@ -1,0 +1,83 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Metrics and monitoring costs explained: series, cardinality, and retention";
+const description =
+  "A practical framework to estimate metrics bills: number of unique time series (cardinality), retention, dashboards/alerts, and the fastest levers to reduce cost safely.";
+
+const faqs = [
+  {
+    q: "What usually drives metrics cost?",
+    a: "The number of unique time series (cardinality) is the big driver. High-cardinality labels like userId, requestId, pod name, or URL path can multiply series quickly.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate the number of unique series, the scrape/publish frequency, and retention. Then add alerting and dashboard usage if your provider prices API calls or alarms separately.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Unexpected label cardinality growth, verbose custom metrics, and always-on dashboards/alerts that poll frequently.",
+  },
+];
+
+const metricsGuides = GUIDES.filter((g) => (g.topics || []).includes("metrics") && g.canonicalPath !== "/guides/metrics-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/metrics-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Metrics bills are usually a cardinality problem. If you model only \"metrics per host\" you will miss label explosion
+    (pod names, paths, user IDs). This hub links the best checklists and the calculators that make series math explicit.
+  </p>
+
+  <h2>1) Estimate unique series (cardinality)</h2>
+  <ul>
+    <li>Count series = metrics x label combinations x environments.</li>
+    <li>High-cardinality labels are the common root cause of runaway spend.</li>
+    <li>
+      Tool: <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost</a>
+    </li>
+  </ul>
+
+  <h2>2) Retention and query behavior</h2>
+  <ul>
+    <li>Retention is a GB-month problem: longer retention grows stored dataset size.</li>
+    <li>Dashboards and API polling can create hidden request-based charges on some platforms.</li>
+  </ul>
+
+  <h2>3) Alerts and high-frequency collection</h2>
+  <ul>
+    <li>Alert counts and evaluation frequency can add recurring cost.</li>
+    <li>Use high-resolution collection only for signals that require it.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
+    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics</a>
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">CloudWatch alarms</a>
+  </div>
+
+  {metricsGuides.length ? (
+    <>
+      <h2>More metrics guides</h2>
+      <div class="grid">
+        {metricsGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

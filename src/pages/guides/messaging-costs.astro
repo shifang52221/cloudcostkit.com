@@ -1,0 +1,85 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Messaging costs explained: requests, deliveries, retries, and payload size";
+const description =
+  "A practical framework to estimate queue and pub/sub bills: request-based pricing, deliveries/retries, fan-out, and payload transfer (the hidden multiplier).";
+
+const faqs = [
+  {
+    q: "What drives messaging cost most often?",
+    a: "Request/delivery volume and retries. Fan-out patterns multiply deliveries, and large payloads amplify both transfer and downstream log/storage cost.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate messages published per month, average deliveries per message (including retries), and average payload size. Then check if your provider prices per request, per delivery, or per GB processed.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Ignoring retries and redrives, underestimating fan-out, and treating payload size as constant when you have a heavy tail (a few large messages).",
+  },
+];
+
+const messagingGuides = GUIDES.filter((g) => (g.topics || []).includes("messaging") && g.canonicalPath !== "/guides/messaging-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/messaging-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Messaging bills look small until they scale. The reliable model is: volume (messages/month) x deliveries (including
+    retries) x payload size. This hub links the key pricing checklists and estimation helpers.
+  </p>
+
+  <h2>1) Define your unit (publish vs delivery)</h2>
+  <ul>
+    <li><strong>Publish volume</strong>: messages you send into the system.</li>
+    <li><strong>Delivery volume</strong>: messages delivered to consumers (can be &gt; publishes due to fan-out and retries).</li>
+    <li>Always write down what your provider bills: request, delivery, or processed GB.</li>
+  </ul>
+
+  <h2>2) Model retries and replays explicitly</h2>
+  <ul>
+    <li>Use a deliveries-per-message assumption (1.0, 1.2, 2.0, etc.).</li>
+    <li>During incidents, retries can jump by 10x. Model a peak scenario.</li>
+    <li>Redrives/replays and batch consumers can change request counts.</li>
+  </ul>
+
+  <h2>3) Payload size is the hidden multiplier</h2>
+  <ul>
+    <li>Large messages can dominate transfer and downstream logging.</li>
+    <li>Split payload sizes by message type (events vs large blobs).</li>
+    <li>
+      Tool: <a href="/calculators/api-response-size-transfer-calculator/">Transfer from requests and payload size</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request cost</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+  </div>
+
+  {messagingGuides.length ? (
+    <>
+      <h2>More messaging guides</h2>
+      <div class="grid">
+        {messagingGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

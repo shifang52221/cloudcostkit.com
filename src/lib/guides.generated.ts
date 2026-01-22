@@ -1286,7 +1286,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Application Gateway pricing: how to model L7 load balancer costs",
-    "description": "Model Application Gateway costs using measurable drivers: hours, request volume, traffic processed, WAF, and logs — plus a validation checklist.",
+    "description": "Model Application Gateway costs using measurable drivers: hours, request volume, traffic processed, WAF, and logs - plus a validation checklist.",
     "canonicalPath": "/guides/azure-application-gateway-pricing",
     "category": "Azure",
     "slug": "azure-application-gateway-pricing",
@@ -1388,7 +1388,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Functions pricing: what to include in a realistic estimate",
-    "description": "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume — plus how to validate with real metrics.",
+    "description": "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume - plus how to validate with real metrics.",
     "canonicalPath": "/guides/azure-functions-pricing",
     "category": "Azure",
     "slug": "azure-functions-pricing",
@@ -1803,6 +1803,17 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "Database costs explained: compute, storage growth, backups, and network",
+    "description": "A practical framework to estimate managed database bills: baseline compute, storage GB-month growth, backups/snapshots, and the network patterns that cause surprises.",
+    "canonicalPath": "/guides/database-costs",
+    "category": "General",
+    "slug": "database-costs",
+    "topics": [
+      "database",
+      "storage"
+    ]
+  },
+  {
     "title": "How to estimate replication GB/month from write volume",
     "description": "Replication cost is driven by changed data, not total stored GB. Learn how to estimate replicated GB/month from write throughput and change rates for S3-like storage.",
     "canonicalPath": "/guides/estimate-replication-gb-per-month-from-writes",
@@ -1810,6 +1821,29 @@ export const GUIDES: GuideLink[] = [
     "slug": "estimate-replication-gb-per-month-from-writes",
     "topics": [
       "storage"
+    ]
+  },
+  {
+    "title": "Messaging costs explained: requests, deliveries, retries, and payload size",
+    "description": "A practical framework to estimate queue and pub/sub bills: request-based pricing, deliveries/retries, fan-out, and payload transfer (the hidden multiplier).",
+    "canonicalPath": "/guides/messaging-costs",
+    "category": "General",
+    "slug": "messaging-costs",
+    "topics": [
+      "egress",
+      "messaging",
+      "requests"
+    ]
+  },
+  {
+    "title": "Metrics and monitoring costs explained: series, cardinality, and retention",
+    "description": "A practical framework to estimate metrics bills: number of unique time series (cardinality), retention, dashboards/alerts, and the fastest levers to reduce cost safely.",
+    "canonicalPath": "/guides/metrics-costs",
+    "category": "General",
+    "slug": "metrics-costs",
+    "topics": [
+      "database",
+      "metrics"
     ]
   },
   {
