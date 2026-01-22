@@ -4,8 +4,32 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "S3 request costs: when GET/PUT/LIST becomes meaningful";
 const description =
   "S3 request costs are often tiny, but they can matter for workloads with many small objects or high metadata churn. Learn how to estimate request fees and when to care.";
+const faqs = [
+  {
+    q: "When do S3 request costs matter?",
+    a: "When you have many small objects, high request rates (GET/PUT), frequent LIST/HEAD calls, or metadata-heavy pipelines. For large objects, storage and egress usually dominate first.",
+  },
+  {
+    q: "What's the fastest way to estimate requests/month?",
+    a: "Use billing exports or access logs. If you only have RPS, convert with the RPS to Monthly Requests calculator, then apply request-class pricing.",
+  },
+  {
+    q: "What creates unexpected request spikes?",
+    a: "Retry loops, inventory scans, LIST operations over large prefixes, chatty SDK usage, and many small object workflows (high requests per GB).",
+  },
+  {
+    q: "How do I reduce request costs safely?",
+    a: "Reduce LIST/HEAD calls, batch operations, cache metadata, and avoid repeated full-prefix scans. Always validate behavior with logs after changes.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-request-costs" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-request-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
   <p>
     Many teams ignore S3 request costs because storage and egress usually dominate. But requests become meaningful when
     you have millions of small objects, frequent LIST/HEAD calls, or chatty pipelines.
@@ -21,6 +45,13 @@ const description =
     Tool: <a href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a>.
   </p>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Confirm request unit pricing (per 1,000 / 10,000 / 1,000,000) for each request class.</li>
+    <li>Separate request fees from transfer: high GET volume often also implies high egress.</li>
+    <li>Look for a small number of noisy prefixes/endpoints driving most LIST/HEAD.</li>
+  </ul>
+
   <h2>Patterns that drive request spikes</h2>
   <ul>
     <li>Frequent LIST operations over large prefixes</li>
@@ -29,10 +60,11 @@ const description =
   </ul>
 
   <h2>Related tools</h2>
-  <p>
+  <div class="btn-row">
     <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 request cost</a>
     <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
     <a class="btn" href="/guides/aws-s3-pricing/">S3 pricing model</a>
-  </p>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-s3-data-transfer/">S3 transfer costs</a>
+  </div>
 </GuideLayout>
-

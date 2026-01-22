@@ -3,44 +3,78 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "EKS node sizing: requests, overhead, and why packing is never perfect";
 const description =
-  "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets, and understand why real scheduling can require more nodes than the math minimum.";
+  "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets and pod limits, and understand why real scheduling can require more nodes than the math minimum.";
+const faqs = [
+  {
+    q: "Should I size from requests or limits?",
+    a: "Size from requests. Requests drive scheduling and node count. Limits are safety caps and can be bursty; sizing from limits usually overestimates.",
+  },
+  {
+    q: "Why does the real node count exceed the spreadsheet?",
+    a: "Because packing is imperfect: pod limits, topology spread, affinities, mixed instance types, and fragmentation all reduce utilization vs the theoretical max.",
+  },
+  {
+    q: "How much headroom should I reserve?",
+    a: "A common starting point is to target ~70-85% utilization of allocatable resources, then adjust based on workload variability and autoscaling behavior.",
+  },
+  {
+    q: "What are the common hidden costs around EKS nodes?",
+    a: "Cross-AZ traffic, load balancers, NAT gateways, and logging/metrics can add meaningful costs beyond node compute.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-eks-node-sizing"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
+  <p class="muted">
     For EKS (and Kubernetes in general), node sizing is best done from <strong>requests</strong>. Then you adjust for
-    overhead and the reality that scheduling is not perfect.
+    overhead and accept the reality that scheduling is not perfect.
   </p>
 
   <h2>Step 1: requests drive capacity</h2>
-  <p>
-    Use representative pod requests to estimate total CPU/memory, then compute node count from allocatable capacity.
-    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; Limits Calculator</a>.
-  </p>
-
-  <h2>Step 2: reserve headroom</h2>
-  <p>
-    Reserve capacity for kube-system, daemonsets, and operational headroom (commonly 85–95% allocatable depending on
-    workload).
-  </p>
-
-  <h2>Step 3: accept imperfect packing</h2>
   <ul>
-    <li>Pod density limits (max pods per node)</li>
-    <li>Topology spread constraints</li>
-    <li>Affinities/anti-affinities and taints</li>
-    <li>Mixed instance types</li>
+    <li>Use representative pod requests (not peaks) for CPU and memory.</li>
+    <li>Sum requests across pods to get total requested CPU/memory.</li>
+    <li>Divide by node allocatable resources to get a baseline node count.</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests and Limits Calculator</a>
+  </p>
+
+  <h2>Step 2: reserve overhead and headroom</h2>
+  <ul>
+    <li><strong>System overhead</strong>: kube-system pods, daemonsets, and networking.</li>
+    <li><strong>Operational headroom</strong>: room for rolling deploys, spikes, and rescheduling during failures.</li>
+    <li>
+      A practical starting point is to plan for <strong>70-85%</strong> utilization of allocatable resources.
+    </li>
+  </ul>
+
+  <h2>Step 3: account for pod limits and imperfect packing</h2>
+  <ul>
+    <li>Max pods per node (ENI/IP limits) can cap density even when CPU/memory is available.</li>
+    <li>Topology spread constraints can force extra nodes across AZs.</li>
+    <li>Affinities/anti-affinities and taints fragment capacity.</li>
+    <li>Mixed instance types increase fragmentation (some pods only fit certain shapes).</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Check real allocatable resources (not vCPU/RAM marketing numbers).</li>
+    <li>Validate daemonset overhead per node and max pods per node.</li>
+    <li>Run a week of real scheduling metrics and compare requested vs allocatable utilization.</li>
   </ul>
 
   <h2>Related tools</h2>
-  <p>
+  <div class="btn-row">
     <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
-    <a class="btn" href="/guides/kubernetes-requests-vs-limits-for-sizing/">Requests vs limits</a>
     <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Node cost</a>
-  </p>
+    <a class="btn" href="/guides/kubernetes-requests-vs-limits-for-sizing/">Requests vs limits</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
 </GuideLayout>
 

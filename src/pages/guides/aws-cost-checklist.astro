@@ -3,41 +3,103 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS cost checklist: a simple budgeting framework";
 const description =
-  "A one-page AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN.";
+  "A practical AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN - plus validation steps to avoid surprises.";
+const faqs = [
+  {
+    q: "Why do AWS budgets miss?",
+    a: "They model only compute. The biggest misses are transfer (egress/cross-AZ), logs/metrics, and request-priced services that scale with traffic.",
+  },
+  {
+    q: "What is the fastest way to get a baseline number?",
+    a: "Use a blended rate approach: estimate the monthly drivers (hours, GB-month, requests, GB/month transfer), multiply by effective unit prices, then refine for tiering and region mix later.",
+  },
+  {
+    q: "How should I validate the checklist estimate?",
+    a: "Compare directionality against a real week of metrics or billing exports. Validate units (GB vs GiB) and separate CDN bandwidth from origin egress.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-cost-checklist" lastUpdated="2026-01-20">
-  <p>
-    Use this checklist when you want a “good enough” AWS budget quickly. The goal is to avoid missing the line items that
-    most often surprise teams.
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-cost-checklist"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Use this checklist when you want a "good enough" AWS budget quickly. The goal is to avoid missing the line items
+    that most often surprise teams.
   </p>
 
-  <h2>Compute</h2>
+  <h2>1) Compute</h2>
   <ul>
-    <li><a href="/calculators/ec2-cost-calculator/">EC2 cost</a> (instances × $/hour × uptime)</li>
-    <li><a href="/calculators/eks-cost-calculator/">EKS cost</a> (nodes + control plane)</li>
+    <li>
+      <a href="/calculators/ec2-cost-calculator/">EC2 cost</a> (instances x $/hour x hours/month x uptime)
+    </li>
+    <li>
+      <a href="/calculators/eks-cost-calculator/">EKS cost</a> (nodes + control plane) and{" "}
+      <a href="/guides/aws-eks-control-plane-cost/">control plane guide</a>
+    </li>
   </ul>
 
-  <h2>Storage</h2>
+  <h2>2) Storage</h2>
   <ul>
-    <li><a href="/calculators/s3-cost-calculator/">S3 cost</a> (storage + requests + egress)</li>
-    <li><a href="/calculators/s3-replication-cost-calculator/">S3 replication</a> (if you replicate/copy data)</li>
+    <li>
+      <a href="/calculators/s3-cost-calculator/">S3 cost</a> (storage + requests + egress)
+    </li>
+    <li>
+      <a href="/calculators/s3-request-cost-calculator/">S3 request cost</a> and{" "}
+      <a href="/guides/aws-s3-request-costs/">request cost guide</a>
+    </li>
+    <li>
+      <a href="/calculators/s3-replication-cost-calculator/">S3 replication</a> (if you replicate/copy data)
+    </li>
+    <li>
+      Storage classes and archive: <a href="/guides/aws-s3-storage-classes/">storage classes</a> and{" "}
+      <a href="/calculators/aws-s3-glacier-cost-calculator/">archive cost calculator</a>
+    </li>
   </ul>
 
-  <h2>Data transfer</h2>
+  <h2>3) Data transfer (usually the biggest surprise)</h2>
   <ul>
     <li><a href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer</a></li>
     <li><a href="/calculators/data-egress-cost-calculator/">Internet egress</a></li>
+    <li>
+      Guide: <a href="/guides/network-transfer-costs/">network transfer costs explained</a>
+    </li>
   </ul>
 
-  <h2>Observability</h2>
+  <h2>4) Observability</h2>
   <ul>
     <li><a href="/calculators/log-cost-calculator/">Log cost</a></li>
+    <li><a href="/calculators/log-search-scan-cost-calculator/">Log search/scan</a></li>
     <li><a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series cost</a></li>
+    <li>
+      Guide: <a href="/guides/aws-logging-cost-reduction/">reduce logging costs</a>
+    </li>
   </ul>
 
-  <h2>CDN</h2>
+  <h2>5) CDN</h2>
   <ul>
     <li><a href="/calculators/cloudfront-cost-calculator/">CloudFront cost</a></li>
+    <li>
+      Guide: <a href="/guides/cdn-costs/">CDN costs explained</a>
+    </li>
   </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate units: GB vs GiB and request units (per 10k vs per 1M).</li>
+    <li>Separate CDN bandwidth (edge-to-user) from origin egress (cache fill).</li>
+    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Full cost estimation checklist</a>
+    <a class="btn" href="/guides/aws-ec2-cost-estimation/">EC2 estimation</a>
+    <a class="btn" href="/guides/aws-s3-data-transfer/">S3 transfer</a>
+    <a class="btn" href="/guides/aws-logging-cost-reduction/">Reduce logging costs</a>
+  </div>
 </GuideLayout>
 

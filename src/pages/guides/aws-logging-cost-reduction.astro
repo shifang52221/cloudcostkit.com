@@ -4,19 +4,38 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "How to reduce logging and observability costs (without losing signal)";
 const description =
   "Practical techniques to reduce log and metrics costs: sampling, retention tiers, label hygiene, and source-side filtering - with calculators to quantify impact.";
+const faqs = [
+  {
+    q: "What usually drives logging cost spikes?",
+    a: "Volume and cardinality. Common causes are debug logs left on, noisy endpoints, retry storms during incidents, high-cardinality labels in metrics, and verbose access logs.",
+  },
+  {
+    q: "Is sampling safe?",
+    a: "Sampling is safest when you keep full fidelity for errors and important events, and sample low-value logs (debug/info) at the source. Always validate that you can still answer your core questions.",
+  },
+  {
+    q: "What's the best first lever?",
+    a: "Source-side filtering and format hygiene. Dropping low-value logs before ingestion typically beats any downstream tuning because it reduces ingestion, retention, and query costs together.",
+  },
+  {
+    q: "How do I quantify savings quickly?",
+    a: "Estimate current ingestion GB/day and scan/query volume, then model a reduction factor (for example -30% ingestion) and compare monthly costs.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-logging-cost-reduction"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p>
     Observability cost usually grows because volume and cardinality grow silently. The best reductions come from removing
     low-value data before it is ingested, and keeping high-value data longer.
   </p>
 
-  <h2>High-impact levers</h2>
+  <h2>High-impact levers (in priority order)</h2>
   <ul>
     <li><strong>Source-side filtering</strong>: drop noisy logs before shipping.</li>
     <li><strong>Sampling</strong>: keep full fidelity for errors, sample debug/info.</li>
@@ -25,13 +44,31 @@ const description =
   </ul>
 
   <h2>Quantify the impact</h2>
-  <p>
-    Use these calculators to estimate savings:
-  </p>
   <ul>
-    <li><a href="/calculators/log-cost-calculator/">Log cost calculator</a></li>
-    <li><a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost</a></li>
-    <li><a href="/calculators/kubernetes-observability-cost-calculator/">Kubernetes observability cost</a></li>
+    <li>
+      Start with ingestion: <a href="/calculators/log-cost-calculator/">log cost calculator</a> and{" "}
+      <a href="/guides/estimate-log-ingestion-gb-per-day/">estimate ingestion GB/day</a>.
+    </li>
+    <li>
+      Add query/scan: <a href="/calculators/log-search-scan-cost-calculator/">log search/scan cost</a>.
+    </li>
+    <li>
+      Metrics cardinality: <a href="/calculators/metrics-timeseries-cost-calculator/">metrics time series cost</a>.
+    </li>
   </ul>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Reduce volume at the source, then validate you still catch errors and key business events.</li>
+    <li>Track a before/after week: ingestion GB/day, scan GB/day, and top noisy sources.</li>
+    <li>Set hard limits for debug logging (timeboxed feature flags).</li>
+  </ul>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/log-retention-storage-cost/">Retention cost</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-insights-pricing/">Logs Insights pricing</a>
+  </div>
+</GuideLayout>

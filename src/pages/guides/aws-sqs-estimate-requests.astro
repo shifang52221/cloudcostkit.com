@@ -3,23 +3,32 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate SQS requests (from messages and retries)";
 const description =
-  "How to estimate billable SQS request volume: messages/month, requests per message, and how retries inflate costs.";
+  "How to estimate billable SQS request volume: messages/month, requests per message, and how retries inflate costs. Includes validation tips and common pitfalls.";
+const faqs = [
+  {
+    q: "What's a good default for requests per message?",
+    a: "Start with 3 (Send + Receive + Delete). Increase it if you have retries, visibility extensions, or extra API calls.",
+  },
+  {
+    q: "How do retries impact requests?",
+    a: "Retries add more Receives and Deletes. A small retry percentage at high volume can materially change total requests.",
+  },
+  {
+    q: "Why do SQS bills spike during incidents?",
+    a: "Retry loops, poison messages, and consumer failures can multiply receives and deletes. The queue can also act as a buffer for bursty producers.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Compare against CloudWatch metrics for NumberOfMessagesSent/Received/Deleted and use a representative week to compute average monthly volume.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-sqs-estimate-requests"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s a good default for requests per message?",
-      a: "Start with 3 (Send + Receive + Delete). Increase it if you have retries, visibility extensions, or extra API calls.",
-    },
-    {
-      q: "How do retries impact requests?",
-      a: "Retries add more Receives and Deletes. A small retry percentage at high volume can materially change total requests.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
     The fastest way to budget SQS is to estimate total monthly requests. Once you have that, the cost model is usually
@@ -30,19 +39,42 @@ const description =
   <p>
     If you have a steady rate, approximate:
     <br />
-    <strong>messages/month ≈ messages/sec × 2,592,000</strong> (30-day month).
+    <strong>messages/month ~ messages/sec x 2,592,000</strong> (30-day month).
+  </p>
+  <p class="muted">
+    If you already have RPS, you can also use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
   </p>
 
   <h2>2) Multiply by requests per message</h2>
-  <p>
-    Use a baseline of 3, then add a buffer for retries. For example, if 10% of messages are retried once, your effective
-    requests per message may be closer to 3.3–3.5 depending on behavior.
-  </p>
+  <ul>
+    <li><strong>Baseline</strong>: 3 requests per message (Send + Receive + Delete).</li>
+    <li><strong>Add retries</strong>: a retry rate increases the effective requests per message.</li>
+    <li><strong>Add extras</strong>: visibility timeout extensions, polling patterns, and DLQ routing can add calls.</li>
+  </ul>
 
-  <h2>3) Sanity-check with a calculator</h2>
-  <p>
-    Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS Cost Calculator</a> and adjust “requests per message” until
-    the estimate matches what you see in your metrics.
-  </p>
+  <h2>3) Price it and sanity-check</h2>
+  <ul>
+    <li>
+      Tool: <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a>
+    </li>
+    <li>
+      If the estimate is far off, adjust requests/message until it matches what you see in metrics, then use that value
+      for budgeting.
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Ignoring retries: failures can multiply receives and deletes.</li>
+    <li>Counting messages but not API calls: "one message" is rarely "one request".</li>
+    <li>Using peak rate for an entire month: budget with an average plus headroom, then model peaks separately.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/calculators/aws-sqs-cost-calculator/">SQS cost tool</a>
+  </div>
 </GuideLayout>
 

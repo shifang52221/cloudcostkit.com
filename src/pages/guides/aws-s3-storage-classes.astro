@@ -4,33 +4,67 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "S3 storage classes: how they change cost (and when archive fees matter)";
 const description =
   "A practical guide to S3-like storage classes: why cheaper storage can come with retrieval/transition tradeoffs, and how to model cost with simple assumptions.";
+const faqs = [
+  {
+    q: "Why can cheaper storage cost more?",
+    a: "Because cold tiers often add retrieval and transition fees, and may enforce minimum storage duration. If your data is short-lived or frequently retrieved, the effective cost can be higher.",
+  },
+  {
+    q: "What inputs should I estimate first?",
+    a: "Average GB-month stored per tier, retrieval GB/month for cold tiers, and how often objects transition between tiers.",
+  },
+  {
+    q: "When do archive fees matter most?",
+    a: "Large restores (audits/backfills), frequent cold reads, and short-lived objects placed into tiers with minimum duration.",
+  },
+  {
+    q: "How do I validate a tiering plan?",
+    a: "Run a 30-day analysis of access patterns (GETs and bytes retrieved) and simulate tiering with conservative retrieval assumptions.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-storage-classes" lastUpdated="2026-01-20">
-  <p>
-    Storage classes are a common source of confusion. “Cheaper per GB” tiers can introduce retrieval, transition, and
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-storage-classes"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Storage classes are a common source of confusion. Cheaper per-GB tiers can introduce retrieval, transition, and
     minimum storage duration effects that matter for bursty access patterns.
   </p>
 
   <h2>How to model storage classes safely</h2>
   <ul>
-    <li>Split your data into a few access tiers (hot / warm / archive)</li>
-    <li>Estimate average GB stored in each tier</li>
-    <li>Estimate retrieval GB/month for colder tiers</li>
-    <li>Model transitions if you move objects between tiers regularly</li>
+    <li>Split your data into a few access tiers (hot / warm / archive).</li>
+    <li>Estimate average GB-month stored in each tier.</li>
+    <li>Estimate retrieval GB/month for colder tiers.</li>
+    <li>Model transitions if you move objects between tiers regularly.</li>
   </ul>
 
   <h2>When archive fees matter</h2>
   <ul>
-    <li>Large restores for backfills or audits</li>
-    <li>Frequent “read after long retention” workflows</li>
-    <li>Short-lived data placed into tiers with minimum duration</li>
+    <li>Large restores for backfills or audits.</li>
+    <li>Frequent "read after long retention" workflows.</li>
+    <li>Short-lived data placed into tiers with minimum duration.</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Ignoring minimum duration: deleting early can create effective waste.</li>
+    <li>Ignoring retrieval: even small retrieval GB/month can matter at scale.</li>
+    <li>Over-transitioning: moving objects too often creates transition fees.</li>
+    <li>Forgetting transfer: delivery to users/CDNs can dominate storage cost.</li>
   </ul>
 
   <h2>Related tools</h2>
-  <p>
+  <div class="btn-row">
     <a class="btn" href="/calculators/s3-cost-calculator/">S3 cost calculator</a>
-    <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing calculator</a>
+    <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing</a>
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">S3 archive cost</a>
     <a class="btn" href="/guides/aws-s3-pricing/">S3 pricing model</a>
-  </p>
+    <a class="btn" href="/guides/storage-costs/">Storage costs (general)</a>
+  </div>
 </GuideLayout>
 
