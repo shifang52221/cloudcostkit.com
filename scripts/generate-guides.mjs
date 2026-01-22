@@ -31,6 +31,15 @@ function extractTopics({ fileName, canonicalPath, title, description }) {
     topics.add("metrics");
   if (s.includes("kubernetes") || s.includes("eks") || s.includes("gke") || s.includes("aks")) topics.add("kubernetes");
   if (
+    s.includes("ec2") ||
+    s.includes("compute") ||
+    s.includes("instance") ||
+    s.includes("vm") ||
+    s.includes("container") ||
+    s.includes("fargate")
+  )
+    topics.add("compute");
+  if (
     s.includes("lambda") ||
     s.includes("functions") ||
     s.includes("cloud run") ||
@@ -63,6 +72,14 @@ function extractTopics({ fileName, canonicalPath, title, description }) {
   if (s.includes("storage") || s.includes("s3") || s.includes("blob") || s.includes("ecr") || s.includes("acr")) topics.add("storage");
   if (s.includes("waf") || s.includes("armor") || s.includes("security") || s.includes("key vault") || s.includes("kms"))
     topics.add("security");
+  if (
+    s.includes("snapshot") ||
+    s.includes("snapshots") ||
+    s.includes("backup") ||
+    s.includes("backups") ||
+    s.includes("retention")
+  )
+    topics.add("backup");
 
   return Array.from(topics).sort((a, b) => a.localeCompare(b));
 }

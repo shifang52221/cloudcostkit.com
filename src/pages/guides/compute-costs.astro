@@ -1,0 +1,90 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Compute costs explained: instance-hours, utilization, and hidden drivers";
+const description =
+  "A practical compute cost model: instance-hours (or vCPU/GB-hours), utilization and idle waste, plus the hidden drivers that often dominate totals (egress, load balancers, and logs).";
+
+const faqs = [
+  {
+    q: "What usually drives compute cost?",
+    a: "Compute is usually priced by time (instance-hours) or resource time (vCPU-hours and GB-hours). The big mistakes are sizing to peak, leaving non-prod always on, and ignoring adjacent line items like egress, load balancers, and logs.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with baseline capacity (instance-hours or vCPU/GB-hours) for steady state. Then run a peak scenario and add separate budgets for egress, logs, and load balancers.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Underestimating idle capacity, bursty traffic, and downstream costs (databases, logging, networking). Commitments can help but only if you validate utilization.",
+  },
+];
+
+const computeGuides = GUIDES.filter((g) => (g.topics || []).includes("compute") && g.canonicalPath !== "/guides/compute-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/compute-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Compute-only estimates are almost always too optimistic. A planning-safe model includes compute time plus at least one
+    scenario for networking (egress) and observability (logs/metrics). This hub links the strongest checklists and tools.
+  </p>
+
+  <h2>1) Baseline compute</h2>
+  <ul>
+    <li>Estimate instance-hours (or vCPU/GB-hours) for steady state, not peak-only.</li>
+    <li>Separate prod vs non-prod; dev/test can dominate if always on.</li>
+  </ul>
+
+  <h2>2) Utilization and idle waste</h2>
+  <ul>
+    <li>Right-size with real utilization (CPU, memory, and burst patterns).</li>
+    <li>For container platforms, validate packing efficiency and headroom.</li>
+    <li>
+      Hubs: <a href="/guides/kubernetes-costs/">Kubernetes costs</a>, <a href="/guides/serverless-costs/">serverless costs</a>
+    </li>
+  </ul>
+
+  <h2>3) Hidden drivers adjacent to compute</h2>
+  <ul>
+    <li><strong>Networking</strong>: egress/NAT/transfer scales with traffic.</li>
+    <li><strong>Load balancers</strong>: hourly + request/GB processed.</li>
+    <li><strong>Logs</strong>: ingestion + retention can exceed compute for verbose systems.</li>
+    <li>
+      Hubs: <a href="/guides/networking-costs/">networking</a>, <a href="/guides/load-balancing-costs/">load balancing</a>,{" "}
+      <a href="/guides/log-costs/">logs</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost</a>
+    <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+  </div>
+
+  {computeGuides.length ? (
+    <>
+      <h2>More compute guides</h2>
+      <div class="grid">
+        {computeGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
+

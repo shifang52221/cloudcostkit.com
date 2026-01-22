@@ -1,0 +1,87 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Observability costs explained: logs, metrics, traces, and query behavior";
+const description =
+  "A practical observability cost model: log ingestion + retention, metrics series cardinality, traces volume, and the query patterns that create scan/search charges.";
+
+const faqs = [
+  {
+    q: "What usually drives observability cost?",
+    a: "Logs (GB ingested and retained) and metrics series cardinality are the most common drivers. Query/scan/search charges can spike during incidents and from dashboards that run broad queries.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate log GB/day and retention days, then estimate unique metrics series count. Add a peak scenario for incident windows where logs and queries spike.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Verbose logs, high-cardinality labels, and always-on dashboards. Retention defaults can silently grow costs over time.",
+  },
+];
+
+const obsGuides = GUIDES.filter((g) => (g.topics || []).some((t) => t === "logging" || t === "metrics") && g.canonicalPath !== "/guides/observability-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/observability-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Observability is one of the most common sources of surprise cloud bills. A planning-safe model includes: log GB/day +
+    retention, metrics series count, and a scenario for incident windows (spikes in volume and queries).
+  </p>
+
+  <h2>1) Logs: ingestion + retention + scan/search</h2>
+  <ul>
+    <li>Estimate log GB/day and retention days (steady state storage ~ GB/day x retention days).</li>
+    <li>Model scan/search if your provider charges by GB scanned.</li>
+    <li>
+      Hub: <a href="/guides/log-costs/">log costs</a>
+    </li>
+  </ul>
+
+  <h2>2) Metrics: series cardinality</h2>
+  <ul>
+    <li>Series count multiplies quickly with labels (pod name, path, userId, requestId).</li>
+    <li>
+      Hub: <a href="/guides/metrics-costs/">metrics costs</a>
+    </li>
+  </ul>
+
+  <h2>3) Traces and incident scenarios</h2>
+  <ul>
+    <li>Trace volume is usually traffic-driven; sample aggressively for low-value spans.</li>
+    <li>During incidents, logs, retries, and query scans often spike together.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>
+    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics</a>
+  </div>
+
+  {obsGuides.length ? (
+    <>
+      <h2>More observability guides</h2>
+      <div class="grid">
+        {obsGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
+

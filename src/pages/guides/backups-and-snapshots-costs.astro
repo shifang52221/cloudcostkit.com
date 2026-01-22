@@ -1,0 +1,89 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Backup and snapshot costs explained: retention, growth, and transfer";
+const description =
+  "A practical backup cost model: snapshot frequency and retention, stored GB-month growth, cross-region copies, and the hidden transfer charges that can surprise bills.";
+
+const faqs = [
+  {
+    q: "What usually drives backup cost?",
+    a: "Retention and growth. In steady state, stored backup size is roughly daily change rate times retention days (plus baseline). Cross-region copies and restore/testing workflows add extra storage and transfer.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate your protected data size, daily change rate, and retention policy (daily/weekly/monthly). Then model GB-month and add cross-region copies if enabled.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Long retention, high churn workloads, and forgetting cross-region backup copies or egress/transfer for restores and replication.",
+  },
+];
+
+const backupGuides = GUIDES.filter((g) => (g.topics || []).includes("backup") && g.canonicalPath !== "/guides/backups-and-snapshots-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/backups-and-snapshots-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Backup bills grow quietly. The stable model is: change rate + retention + copy strategy. This hub links snapshot and
+    backup estimation workflows so retention policies are explicit and measurable.
+  </p>
+
+  <h2>1) Retention policy (daily/weekly/monthly)</h2>
+  <ul>
+    <li>Write the policy down: how many daily, weekly, and monthly backups.</li>
+    <li>Validate compliance vs practical troubleshooting needs.</li>
+  </ul>
+
+  <h2>2) Storage growth (GB-month)</h2>
+  <ul>
+    <li>Estimate protected data size and daily change/churn rate.</li>
+    <li>Convert retention into stored GB-month over time.</li>
+    <li>
+      Tool: <a href="/calculators/aws-ebs-snapshot-cost-calculator/">snapshot cost calculator</a>
+    </li>
+  </ul>
+
+  <h2>3) Copies and transfer</h2>
+  <ul>
+    <li>Cross-region copies duplicate storage and can add transfer charges.</li>
+    <li>Restore testing and DR drills add read/restore costs depending on provider.</li>
+    <li>
+      Tools: <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>,{" "}
+      <a href="/calculators/data-egress-cost-calculator/">egress</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost</a>
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+    <a class="btn" href="/guides/database-costs/">Database costs</a>
+  </div>
+
+  {backupGuides.length ? (
+    <>
+      <h2>More backup guides</h2>
+      <div class="grid">
+        {backupGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
+

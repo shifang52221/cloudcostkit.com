@@ -27,6 +27,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-api-gateway-access-logs-cost",
     "topics": [
+      "backup",
       "logging",
       "requests"
     ]
@@ -73,6 +74,8 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-aurora-pricing",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "storage"
     ]
@@ -84,6 +87,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-aurora-serverless-v2-pricing",
     "topics": [
+      "backup",
       "database",
       "kubernetes",
       "serverless",
@@ -98,6 +102,7 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-cost-checklist",
     "topics": [
       "cdn",
+      "compute",
       "egress",
       "storage"
     ]
@@ -109,6 +114,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-dynamodb-cost-optimization",
     "topics": [
+      "backup",
       "requests",
       "storage"
     ]
@@ -129,7 +135,9 @@ export const GUIDES: GuideLink[] = [
     "canonicalPath": "/guides/aws-ebs-cost-optimization",
     "category": "AWS",
     "slug": "aws-ebs-cost-optimization",
-    "topics": []
+    "topics": [
+      "backup"
+    ]
   },
   {
     "title": "AWS EBS pricing (what to include)",
@@ -138,6 +146,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ebs-pricing",
     "topics": [
+      "backup",
       "storage"
     ]
   },
@@ -193,6 +202,8 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-rds-cost-optimization",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "storage"
     ]
@@ -204,6 +215,8 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-rds-pricing",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "storage"
     ]
@@ -281,6 +294,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-cloudfront-logs-cost",
     "topics": [
+      "backup",
       "cdn",
       "logging",
       "storage"
@@ -368,6 +382,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-cloudwatch-logs-pricing",
     "topics": [
+      "backup",
       "logging"
     ]
   },
@@ -430,6 +445,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ebs-snapshot-cost",
     "topics": [
+      "backup",
       "storage"
     ]
   },
@@ -440,6 +456,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ec2-cost-estimation",
     "topics": [
+      "compute",
       "egress",
       "storage"
     ]
@@ -451,6 +468,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ecr-cost-optimization",
     "topics": [
+      "backup",
       "storage"
     ]
   },
@@ -485,6 +503,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ecs-cost-model-beyond-compute",
     "topics": [
+      "compute",
       "egress",
       "load-balancing",
       "logging",
@@ -499,6 +518,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ecs-ec2-vs-fargate-cost",
     "topics": [
+      "compute",
       "egress",
       "load-balancing",
       "logging",
@@ -512,6 +532,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ecs-pricing",
     "topics": [
+      "compute",
       "egress",
       "load-balancing",
       "logging",
@@ -534,6 +555,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ecs-vs-eks-cost",
     "topics": [
+      "compute",
       "egress",
       "kubernetes",
       "load-balancing",
@@ -661,6 +683,8 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-ecr-estimate-storage-gb-month",
     "topics": [
+      "backup",
+      "compute",
       "storage"
     ]
   },
@@ -736,6 +760,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-rds-backup-storage-gb-month-estimate",
     "topics": [
+      "backup",
       "database",
       "storage"
     ]
@@ -807,6 +832,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-fargate-cost-optimization",
     "topics": [
+      "compute",
       "logging",
       "serverless"
     ]
@@ -818,6 +844,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-fargate-pricing",
     "topics": [
+      "compute",
       "egress",
       "load-balancing",
       "logging",
@@ -831,6 +858,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-fargate-vs-ec2-cost",
     "topics": [
+      "compute",
       "egress",
       "load-balancing",
       "logging",
@@ -844,6 +872,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-fargate-vs-eks-cost",
     "topics": [
+      "compute",
       "egress",
       "kubernetes",
       "load-balancing",
@@ -879,6 +908,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-logging-cost-reduction",
     "topics": [
+      "backup",
       "logging",
       "metrics"
     ]
@@ -922,6 +952,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-lambda-vs-fargate-cost",
     "topics": [
+      "compute",
       "egress",
       "logging",
       "requests",
@@ -1029,6 +1060,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-rds-backups-and-snapshots",
     "topics": [
+      "backup",
       "database",
       "storage"
     ]
@@ -1040,6 +1072,7 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-rds-snapshot-retention-policy-cost",
     "topics": [
+      "backup",
       "database"
     ]
   },
@@ -1050,6 +1083,8 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-rds-vs-aurora-cost",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "storage"
     ]
@@ -1316,6 +1351,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-application-insights-pricing",
     "topics": [
+      "backup",
       "metrics"
     ]
   },
@@ -1360,6 +1396,8 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-container-registry-pricing",
     "topics": [
+      "backup",
+      "compute",
       "egress",
       "storage"
     ]
@@ -1382,6 +1420,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
     "topics": [
+      "backup",
       "egress",
       "messaging"
     ]
@@ -1429,6 +1468,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-aks-pricing",
     "topics": [
+      "compute",
       "egress",
       "kubernetes",
       "storage"
@@ -1452,6 +1492,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-log-analytics-pricing",
     "topics": [
+      "backup",
       "logging"
     ]
   },
@@ -1462,6 +1503,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-monitor-metrics-pricing",
     "topics": [
+      "backup",
       "database",
       "metrics",
       "requests"
@@ -1507,6 +1549,8 @@ export const GUIDES: GuideLink[] = [
     "category": "Azure",
     "slug": "azure-sql-database-pricing",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "egress",
       "storage"
@@ -1579,6 +1623,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-artifact-registry-pricing",
     "topics": [
+      "backup",
       "egress",
       "storage"
     ]
@@ -1590,6 +1635,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-bigquery-cost-estimation",
     "topics": [
+      "backup",
       "storage"
     ]
   },
@@ -1648,6 +1694,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-cloud-logging-pricing",
     "topics": [
+      "backup",
       "logging"
     ]
   },
@@ -1658,6 +1705,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-cloud-monitoring-metrics-pricing",
     "topics": [
+      "backup",
       "database",
       "metrics"
     ]
@@ -1679,6 +1727,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-cloud-run-pricing",
     "topics": [
+      "compute",
       "egress",
       "logging",
       "requests",
@@ -1692,6 +1741,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-cloud-spanner-cost-estimation",
     "topics": [
+      "compute",
       "database",
       "storage"
     ]
@@ -1703,6 +1753,8 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-cloud-sql-pricing",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "egress",
       "storage"
@@ -1715,6 +1767,7 @@ export const GUIDES: GuideLink[] = [
     "category": "GCP",
     "slug": "gcp-dataflow-pricing",
     "topics": [
+      "compute",
       "logging",
       "metrics"
     ]
@@ -1805,16 +1858,41 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "Backup and snapshot costs explained: retention, growth, and transfer",
+    "description": "A practical backup cost model: snapshot frequency and retention, stored GB-month growth, cross-region copies, and the hidden transfer charges that can surprise bills.",
+    "canonicalPath": "/guides/backups-and-snapshots-costs",
+    "category": "General",
+    "slug": "backups-and-snapshots-costs",
+    "topics": [
+      "backup",
+      "egress"
+    ]
+  },
+  {
     "title": "Cloud cost estimation checklist (avoid thin estimates)",
     "description": "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs, and network transfer. Includes validation steps and common pitfalls.",
     "canonicalPath": "/guides/cloud-cost-estimation-checklist",
     "category": "General",
     "slug": "cloud-cost-estimation-checklist",
     "topics": [
+      "compute",
       "egress",
       "logging",
       "requests",
       "storage"
+    ]
+  },
+  {
+    "title": "Compute costs explained: instance-hours, utilization, and hidden drivers",
+    "description": "A practical compute cost model: instance-hours (or vCPU/GB-hours), utilization and idle waste, plus the hidden drivers that often dominate totals (egress, load balancers, and logs).",
+    "canonicalPath": "/guides/compute-costs",
+    "category": "General",
+    "slug": "compute-costs",
+    "topics": [
+      "compute",
+      "egress",
+      "load-balancing",
+      "logging"
     ]
   },
   {
@@ -1824,6 +1902,8 @@ export const GUIDES: GuideLink[] = [
     "category": "General",
     "slug": "database-costs",
     "topics": [
+      "backup",
+      "compute",
       "database",
       "storage"
     ]
@@ -1869,6 +1949,7 @@ export const GUIDES: GuideLink[] = [
     "category": "General",
     "slug": "metrics-costs",
     "topics": [
+      "backup",
       "database",
       "metrics"
     ]
@@ -1881,6 +1962,18 @@ export const GUIDES: GuideLink[] = [
     "slug": "networking-costs",
     "topics": [
       "egress"
+    ]
+  },
+  {
+    "title": "Observability costs explained: logs, metrics, traces, and query behavior",
+    "description": "A practical observability cost model: log ingestion + retention, metrics series cardinality, traces volume, and the query patterns that create scan/search charges.",
+    "canonicalPath": "/guides/observability-costs",
+    "category": "General",
+    "slug": "observability-costs",
+    "topics": [
+      "backup",
+      "logging",
+      "metrics"
     ]
   },
   {
@@ -1913,6 +2006,7 @@ export const GUIDES: GuideLink[] = [
     "category": "General",
     "slug": "serverless-costs",
     "topics": [
+      "compute",
       "egress",
       "logging",
       "requests",
@@ -1939,6 +2033,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Kubernetes",
     "slug": "kubernetes-cost-calculator",
     "topics": [
+      "compute",
       "egress",
       "kubernetes",
       "load-balancing",
@@ -2013,6 +2108,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Logging",
     "slug": "log-costs",
     "topics": [
+      "backup",
       "logging"
     ]
   },
@@ -2023,6 +2119,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Logging",
     "slug": "log-retention-storage-cost",
     "topics": [
+      "backup",
       "logging",
       "storage"
     ]
@@ -2065,6 +2162,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Storage",
     "slug": "copy-storage-pricing",
     "topics": [
+      "backup",
       "egress",
       "requests",
       "storage"
@@ -2113,6 +2211,7 @@ export const GUIDES: GuideLink[] = [
     "category": "Storage",
     "slug": "storage-costs",
     "topics": [
+      "backup",
       "egress",
       "requests",
       "storage"
