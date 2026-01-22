@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateSqsCost } from "../../lib/calc/sqs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsSqsCostCalculator() {
-  const [messagesPerMonth, setMessagesPerMonth] = useState(200_000_000);
-  const [requestsPerMessage, setRequestsPerMessage] = useState(3);
-  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useState(0.4);
-  const [freeRequestsPerMonth, setFreeRequestsPerMonth] = useState(0);
+  const [messagesPerMonth, setMessagesPerMonth] = useNumberParamState("AwsSqsCost.messagesPerMonth", 200_000_000);
+  const [requestsPerMessage, setRequestsPerMessage] = useNumberParamState("AwsSqsCost.requestsPerMessage", 3);
+  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsSqsCost.pricePerMillionRequestsUsd", 0.4);
+  const [freeRequestsPerMonth, setFreeRequestsPerMonth] = useNumberParamState("AwsSqsCost.freeRequestsPerMonth", 0);
 
   const result = useMemo(() => {
     return estimateSqsCost({

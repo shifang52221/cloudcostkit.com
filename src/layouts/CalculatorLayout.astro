@@ -72,7 +72,43 @@ const schemas = [breadcrumbSchema, faqSchema].filter(Boolean);
   <section class="card hero">
     <h1>{title}</h1>
     <p>{intro}</p>
+    <div class="btn-row" style="margin-top:12px; align-items:center">
+      <button class="btn" type="button" id="copy-share-link">Copy share link</button>
+      <span class="muted" id="copy-share-link-status" aria-live="polite" style="font-size:13px"></span>
+    </div>
   </section>
+
+  <script is:inline type="text/javascript">
+    (function () {
+      var btn = document.getElementById("copy-share-link");
+      var status = document.getElementById("copy-share-link-status");
+      if (!btn) return;
+      function setStatus(msg) {
+        if (!status) return;
+        status.textContent = msg || "";
+      }
+      btn.addEventListener("click", function () {
+        try {
+          var url = window.location.href;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard
+              .writeText(url)
+              .then(function () {
+                setStatus("Copied");
+                setTimeout(function () {
+                  setStatus("");
+                }, 1200);
+              })
+              .catch(function () {
+                window.prompt("Copy link:", url);
+              });
+          } else {
+            window.prompt("Copy link:", url);
+          }
+        } catch (e) {}
+      });
+    })();
+  </script>
 
   <section class="card section">
     <slot />

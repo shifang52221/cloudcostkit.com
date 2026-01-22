@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateTimeseriesCost } from "../../lib/calc/metrics";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function MetricsTimeseriesCostCalculator() {
-  const [activeSeries, setActiveSeries] = useState(50_000);
-  const [pricePerSeriesMonthUsd, setPricePerSeriesMonthUsd] = useState(0.0005);
+  const [activeSeries, setActiveSeries] = useNumberParamState("MetricsTimeseriesCost.activeSeries", 50_000);
+  const [pricePerSeriesMonthUsd, setPricePerSeriesMonthUsd] = useNumberParamState("MetricsTimeseriesCost.pricePerSeriesMonthUsd", 0.0005);
 
   const result = useMemo(() => {
     return estimateTimeseriesCost({

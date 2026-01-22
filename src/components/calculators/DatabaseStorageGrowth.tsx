@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateDbStorageGrowth } from "../../lib/calc/dbGrowth";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function DatabaseStorageGrowthCostCalculator() {
-  const [startingGb, setStartingGb] = useState(500);
-  const [growthGbPerDay, setGrowthGbPerDay] = useState(5);
-  const [months, setMonths] = useState(6);
-  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useState(0.12);
+  const [startingGb, setStartingGb] = useNumberParamState("DatabaseStorageGrowth.startingGb", 500);
+  const [growthGbPerDay, setGrowthGbPerDay] = useNumberParamState("DatabaseStorageGrowth.growthGbPerDay", 5);
+  const [months, setMonths] = useNumberParamState("DatabaseStorageGrowth.months", 6);
+  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("DatabaseStorageGrowth.storagePricePerGbMonthUsd", 0.12);
 
   const result = useMemo(() => {
     return estimateDbStorageGrowth({

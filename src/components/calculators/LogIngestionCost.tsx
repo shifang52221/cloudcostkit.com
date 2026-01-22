@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateLogCost } from "../../lib/calc/logs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function LogIngestionCostCalculator() {
-  const [gbPerDayIngest, setGbPerDayIngest] = useState(50);
-  const [retentionDays, setRetentionDays] = useState(30);
-  const [ingestPricePerGbUsd, setIngestPricePerGbUsd] = useState(0.5);
-  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useState(0.03);
+  const [gbPerDayIngest, setGbPerDayIngest] = useNumberParamState("LogIngestionCost.gbPerDayIngest", 50);
+  const [retentionDays, setRetentionDays] = useNumberParamState("LogIngestionCost.retentionDays", 30);
+  const [ingestPricePerGbUsd, setIngestPricePerGbUsd] = useNumberParamState("LogIngestionCost.ingestPricePerGbUsd", 0.5);
+  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("LogIngestionCost.storagePricePerGbMonthUsd", 0.03);
 
   const result = useMemo(() => {
     return estimateLogCost({

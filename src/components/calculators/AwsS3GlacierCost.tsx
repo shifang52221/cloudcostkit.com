@@ -1,17 +1,18 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateS3GlacierCost } from "../../lib/calc/s3Glacier";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsS3GlacierCostCalculator() {
-  const [storedGbMonth, setStoredGbMonth] = useState(10_000);
-  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useState(0.004);
+  const [storedGbMonth, setStoredGbMonth] = useNumberParamState("AwsS3GlacierCost.storedGbMonth", 10_000);
+  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("AwsS3GlacierCost.storagePricePerGbMonthUsd", 0.004);
 
-  const [retrievalGbPerMonth, setRetrievalGbPerMonth] = useState(500);
-  const [retrievalPricePerGbUsd, setRetrievalPricePerGbUsd] = useState(0.01);
+  const [retrievalGbPerMonth, setRetrievalGbPerMonth] = useNumberParamState("AwsS3GlacierCost.retrievalGbPerMonth", 500);
+  const [retrievalPricePerGbUsd, setRetrievalPricePerGbUsd] = useNumberParamState("AwsS3GlacierCost.retrievalPricePerGbUsd", 0.01);
 
-  const [retrievalRequestsPerMonth, setRetrievalRequestsPerMonth] = useState(2_000_000);
-  const [retrievalPricePer1000RequestsUsd, setRetrievalPricePer1000RequestsUsd] = useState(0.05);
+  const [retrievalRequestsPerMonth, setRetrievalRequestsPerMonth] = useNumberParamState("AwsS3GlacierCost.retrievalRequestsPerMonth", 2_000_000);
+  const [retrievalPricePer1000RequestsUsd, setRetrievalPricePer1000RequestsUsd] = useNumberParamState("AwsS3GlacierCost.retrievalPricePer1000RequestsUsd", 0.05);
 
   const result = useMemo(() => {
     return estimateS3GlacierCost({

@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateSesCost } from "../../lib/calc/ses";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsSesCostCalculator() {
-  const [emailsPerMonth, setEmailsPerMonth] = useState(5_000_000);
-  const [pricePer1000EmailsUsd, setPricePer1000EmailsUsd] = useState(0.1);
-  const [avgEmailKb, setAvgEmailKb] = useState(10);
-  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useState(0.09);
+  const [emailsPerMonth, setEmailsPerMonth] = useNumberParamState("AwsSesCost.emailsPerMonth", 5_000_000);
+  const [pricePer1000EmailsUsd, setPricePer1000EmailsUsd] = useNumberParamState("AwsSesCost.pricePer1000EmailsUsd", 0.1);
+  const [avgEmailKb, setAvgEmailKb] = useNumberParamState("AwsSesCost.avgEmailKb", 10);
+  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsSesCost.egressPricePerGbUsd", 0.09);
 
   const result = useMemo(() => {
     return estimateSesCost({

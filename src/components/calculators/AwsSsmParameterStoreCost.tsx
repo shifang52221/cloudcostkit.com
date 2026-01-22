@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateSsmParameterStoreCost } from "../../lib/calc/ssmParameterStore";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsSsmParameterStoreCostCalculator() {
-  const [standardParameters, setStandardParameters] = useState(1000);
-  const [advancedParameters, setAdvancedParameters] = useState(200);
-  const [pricePerAdvancedParameterUsdPerMonth, setPricePerAdvancedParameterUsdPerMonth] = useState(0.05);
+  const [standardParameters, setStandardParameters] = useNumberParamState("AwsSsmParameterStoreCost.standardParameters", 1000);
+  const [advancedParameters, setAdvancedParameters] = useNumberParamState("AwsSsmParameterStoreCost.advancedParameters", 200);
+  const [pricePerAdvancedParameterUsdPerMonth, setPricePerAdvancedParameterUsdPerMonth] = useNumberParamState("AwsSsmParameterStoreCost.pricePerAdvancedParameterUsdPerMonth", 0.05);
 
-  const [apiCallsPerMonth, setApiCallsPerMonth] = useState(200_000_000);
-  const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useState(0.05);
+  const [apiCallsPerMonth, setApiCallsPerMonth] = useNumberParamState("AwsSsmParameterStoreCost.apiCallsPerMonth", 200_000_000);
+  const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useNumberParamState("AwsSsmParameterStoreCost.pricePer10kApiCallsUsd", 0.05);
 
   const result = useMemo(() => {
     return estimateSsmParameterStoreCost({

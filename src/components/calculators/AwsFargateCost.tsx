@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateFargateCost } from "../../lib/calc/fargate";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsFargateCostCalculator() {
-  const [tasks, setTasks] = useState(3);
-  const [vcpuPerTask, setVcpuPerTask] = useState(0.5);
-  const [memoryGbPerTask, setMemoryGbPerTask] = useState(1);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
-  const [pricePerVcpuHourUsd, setPricePerVcpuHourUsd] = useState(0.04048);
-  const [pricePerGbHourUsd, setPricePerGbHourUsd] = useState(0.004445);
+  const [tasks, setTasks] = useNumberParamState("AwsFargateCost.tasks", 3);
+  const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsFargateCost.vcpuPerTask", 0.5);
+  const [memoryGbPerTask, setMemoryGbPerTask] = useNumberParamState("AwsFargateCost.memoryGbPerTask", 1);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsFargateCost.hoursPerMonth", 730);
+  const [pricePerVcpuHourUsd, setPricePerVcpuHourUsd] = useNumberParamState("AwsFargateCost.pricePerVcpuHourUsd", 0.04048);
+  const [pricePerGbHourUsd, setPricePerGbHourUsd] = useNumberParamState("AwsFargateCost.pricePerGbHourUsd", 0.004445);
 
   const result = useMemo(() => {
     return estimateFargateCost({

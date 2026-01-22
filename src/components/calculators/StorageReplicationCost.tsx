@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateReplicationCost } from "../../lib/calc/replication";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function StorageReplicationCostCalculator() {
-  const [replicatedGbPerMonth, setReplicatedGbPerMonth] = useState(2500);
-  const [pricePerGbUsd, setPricePerGbUsd] = useState(0.02);
+  const [replicatedGbPerMonth, setReplicatedGbPerMonth] = useNumberParamState("StorageReplicationCost.replicatedGbPerMonth", 2500);
+  const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("StorageReplicationCost.pricePerGbUsd", 0.02);
 
   const result = useMemo(() => {
     return estimateReplicationCost({

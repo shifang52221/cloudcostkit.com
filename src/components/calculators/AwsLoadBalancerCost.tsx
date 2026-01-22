@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateLoadBalancerCost } from "../../lib/calc/loadBalancer";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsLoadBalancerCostCalculator() {
-  const [loadBalancers, setLoadBalancers] = useState(2);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
-  const [pricePerLbHourUsd, setPricePerLbHourUsd] = useState(0.0225);
-  const [capacityUnitsPerHour, setCapacityUnitsPerHour] = useState(5);
-  const [pricePerCapacityUnitHourUsd, setPricePerCapacityUnitHourUsd] = useState(0.008);
+  const [loadBalancers, setLoadBalancers] = useNumberParamState("AwsLoadBalancerCost.loadBalancers", 2);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsLoadBalancerCost.hoursPerMonth", 730);
+  const [pricePerLbHourUsd, setPricePerLbHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerLbHourUsd", 0.0225);
+  const [capacityUnitsPerHour, setCapacityUnitsPerHour] = useNumberParamState("AwsLoadBalancerCost.capacityUnitsPerHour", 5);
+  const [pricePerCapacityUnitHourUsd, setPricePerCapacityUnitHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerCapacityUnitHourUsd", 0.008);
 
   const result = useMemo(() => {
     return estimateLoadBalancerCost({

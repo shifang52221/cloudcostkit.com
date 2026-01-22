@@ -1,14 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState, useStringParamState } from "./useNumberParamState";
 import { estimateLoadBalancerCapacityUnits, type LoadBalancerType } from "../../lib/calc/loadBalancerCapacityUnits";
 import { formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsLoadBalancerCapacityUnitsCalculator() {
-  const [type, setType] = useState<LoadBalancerType>("alb");
-  const [newConnectionsPerSecond, setNewConnectionsPerSecond] = useState(40);
-  const [activeConnections, setActiveConnections] = useState(2000);
-  const [processedGbPerHour, setProcessedGbPerHour] = useState(0.8);
-  const [ruleEvaluationsPerSecond, setRuleEvaluationsPerSecond] = useState(300);
+  const [typeRaw, setTypeRaw] = useStringParamState("AwsLoadBalancerCapacityUnits.type", "alb", ["alb", "nlb"]);
+  const type = typeRaw as LoadBalancerType;
+  const [newConnectionsPerSecond, setNewConnectionsPerSecond] = useNumberParamState("AwsLoadBalancerCapacityUnits.newConnectionsPerSecond", 40);
+  const [activeConnections, setActiveConnections] = useNumberParamState("AwsLoadBalancerCapacityUnits.activeConnections", 2000);
+  const [processedGbPerHour, setProcessedGbPerHour] = useNumberParamState("AwsLoadBalancerCapacityUnits.processedGbPerHour", 0.8);
+  const [ruleEvaluationsPerSecond, setRuleEvaluationsPerSecond] = useNumberParamState("AwsLoadBalancerCapacityUnits.ruleEvaluationsPerSecond", 300);
 
   const result = useMemo(() => {
     return estimateLoadBalancerCapacityUnits({
@@ -27,7 +29,7 @@ export function AwsLoadBalancerCapacityUnitsCalculator() {
         <div className="form">
           <div className="field field-3">
             <div className="label">LB type</div>
-            <select value={type} onChange={(e) => setType(e.target.value as LoadBalancerType)}>
+            <select value={typeRaw} onChange={(e) => setTypeRaw(e.target.value)}>
               <option value="alb">ALB (LCU)</option>
               <option value="nlb">NLB (NLCU)</option>
             </select>
@@ -93,7 +95,7 @@ export function AwsLoadBalancerCapacityUnitsCalculator() {
                 className="btn"
                 type="button"
                 onClick={() => {
-                  setType("alb");
+                  setTypeRaw("alb");
                   setNewConnectionsPerSecond(40);
                   setActiveConnections(2000);
                   setProcessedGbPerHour(0.8);
@@ -141,4 +143,3 @@ export function AwsLoadBalancerCapacityUnitsCalculator() {
     </div>
   );
 }
-

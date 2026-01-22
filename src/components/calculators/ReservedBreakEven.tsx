@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateReservedBreakEven } from "../../lib/calc/reserved";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function ReservedBreakEvenCalculator() {
-  const [onDemandHourlyUsd, setOnDemandHourlyUsd] = useState(0.12);
-  const [reservedHourlyUsd, setReservedHourlyUsd] = useState(0.075);
-  const [upfrontUsd, setUpfrontUsd] = useState(300);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
+  const [onDemandHourlyUsd, setOnDemandHourlyUsd] = useNumberParamState("ReservedBreakEven.onDemandHourlyUsd", 0.12);
+  const [reservedHourlyUsd, setReservedHourlyUsd] = useNumberParamState("ReservedBreakEven.reservedHourlyUsd", 0.075);
+  const [upfrontUsd, setUpfrontUsd] = useNumberParamState("ReservedBreakEven.upfrontUsd", 300);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("ReservedBreakEven.hoursPerMonth", 730);
 
   const result = useMemo(() => {
     return estimateReservedBreakEven({

@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateEbsSnapshotCost } from "../../lib/calc/ebsSnapshot";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsEbsSnapshotCostCalculator() {
-  const [volumeGb, setVolumeGb] = useState(1000);
-  const [dailyChangePct, setDailyChangePct] = useState(2);
-  const [retentionDays, setRetentionDays] = useState(30);
-  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useState(0.05);
+  const [volumeGb, setVolumeGb] = useNumberParamState("AwsEbsSnapshotCost.volumeGb", 1000);
+  const [dailyChangePct, setDailyChangePct] = useNumberParamState("AwsEbsSnapshotCost.dailyChangePct", 2);
+  const [retentionDays, setRetentionDays] = useNumberParamState("AwsEbsSnapshotCost.retentionDays", 30);
+  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsEbsSnapshotCost.pricePerGbMonthUsd", 0.05);
 
   const result = useMemo(() => {
     return estimateEbsSnapshotCost({

@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateEcsTasks } from "../../lib/calc/ecsTasks";
 import { formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsEcsTaskSizingCalculator() {
-  const [totalVcpuNeeded, setTotalVcpuNeeded] = useState(2);
-  const [totalMemoryGbNeeded, setTotalMemoryGbNeeded] = useState(4);
-  const [vcpuPerTask, setVcpuPerTask] = useState(0.5);
-  const [memoryGbPerTask, setMemoryGbPerTask] = useState(1);
-  const [targetUtilizationPct, setTargetUtilizationPct] = useState(70);
+  const [totalVcpuNeeded, setTotalVcpuNeeded] = useNumberParamState("AwsEcsTaskSizing.totalVcpuNeeded", 2);
+  const [totalMemoryGbNeeded, setTotalMemoryGbNeeded] = useNumberParamState("AwsEcsTaskSizing.totalMemoryGbNeeded", 4);
+  const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsEcsTaskSizing.vcpuPerTask", 0.5);
+  const [memoryGbPerTask, setMemoryGbPerTask] = useNumberParamState("AwsEcsTaskSizing.memoryGbPerTask", 1);
+  const [targetUtilizationPct, setTargetUtilizationPct] = useNumberParamState("AwsEcsTaskSizing.targetUtilizationPct", 70);
 
   const result = useMemo(() => {
     return estimateEcsTasks({

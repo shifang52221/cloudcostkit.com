@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateLogCost } from "../../lib/calc/logs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -12,11 +13,11 @@ function estimateGbPerDayFromRequests(opts: { requestsPerMonth: number; bytesPer
 }
 
 export function AwsApiGatewayAccessLogCostCalculator() {
-  const [requestsPerMonth, setRequestsPerMonth] = useState(50_000_000);
-  const [avgLogBytesPerRequest, setAvgLogBytesPerRequest] = useState(1500);
-  const [retentionDays, setRetentionDays] = useState(30);
-  const [ingestPricePerGbUsd, setIngestPricePerGbUsd] = useState(0.5);
-  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useState(0.03);
+  const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("AwsApiGatewayAccessLogCost.requestsPerMonth", 50_000_000);
+  const [avgLogBytesPerRequest, setAvgLogBytesPerRequest] = useNumberParamState("AwsApiGatewayAccessLogCost.avgLogBytesPerRequest", 1500);
+  const [retentionDays, setRetentionDays] = useNumberParamState("AwsApiGatewayAccessLogCost.retentionDays", 30);
+  const [ingestPricePerGbUsd, setIngestPricePerGbUsd] = useNumberParamState("AwsApiGatewayAccessLogCost.ingestPricePerGbUsd", 0.5);
+  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("AwsApiGatewayAccessLogCost.storagePricePerGbMonthUsd", 0.03);
 
   const gbPerDay = useMemo(() => {
     return estimateGbPerDayFromRequests({

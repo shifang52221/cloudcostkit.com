@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateMonthlyRequestsFromRps } from "../../lib/calc/rps";
 import { formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function RpsToMonthlyRequestsCalculator() {
-  const [rps, setRps] = useState(2500);
-  const [utilizationPct, setUtilizationPct] = useState(35);
-  const [hoursPerDay, setHoursPerDay] = useState(24);
+  const [rps, setRps] = useNumberParamState("RpsToMonthlyRequests.rps", 2500);
+  const [utilizationPct, setUtilizationPct] = useNumberParamState("RpsToMonthlyRequests.utilizationPct", 35);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("RpsToMonthlyRequests.hoursPerDay", 24);
 
   const result = useMemo(() => {
     return estimateMonthlyRequestsFromRps({

@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateKmsCost } from "../../lib/calc/kms";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsKmsCostCalculator() {
-  const [keys, setKeys] = useState(50);
-  const [requestsPerMonth, setRequestsPerMonth] = useState(300_000_000);
-  const [pricePerKeyUsdPerMonth, setPricePerKeyUsdPerMonth] = useState(1);
-  const [pricePer10kRequestsUsd, setPricePer10kRequestsUsd] = useState(0.03);
+  const [keys, setKeys] = useNumberParamState("AwsKmsCost.keys", 50);
+  const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("AwsKmsCost.requestsPerMonth", 300_000_000);
+  const [pricePerKeyUsdPerMonth, setPricePerKeyUsdPerMonth] = useNumberParamState("AwsKmsCost.pricePerKeyUsdPerMonth", 1);
+  const [pricePer10kRequestsUsd, setPricePer10kRequestsUsd] = useNumberParamState("AwsKmsCost.pricePer10kRequestsUsd", 0.03);
 
   const result = useMemo(() => {
     return estimateKmsCost({

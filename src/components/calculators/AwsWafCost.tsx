@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateWafCost } from "../../lib/calc/waf";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsWafCostCalculator() {
-  const [webAcls, setWebAcls] = useState(2);
-  const [rules, setRules] = useState(20);
-  const [requestsPerMonth, setRequestsPerMonth] = useState(200_000_000);
+  const [webAcls, setWebAcls] = useNumberParamState("AwsWafCost.webAcls", 2);
+  const [rules, setRules] = useNumberParamState("AwsWafCost.rules", 20);
+  const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("AwsWafCost.requestsPerMonth", 200_000_000);
 
-  const [pricePerWebAclUsdPerMonth, setPricePerWebAclUsdPerMonth] = useState(5);
-  const [pricePerRuleUsdPerMonth, setPricePerRuleUsdPerMonth] = useState(1);
-  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useState(0.6);
+  const [pricePerWebAclUsdPerMonth, setPricePerWebAclUsdPerMonth] = useNumberParamState("AwsWafCost.pricePerWebAclUsdPerMonth", 5);
+  const [pricePerRuleUsdPerMonth, setPricePerRuleUsdPerMonth] = useNumberParamState("AwsWafCost.pricePerRuleUsdPerMonth", 1);
+  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsWafCost.pricePerMillionRequestsUsd", 0.6);
 
   const result = useMemo(() => {
     return estimateWafCost({

@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateVpcInterfaceEndpointCost } from "../../lib/calc/vpcInterfaceEndpoint";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsVpcInterfaceEndpointCostCalculator() {
-  const [endpoints, setEndpoints] = useState(3);
-  const [azsPerEndpoint, setAzsPerEndpoint] = useState(2);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
-  const [pricePerEndpointHourUsd, setPricePerEndpointHourUsd] = useState(0.01);
-  const [dataProcessedGbPerMonth, setDataProcessedGbPerMonth] = useState(2000);
-  const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useState(0.01);
+  const [endpoints, setEndpoints] = useNumberParamState("AwsVpcInterfaceEndpointCost.endpoints", 3);
+  const [azsPerEndpoint, setAzsPerEndpoint] = useNumberParamState("AwsVpcInterfaceEndpointCost.azsPerEndpoint", 2);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsVpcInterfaceEndpointCost.hoursPerMonth", 730);
+  const [pricePerEndpointHourUsd, setPricePerEndpointHourUsd] = useNumberParamState("AwsVpcInterfaceEndpointCost.pricePerEndpointHourUsd", 0.01);
+  const [dataProcessedGbPerMonth, setDataProcessedGbPerMonth] = useNumberParamState("AwsVpcInterfaceEndpointCost.dataProcessedGbPerMonth", 2000);
+  const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useNumberParamState("AwsVpcInterfaceEndpointCost.pricePerGbProcessedUsd", 0.01);
 
   const result = useMemo(() => {
     return estimateVpcInterfaceEndpointCost({

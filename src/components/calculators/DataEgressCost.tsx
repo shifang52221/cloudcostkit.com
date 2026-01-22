@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateEgressCost } from "../../lib/calc/egress";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -18,8 +19,8 @@ export function DataEgressCostCalculator({
   defaultGbPerMonth = 2500,
   defaultPricePerGbUsd = 0.09,
 }: BandwidthCostProps) {
-  const [gbPerMonth, setGbPerMonth] = useState(defaultGbPerMonth);
-  const [pricePerGbUsd, setPricePerGbUsd] = useState(defaultPricePerGbUsd);
+  const [gbPerMonth, setGbPerMonth] = useNumberParamState("DataEgressCost.gbPerMonth", defaultGbPerMonth);
+  const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("DataEgressCost.pricePerGbUsd", defaultPricePerGbUsd);
 
   const result = useMemo(() => {
     return estimateEgressCost({

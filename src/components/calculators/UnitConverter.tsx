@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import {
   gbToGib,
   gibToGb,
@@ -10,12 +11,12 @@ import { formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function UnitConverterCalculator() {
-  const [gb, setGb] = useState(1000);
-  const [gib, setGib] = useState(931.32);
-  const [mbps, setMbps] = useState(100);
-  const [mBps, setMBps] = useState(12.5);
-  const [utilizationPct, setUtilizationPct] = useState(30);
-  const [hoursPerDay, setHoursPerDay] = useState(24);
+  const [gb, setGb] = useNumberParamState("UnitConverter.gb", 1000);
+  const [gib, setGib] = useNumberParamState("UnitConverter.gib", 931.32);
+  const [mbps, setMbps] = useNumberParamState("UnitConverter.mbps", 100);
+  const [mBps, setMBps] = useNumberParamState("UnitConverter.mBps", 12.5);
+  const [utilizationPct, setUtilizationPct] = useNumberParamState("UnitConverter.utilizationPct", 30);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("UnitConverter.hoursPerDay", 24);
 
   const conv = useMemo(() => {
     const gbVal = clamp(gb, 0, 1e18);

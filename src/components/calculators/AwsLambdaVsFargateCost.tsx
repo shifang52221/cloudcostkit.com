@@ -1,23 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateFargateCost } from "../../lib/calc/fargate";
 import { estimateLambdaCost } from "../../lib/calc/lambda";
 import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsLambdaVsFargateCostCalculator() {
-  const [invocationsPerMonth, setInvocationsPerMonth] = useState(50_000_000);
-  const [avgDurationMs, setAvgDurationMs] = useState(120);
-  const [memoryMb, setMemoryMb] = useState(512);
-  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useState(0.2);
-  const [pricePerGbSecondUsd, setPricePerGbSecondUsd] = useState(0.0000166667);
-  const [includeFreeTier, setIncludeFreeTier] = useState(true);
+  const [invocationsPerMonth, setInvocationsPerMonth] = useNumberParamState("AwsLambdaVsFargateCost.invocationsPerMonth", 50_000_000);
+  const [avgDurationMs, setAvgDurationMs] = useNumberParamState("AwsLambdaVsFargateCost.avgDurationMs", 120);
+  const [memoryMb, setMemoryMb] = useNumberParamState("AwsLambdaVsFargateCost.memoryMb", 512);
+  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerMillionRequestsUsd", 0.2);
+  const [pricePerGbSecondUsd, setPricePerGbSecondUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerGbSecondUsd", 0.0000166667);
+  const [includeFreeTier, setIncludeFreeTier] = useBooleanParamState("AwsLambdaVsFargateCost.includeFreeTier", true);
 
-  const [tasks, setTasks] = useState(3);
-  const [vcpuPerTask, setVcpuPerTask] = useState(0.5);
-  const [memoryGbPerTask, setMemoryGbPerTask] = useState(1);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
-  const [pricePerVcpuHourUsd, setPricePerVcpuHourUsd] = useState(0.04048);
-  const [pricePerGbHourUsd, setPricePerGbHourUsd] = useState(0.004445);
+  const [tasks, setTasks] = useNumberParamState("AwsLambdaVsFargateCost.tasks", 3);
+  const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsLambdaVsFargateCost.vcpuPerTask", 0.5);
+  const [memoryGbPerTask, setMemoryGbPerTask] = useNumberParamState("AwsLambdaVsFargateCost.memoryGbPerTask", 1);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsLambdaVsFargateCost.hoursPerMonth", 730);
+  const [pricePerVcpuHourUsd, setPricePerVcpuHourUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerVcpuHourUsd", 0.04048);
+  const [pricePerGbHourUsd, setPricePerGbHourUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerGbHourUsd", 0.004445);
 
   const lambda = useMemo(() => {
     return estimateLambdaCost({
@@ -281,4 +282,3 @@ export function AwsLambdaVsFargateCostCalculator() {
     </div>
   );
 }
-

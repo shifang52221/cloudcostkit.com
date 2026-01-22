@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateObjectStorageCost } from "../../lib/calc/storage";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function ObjectStorageCostCalculator() {
-  const [averageStoredGb, setAverageStoredGb] = useState(5000);
-  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useState(0.023);
-  const [getRequestsPerMonth, setGetRequestsPerMonth] = useState(5_000_000);
-  const [putRequestsPerMonth, setPutRequestsPerMonth] = useState(500_000);
-  const [getPricePer1kUsd, setGetPricePer1kUsd] = useState(0.0004);
-  const [putPricePer1kUsd, setPutPricePer1kUsd] = useState(0.005);
+  const [averageStoredGb, setAverageStoredGb] = useNumberParamState("ObjectStorageCost.averageStoredGb", 5000);
+  const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("ObjectStorageCost.storagePricePerGbMonthUsd", 0.023);
+  const [getRequestsPerMonth, setGetRequestsPerMonth] = useNumberParamState("ObjectStorageCost.getRequestsPerMonth", 5_000_000);
+  const [putRequestsPerMonth, setPutRequestsPerMonth] = useNumberParamState("ObjectStorageCost.putRequestsPerMonth", 500_000);
+  const [getPricePer1kUsd, setGetPricePer1kUsd] = useNumberParamState("ObjectStorageCost.getPricePer1kUsd", 0.0004);
+  const [putPricePer1kUsd, setPutPricePer1kUsd] = useNumberParamState("ObjectStorageCost.putPricePer1kUsd", 0.005);
 
   const result = useMemo(() => {
     return estimateObjectStorageCost({

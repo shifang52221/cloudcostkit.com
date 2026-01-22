@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateRequestCost } from "../../lib/calc/requests";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function ApiRequestCostCalculator() {
-  const [requestsPerMonth, setRequestsPerMonth] = useState(500_000_000);
-  const [pricePerMillionUsd, setPricePerMillionUsd] = useState(1.0);
+  const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("ApiRequestCost.requestsPerMonth", 500_000_000);
+  const [pricePerMillionUsd, setPricePerMillionUsd] = useNumberParamState("ApiRequestCost.pricePerMillionUsd", 1.0);
 
   const result = useMemo(() => {
     return estimateRequestCost({

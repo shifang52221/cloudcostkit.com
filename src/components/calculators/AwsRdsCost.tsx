@@ -1,21 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateRdsCost } from "../../lib/calc/rds";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsRdsCostCalculator() {
-  const [instances, setInstances] = useState(1);
-  const [pricePerHourUsd, setPricePerHourUsd] = useState(0.2);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
+  const [instances, setInstances] = useNumberParamState("AwsRdsCost.instances", 1);
+  const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("AwsRdsCost.pricePerHourUsd", 0.2);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsRdsCost.hoursPerMonth", 730);
 
-  const [storageGb, setStorageGb] = useState(200);
-  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useState(0.115);
+  const [storageGb, setStorageGb] = useNumberParamState("AwsRdsCost.storageGb", 200);
+  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsRdsCost.pricePerGbMonthUsd", 0.115);
 
-  const [backupGb, setBackupGb] = useState(200);
-  const [pricePerBackupGbMonthUsd, setPricePerBackupGbMonthUsd] = useState(0.095);
+  const [backupGb, setBackupGb] = useNumberParamState("AwsRdsCost.backupGb", 200);
+  const [pricePerBackupGbMonthUsd, setPricePerBackupGbMonthUsd] = useNumberParamState("AwsRdsCost.pricePerBackupGbMonthUsd", 0.095);
 
-  const [ioRequestsPerMonth, setIoRequestsPerMonth] = useState(5_000_000_000);
-  const [pricePerMillionIoRequestsUsd, setPricePerMillionIoRequestsUsd] = useState(0.2);
+  const [ioRequestsPerMonth, setIoRequestsPerMonth] = useNumberParamState("AwsRdsCost.ioRequestsPerMonth", 5_000_000_000);
+  const [pricePerMillionIoRequestsUsd, setPricePerMillionIoRequestsUsd] = useNumberParamState("AwsRdsCost.pricePerMillionIoRequestsUsd", 0.2);
 
   const result = useMemo(() => {
     return estimateRdsCost({

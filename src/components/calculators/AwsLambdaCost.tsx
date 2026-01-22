@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLambdaCost } from "../../lib/calc/lambda";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsLambdaCostCalculator() {
-  const [invocationsPerMonth, setInvocationsPerMonth] = useState(50_000_000);
-  const [avgDurationMs, setAvgDurationMs] = useState(120);
-  const [memoryMb, setMemoryMb] = useState(512);
-  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useState(0.2);
-  const [pricePerGbSecondUsd, setPricePerGbSecondUsd] = useState(0.0000166667);
-  const [includeFreeTier, setIncludeFreeTier] = useState(true);
+  const [invocationsPerMonth, setInvocationsPerMonth] = useNumberParamState("AwsLambdaCost.invocationsPerMonth", 50_000_000);
+  const [avgDurationMs, setAvgDurationMs] = useNumberParamState("AwsLambdaCost.avgDurationMs", 120);
+  const [memoryMb, setMemoryMb] = useNumberParamState("AwsLambdaCost.memoryMb", 512);
+  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsLambdaCost.pricePerMillionRequestsUsd", 0.2);
+  const [pricePerGbSecondUsd, setPricePerGbSecondUsd] = useNumberParamState("AwsLambdaCost.pricePerGbSecondUsd", 0.0000166667);
+  const [includeFreeTier, setIncludeFreeTier] = useBooleanParamState("AwsLambdaCost.includeFreeTier", true);
 
   const result = useMemo(() => {
     return estimateLambdaCost({
@@ -159,4 +160,3 @@ export function AwsLambdaCostCalculator() {
     </div>
   );
 }
-

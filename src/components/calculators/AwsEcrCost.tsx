@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateEcrCost } from "../../lib/calc/ecr";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsEcrCostCalculator() {
-  const [storedGbMonth, setStoredGbMonth] = useState(2000);
-  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useState(0.1);
-  const [egressGbPerMonth, setEgressGbPerMonth] = useState(500);
-  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useState(0.09);
+  const [storedGbMonth, setStoredGbMonth] = useNumberParamState("AwsEcrCost.storedGbMonth", 2000);
+  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsEcrCost.pricePerGbMonthUsd", 0.1);
+  const [egressGbPerMonth, setEgressGbPerMonth] = useNumberParamState("AwsEcrCost.egressGbPerMonth", 500);
+  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsEcrCost.egressPricePerGbUsd", 0.09);
 
   const result = useMemo(() => {
     return estimateEcrCost({

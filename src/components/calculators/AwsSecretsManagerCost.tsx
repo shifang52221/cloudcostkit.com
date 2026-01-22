@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateSecretsManagerCost } from "../../lib/calc/secretsManager";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsSecretsManagerCostCalculator() {
-  const [secrets, setSecrets] = useState(500);
-  const [pricePerSecretUsdPerMonth, setPricePerSecretUsdPerMonth] = useState(0.4);
+  const [secrets, setSecrets] = useNumberParamState("AwsSecretsManagerCost.secrets", 500);
+  const [pricePerSecretUsdPerMonth, setPricePerSecretUsdPerMonth] = useNumberParamState("AwsSecretsManagerCost.pricePerSecretUsdPerMonth", 0.4);
 
-  const [apiCallsPerMonth, setApiCallsPerMonth] = useState(300_000_000);
-  const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useState(0.05);
+  const [apiCallsPerMonth, setApiCallsPerMonth] = useNumberParamState("AwsSecretsManagerCost.apiCallsPerMonth", 300_000_000);
+  const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useNumberParamState("AwsSecretsManagerCost.pricePer10kApiCallsUsd", 0.05);
 
   const result = useMemo(() => {
     return estimateSecretsManagerCost({

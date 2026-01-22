@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateCloudwatchAlarmsCost } from "../../lib/calc/cloudwatchAlarms";
 import { formatCurrency2 } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsCloudwatchAlarmsCostCalculator() {
-  const [standardAlarms, setStandardAlarms] = useState(500);
-  const [highResAlarms, setHighResAlarms] = useState(50);
-  const [compositeAlarms, setCompositeAlarms] = useState(20);
+  const [standardAlarms, setStandardAlarms] = useNumberParamState("AwsCloudwatchAlarmsCost.standardAlarms", 500);
+  const [highResAlarms, setHighResAlarms] = useNumberParamState("AwsCloudwatchAlarmsCost.highResAlarms", 50);
+  const [compositeAlarms, setCompositeAlarms] = useNumberParamState("AwsCloudwatchAlarmsCost.compositeAlarms", 20);
 
-  const [pricePerStandardAlarmUsdPerMonth, setPricePerStandardAlarmUsdPerMonth] = useState(0.1);
-  const [pricePerHighResAlarmUsdPerMonth, setPricePerHighResAlarmUsdPerMonth] = useState(0.3);
-  const [pricePerCompositeAlarmUsdPerMonth, setPricePerCompositeAlarmUsdPerMonth] = useState(0.5);
+  const [pricePerStandardAlarmUsdPerMonth, setPricePerStandardAlarmUsdPerMonth] = useNumberParamState("AwsCloudwatchAlarmsCost.pricePerStandardAlarmUsdPerMonth", 0.1);
+  const [pricePerHighResAlarmUsdPerMonth, setPricePerHighResAlarmUsdPerMonth] = useNumberParamState("AwsCloudwatchAlarmsCost.pricePerHighResAlarmUsdPerMonth", 0.3);
+  const [pricePerCompositeAlarmUsdPerMonth, setPricePerCompositeAlarmUsdPerMonth] = useNumberParamState("AwsCloudwatchAlarmsCost.pricePerCompositeAlarmUsdPerMonth", 0.5);
 
   const result = useMemo(() => {
     return estimateCloudwatchAlarmsCost({

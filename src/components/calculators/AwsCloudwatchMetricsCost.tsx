@@ -1,17 +1,18 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateCloudwatchMetricsCost } from "../../lib/calc/cloudwatchMetrics";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsCloudwatchMetricsCostCalculator() {
-  const [customMetrics, setCustomMetrics] = useState(2000);
-  const [pricePerMetricMonthUsd, setPricePerMetricMonthUsd] = useState(0.3);
-  const [alarms, setAlarms] = useState(150);
-  const [pricePerAlarmMonthUsd, setPricePerAlarmMonthUsd] = useState(0.1);
-  const [dashboards, setDashboards] = useState(5);
-  const [pricePerDashboardMonthUsd, setPricePerDashboardMonthUsd] = useState(3);
-  const [apiRequestsPerMonth, setApiRequestsPerMonth] = useState(10_000_000);
-  const [pricePerThousandApiRequestsUsd, setPricePerThousandApiRequestsUsd] = useState(0.01);
+  const [customMetrics, setCustomMetrics] = useNumberParamState("AwsCloudwatchMetricsCost.customMetrics", 2000);
+  const [pricePerMetricMonthUsd, setPricePerMetricMonthUsd] = useNumberParamState("AwsCloudwatchMetricsCost.pricePerMetricMonthUsd", 0.3);
+  const [alarms, setAlarms] = useNumberParamState("AwsCloudwatchMetricsCost.alarms", 150);
+  const [pricePerAlarmMonthUsd, setPricePerAlarmMonthUsd] = useNumberParamState("AwsCloudwatchMetricsCost.pricePerAlarmMonthUsd", 0.1);
+  const [dashboards, setDashboards] = useNumberParamState("AwsCloudwatchMetricsCost.dashboards", 5);
+  const [pricePerDashboardMonthUsd, setPricePerDashboardMonthUsd] = useNumberParamState("AwsCloudwatchMetricsCost.pricePerDashboardMonthUsd", 3);
+  const [apiRequestsPerMonth, setApiRequestsPerMonth] = useNumberParamState("AwsCloudwatchMetricsCost.apiRequestsPerMonth", 10_000_000);
+  const [pricePerThousandApiRequestsUsd, setPricePerThousandApiRequestsUsd] = useNumberParamState("AwsCloudwatchMetricsCost.pricePerThousandApiRequestsUsd", 0.01);
 
   const result = useMemo(() => {
     return estimateCloudwatchMetricsCost({

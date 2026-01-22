@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateComputeCost } from "../../lib/calc/compute";
 import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function ComputeInstanceCostCalculator() {
-  const [instances, setInstances] = useState(6);
-  const [pricePerHourUsd, setPricePerHourUsd] = useState(0.18);
-  const [utilizationPct, setUtilizationPct] = useState(100);
-  const [hoursPerDay, setHoursPerDay] = useState(24);
+  const [instances, setInstances] = useNumberParamState("ComputeInstanceCost.instances", 6);
+  const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("ComputeInstanceCost.pricePerHourUsd", 0.18);
+  const [utilizationPct, setUtilizationPct] = useNumberParamState("ComputeInstanceCost.utilizationPct", 100);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("ComputeInstanceCost.hoursPerDay", 24);
 
   const result = useMemo(() => {
     return estimateComputeCost({

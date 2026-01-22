@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateDynamoDbCost } from "../../lib/calc/dynamodb";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsDynamoDbCostCalculator() {
-  const [readRequestsPerMonth, setReadRequestsPerMonth] = useState(2_000_000_000);
-  const [writeRequestsPerMonth, setWriteRequestsPerMonth] = useState(500_000_000);
-  const [pricePerMillionReadRequestsUsd, setPricePerMillionReadRequestsUsd] = useState(0.25);
-  const [pricePerMillionWriteRequestsUsd, setPricePerMillionWriteRequestsUsd] = useState(1.25);
+  const [readRequestsPerMonth, setReadRequestsPerMonth] = useNumberParamState("AwsDynamoDbCost.readRequestsPerMonth", 2_000_000_000);
+  const [writeRequestsPerMonth, setWriteRequestsPerMonth] = useNumberParamState("AwsDynamoDbCost.writeRequestsPerMonth", 500_000_000);
+  const [pricePerMillionReadRequestsUsd, setPricePerMillionReadRequestsUsd] = useNumberParamState("AwsDynamoDbCost.pricePerMillionReadRequestsUsd", 0.25);
+  const [pricePerMillionWriteRequestsUsd, setPricePerMillionWriteRequestsUsd] = useNumberParamState("AwsDynamoDbCost.pricePerMillionWriteRequestsUsd", 1.25);
 
-  const [storageGb, setStorageGb] = useState(200);
-  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useState(0.25);
+  const [storageGb, setStorageGb] = useNumberParamState("AwsDynamoDbCost.storageGb", 200);
+  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsDynamoDbCost.pricePerGbMonthUsd", 0.25);
 
   const result = useMemo(() => {
     return estimateDynamoDbCost({

@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateApiTransfer } from "../../lib/calc/apiTransfer";
 import { formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function ApiResponseTransferCalculator() {
-  const [requestsPerDay, setRequestsPerDay] = useState(2_000_000);
-  const [avgResponseKb, setAvgResponseKb] = useState(15);
+  const [requestsPerDay, setRequestsPerDay] = useNumberParamState("ApiResponseTransfer.requestsPerDay", 2_000_000);
+  const [avgResponseKb, setAvgResponseKb] = useNumberParamState("ApiResponseTransfer.avgResponseKb", 15);
 
   const result = useMemo(() => {
     return estimateApiTransfer({

@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateApiGatewayCost } from "../../lib/calc/apiGateway";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsApiGatewayCostCalculator() {
-  const [requestsPerMonth, setRequestsPerMonth] = useState(300_000_000);
-  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useState(3.5);
-  const [avgResponseKb, setAvgResponseKb] = useState(15);
-  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useState(0.09);
+  const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("AwsApiGatewayCost.requestsPerMonth", 300_000_000);
+  const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsApiGatewayCost.pricePerMillionRequestsUsd", 3.5);
+  const [avgResponseKb, setAvgResponseKb] = useNumberParamState("AwsApiGatewayCost.avgResponseKb", 15);
+  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsApiGatewayCost.egressPricePerGbUsd", 0.09);
 
   const result = useMemo(() => {
     return estimateApiGatewayCost({

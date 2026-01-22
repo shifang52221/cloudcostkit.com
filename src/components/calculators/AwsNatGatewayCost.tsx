@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateNatGatewayCost } from "../../lib/calc/natGateway";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsNatGatewayCostCalculator() {
-  const [natGateways, setNatGateways] = useState(1);
-  const [hoursPerMonth, setHoursPerMonth] = useState(730);
-  const [pricePerNatGatewayHourUsd, setPricePerNatGatewayHourUsd] = useState(0.045);
-  const [dataProcessedGbPerMonth, setDataProcessedGbPerMonth] = useState(2000);
-  const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useState(0.045);
+  const [natGateways, setNatGateways] = useNumberParamState("AwsNatGatewayCost.natGateways", 1);
+  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsNatGatewayCost.hoursPerMonth", 730);
+  const [pricePerNatGatewayHourUsd, setPricePerNatGatewayHourUsd] = useNumberParamState("AwsNatGatewayCost.pricePerNatGatewayHourUsd", 0.045);
+  const [dataProcessedGbPerMonth, setDataProcessedGbPerMonth] = useNumberParamState("AwsNatGatewayCost.dataProcessedGbPerMonth", 2000);
+  const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useNumberParamState("AwsNatGatewayCost.pricePerGbProcessedUsd", 0.045);
 
   const result = useMemo(() => {
     return estimateNatGatewayCost({

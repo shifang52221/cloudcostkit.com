@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateComputeCost } from "../../lib/calc/compute";
 import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function KubernetesNodeCostCalculator() {
-  const [nodes, setNodes] = useState(12);
-  const [pricePerHourUsd, setPricePerHourUsd] = useState(0.32);
-  const [utilizationPct, setUtilizationPct] = useState(100);
-  const [hoursPerDay, setHoursPerDay] = useState(24);
+  const [nodes, setNodes] = useNumberParamState("KubernetesNodeCost.nodes", 12);
+  const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("KubernetesNodeCost.pricePerHourUsd", 0.32);
+  const [utilizationPct, setUtilizationPct] = useNumberParamState("KubernetesNodeCost.utilizationPct", 100);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("KubernetesNodeCost.hoursPerDay", 24);
 
   const result = useMemo(() => {
     return estimateComputeCost({

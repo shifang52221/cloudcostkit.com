@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateLogScanCost } from "../../lib/calc/logScan";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function LogSearchScanCostCalculator() {
-  const [gbScannedPerDay, setGbScannedPerDay] = useState(800);
-  const [pricePerGbUsd, setPricePerGbUsd] = useState(0.005);
+  const [gbScannedPerDay, setGbScannedPerDay] = useNumberParamState("LogSearchScanCost.gbScannedPerDay", 800);
+  const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("LogSearchScanCost.pricePerGbUsd", 0.005);
 
   const result = useMemo(() => {
     return estimateLogScanCost({

@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateRoute53Cost } from "../../lib/calc/route53";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsRoute53CostCalculator() {
-  const [hostedZones, setHostedZones] = useState(20);
-  const [standardQueriesPerMonth, setStandardQueriesPerMonth] = useState(500_000_000);
-  const [healthChecks, setHealthChecks] = useState(10);
+  const [hostedZones, setHostedZones] = useNumberParamState("AwsRoute53Cost.hostedZones", 20);
+  const [standardQueriesPerMonth, setStandardQueriesPerMonth] = useNumberParamState("AwsRoute53Cost.standardQueriesPerMonth", 500_000_000);
+  const [healthChecks, setHealthChecks] = useNumberParamState("AwsRoute53Cost.healthChecks", 10);
 
-  const [pricePerHostedZoneUsdPerMonth, setPricePerHostedZoneUsdPerMonth] = useState(0.5);
-  const [pricePerMillionQueriesUsd, setPricePerMillionQueriesUsd] = useState(0.4);
-  const [pricePerHealthCheckUsdPerMonth, setPricePerHealthCheckUsdPerMonth] = useState(0.5);
+  const [pricePerHostedZoneUsdPerMonth, setPricePerHostedZoneUsdPerMonth] = useNumberParamState("AwsRoute53Cost.pricePerHostedZoneUsdPerMonth", 0.5);
+  const [pricePerMillionQueriesUsd, setPricePerMillionQueriesUsd] = useNumberParamState("AwsRoute53Cost.pricePerMillionQueriesUsd", 0.4);
+  const [pricePerHealthCheckUsdPerMonth, setPricePerHealthCheckUsdPerMonth] = useNumberParamState("AwsRoute53Cost.pricePerHealthCheckUsdPerMonth", 0.5);
 
   const result = useMemo(() => {
     return estimateRoute53Cost({

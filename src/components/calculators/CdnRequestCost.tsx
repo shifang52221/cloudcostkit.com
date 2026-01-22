@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateRequestCostPer10k } from "../../lib/calc/requests";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function CdnRequestCostCalculator() {
-  const [requestsPerMonth, setRequestsPerMonth] = useState(300_000_000);
-  const [pricePer10kUsd, setPricePer10kUsd] = useState(0.0075);
+  const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("CdnRequestCost.requestsPerMonth", 300_000_000);
+  const [pricePer10kUsd, setPricePer10kUsd] = useNumberParamState("CdnRequestCost.pricePer10kUsd", 0.0075);
 
   const result = useMemo(() => {
     return estimateRequestCostPer10k({

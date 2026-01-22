@@ -1,17 +1,18 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateEbsCost } from "../../lib/calc/ebs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsEbsCostCalculator() {
-  const [storageGb, setStorageGb] = useState(500);
-  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useState(0.08);
+  const [storageGb, setStorageGb] = useNumberParamState("AwsEbsCost.storageGb", 500);
+  const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsEbsCost.pricePerGbMonthUsd", 0.08);
 
-  const [provisionedIops, setProvisionedIops] = useState(6000);
-  const [pricePerIopsMonthUsd, setPricePerIopsMonthUsd] = useState(0.005);
+  const [provisionedIops, setProvisionedIops] = useNumberParamState("AwsEbsCost.provisionedIops", 6000);
+  const [pricePerIopsMonthUsd, setPricePerIopsMonthUsd] = useNumberParamState("AwsEbsCost.pricePerIopsMonthUsd", 0.005);
 
-  const [provisionedThroughputMbps, setProvisionedThroughputMbps] = useState(250);
-  const [pricePerMbpsMonthUsd, setPricePerMbpsMonthUsd] = useState(0.04);
+  const [provisionedThroughputMbps, setProvisionedThroughputMbps] = useNumberParamState("AwsEbsCost.provisionedThroughputMbps", 250);
+  const [pricePerMbpsMonthUsd, setPricePerMbpsMonthUsd] = useNumberParamState("AwsEbsCost.pricePerMbpsMonthUsd", 0.04);
 
   const result = useMemo(() => {
     return estimateEbsCost({

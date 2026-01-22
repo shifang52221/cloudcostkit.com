@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateSnsCost } from "../../lib/calc/sns";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsSnsCostCalculator() {
-  const [publishesPerMonth, setPublishesPerMonth] = useState(200_000_000);
-  const [deliveriesPerMonth, setDeliveriesPerMonth] = useState(800_000_000);
-  const [pricePerMillionPublishesUsd, setPricePerMillionPublishesUsd] = useState(0.5);
-  const [pricePerMillionDeliveriesUsd, setPricePerMillionDeliveriesUsd] = useState(0.6);
-  const [avgPayloadKb, setAvgPayloadKb] = useState(2);
-  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useState(0.09);
+  const [publishesPerMonth, setPublishesPerMonth] = useNumberParamState("AwsSnsCost.publishesPerMonth", 200_000_000);
+  const [deliveriesPerMonth, setDeliveriesPerMonth] = useNumberParamState("AwsSnsCost.deliveriesPerMonth", 800_000_000);
+  const [pricePerMillionPublishesUsd, setPricePerMillionPublishesUsd] = useNumberParamState("AwsSnsCost.pricePerMillionPublishesUsd", 0.5);
+  const [pricePerMillionDeliveriesUsd, setPricePerMillionDeliveriesUsd] = useNumberParamState("AwsSnsCost.pricePerMillionDeliveriesUsd", 0.6);
+  const [avgPayloadKb, setAvgPayloadKb] = useNumberParamState("AwsSnsCost.avgPayloadKb", 2);
+  const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsSnsCost.egressPricePerGbUsd", 0.09);
 
   const result = useMemo(() => {
     return estimateSnsCost({

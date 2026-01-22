@@ -1,17 +1,18 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateK8sResources } from "../../lib/calc/k8s";
 import { formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function KubernetesRequestsLimitsCalculator() {
-  const [pods, setPods] = useState(60);
-  const [cpuRequestMillicores, setCpuRequestMillicores] = useState(250);
-  const [memRequestMiB, setMemRequestMiB] = useState(512);
-  const [cpuLimitMillicores, setCpuLimitMillicores] = useState(500);
-  const [memLimitMiB, setMemLimitMiB] = useState(1024);
-  const [nodeCpuCores, setNodeCpuCores] = useState(8);
-  const [nodeMemGiB, setNodeMemGiB] = useState(32);
-  const [nodeAllocatablePct, setNodeAllocatablePct] = useState(90);
+  const [pods, setPods] = useNumberParamState("KubernetesRequestsLimits.pods", 60);
+  const [cpuRequestMillicores, setCpuRequestMillicores] = useNumberParamState("KubernetesRequestsLimits.cpuRequestMillicores", 250);
+  const [memRequestMiB, setMemRequestMiB] = useNumberParamState("KubernetesRequestsLimits.memRequestMiB", 512);
+  const [cpuLimitMillicores, setCpuLimitMillicores] = useNumberParamState("KubernetesRequestsLimits.cpuLimitMillicores", 500);
+  const [memLimitMiB, setMemLimitMiB] = useNumberParamState("KubernetesRequestsLimits.memLimitMiB", 1024);
+  const [nodeCpuCores, setNodeCpuCores] = useNumberParamState("KubernetesRequestsLimits.nodeCpuCores", 8);
+  const [nodeMemGiB, setNodeMemGiB] = useNumberParamState("KubernetesRequestsLimits.nodeMemGiB", 32);
+  const [nodeAllocatablePct, setNodeAllocatablePct] = useNumberParamState("KubernetesRequestsLimits.nodeAllocatablePct", 90);
 
   const result = useMemo(() => {
     return estimateK8sResources({

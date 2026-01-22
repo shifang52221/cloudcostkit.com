@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useNumberParamState } from "./useNumberParamState";
 import { estimateCloudTrailCost } from "../../lib/calc/cloudTrail";
 import { formatCurrency2 } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsCloudTrailCostCalculator() {
-  const [managementEventsPerMonth, setManagementEventsPerMonth] = useState(50_000_000);
-  const [dataEventsPerMonth, setDataEventsPerMonth] = useState(10_000_000);
-  const [insightsEventsPerMonth, setInsightsEventsPerMonth] = useState(1_000_000);
+  const [managementEventsPerMonth, setManagementEventsPerMonth] = useNumberParamState("AwsCloudTrailCost.managementEventsPerMonth", 50_000_000);
+  const [dataEventsPerMonth, setDataEventsPerMonth] = useNumberParamState("AwsCloudTrailCost.dataEventsPerMonth", 10_000_000);
+  const [insightsEventsPerMonth, setInsightsEventsPerMonth] = useNumberParamState("AwsCloudTrailCost.insightsEventsPerMonth", 1_000_000);
 
-  const [pricePer100kManagementEventsUsd, setPricePer100kManagementEventsUsd] = useState(0.1);
-  const [pricePer100kDataEventsUsd, setPricePer100kDataEventsUsd] = useState(0.2);
-  const [pricePer100kInsightsEventsUsd, setPricePer100kInsightsEventsUsd] = useState(0.35);
+  const [pricePer100kManagementEventsUsd, setPricePer100kManagementEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kManagementEventsUsd", 0.1);
+  const [pricePer100kDataEventsUsd, setPricePer100kDataEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kDataEventsUsd", 0.2);
+  const [pricePer100kInsightsEventsUsd, setPricePer100kInsightsEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kInsightsEventsUsd", 0.35);
 
   const result = useMemo(() => {
     return estimateCloudTrailCost({
