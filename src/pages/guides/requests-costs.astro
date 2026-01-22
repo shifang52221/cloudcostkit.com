@@ -1,0 +1,90 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Request-based pricing explained: how to estimate requests and avoid surprises";
+const description =
+  "A practical framework for request-based cloud pricing: convert RPS to monthly requests, model retries and fan-out, and avoid unit mistakes (per 10k vs per 1M).";
+
+const faqs = [
+  {
+    q: "What services are request-priced?",
+    a: "Many edge and API products: API gateways, CDNs, WAFs, serverless invocations, and some messaging services. The unit varies by provider (per 10k, per 1M, per 100k).",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Convert RPS to monthly requests, then model retries separately. For fan-out systems (messaging), estimate deliveries per message and multiply.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Retry storms, bot traffic, and unit mistakes (per 10k vs per 1M). Also, average RPS can hide spikes that dominate cost on bursty workloads.",
+  },
+];
+
+const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests") && g.canonicalPath !== "/guides/requests-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/requests-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Request-based pricing looks simple until retries, fan-out, and peak traffic show up. This hub connects the main
+    estimation workflows and tools so your model survives real production traffic.
+  </p>
+
+  <h2>1) Convert traffic to monthly requests</h2>
+  <ul>
+    <li>Start from RPS (average and peak) and convert to monthly requests.</li>
+    <li>Keep units explicit: per 10k vs per 1M is a common order-of-magnitude error.</li>
+    <li>
+      Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+    </li>
+  </ul>
+
+  <h2>2) Model retries and spikes separately</h2>
+  <ul>
+    <li>Retry storms can multiply request volume 5x to 50x during incidents.</li>
+    <li>Bot traffic can create request spikes that dominate WAF/API/CDN bills.</li>
+    <li>
+      Hub: <a href="/guides/security-costs/">security costs</a>
+    </li>
+  </ul>
+
+  <h2>3) Include payload and transfer when relevant</h2>
+  <ul>
+    <li>Requests correlate with bandwidth; large payloads amplify egress and logging.</li>
+    <li>
+      Tool: <a href="/calculators/api-response-size-transfer-calculator/">response size transfer</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request cost</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
+    <a class="btn" href="/calculators/aws-waf-cost-calculator/">WAF cost</a>
+    <a class="btn" href="/guides/messaging-costs/">Messaging costs</a>
+  </div>
+
+  {requestGuides.length ? (
+    <>
+      <h2>More request pricing guides</h2>
+      <div class="grid">
+        {requestGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
+

@@ -86,6 +86,7 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "database",
       "kubernetes",
+      "serverless",
       "storage"
     ]
   },
@@ -148,7 +149,8 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-lambda-cost-optimization",
     "topics": [
       "egress",
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -159,7 +161,8 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-lambda-pricing",
     "topics": [
       "logging",
-      "requests"
+      "requests",
+      "serverless"
     ]
   },
   {
@@ -498,7 +501,8 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "egress",
       "load-balancing",
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -511,6 +515,7 @@ export const GUIDES: GuideLink[] = [
       "egress",
       "load-balancing",
       "logging",
+      "serverless",
       "storage"
     ]
   },
@@ -802,7 +807,8 @@ export const GUIDES: GuideLink[] = [
     "category": "AWS",
     "slug": "aws-fargate-cost-optimization",
     "topics": [
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -814,7 +820,8 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "egress",
       "load-balancing",
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -826,7 +833,8 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "egress",
       "load-balancing",
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -839,7 +847,8 @@ export const GUIDES: GuideLink[] = [
       "egress",
       "kubernetes",
       "load-balancing",
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -902,7 +911,9 @@ export const GUIDES: GuideLink[] = [
     "canonicalPath": "/guides/aws-lambda-concurrency-and-cold-starts",
     "category": "AWS",
     "slug": "aws-lambda-concurrency-and-cold-starts",
-    "topics": []
+    "topics": [
+      "serverless"
+    ]
   },
   {
     "title": "Lambda vs Fargate cost: a practical comparison (unit economics)",
@@ -913,7 +924,8 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "egress",
       "logging",
-      "requests"
+      "requests",
+      "serverless"
     ]
   },
   {
@@ -1394,7 +1406,8 @@ export const GUIDES: GuideLink[] = [
     "slug": "azure-functions-pricing",
     "topics": [
       "logging",
-      "metrics"
+      "metrics",
+      "serverless"
     ]
   },
   {
@@ -1624,7 +1637,8 @@ export const GUIDES: GuideLink[] = [
     "slug": "gcp-cloud-functions-pricing",
     "topics": [
       "egress",
-      "logging"
+      "logging",
+      "serverless"
     ]
   },
   {
@@ -1667,7 +1681,8 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "egress",
       "logging",
-      "requests"
+      "requests",
+      "serverless"
     ]
   },
   {
@@ -1824,6 +1839,18 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "Load balancing costs explained: hours, requests, and traffic processed",
+    "description": "A practical load balancer cost model: hourly baseline, request-based pricing, GB processed, WAF add-ons, and the patterns that create cross-zone traffic surprises.",
+    "canonicalPath": "/guides/load-balancing-costs",
+    "category": "General",
+    "slug": "load-balancing-costs",
+    "topics": [
+      "load-balancing",
+      "requests",
+      "security"
+    ]
+  },
+  {
     "title": "Messaging costs explained: requests, deliveries, retries, and payload size",
     "description": "A practical framework to estimate queue and pub/sub bills: request-based pricing, deliveries/retries, fan-out, and payload transfer (the hidden multiplier).",
     "canonicalPath": "/guides/messaging-costs",
@@ -1877,6 +1904,19 @@ export const GUIDES: GuideLink[] = [
       "requests",
       "security",
       "storage"
+    ]
+  },
+  {
+    "title": "Serverless costs explained: invocations, duration, requests, and downstream spend",
+    "description": "A practical serverless cost model: invocations and duration (compute time), request-based add-ons, networking/egress, and the log/metric drivers that often dominate totals.",
+    "canonicalPath": "/guides/serverless-costs",
+    "category": "General",
+    "slug": "serverless-costs",
+    "topics": [
+      "egress",
+      "logging",
+      "requests",
+      "serverless"
     ]
   },
   {
@@ -2006,6 +2046,16 @@ export const GUIDES: GuideLink[] = [
     "slug": "egress-costs",
     "topics": [
       "egress"
+    ]
+  },
+  {
+    "title": "Request-based pricing explained: how to estimate requests and avoid surprises",
+    "description": "A practical framework for request-based cloud pricing: convert RPS to monthly requests, model retries and fan-out, and avoid unit mistakes (per 10k vs per 1M).",
+    "canonicalPath": "/guides/requests-costs",
+    "category": "Requests",
+    "slug": "requests-costs",
+    "topics": [
+      "requests"
     ]
   },
   {

@@ -31,6 +31,14 @@ function extractTopics({ fileName, canonicalPath, title, description }) {
     topics.add("metrics");
   if (s.includes("kubernetes") || s.includes("eks") || s.includes("gke") || s.includes("aks")) topics.add("kubernetes");
   if (
+    s.includes("lambda") ||
+    s.includes("functions") ||
+    s.includes("cloud run") ||
+    s.includes("serverless") ||
+    s.includes("fargate")
+  )
+    topics.add("serverless");
+  if (
     s.includes("database") ||
     s.includes("rds") ||
     s.includes("aurora") ||

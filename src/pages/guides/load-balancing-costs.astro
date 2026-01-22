@@ -1,0 +1,89 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Load balancing costs explained: hours, requests, and traffic processed";
+const description =
+  "A practical load balancer cost model: hourly baseline, request-based pricing, GB processed, WAF add-ons, and the patterns that create cross-zone traffic surprises.";
+
+const faqs = [
+  {
+    q: "What usually drives load balancer cost?",
+    a: "Hourly baseline is the floor. After that, request volume and GB processed often dominate. Add-ons like WAF and logs can become meaningful at scale.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with hours/month, requests/month, and an estimate of GB processed derived from response size. Then validate cross-zone traffic and WAF/logging settings.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Underestimating traffic processed, forgetting WAF and logging, and ignoring cross-zone patterns that create extra data transfer charges.",
+  },
+];
+
+const lbGuides = GUIDES.filter((g) => (g.topics || []).includes("load-balancing") && g.canonicalPath !== "/guides/load-balancing-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/load-balancing-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    A planning-safe load balancer estimate includes: (1) hourly baseline, (2) request volume, (3) traffic processed (GB),
+    and (4) add-ons like WAF and logs. This hub links the strongest checklists and calculators.
+  </p>
+
+  <h2>1) Hourly baseline</h2>
+  <ul>
+    <li>Count load balancers per environment (dev/stage/prod).</li>
+    <li>Multiply by hours/month (usually ~730).</li>
+  </ul>
+
+  <h2>2) Requests and traffic processed</h2>
+  <ul>
+    <li>Convert RPS to monthly requests.</li>
+    <li>Estimate GB processed from average response size (separate top endpoints if heavy-tailed).</li>
+    <li>
+      Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
+      <a href="/calculators/api-response-size-transfer-calculator/">transfer from response size</a>
+    </li>
+  </ul>
+
+  <h2>3) WAF and logging</h2>
+  <ul>
+    <li>WAF is request-driven and spikes with bot traffic.</li>
+    <li>Logs create ingestion + retention costs that can exceed the LB baseline.</li>
+    <li>
+      Hubs: <a href="/guides/security-costs/">security costs</a>, <a href="/guides/log-costs/">log costs</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">LCU/NLCU</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request cost</a>
+    <a class="btn" href="/guides/networking-costs/">Networking costs</a>
+  </div>
+
+  {lbGuides.length ? (
+    <>
+      <h2>More load balancing guides</h2>
+      <div class="grid">
+        {lbGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
+

@@ -1,0 +1,92 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Serverless costs explained: invocations, duration, requests, and downstream spend";
+const description =
+  "A practical serverless cost model: invocations and duration (compute time), request-based add-ons, networking/egress, and the log/metric drivers that often dominate totals.";
+
+const faqs = [
+  {
+    q: "What usually drives serverless cost?",
+    a: "Invocation count and duration are the core drivers, but logs/metrics and networking/egress are common surprises. Downstream services (databases, queues, storage) often dominate the system cost even if compute is small.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly invocations, average duration, and average payload size. Then add separate budgets for logs (GB/day) and egress (GB/month), and validate retries/timeouts.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Retry storms, chatty calls to downstream services, and verbose logs during incidents. Also, cold starts and concurrency can change resource usage patterns.",
+  },
+];
+
+const serverlessGuides = GUIDES.filter((g) => (g.topics || []).includes("serverless") && g.canonicalPath !== "/guides/serverless-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/serverless-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Serverless estimates fail when you model only invocations. The reliable approach is: invocations + duration + logs
+    + egress + downstream requests. This hub links the best checklists and calculators to avoid thin compute-only models.
+  </p>
+
+  <h2>1) Invocations and duration (compute time)</h2>
+  <ul>
+    <li>Convert traffic to invocations per month.</li>
+    <li>Model average duration and consider peak / incident scenarios separately.</li>
+    <li>
+      Hub: <a href="/guides/requests-costs/">request-based pricing</a>
+    </li>
+  </ul>
+
+  <h2>2) Logs and metrics (often the surprise)</h2>
+  <ul>
+    <li>Verbose logs can dominate for chatty functions.</li>
+    <li>Metrics cost is a cardinality problem; label explosion is common in serverless apps.</li>
+    <li>
+      Hubs: <a href="/guides/log-costs/">log costs</a>, <a href="/guides/metrics-costs/">metrics costs</a>
+    </li>
+  </ul>
+
+  <h2>3) Egress and downstream spend</h2>
+  <ul>
+    <li>Outbound transfer scales with payload size and traffic.</li>
+    <li>Downstream requests (DB/queue/storage) can dwarf compute charges.</li>
+    <li>
+      Hubs: <a href="/guides/networking-costs/">networking costs</a>, <a href="/guides/database-costs/">database costs</a>,{" "}
+      <a href="/guides/messaging-costs/">messaging costs</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request cost</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+  </div>
+
+  {serverlessGuides.length ? (
+    <>
+      <h2>More serverless guides</h2>
+      <div class="grid">
+        {serverlessGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
+
