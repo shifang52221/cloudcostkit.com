@@ -1,0 +1,78 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud Functions pricing: invocations, duration, and log volume";
+const description =
+  "A practical Cloud Functions cost model: invocations, duration, networking/egress, and logs. Includes a validation checklist to avoid underestimating retries.";
+
+const faqs = [
+  {
+    q: "What usually drives Cloud Functions cost?",
+    a: "Invocations and duration are the core drivers, but log ingestion and outbound transfer can dominate for high-volume workloads.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly invocations and average duration, then estimate response/outbound transfer and log bytes per invocation.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate retries/timeouts, validate event trigger volume, and validate actual log payload sizes from a sample.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-functions-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    The best Cloud Functions estimate is a “unit economics” model: per-invocation cost drivers multiplied by monthly volume.
+    Keep compute, transfer, and logs as separate lines.
+  </p>
+
+  <h2>1) Invocations</h2>
+  <p>
+    Convert your trigger source to monthly invocations (HTTP RPS, Pub/Sub messages, scheduler triggers). Model peak periods
+    separately if you have bursty traffic.
+  </p>
+  <p>
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+  </p>
+
+  <h2>2) Duration</h2>
+  <p>Use p50 and p95 duration to model steady-state and spikes. Spikes often come from upstream latency and retries.</p>
+
+  <h2>3) Transfer and egress</h2>
+  <p>Response size and outbound calls can make egress large. Estimate average response size and outbound GB separately.</p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
+  </p>
+
+  <h2>4) Logs</h2>
+  <p>
+    Multiply bytes logged per invocation by invocation volume to estimate ingestion. Add retention and scan costs if you run
+    frequent queries.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-cost-calculator/">Log cost tools</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate retry behavior (each retry multiplies invocations and transfer).</li>
+    <li>Validate p95 duration and cold-start periods.</li>
+    <li>Validate log volume per invocation and retention policies.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

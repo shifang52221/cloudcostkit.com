@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Artifact Registry pricing: storage + pulls + egress (a practical estimate)";
+const description =
+  "Model Artifact Registry costs: storage (GB-month), download volume (pulls), and outbound transfer. Includes a workflow to estimate GB-month from retention.";
+
+const faqs = [
+  {
+    q: "What usually drives Artifact Registry cost?",
+    a: "Storage (GB-month) is the baseline, but heavy CI/CD or large clusters can make downloads and egress meaningful.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate average artifact size, retention, and download volume. Treat cross-region downloads and internet egress separately.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate real storage usage, validate retention policies, and sample download volumes during peak build/deploy windows.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-artifact-registry-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Registries are “store bits, move bits”. A reliable estimate separates storage (GB-month) from download volume and egress.
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>
+    Estimate GB-month from retention: average artifact size × number retained. If artifacts share layers (container images),
+    storage is often less than “tags × size”, so validate with real usage stats when possible.
+  </p>
+  <p>
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Storage cost</a>.
+  </p>
+
+  <h2>2) Downloads (pull volume)</h2>
+  <p>
+    Downloads scale with CI/CD and autoscaling. Model the top drivers explicitly (build pipelines, node churn, deploy
+    frequency) rather than using one blended number.
+  </p>
+
+  <h2>3) Egress</h2>
+  <p>
+    Split egress by destination and validate whether cross-region downloads are frequent (multi-region clusters often cause
+    this).
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate retention and garbage collection (old layers can keep storage high).</li>
+    <li>Validate download volume during peak build/deploy windows and cluster scale-outs.</li>
+    <li>Validate cross-region patterns (multi-region setups can multiply transfer).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">GB-month</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
+    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+  </div>
+</GuideLayout>
+

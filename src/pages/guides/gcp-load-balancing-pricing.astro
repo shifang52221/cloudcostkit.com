@@ -1,0 +1,69 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "GCP load balancing pricing: model hours, requests, and traffic processed";
+const description =
+  "A driver-based approach to load balancer cost: hours, request volume, and GB processed/egress. Includes a workflow to estimate GB from RPS and response size.";
+
+const faqs = [
+  {
+    q: "What usually drives load balancer cost?",
+    a: "Time and traffic processed are common drivers. For internet-facing apps, outbound egress is often the largest variable.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly requests and average response size to get monthly GB, then split load balancer vs egress as separate lines.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak traffic and retry storms, and validate whether traffic is served via CDN (changing origin egress).",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-load-balancing-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Load balancer estimates get accurate when you treat them as: hours + requests + traffic processed. Egress is usually a
+    separate, often larger line item for public services.
+  </p>
+
+  <h2>1) Hours</h2>
+  <p>Count load balancers and hours per month per environment.</p>
+
+  <h2>2) Requests</h2>
+  <p>Convert RPS to monthly requests and split high-volume endpoints if needed.</p>
+  <p>
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>.
+  </p>
+
+  <h2>3) Traffic processed and egress</h2>
+  <p>
+    Use average response size to estimate GB transferred. Split origin egress vs CDN edge bandwidth and validate cache hit
+    rate behavior if you use a CDN.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate peak traffic and burst behavior (capacity and scaling depend on peaks).</li>
+    <li>Validate retries/timeouts that multiply request volume and transfer volume.</li>
+    <li>Validate CDN usage and avoid double-counting origin egress and edge bandwidth.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>
+

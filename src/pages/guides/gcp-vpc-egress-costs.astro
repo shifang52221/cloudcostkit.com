@@ -1,0 +1,77 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "GCP VPC egress costs: how to estimate outbound transfer";
+const description =
+  "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert metrics to GB/month, and validate boundaries.";
+
+const faqs = [
+  {
+    q: "What usually drives VPC egress costs?",
+    a: "Internet egress is the main driver for many apps, but cross-region and inter-zone patterns can create large hidden costs in distributed systems.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly outbound GB by destination using a blended effective rate, then refine by splitting the top traffic flows.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate real outbound GB from flow logs or metrics, validate cross-zone/region traffic, and validate CDN origin egress separately from edge bandwidth.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-vpc-egress-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Transfer costs are easiest to control when you split traffic into billable categories and validate boundaries. This guide
+    is a practical workflow you can apply before you deploy or when you see an unexpected bill.
+  </p>
+
+  <h2>1) Split traffic into destinations</h2>
+  <ul>
+    <li>Internet egress (end users, SaaS, third-party APIs)</li>
+    <li>Cross-region (replication, DR, multi-region services)</li>
+    <li>Cross-zone / inter-zone (distributed services)</li>
+    <li>Origin egress to CDN (cache fill)</li>
+  </ul>
+
+  <h2>2) Convert usage to GB/month</h2>
+  <p>
+    Use a representative time window and convert to monthly GB. If you only have RPS, multiply by average response size to
+    approximate transfer volume.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>.
+  </p>
+
+  <h2>3) Apply effective blended rates for planning</h2>
+  <p>
+    For early budgeting, a blended effective rate per GB is fine. The real value is the breakdown: it tells you what to
+    cache, compress, or route differently.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost calculator</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate cross-zone and cross-region traffic from distributed systems (common hidden drivers).</li>
+    <li>Validate compression and payload sizes for high-volume endpoints.</li>
+    <li>Validate CDN origin egress separately from edge bandwidth and cache hit rate.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>
+

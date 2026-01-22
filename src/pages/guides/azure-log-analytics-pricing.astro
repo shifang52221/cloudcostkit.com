@@ -1,0 +1,84 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Log Analytics pricing: ingestion, retention, and query costs";
+const description =
+  "A practical model for Log Analytics-style costs: GB ingested, retention, and query/scan. Includes a method to estimate log GB from event rate and payload size.";
+
+const faqs = [
+  {
+    q: "What usually drives Log Analytics cost?",
+    a: "Log ingestion volume (GB) is usually the biggest driver, followed by retention. Query cost matters when you scan lots of data frequently.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate events per second, average event size, and retention days. Convert to GB/day and then to GB/month.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Sample real log payloads, validate whether high-volume sources (ingress, firewall, audit logs) are enabled, and validate dashboard/alert query windows.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-log-analytics-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Log Analytics costs scale with volume. The safest estimate is a simple pipeline:
+    <strong>events × size → GB ingested → retention storage → query scans</strong>.
+  </p>
+
+  <h2>1) Ingestion (GB)</h2>
+  <p>
+    Start with an event rate and average payload size. Multiply to get bytes/day, then convert to GB/day and GB/month.
+    Add separate line items for big sources (ingress logs, audit logs, firewall logs) instead of averaging everything.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost calculator</a>.
+  </p>
+
+  <h2>2) Retention (GB-month)</h2>
+  <p>
+    Retention is “ingested GB per day × retention days” converted into GB-month. If you store a month of logs and ingest
+    50 GB/day, you are roughly holding 1500 GB of data on average.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage calculator</a>.
+  </p>
+
+  <h2>3) Query and scan costs</h2>
+  <p>
+    Query cost depends on how much data you scan per query and how often. Dashboards and alert rules can scan far more data
+    than you expect, especially with broad time windows.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-search-scan-cost-calculator/">Log search/scan calculator</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate the biggest sources (ingress/firewall/audit) and estimate them separately.</li>
+    <li>Validate retention windows for each log type (short vs long retention).</li>
+    <li>Validate dashboards/alerts for wide time windows that scan lots of data repeatedly.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">All log tools</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Ingestion</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan</a>
+  </div>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/log-costs/">Log cost basics</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+</GuideLayout>
+

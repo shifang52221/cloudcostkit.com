@@ -1,0 +1,88 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Kubernetes Service (AKS) pricing: what to include";
+const description =
+  "AKS cost is more than node VMs: include node pools, networking/egress, storage, and observability. Use this checklist-style model to estimate safely.";
+
+const faqs = [
+  {
+    q: "What usually drives AKS cost?",
+    a: "Node compute (VMs) is typically the largest line item, but egress, load balancing, persistent storage, and logging can be large in production.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate node-hours by node pool, then add separate estimates for egress, load balancer traffic, storage GB-month, and log ingestion.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate requests/limits and overhead, then compare estimated node utilization against real cluster metrics during peak periods.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/azure-aks-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    AKS cost planning fails when you only count nodes. A realistic estimate is a checklist across compute, networking,
+    storage, and observability — and it validates packing assumptions.
+  </p>
+
+  <h2>1) Node pools (VM hours)</h2>
+  <p>
+    Model each node pool separately: instance type, number of nodes, and hours per month. If you autoscale, model average
+    and peak node counts.
+  </p>
+  <p>
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost calculator</a>.
+  </p>
+
+  <h2>2) Workload packing (requests/limits)</h2>
+  <p>
+    Requests/limits determine packing and therefore node count. Over-requesting CPU/memory is one of the most common cost
+    leaks in Kubernetes.
+  </p>
+  <p>
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests/limits helper</a>.
+  </p>
+
+  <h2>3) Networking and egress</h2>
+  <p>
+    Egress from pods (to the internet, to other regions, or to external services) is frequently underestimated. Split
+    “internal” traffic from billable egress and validate cache behavior when using CDNs.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost calculator</a>.
+  </p>
+
+  <h2>4) Storage (persistent volumes)</h2>
+  <p>
+    Persistent storage is a GB-month driver. Include snapshots/backups if you rely on them, and validate retention windows.
+  </p>
+  <p>
+    Tool: <a href="/calculators/storage-pricing-calculator/">Storage pricing (generic)</a>.
+  </p>
+
+  <h2>5) Observability (logs/metrics)</h2>
+  <p>
+    Logging and metrics scale with pod count and verbosity. Model ingestion and retention separately; logs can exceed node
+    compute if you ingest too much.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-cost-calculator/">Log cost calculator</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate kube-system overhead and DaemonSets (logging, CNI, monitoring) that consume node capacity.</li>
+    <li>Validate autoscaling behavior: average vs peak nodes, and whether scale-outs are frequent.</li>
+    <li>Validate egress boundaries (internet vs internal) and measure real outbound GB in a representative window.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost</a>
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+  </div>
+</GuideLayout>
+

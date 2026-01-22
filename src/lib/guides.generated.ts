@@ -822,6 +822,76 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-waf-cost-spikes-during-attacks"
   },
   {
+    "title": "Azure Application Gateway pricing: how to model L7 load balancer costs",
+    "description": "Model Application Gateway costs using measurable drivers: hours, request volume, traffic processed, WAF, and logs — plus a validation checklist.",
+    "canonicalPath": "/guides/azure-application-gateway-pricing",
+    "category": "Azure",
+    "slug": "azure-application-gateway-pricing"
+  },
+  {
+    "title": "Azure bandwidth and egress costs: how to estimate outbound data transfer",
+    "description": "A practical method to estimate outbound bandwidth costs: split by destination (internet, cross-region, CDN origin), validate units, and avoid double-counting.",
+    "canonicalPath": "/guides/azure-bandwidth-egress-costs",
+    "category": "Azure",
+    "slug": "azure-bandwidth-egress-costs"
+  },
+  {
+    "title": "Azure Blob Storage pricing: a practical cost model",
+    "description": "Model Blob Storage cost without copying price tables: GB-month, operations, redundancy/replication, retrieval, and egress.",
+    "canonicalPath": "/guides/azure-blob-storage-pricing",
+    "category": "Azure",
+    "slug": "azure-blob-storage-pricing"
+  },
+  {
+    "title": "Azure Container Registry (ACR) pricing: storage + pulls + egress",
+    "description": "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a simple way to estimate GB-month from retention.",
+    "canonicalPath": "/guides/azure-container-registry-pricing",
+    "category": "Azure",
+    "slug": "azure-container-registry-pricing"
+  },
+  {
+    "title": "Azure Functions pricing: what to include in a realistic estimate",
+    "description": "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume — plus how to validate with real metrics.",
+    "canonicalPath": "/guides/azure-functions-pricing",
+    "category": "Azure",
+    "slug": "azure-functions-pricing"
+  },
+  {
+    "title": "Azure Kubernetes Service (AKS) pricing: what to include",
+    "description": "AKS cost is more than node VMs: include node pools, networking/egress, storage, and observability. Use this checklist-style model to estimate safely.",
+    "canonicalPath": "/guides/azure-aks-pricing",
+    "category": "Azure",
+    "slug": "azure-aks-pricing"
+  },
+  {
+    "title": "Azure Load Balancer pricing: L4 traffic and data processing model",
+    "description": "A practical cost model for L4 load balancing: hours, traffic processed, and egress. Includes a workflow to estimate GB processed from RPS and payload size.",
+    "canonicalPath": "/guides/azure-load-balancer-pricing",
+    "category": "Azure",
+    "slug": "azure-load-balancer-pricing"
+  },
+  {
+    "title": "Azure Log Analytics pricing: ingestion, retention, and query costs",
+    "description": "A practical model for Log Analytics-style costs: GB ingested, retention, and query/scan. Includes a method to estimate log GB from event rate and payload size.",
+    "canonicalPath": "/guides/azure-log-analytics-pricing",
+    "category": "Azure",
+    "slug": "azure-log-analytics-pricing"
+  },
+  {
+    "title": "Azure NAT Gateway cost: why bills spike and how to model them",
+    "description": "A practical NAT Gateway estimate: hourly baseline + GB processed (plus egress). Includes common failure patterns that multiply outbound traffic.",
+    "canonicalPath": "/guides/azure-nat-gateway-cost",
+    "category": "Azure",
+    "slug": "azure-nat-gateway-cost"
+  },
+  {
+    "title": "Azure SQL Database pricing: a practical way to estimate",
+    "description": "Model managed database cost without price tables: compute baseline, storage GB-month, backups/retention, and network/egress. Includes a validation checklist.",
+    "canonicalPath": "/guides/azure-sql-database-pricing",
+    "category": "Azure",
+    "slug": "azure-sql-database-pricing"
+  },
+  {
     "title": "CDN Costs Explained: bandwidth, requests, and origin egress",
     "description": "A practical CDN cost breakdown: what you pay for bandwidth ($/GB), request fees ($ per 10k/1M), cache fill, and origin egress. Includes estimation steps and common pitfalls.",
     "canonicalPath": "/guides/cdn-costs",
@@ -857,6 +927,76 @@ export const GUIDES: GuideLink[] = [
     "slug": "origin-egress-vs-cdn-bandwidth"
   },
   {
+    "title": "Artifact Registry pricing: storage + pulls + egress (a practical estimate)",
+    "description": "Model Artifact Registry costs: storage (GB-month), download volume (pulls), and outbound transfer. Includes a workflow to estimate GB-month from retention.",
+    "canonicalPath": "/guides/gcp-artifact-registry-pricing",
+    "category": "GCP",
+    "slug": "gcp-artifact-registry-pricing"
+  },
+  {
+    "title": "BigQuery cost estimation: storage, scans, and streaming (practical model)",
+    "description": "Estimate BigQuery-style analytics costs with drivers you can measure: stored data (GB-month), scanned bytes, streaming ingestion, and partitioning/retention choices.",
+    "canonicalPath": "/guides/gcp-bigquery-cost-estimation",
+    "category": "GCP",
+    "slug": "gcp-bigquery-cost-estimation"
+  },
+  {
+    "title": "Cloud Functions pricing: invocations, duration, and log volume",
+    "description": "A practical Cloud Functions cost model: invocations, duration, networking/egress, and logs. Includes a validation checklist to avoid underestimating retries.",
+    "canonicalPath": "/guides/gcp-cloud-functions-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-functions-pricing"
+  },
+  {
+    "title": "Cloud Logging pricing: ingestion, retention, and query scans",
+    "description": "A practical model for Cloud Logging-style costs: GB ingested, retention GB-month, and query/scan. Includes a fast way to estimate GB/month from event rate and payload size.",
+    "canonicalPath": "/guides/gcp-cloud-logging-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-logging-pricing"
+  },
+  {
+    "title": "Cloud NAT cost: why it spikes and how to model outbound traffic",
+    "description": "A practical Cloud NAT estimate: hourly baseline + data processed (plus egress). Includes common patterns that multiply outbound GB during incidents and deployments.",
+    "canonicalPath": "/guides/gcp-cloud-nat-cost",
+    "category": "GCP",
+    "slug": "gcp-cloud-nat-cost"
+  },
+  {
+    "title": "Cloud Run pricing: a practical model (requests, CPU/memory time, and egress)",
+    "description": "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, CPU/memory time, concurrency, outbound transfer, and logs.",
+    "canonicalPath": "/guides/gcp-cloud-run-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-run-pricing"
+  },
+  {
+    "title": "GCP load balancing pricing: model hours, requests, and traffic processed",
+    "description": "A driver-based approach to load balancer cost: hours, request volume, and GB processed/egress. Includes a workflow to estimate GB from RPS and response size.",
+    "canonicalPath": "/guides/gcp-load-balancing-pricing",
+    "category": "GCP",
+    "slug": "gcp-load-balancing-pricing"
+  },
+  {
+    "title": "GCP VPC egress costs: how to estimate outbound transfer",
+    "description": "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert metrics to GB/month, and validate boundaries.",
+    "canonicalPath": "/guides/gcp-vpc-egress-costs",
+    "category": "GCP",
+    "slug": "gcp-vpc-egress-costs"
+  },
+  {
+    "title": "Google Cloud Storage pricing: a practical model for storage, requests, and egress",
+    "description": "Model GCS cost without copying price tables: GB-month, operations, retrieval rules, and outbound transfer. Includes a validation checklist.",
+    "canonicalPath": "/guides/gcp-cloud-storage-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-storage-pricing"
+  },
+  {
+    "title": "Google Kubernetes Engine (GKE) pricing: a checklist-style estimate",
+    "description": "GKE cost is not just nodes: include node pools, networking/egress, load balancing, storage, and logs/metrics. Validate requests/limits to avoid overpaying.",
+    "canonicalPath": "/guides/gcp-gke-pricing",
+    "category": "GCP",
+    "slug": "gcp-gke-pricing"
+  },
+  {
     "title": "AWS cost guides | ${SITE.name}",
     "description": "AWS cost estimation guides for CloudFront, EKS, EC2, S3, VPC data transfer, and CloudWatch-style logging.",
     "canonicalPath": "/guides/aws",
@@ -864,11 +1004,25 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws"
   },
   {
+    "title": "Azure cost guides | ${SITE.name}",
+    "description": "Azure cost estimation guides for Blob Storage, AKS, Azure Functions, networking (NAT/egress), load balancing, and logs.",
+    "canonicalPath": "/guides/azure",
+    "category": "General",
+    "slug": "azure"
+  },
+  {
     "title": "Cloud cost estimation checklist (avoid thin estimates)",
     "description": "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs, and network transfer. Includes validation steps and common pitfalls.",
     "canonicalPath": "/guides/cloud-cost-estimation-checklist",
     "category": "General",
     "slug": "cloud-cost-estimation-checklist"
+  },
+  {
+    "title": "GCP cost guides | ${SITE.name}",
+    "description": "GCP cost estimation guides for Cloud Storage, GKE, Cloud Run/Functions, VPC egress, load balancing, Cloud Logging, and BigQuery-style analytics.",
+    "canonicalPath": "/guides/gcp",
+    "category": "General",
+    "slug": "gcp"
   },
   {
     "title": "How to estimate replication GB/month from write volume",

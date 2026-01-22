@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Azure cost guides | ${SITE.name}`;
+const description =
+  "Azure cost estimation guides for Blob Storage, AKS, Azure Functions, networking (NAT/egress), load balancing, and logs.";
+const slots = SITE.adsenseSlots;
+---
+<BaseLayout title={title} description={description} canonicalPath="/guides/azure">
+  <section class="card hero">
+    <h1>Azure cost guides</h1>
+    <p>Practical models to estimate common Azure line items and avoid frequent surprises.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/guides/">All guides</a>
+      <a class="btn" href="/calculators/">Calculators</a>
+      <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+    </div>
+  </section>
+
+  <section class="card section">
+    <div class="grid">
+      <a class="card2 tool col-6" href="/guides/azure-blob-storage-pricing/">
+        <div class="tool-title">Blob Storage pricing model</div>
+        <div class="tool-desc">GB-month + operations + replication + egress.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-functions-pricing/">
+        <div class="tool-title">Azure Functions pricing model</div>
+        <div class="tool-desc">Invocations + duration + logs + egress.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-container-registry-pricing/">
+        <div class="tool-title">ACR pricing model</div>
+        <div class="tool-desc">Storage, pulls, and transfer.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-aks-pricing/">
+        <div class="tool-title">AKS pricing checklist</div>
+        <div class="tool-desc">Nodes, egress, storage, and logs.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-log-analytics-pricing/">
+        <div class="tool-title">Log Analytics pricing model</div>
+        <div class="tool-desc">Ingest, retain, and scan/query.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-application-gateway-pricing/">
+        <div class="tool-title">Application Gateway pricing</div>
+        <div class="tool-desc">Hours, requests, WAF, logs, and egress.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-load-balancer-pricing/">
+        <div class="tool-title">Load Balancer pricing</div>
+        <div class="tool-desc">Hours, traffic processed, and egress.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-nat-gateway-cost/">
+        <div class="tool-title">NAT Gateway cost</div>
+        <div class="tool-desc">Why it spikes and how to model outbound GB.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-bandwidth-egress-costs/">
+        <div class="tool-title">Bandwidth / egress costs</div>
+        <div class="tool-desc">Split by destination and validate boundaries.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-sql-database-pricing/">
+        <div class="tool-title">Azure SQL Database estimate</div>
+        <div class="tool-desc">Compute + storage + backups + networking.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.guidesMid} minHeight={280} />
+  </section>
+</BaseLayout>
+

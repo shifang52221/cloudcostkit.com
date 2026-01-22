@@ -1,0 +1,94 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Functions pricing: what to include in a realistic estimate";
+const description =
+  "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume — plus how to validate with real metrics.";
+
+const faqs = [
+  {
+    q: "What usually drives Azure Functions cost?",
+    a: "Invocation count and execution duration are the core drivers, but networking and logging can dominate for chatty or high-volume workloads.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly invocations, average duration, and payload sizes. Add a separate estimate for log ingestion and outbound data transfer.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Measure a representative window, then validate retries/timeouts (which multiply invocations) and confirm log volume per invocation.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-functions-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Serverless bills are rarely “just compute”. A solid Azure Functions estimate separates the drivers you can measure:
+    <strong>invocations</strong>, <strong>duration</strong>, <strong>data transfer</strong>, and <strong>logs</strong>.
+  </p>
+
+  <h2>1) Invocation volume</h2>
+  <p>
+    Start with a monthly request estimate. If the function is triggered by HTTP, map traffic from RPS to monthly requests.
+    If it’s event-driven, use your queue/topic/event stream rates.
+  </p>
+  <p>
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+  </p>
+
+  <h2>2) Duration and concurrency</h2>
+  <p>
+    Duration is the multiplier. Use a percentile (p50 and p95) instead of a single average so you can model “normal” vs
+    “spiky” periods. Spikes often come from upstream latency, retries, or cold starts.
+  </p>
+
+  <h2>3) Networking and payload size</h2>
+  <p>
+    Outbound data transfer can become a major cost driver when functions call external APIs, return large responses, or
+    stream data. Estimate response size and outbound volume separately.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>4) Logs and observability</h2>
+  <p>
+    Logging cost scales with log volume and retention. If each invocation logs a few KB and you have millions of invocations,
+    log ingestion can exceed compute. Model ingestion, storage, and any query/scan cost separately.
+  </p>
+  <p>
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Search/scan</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate invocation drivers during incident windows (retries and timeouts multiply costs).</li>
+    <li>Validate average response size and outbound transfer (especially for public APIs).</li>
+    <li>Validate log volume per invocation (sample real logs and multiply by invocation count).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+  </div>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/log-costs/">Log cost basics</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+  </div>
+</GuideLayout>
+

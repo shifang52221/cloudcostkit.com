@@ -1,0 +1,64 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud NAT cost: why it spikes and how to model outbound traffic";
+const description =
+  "A practical Cloud NAT estimate: hourly baseline + data processed (plus egress). Includes common patterns that multiply outbound GB during incidents and deployments.";
+
+const faqs = [
+  {
+    q: "Why do Cloud NAT costs spike?",
+    a: "Retry storms, node churn (image pulls), package downloads, and unbounded telemetry/log shipping can rapidly increase outbound GB.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Model NAT hours plus monthly outbound GB through NAT, then add a safety multiplier for retries/incidents if the workload is new.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate which subnets route via NAT and measure outbound GB from flow logs or a representative traffic window.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-nat-cost" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    Cloud NAT sits on the outbound path for private workloads. That makes its cost highly sensitive to deployment patterns
+    and incident behavior. The estimate is straightforward once you isolate the outbound flows routed through NAT.
+  </p>
+
+  <h2>1) Hours</h2>
+  <p>Model NAT gateway hours per region/environment.</p>
+
+  <h2>2) Outbound GB processed</h2>
+  <p>
+    List your major outbound flows (package downloads, container pulls, external APIs, telemetry) and estimate monthly GB for
+    each. This also reveals what to cache or proxy to reduce cost.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>3) Cost multipliers to watch</h2>
+  <ul>
+    <li>Retries/timeouts that repeat large payloads.</li>
+    <li>Scale-outs and node churn causing repeated image pulls.</li>
+    <li>CI runners downloading dependencies repeatedly without caching.</li>
+    <li>High-volume telemetry shipped out of VPC.</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate routing: which subnets use NAT and which have direct egress paths.</li>
+    <li>Validate peak windows (deploys/incidents) where outbound GB spikes.</li>
+    <li>Validate caching: registries, package proxies, CDN for large downloads.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

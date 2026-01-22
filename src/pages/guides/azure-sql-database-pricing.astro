@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure SQL Database pricing: a practical way to estimate";
+const description =
+  "Model managed database cost without price tables: compute baseline, storage GB-month, backups/retention, and network/egress. Includes a validation checklist.";
+
+const faqs = [
+  {
+    q: "What usually drives managed database cost?",
+    a: "Compute capacity and storage are the primary drivers. Backups/retention and cross-zone/region data movement can be meaningful in production.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate a compute baseline, average storage GB, and backup retention. Add a separate line item for outbound data transfer if you have cross-region access patterns.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak CPU/memory/IO usage, validate storage growth rate, and validate backup retention policies (including snapshots and PITR).",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/azure-sql-database-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    Managed database cost is usually “capacity + data”. The safest estimate breaks the database into compute, storage, and
+    backup/retention, and then validates IO and growth assumptions.
+  </p>
+
+  <h2>1) Compute baseline</h2>
+  <p>
+    Pick an initial capacity based on expected concurrency and query patterns, then plan for headroom. If the workload is
+    spiky, model peak periods separately (peak hours drive the right sizing).
+  </p>
+
+  <h2>2) Storage (GB-month)</h2>
+  <p>
+    Use average stored GB. If the dataset is growing, estimate monthly growth and compute average size across the month.
+  </p>
+  <p>
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>.
+  </p>
+
+  <h2>3) Backups and retention</h2>
+  <p>
+    Backup retention is often a quiet cost driver. Model backup storage separately from primary storage, and validate
+    retention windows (PITR, snapshots, long-term retention).
+  </p>
+
+  <h2>4) Networking</h2>
+  <p>
+    If clients access the database cross-zone/region or from the public internet, network transfer may be billed. Split
+    transfer by destination and validate boundaries.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate peak CPU/memory/IO and plan headroom (avoid resizing churn).</li>
+    <li>Validate storage growth and retention policy for backups/snapshots.</li>
+    <li>Validate network paths (private access vs public/cross-region) and billable transfer.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>
+

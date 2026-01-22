@@ -1,0 +1,80 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Google Cloud Storage pricing: a practical model for storage, requests, and egress";
+const description =
+  "Model GCS cost without copying price tables: GB-month, operations, retrieval rules, and outbound transfer. Includes a validation checklist.";
+
+const faqs = [
+  {
+    q: "What usually drives GCS cost?",
+    a: "GB-month stored and outbound transfer are usually the biggest drivers, with operations becoming material for high-request workloads.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate average stored GB, monthly egress, and a rough request count. Add separate line items for archival retrieval and replication patterns.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate storage class mix, validate egress boundaries (internet vs internal), and validate request pricing units (per 1k/10k/1M).",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-storage-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    GCS-like object storage pricing becomes predictable when you separate it into four buckets:
+    <strong>GB-month</strong>, <strong>operations</strong>, <strong>retrieval rules</strong>, and <strong>egress</strong>.
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>Use average stored GB and split by storage class if you know the mix.</p>
+  <p>
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>.
+  </p>
+
+  <h2>2) Operations (GET/PUT/LIST)</h2>
+  <p>
+    Operations are the main driver for “lots of small objects” workloads. For large objects and CDN-backed delivery,
+    operations are often small compared to egress.
+  </p>
+  <p>
+    Tool: <a href="/calculators/api-request-cost-calculator/">API request cost</a>.
+  </p>
+
+  <h2>3) Retrieval and minimum duration rules</h2>
+  <p>
+    Colder classes often have retrieval fees and minimum storage durations. Model retrieval GB and retrieval requests
+    separately, and validate any early-deletion penalties.
+  </p>
+
+  <h2>4) Outbound transfer (egress)</h2>
+  <p>
+    Egress is frequently the surprise line item. Split internet egress vs cross-region and keep CDN edge bandwidth separate
+    from origin egress (cache fill).
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate storage class mix and lifecycle transitions (hot → cold → archive).</li>
+    <li>Validate request pricing units and whether requests are charged per 1k/10k/1M.</li>
+    <li>Validate origin egress separately from CDN edge bandwidth to avoid double-counting.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">Storage</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Requests</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>
+

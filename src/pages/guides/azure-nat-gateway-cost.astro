@@ -1,0 +1,64 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure NAT Gateway cost: why bills spike and how to model them";
+const description =
+  "A practical NAT Gateway estimate: hourly baseline + GB processed (plus egress). Includes common failure patterns that multiply outbound traffic.";
+
+const faqs = [
+  {
+    q: "Why do NAT bills spike?",
+    a: "Retry storms, large outbound downloads, container image pulls, and unbounded logging/telemetry can multiply GB processed quickly.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate baseline hours plus monthly GB outbound through NAT. Add a multiplier for retries/timeouts if the workload is not yet stable.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate which subnets route through NAT and measure outbound GB from flow logs or a representative traffic window.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/azure-nat-gateway-cost" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    NAT gateways are deceptively simple: an hourly baseline plus a data processing driver. The real problem is that NAT sits
+    on the hot path for outbound traffic, so any retry storm or oversized download can amplify cost.
+  </p>
+
+  <h2>1) Baseline hours</h2>
+  <p>Model NAT gateway count × hours per month.</p>
+
+  <h2>2) GB processed</h2>
+  <p>
+    The practical way to estimate GB processed is to list the major outbound flows routed via NAT: container pulls, package
+    downloads, external API calls, telemetry, and backups. Then estimate monthly GB for each flow.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
+  </p>
+
+  <h2>3) Common cost multipliers</h2>
+  <ul>
+    <li>Retries/timeouts to external APIs (each retry repeats full payload transfer).</li>
+    <li>Image pulls during node churn or frequent redeploys.</li>
+    <li>Uncached package downloads in CI or autoscaling environments.</li>
+    <li>High-volume telemetry/log shipping routed through NAT.</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate which subnets and workloads egress via NAT (routing tables matter).</li>
+    <li>Validate peak periods (deployments, incidents, scale-outs) where GB processed spikes.</li>
+    <li>Validate that large downloads are cached (registry mirrors, package proxies, CDN).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

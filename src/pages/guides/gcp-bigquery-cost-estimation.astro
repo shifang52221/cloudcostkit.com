@@ -1,0 +1,76 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "BigQuery cost estimation: storage, scans, and streaming (practical model)";
+const description =
+  "Estimate BigQuery-style analytics costs with drivers you can measure: stored data (GB-month), scanned bytes, streaming ingestion, and partitioning/retention choices.";
+
+const faqs = [
+  {
+    q: "What usually drives analytics warehouse costs?",
+    a: "Query scans (bytes processed) are often the biggest variable, while storage is a steady baseline. Inefficient queries and wide time windows cause most surprises.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate how many queries run per day and how much data each query scans. Model storage separately using average GB and retention.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate partitioning/clustering, validate dashboard refresh rates, and validate that common queries scan only needed partitions.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-bigquery-cost-estimation"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Data warehouses are “pay for scans”. You can estimate BigQuery-like systems with two independent lines:
+    <strong>storage</strong> (GB-month) and <strong>bytes scanned</strong> (per query × query count). If you stream data in,
+    treat ingestion as another driver.
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>
+    Start with average stored GB and retention. If you have daily partitions, storage often grows steadily; model growth rate
+    and compute average size for the month.
+  </p>
+  <p>
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth model</a>.
+  </p>
+
+  <h2>2) Query scans (bytes processed)</h2>
+  <p>
+    Estimate: queries per day × bytes scanned per query. Dashboards and scheduled jobs can scan large windows repeatedly,
+    so model them explicitly.
+  </p>
+  <p>
+    Tip: if you don’t know bytes scanned, approximate it with “rows read × average row size” and validate later with query
+    stats.
+  </p>
+
+  <h2>3) Streaming ingestion and exports</h2>
+  <p>
+    If you stream in events or export results frequently, model those paths separately. Ingestion is a volume problem; exports
+    can become a transfer/egress problem.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate partitioning/clustering and ensure common queries prune partitions.</li>
+    <li>Validate dashboard refresh rates and scheduled jobs (hidden repeated scans).</li>
+    <li>Validate scan windows during incidents (retries can multiply query volume).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan model</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

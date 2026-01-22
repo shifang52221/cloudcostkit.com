@@ -1,0 +1,74 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Container Registry (ACR) pricing: storage + pulls + egress";
+const description =
+  "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a simple way to estimate GB-month from retention.";
+
+const faqs = [
+  {
+    q: "What usually drives ACR cost?",
+    a: "Image storage (GB-month) is the baseline, but heavy CI/CD or large clusters can make pulls and data transfer meaningful.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate average image size, retention window, and pull volume. Treat cross-region pulls and internet egress separately.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate the true image size on disk (compressed layers), confirm retention policies, and sample real pull counts during peak build periods.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-container-registry-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Container registries are “storage + transfer”. A clean estimate separates what you store from what you pull, and splits
+    transfer by where it goes (same region, cross-region, internet).
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>
+    Build a GB-month estimate from your retention policy: average image size × number of tags retained × number of repos.
+    If tags share layers, storage is less than “tags × size”, so validate with real registry stats when possible.
+  </p>
+  <p>
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Storage cost (GB-month)</a>.
+  </p>
+
+  <h2>2) Pull volume</h2>
+  <p>
+    Pulls scale with CI/CD, autoscaling, and node churn. A good first model is:
+    <strong>deployments per day × pulls per deployment × image size</strong>. Add a multiplier for cache misses.
+  </p>
+
+  <h2>3) Data transfer (egress)</h2>
+  <p>
+    Transfer is often the hidden part: cross-region cluster pulls, external runners, or edge nodes. Split outbound transfer
+    by destination and validate where billing applies.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate retention policy and garbage collection (old tags/layers can keep storage high).</li>
+    <li>Validate pull counts during peak CI windows and during cluster scale-out events.</li>
+    <li>Validate where transfer is billed (same-region vs cross-region vs internet).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">GB-month</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
+    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+  </div>
+</GuideLayout>
+

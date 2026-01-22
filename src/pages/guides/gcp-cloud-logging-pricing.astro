@@ -1,0 +1,77 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud Logging pricing: ingestion, retention, and query scans";
+const description =
+  "A practical model for Cloud Logging-style costs: GB ingested, retention GB-month, and query/scan. Includes a fast way to estimate GB/month from event rate and payload size.";
+
+const faqs = [
+  {
+    q: "What usually drives logging cost?",
+    a: "Ingestion volume (GB) is usually the primary driver. Retention becomes material when you keep logs for months, and query scans matter for heavy analytics.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate events per second and average payload size, convert to GB/day and GB/month, then multiply by retention days.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Sample real log payloads, validate high-volume sources, and validate dashboards/alerts that scan large windows repeatedly.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-logging-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Logging costs are predictable when you treat logs like data: bytes in, bytes stored, bytes scanned. The biggest wins come
+    from controlling ingestion volume and retention.
+  </p>
+
+  <h2>1) Ingestion (GB)</h2>
+  <p>
+    Estimate log bytes per event × events per second. Convert to GB/day and multiply by 30 for a monthly baseline. Model the
+    biggest sources separately (ingress, audit, firewall, application logs).
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>.
+  </p>
+
+  <h2>2) Retention (GB-month)</h2>
+  <p>
+    Retention is a GB-month problem. If you ingest 20 GB/day and retain 30 days, you store roughly 600 GB on average (before
+    compression and tiering assumptions).
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>.
+  </p>
+
+  <h2>3) Query and scan</h2>
+  <p>
+    Queries and dashboards often scan far more data than expected. Count how many queries run per day and estimate GB scanned
+    per query based on time window and filters.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-search-scan-cost-calculator/">Log scan</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate the biggest sources and turn off or sample noisy logs first.</li>
+    <li>Validate retention windows and whether long-term retention is needed for all sources.</li>
+    <li>Validate dashboards/alerts for wide time windows that scan lots of data repeatedly.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">All log tools</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Ingestion</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan</a>
+  </div>
+</GuideLayout>
+

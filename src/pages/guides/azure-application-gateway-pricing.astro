@@ -1,0 +1,85 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Application Gateway pricing: how to model L7 load balancer costs";
+const description =
+  "Model Application Gateway costs using measurable drivers: hours, request volume, traffic processed, WAF, and logs — plus a validation checklist.";
+
+const faqs = [
+  {
+    q: "What usually drives Application Gateway cost?",
+    a: "Gateway-hours are the baseline, but throughput and request volume (plus WAF and logging) often decide the real bill.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with hours + expected request rate and response size to estimate monthly GB. Add separate estimates for WAF and logs if enabled.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak traffic vs average, validate retry storms, and confirm whether WAF and access logs are enabled (and retained).",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-application-gateway-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    L7 load balancer bills usually scale with <strong>time</strong>, <strong>traffic processed</strong>, and sometimes
+    <strong>requests</strong>. The main mistake is to estimate only “one gateway” without modeling traffic and log volume.
+  </p>
+
+  <h2>1) Time (gateway-hours)</h2>
+  <p>
+    Start with the number of gateways and hours per month. If you run multiple environments (dev/stage/prod), model them
+    separately.
+  </p>
+
+  <h2>2) Requests and response sizes</h2>
+  <p>
+    Request volume and response sizes determine traffic processed. If you know only RPS, convert to monthly requests, then
+    estimate average response size to get GB transferred.
+  </p>
+  <p>
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
+  </p>
+
+  <h2>3) Data transfer (egress)</h2>
+  <p>
+    If the gateway sends data to the internet, outbound transfer is often billed separately and can dominate cost for
+    high-bandwidth apps.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
+  </p>
+
+  <h2>4) WAF and logging</h2>
+  <p>
+    If WAF and access logs are enabled, model them separately. WAF is request-driven; logs are volume-driven (GB ingested +
+    retention).
+  </p>
+  <p>
+    Tools: <a href="/calculators/cdn-request-cost-calculator/">Request cost</a>,{" "}
+    <a href="/calculators/log-cost-calculator/">Log cost</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate peak vs average RPS/GB (capacity and scaling depend on peaks).</li>
+    <li>Validate retry/timeout patterns that multiply requests and traffic processed.</li>
+    <li>Validate whether WAF and access logs are enabled and what retention window applies.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+  </div>
+</GuideLayout>
+

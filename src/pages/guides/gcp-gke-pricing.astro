@@ -1,0 +1,83 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Google Kubernetes Engine (GKE) pricing: a checklist-style estimate";
+const description =
+  "GKE cost is not just nodes: include node pools, networking/egress, load balancing, storage, and logs/metrics. Validate requests/limits to avoid overpaying.";
+
+const faqs = [
+  {
+    q: "What usually drives GKE cost?",
+    a: "Node compute dominates many clusters, but egress, load balancers, persistent disks, and logging can be large for production workloads.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate node-hours by pool, then add separate estimates for egress, storage GB-month, and log ingestion.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate workload requests/limits and overhead, then validate outbound GB and log volume in a representative window.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-gke-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    GKE planning gets accurate when you treat it as a stack: compute (nodes), networking, storage, and observability. This
+    checklist gives you a safe baseline for budgeting and an audit path for an existing bill.
+  </p>
+
+  <h2>1) Node pools (instance-hours)</h2>
+  <p>Model each pool: instance type, min/max nodes, and average hours per month.</p>
+  <p>
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
+  </p>
+
+  <h2>2) Packing (requests/limits)</h2>
+  <p>
+    Requests drive how many pods fit on a node. Over-requesting is a common cost leak. Validate overhead (kube-system,
+    DaemonSets) and reserved capacity.
+  </p>
+  <p>
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests/limits helper</a>.
+  </p>
+
+  <h2>3) Egress and load balancing</h2>
+  <p>
+    Internet-facing services often have material egress. Split egress by destination and validate whether traffic is served
+    via CDN (which changes origin egress).
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>4) Storage</h2>
+  <p>Persistent volumes are a GB-month driver. Include snapshots/backups and validate retention windows.</p>
+  <p>
+    Tool: <a href="/calculators/storage-pricing-calculator/">Storage pricing (generic)</a>.
+  </p>
+
+  <h2>5) Logs and metrics</h2>
+  <p>
+    Logging and metrics scale with pod count and verbosity. If each request emits multiple log lines, log ingestion can
+    exceed compute. Estimate ingestion and retention explicitly.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-cost-calculator/">Log cost tools</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate node utilization vs requested resources (look for over-requesting and bin-packing gaps).</li>
+    <li>Validate outbound GB by destination and peak periods (deployments, incidents, scale-outs).</li>
+    <li>Validate log volume per request and retention policies.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost</a>
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+  </div>
+</GuideLayout>
+

@@ -1,0 +1,102 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Blob Storage pricing: a practical cost model";
+const description =
+  "Model Blob Storage cost without copying price tables: GB-month, operations, redundancy/replication, retrieval, and egress.";
+
+const faqs = [
+  {
+    q: "What usually drives Blob Storage cost?",
+    a: "Most workloads are driven by GB-month stored and data transfer (egress/replication). For high-request workloads, operations can also matter.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with average stored GB, expected monthly egress, and a rough request count (reads/writes). Add redundancy/replication as a separate line item.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Validate units (GB vs GiB), confirm which traffic is billed as egress, and compare to a real week of storage + transfer metrics if available.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-blob-storage-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Blob Storage looks simple on the surface (GB-month), but real bills usually include multiple drivers: operations,
+    redundancy/replication, and <strong>data transfer</strong>. This guide is a practical model you can apply to a new
+    workload or to sanity-check an existing bill.
+  </p>
+
+  <h2>1) Storage (GB-month)</h2>
+  <p>
+    Use average stored GB over the month (GB-month). If the dataset is growing, average is more accurate than end-of-month
+    size. Split by tier (hot/cool/archive) if you know the mix.
+  </p>
+  <p>
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Object storage cost calculator</a>.
+  </p>
+
+  <h2>2) Operations (reads/writes/list)</h2>
+  <p>
+    Operations matter when you have lots of small objects and high request volume (APIs, thumbnails, telemetry archives).
+    For large-object workloads, operations are often second-order.
+  </p>
+  <p>
+    Tool: <a href="/calculators/api-request-cost-calculator/">API request cost calculator</a>.
+  </p>
+
+  <h2>3) Redundancy and replication</h2>
+  <p>
+    Redundancy choices (e.g., zone-redundant or geo-redundant strategies) can affect both storage and transfer. Treat
+    replication as its own line: replicated GB-month and replicated GB transferred.
+  </p>
+  <p>
+    Tool: <a href="/calculators/storage-replication-cost-calculator/">Storage replication cost calculator</a>.
+  </p>
+
+  <h2>4) Retrieval and data movement</h2>
+  <p>
+    For colder tiers and archived data, retrieval and early-deletion rules can be a hidden cost driver. Separately model:
+    retrieval GB, retrieval requests, and any minimum storage duration penalties.
+  </p>
+
+  <h2>5) Egress (outbound bandwidth)</h2>
+  <p>
+    Outbound data transfer is frequently the surprise line item. Split egress into at least: <strong>to the internet</strong>,
+    <strong>to CDN</strong>, and <strong>cross-region</strong> (if applicable). If you front storage with a CDN, distinguish
+    CDN edge bandwidth from origin egress (cache fill).
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Confirm whether you are estimating GB or GiB and keep units consistent end-to-end.</li>
+    <li>Separate storage, requests, replication, and egress into distinct line items (no blended assumptions).</li>
+    <li>When using a CDN, validate origin egress separately from edge bandwidth.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">API requests</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/storage-replication-cost-calculator/">Replication</a>
+  </div>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+  </div>
+</GuideLayout>
+

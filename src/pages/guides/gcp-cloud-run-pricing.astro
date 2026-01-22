@@ -1,0 +1,75 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud Run pricing: a practical model (requests, CPU/memory time, and egress)";
+const description =
+  "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, CPU/memory time, concurrency, outbound transfer, and logs.";
+
+const faqs = [
+  {
+    q: "What usually drives Cloud Run cost?",
+    a: "CPU/memory time is the core driver, but request volume and egress can dominate for high-traffic or large-response services.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly requests, average response size, and average request duration. Add separate line items for outbound transfer and logs.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate p50/p95 latency and concurrency, and validate retry storms or cold-start periods that change average CPU time.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-run-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    Cloud Run-style platforms are predictable when you model the measurable drivers: requests, CPU/memory time, and outbound
+    transfer. The main risk is to ignore response size and logging.
+  </p>
+
+  <h2>1) Requests</h2>
+  <p>Convert traffic (RPS) to monthly requests and model peak vs average.</p>
+  <p>
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+  </p>
+
+  <h2>2) Duration and concurrency</h2>
+  <p>
+    Use p50 and p95 request duration to model steady-state and spikes. Concurrency affects how many instances you run and
+    can change CPU time per request if the service is resource constrained.
+  </p>
+
+  <h2>3) Response transfer and egress</h2>
+  <p>
+    If each request returns significant data, egress becomes a major driver. Estimate average response size and multiply by
+    monthly requests.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>4) Logs</h2>
+  <p>
+    Ingestion and retention can outweigh compute if you log too much per request. Estimate log bytes per request × request
+    volume.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-cost-calculator/">Log cost</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate p50/p95 latency and retry storms (incidents multiply request volume and CPU time).</li>
+    <li>Validate response size distribution (large payload endpoints should be modeled separately).</li>
+    <li>Validate log volume per request and retention settings.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+  </div>
+</GuideLayout>
+

@@ -1,0 +1,72 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Load Balancer pricing: L4 traffic and data processing model";
+const description =
+  "A practical cost model for L4 load balancing: hours, traffic processed, and egress. Includes a workflow to estimate GB processed from RPS and payload size.";
+
+const faqs = [
+  {
+    q: "What usually drives L4 load balancer cost?",
+    a: "Time and traffic processed are common drivers, with outbound egress often being the biggest variable for internet-facing services.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Convert request rate and average response size to monthly GB, then model load balancer hours and egress separately.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak traffic, validate retry storms, and validate internal vs internet traffic boundaries for egress billing.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-load-balancer-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    L4 load balancer estimates are easiest when you treat them like a network device: it runs for a number of hours and it
+    processes a volume of traffic. Split traffic into internal vs internet-facing.
+  </p>
+
+  <h2>1) Hours</h2>
+  <p>Count load balancers per environment and multiply by hours per month.</p>
+
+  <h2>2) Traffic processed (GB)</h2>
+  <p>
+    Estimate monthly GB processed by converting RPS and average response size into total transfer. If you have multiple
+    endpoints, model the highest-volume ones separately.
+  </p>
+  <p>
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
+  </p>
+
+  <h2>3) Egress</h2>
+  <p>
+    If traffic exits to the internet, egress is often the material line item. Treat egress as independent from load balancer
+    “GB processed” and validate what is billed.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate internal vs internet traffic boundaries and where egress billing applies.</li>
+    <li>Validate peak traffic and burst behavior (autoscaling and capacity planning depend on peaks).</li>
+    <li>Validate retries/timeouts that multiply both request volume and transfer volume.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>
+

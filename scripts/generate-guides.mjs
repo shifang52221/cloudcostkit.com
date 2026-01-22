@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 function classifyGuide({ fileName, canonicalPath }) {
   const s = `${fileName} ${canonicalPath}`.toLowerCase();
   if (s.includes("/guides/aws/") || s.includes("aws-")) return "AWS";
+  if (s.includes("/guides/azure/") || s.includes("azure-")) return "Azure";
+  if (s.includes("/guides/gcp/") || s.includes("gcp-")) return "GCP";
   if (s.includes("kubernetes") || s.includes("eks") || s.includes("gke") || s.includes("aks")) return "Kubernetes";
   if (s.includes("cdn") || s.includes("cloudfront") || s.includes("cloudflare")) return "CDN";
   if (s.includes("log") || s.includes("cloudwatch") || s.includes("cloudtrail")) return "Logging";
@@ -83,4 +85,3 @@ async function main() {
 }
 
 await main();
-
