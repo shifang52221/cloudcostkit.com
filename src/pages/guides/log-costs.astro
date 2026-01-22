@@ -1,5 +1,7 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = "Estimating log costs: ingestion, retention, and scan/search";
 const description =
@@ -18,6 +20,11 @@ const faqs = [
     a: "Reduce noisy logs at source (drop/sampling), shorten hot retention for low-value logs, and avoid expensive broad scans by narrowing queries and time ranges.",
   },
 ];
+
+const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") && g.canonicalPath !== "/guides/log-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 12);
 ---
 <GuideLayout
   title={title}
@@ -79,4 +86,18 @@ const faqs = [
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan/search cost</a>
     <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
   </div>
+
+  {loggingGuides.length ? (
+    <>
+      <h2>More log cost guides</h2>
+      <div class="grid">
+        {loggingGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
 </GuideLayout>

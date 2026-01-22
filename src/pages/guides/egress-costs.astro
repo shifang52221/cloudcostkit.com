@@ -1,5 +1,7 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = "Understanding cloud egress costs";
 const description =
@@ -22,6 +24,11 @@ const faqs = [
     a: "Not necessarily. CDN bandwidth is edge-to-user delivery. Origin egress (cache fill) is origin-to-CDN traffic and is often billed separately by the origin provider.",
   },
 ];
+
+const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") && g.canonicalPath !== "/guides/egress-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 12);
 ---
 <GuideLayout
   title={title}
@@ -96,5 +103,18 @@ const faqs = [
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
-</GuideLayout>
 
+  {egressGuides.length ? (
+    <>
+      <h2>More egress guides</h2>
+      <div class="grid">
+        {egressGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

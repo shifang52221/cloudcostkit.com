@@ -6,6 +6,7 @@ export type GuideLink = {
   canonicalPath: string;
   category: string;
   slug: string;
+  topics: string[];
 };
 
 export const GUIDES: GuideLink[] = [
@@ -14,1252 +15,1987 @@ export const GUIDES: GuideLink[] = [
     "description": "Compare ALB vs NLB cost with a practical checklist: fixed hourly fees, LCU vs NLCU drivers, traffic patterns, and when each tends to win.",
     "canonicalPath": "/guides/aws-alb-vs-nlb-cost",
     "category": "AWS",
-    "slug": "aws-alb-vs-nlb-cost"
+    "slug": "aws-alb-vs-nlb-cost",
+    "topics": [
+      "load-balancing"
+    ]
   },
   {
     "title": "API Gateway access logs cost: how to estimate ingestion and retention",
     "description": "A practical guide to estimate API Gateway access logs cost: how to estimate average log bytes per request, convert to GB/day, model retention (GB-month), and reduce log spend safely.",
     "canonicalPath": "/guides/aws-api-gateway-access-logs-cost",
     "category": "AWS",
-    "slug": "aws-api-gateway-access-logs-cost"
+    "slug": "aws-api-gateway-access-logs-cost",
+    "topics": [
+      "logging",
+      "requests"
+    ]
   },
   {
     "title": "API Gateway cost optimization (high-leverage levers)",
     "description": "A short playbook to reduce API Gateway spend: cut requests, cut payload sizes, and avoid retry-driven cost spikes.",
     "canonicalPath": "/guides/aws-api-gateway-cost-optimization",
     "category": "AWS",
-    "slug": "aws-api-gateway-cost-optimization"
+    "slug": "aws-api-gateway-cost-optimization",
+    "topics": [
+      "requests"
+    ]
   },
   {
     "title": "API Gateway pricing: what to model (requests + transfer)",
     "description": "A practical API Gateway pricing checklist: request charges, data transfer, and the add-ons that can show up on the bill.",
     "canonicalPath": "/guides/aws-api-gateway-pricing",
     "category": "AWS",
-    "slug": "aws-api-gateway-pricing"
+    "slug": "aws-api-gateway-pricing",
+    "topics": [
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "API Gateway vs ALB vs CloudFront cost: what to compare (requests, transfer, add-ons)",
     "description": "A practical cost comparison of API Gateway, Application Load Balancer (ALB), and CloudFront. Compare request pricing, data transfer, caching, WAF, and where each option tends to win.",
     "canonicalPath": "/guides/aws-api-gateway-vs-alb-vs-cloudfront-cost",
     "category": "AWS",
-    "slug": "aws-api-gateway-vs-alb-vs-cloudfront-cost"
+    "slug": "aws-api-gateway-vs-alb-vs-cloudfront-cost",
+    "topics": [
+      "cdn",
+      "egress",
+      "load-balancing",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Aurora pricing (what to include): compute, storage, I/O, and backups",
     "description": "A practical checklist for estimating Aurora costs: instance hours (or ACUs), storage growth, I/O-heavy workloads, backups/retention, and the line items that commonly surprise budgets.",
     "canonicalPath": "/guides/aws-aurora-pricing",
     "category": "AWS",
-    "slug": "aws-aurora-pricing"
+    "slug": "aws-aurora-pricing",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "Aurora Serverless v2 pricing: how to estimate ACUs and avoid surprise bills",
     "description": "A practical way to estimate Aurora Serverless v2 costs: ACU-hours, storage GB-month, backups/retention, and how to model peaks so your estimate survives real traffic.",
     "canonicalPath": "/guides/aws-aurora-serverless-v2-pricing",
     "category": "AWS",
-    "slug": "aws-aurora-serverless-v2-pricing"
+    "slug": "aws-aurora-serverless-v2-pricing",
+    "topics": [
+      "database",
+      "kubernetes",
+      "storage"
+    ]
   },
   {
     "title": "AWS cost checklist: a simple budgeting framework",
     "description": "A practical AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN - plus validation steps to avoid surprises.",
     "canonicalPath": "/guides/aws-cost-checklist",
     "category": "AWS",
-    "slug": "aws-cost-checklist"
+    "slug": "aws-cost-checklist",
+    "topics": [
+      "cdn",
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "AWS DynamoDB cost optimization (high-leverage fixes)",
     "description": "A short playbook to reduce DynamoDB spend: reduce request volume, right-size items, avoid hot partitions, and keep storage and retention under control.",
     "canonicalPath": "/guides/aws-dynamodb-cost-optimization",
     "category": "AWS",
-    "slug": "aws-dynamodb-cost-optimization"
+    "slug": "aws-dynamodb-cost-optimization",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "AWS DynamoDB pricing (what to include)",
     "description": "A practical checklist for estimating DynamoDB costs: reads, writes, storage, and the common line items that surprise budgets.",
     "canonicalPath": "/guides/aws-dynamodb-pricing",
     "category": "AWS",
-    "slug": "aws-dynamodb-pricing"
+    "slug": "aws-dynamodb-pricing",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "AWS EBS cost optimization (high-leverage fixes)",
     "description": "A practical playbook to reduce EBS spend: right-size volumes, avoid over-provisioned IOPS/throughput, and manage snapshots intentionally. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ebs-cost-optimization",
     "category": "AWS",
-    "slug": "aws-ebs-cost-optimization"
+    "slug": "aws-ebs-cost-optimization",
+    "topics": []
   },
   {
     "title": "AWS EBS pricing (what to include)",
     "description": "A practical checklist for estimating EBS costs: storage, provisioned IOPS/throughput (when applicable), snapshots, and common pitfalls.",
     "canonicalPath": "/guides/aws-ebs-pricing",
     "category": "AWS",
-    "slug": "aws-ebs-pricing"
+    "slug": "aws-ebs-pricing",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "AWS Lambda cost optimization (high-leverage fixes)",
     "description": "A short playbook for reducing Lambda-style spend: reduce duration, right-size memory, cut logs, and avoid transfer surprises.",
     "canonicalPath": "/guides/aws-lambda-cost-optimization",
     "category": "AWS",
-    "slug": "aws-lambda-cost-optimization"
+    "slug": "aws-lambda-cost-optimization",
+    "topics": [
+      "egress",
+      "logging"
+    ]
   },
   {
     "title": "AWS Lambda pricing (what to include)",
     "description": "A practical checklist for estimating AWS Lambda-style costs: requests, duration x memory, logs, and common hidden line items.",
     "canonicalPath": "/guides/aws-lambda-pricing",
     "category": "AWS",
-    "slug": "aws-lambda-pricing"
+    "slug": "aws-lambda-pricing",
+    "topics": [
+      "logging",
+      "requests"
+    ]
   },
   {
     "title": "AWS network cost guide: NAT, VPC endpoints, PrivateLink, and data transfer (what to model)",
     "description": "A practical AWS network cost hub: how to model NAT Gateway, VPC endpoints/PrivateLink, and cross-AZ/cross-region data transfer. Includes formulas, break-even workflow, and a troubleshooting checklist.",
     "canonicalPath": "/guides/aws-network-costs",
     "category": "AWS",
-    "slug": "aws-network-costs"
+    "slug": "aws-network-costs",
+    "topics": [
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "AWS PrivateLink pricing: what to model (consumer vs provider)",
     "description": "A practical PrivateLink pricing checklist: interface endpoint-hours, per-GB processing, and provider-side considerations. Includes the transfer pitfalls that cause surprise bills.",
     "canonicalPath": "/guides/aws-privatelink-pricing",
     "category": "AWS",
-    "slug": "aws-privatelink-pricing"
+    "slug": "aws-privatelink-pricing",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "AWS RDS cost optimization (high-leverage fixes)",
     "description": "A short playbook to reduce RDS cost: right-size instances, control storage growth, tune backups, and avoid expensive I/O patterns.",
     "canonicalPath": "/guides/aws-rds-cost-optimization",
     "category": "AWS",
-    "slug": "aws-rds-cost-optimization"
+    "slug": "aws-rds-cost-optimization",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "AWS RDS pricing (what to include)",
     "description": "A practical checklist for estimating AWS RDS costs: instances, storage, backups, I/O, and the line items that commonly surprise budgets.",
     "canonicalPath": "/guides/aws-rds-pricing",
     "category": "AWS",
-    "slug": "aws-rds-pricing"
+    "slug": "aws-rds-pricing",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "AWS SQS cost optimization (high-leverage fixes)",
     "description": "A practical playbook to reduce SQS costs: reduce requests per message, batch operations, avoid retry storms, and handle poison messages. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-sqs-cost-optimization",
     "category": "AWS",
-    "slug": "aws-sqs-cost-optimization"
+    "slug": "aws-sqs-cost-optimization",
+    "topics": [
+      "messaging",
+      "requests"
+    ]
   },
   {
     "title": "AWS SQS pricing (what to include)",
     "description": "A practical checklist for estimating SQS costs: requests, retries, Receive/Delete patterns, and the common pitfalls that inflate spend.",
     "canonicalPath": "/guides/aws-sqs-pricing",
     "category": "AWS",
-    "slug": "aws-sqs-pricing"
+    "slug": "aws-sqs-pricing",
+    "topics": [
+      "messaging",
+      "requests"
+    ]
   },
   {
     "title": "AWS WAF pricing: what to model (ACLs, rules, requests)",
     "description": "A practical AWS WAF pricing checklist: Web ACL fees, rule fees, request charges, and the downstream costs security teams forget.",
     "canonicalPath": "/guides/aws-waf-pricing",
     "category": "AWS",
-    "slug": "aws-waf-pricing"
+    "slug": "aws-waf-pricing",
+    "topics": [
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "AWS WAF vs Cloudflare WAF cost: a practical comparison checklist",
     "description": "Compare AWS WAF vs Cloudflare WAF cost using a practical checklist: request-based charges, rule/policy baselines, logging/analytics costs, and what to model for your traffic shape.",
     "canonicalPath": "/guides/aws-waf-vs-cloudflare-waf-cost",
     "category": "AWS",
-    "slug": "aws-waf-vs-cloudflare-waf-cost"
+    "slug": "aws-waf-vs-cloudflare-waf-cost",
+    "topics": [
+      "logging",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "CloudFront cache hit rate: how it changes origin egress costs",
     "description": "Cache hit rate strongly influences origin egress (cache fill) and overall CDN cost. Learn a simple way to estimate origin egress from hit rate and traffic.",
     "canonicalPath": "/guides/aws-cloudfront-cache-hit-rate",
     "category": "AWS",
-    "slug": "aws-cloudfront-cache-hit-rate"
+    "slug": "aws-cloudfront-cache-hit-rate",
+    "topics": [
+      "cdn",
+      "egress"
+    ]
   },
   {
     "title": "CloudFront invalidation pricing: when it matters and how to estimate",
     "description": "A practical guide to CloudFront invalidation costs: what to count, why cache-busting patterns can create surprising invalidation volume, and how to reduce invalidations safely.",
     "canonicalPath": "/guides/aws-cloudfront-invalidation-pricing",
     "category": "AWS",
-    "slug": "aws-cloudfront-invalidation-pricing"
+    "slug": "aws-cloudfront-invalidation-pricing",
+    "topics": [
+      "cdn"
+    ]
   },
   {
     "title": "CloudFront logs cost: estimate storage, retention, and queries",
     "description": "How to estimate CloudFront log costs: log volume (GB/day), retention (GB-month), and downstream query/scan costs in log analytics tools. Includes practical cost-control levers.",
     "canonicalPath": "/guides/aws-cloudfront-logs-cost",
     "category": "AWS",
-    "slug": "aws-cloudfront-logs-cost"
+    "slug": "aws-cloudfront-logs-cost",
+    "topics": [
+      "cdn",
+      "logging",
+      "storage"
+    ]
   },
   {
     "title": "CloudFront pricing: estimate bandwidth and request costs (without hardcoding prices)",
     "description": "A practical way to estimate CloudFront-style CDN costs using your own bandwidth ($/GB) and request-fee ($ per 10k/1M) assumptions, plus common pitfalls like tiered pricing and origin egress.",
     "canonicalPath": "/guides/aws-cloudfront-pricing",
     "category": "AWS",
-    "slug": "aws-cloudfront-pricing"
+    "slug": "aws-cloudfront-pricing",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "CloudTrail cost optimization (reduce high-volume drivers)",
     "description": "A practical playbook to reduce CloudTrail costs: control data event scope, reduce automated churn, and avoid downstream storage/query waste. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-cloudtrail-cost-optimization",
     "category": "AWS",
-    "slug": "aws-cloudtrail-cost-optimization"
+    "slug": "aws-cloudtrail-cost-optimization",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "CloudTrail pricing: what to model (management vs data events)",
     "description": "A practical CloudTrail pricing checklist: management events, data events, optional Insights, and the costs that sit downstream of audit logs.",
     "canonicalPath": "/guides/aws-cloudtrail-pricing",
     "category": "AWS",
-    "slug": "aws-cloudtrail-pricing"
+    "slug": "aws-cloudtrail-pricing",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "CloudWatch alarms cost optimization (reduce alarm sprawl)",
     "description": "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-cloudwatch-alarms-cost-optimization",
     "category": "AWS",
-    "slug": "aws-cloudwatch-alarms-cost-optimization"
+    "slug": "aws-cloudwatch-alarms-cost-optimization",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "CloudWatch Alarms pricing: what to model (alarm-months)",
     "description": "A practical CloudWatch Alarms pricing checklist: standard vs high-resolution vs composite alarms, and the observability line items that often dominate total cost.",
     "canonicalPath": "/guides/aws-cloudwatch-alarms-pricing",
     "category": "AWS",
-    "slug": "aws-cloudwatch-alarms-pricing"
+    "slug": "aws-cloudwatch-alarms-pricing",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "CloudWatch dashboards pricing: estimate dashboard-month costs",
     "description": "A practical checklist for CloudWatch dashboards pricing: how to count dashboards, what a dashboard-month represents, and the common sources of dashboard sprawl.",
     "canonicalPath": "/guides/aws-cloudwatch-dashboards-pricing",
     "category": "AWS",
-    "slug": "aws-cloudwatch-dashboards-pricing"
+    "slug": "aws-cloudwatch-dashboards-pricing",
+    "topics": [
+      "database",
+      "logging"
+    ]
   },
   {
     "title": "CloudWatch Logs Insights pricing (what to include)",
     "description": "A practical checklist for estimating CloudWatch Logs Insights costs: scanned bytes, query patterns, and the common pitfalls that inflate scan spend.",
     "canonicalPath": "/guides/aws-cloudwatch-logs-insights-pricing",
     "category": "AWS",
-    "slug": "aws-cloudwatch-logs-insights-pricing"
+    "slug": "aws-cloudwatch-logs-insights-pricing",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "CloudWatch Logs pricing: ingestion vs retention and the fastest levers",
     "description": "A practical guide to CloudWatch Logs-style pricing: model ingestion and retention separately, and use retention/noise reduction to control cost.",
     "canonicalPath": "/guides/aws-cloudwatch-logs-pricing",
     "category": "AWS",
-    "slug": "aws-cloudwatch-logs-pricing"
+    "slug": "aws-cloudwatch-logs-pricing",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "CloudWatch metrics cost optimization (high-leverage fixes)",
     "description": "A short playbook to reduce CloudWatch metrics spend: reduce high-cardinality dimensions, remove unused alarms/dashboards, and cut API polling.",
     "canonicalPath": "/guides/aws-cloudwatch-metrics-cost-optimization",
     "category": "AWS",
-    "slug": "aws-cloudwatch-metrics-cost-optimization"
+    "slug": "aws-cloudwatch-metrics-cost-optimization",
+    "topics": [
+      "database",
+      "logging",
+      "metrics",
+      "requests"
+    ]
   },
   {
     "title": "CloudWatch metrics pricing: cardinality pitfalls and how to estimate series",
     "description": "A practical guide to metrics pricing: why high-cardinality labels create many time series, how to estimate active series, and how to control costs.",
     "canonicalPath": "/guides/aws-cloudwatch-metrics-pricing",
     "category": "AWS",
-    "slug": "aws-cloudwatch-metrics-pricing"
+    "slug": "aws-cloudwatch-metrics-pricing",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "Cross-AZ data transfer cost: why it shows up and how to estimate it",
     "description": "Cross-AZ traffic can become a large VPC data transfer line item. Learn common sources (service calls, load balancers, multi-AZ storage), how to estimate GB/month, and how to reduce it safely.",
     "canonicalPath": "/guides/aws-cross-az-data-transfer-cost",
     "category": "AWS",
-    "slug": "aws-cross-az-data-transfer-cost"
+    "slug": "aws-cross-az-data-transfer-cost",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "storage"
+    ]
   },
   {
     "title": "DynamoDB RCU/WCU explained (for cost estimates)",
     "description": "Understand how reads and writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-dynamodb-rcu-wcu-explained",
     "category": "AWS",
-    "slug": "aws-dynamodb-rcu-wcu-explained"
+    "slug": "aws-dynamodb-rcu-wcu-explained",
+    "topics": []
   },
   {
     "title": "EBS gp3 IOPS and throughput (how to budget)",
     "description": "How to budget gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and common mistakes in estimates. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ebs-gp3-iops-throughput",
     "category": "AWS",
-    "slug": "aws-ebs-gp3-iops-throughput"
+    "slug": "aws-ebs-gp3-iops-throughput",
+    "topics": []
   },
   {
     "title": "EBS snapshot cost: how to estimate storage from daily change rate",
     "description": "A practical guide to estimate EBS snapshot cost: incremental snapshots, daily change rate, retention windows, and a calculator workflow to avoid under-budgeting.",
     "canonicalPath": "/guides/aws-ebs-snapshot-cost",
     "category": "AWS",
-    "slug": "aws-ebs-snapshot-cost"
+    "slug": "aws-ebs-snapshot-cost",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "EC2 cost estimation: blended rates, uptime, and hidden line items",
     "description": "A practical EC2 cost estimation guide: model instance hours with uptime and blended rates, and remember storage and data transfer line items.",
     "canonicalPath": "/guides/aws-ec2-cost-estimation",
     "category": "AWS",
-    "slug": "aws-ec2-cost-estimation"
+    "slug": "aws-ec2-cost-estimation",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "ECR cost optimization (retention, smaller images, fewer pulls)",
     "description": "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ecr-cost-optimization",
     "category": "AWS",
-    "slug": "aws-ecr-cost-optimization"
+    "slug": "aws-ecr-cost-optimization",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "ECR pricing: what to model (storage + transfer)",
     "description": "A practical AWS ECR pricing checklist: stored GB-month, data transfer paths, and the operational patterns that create cost spikes.",
     "canonicalPath": "/guides/aws-ecr-pricing",
     "category": "AWS",
-    "slug": "aws-ecr-pricing"
+    "slug": "aws-ecr-pricing",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "ECS autoscaling cost pitfalls (and how to avoid them)",
     "description": "A practical guide to ECS autoscaling cost pitfalls: noisy CPU metrics, retry storms, scaling oscillations, and hidden line items (logs, NAT/egress, load balancers).",
     "canonicalPath": "/guides/aws-ecs-autoscaling-cost-pitfalls",
     "category": "AWS",
-    "slug": "aws-ecs-autoscaling-cost-pitfalls"
+    "slug": "aws-ecs-autoscaling-cost-pitfalls",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "ECS cost model beyond compute: the checklist that prevents surprise bills",
     "description": "A practical ECS cost model checklist beyond compute: load balancers, logs/metrics, NAT/egress, cross-AZ transfer, and storage. Use it to avoid underestimating ECS total cost.",
     "canonicalPath": "/guides/aws-ecs-cost-model-beyond-compute",
     "category": "AWS",
-    "slug": "aws-ecs-cost-model-beyond-compute"
+    "slug": "aws-ecs-cost-model-beyond-compute",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "logging",
+      "metrics",
+      "storage"
+    ]
   },
   {
     "title": "ECS on EC2 vs ECS on Fargate cost: a practical decision checklist",
     "description": "Compare ECS on EC2 vs ECS on Fargate cost with a practical checklist: compute model, idle capacity, packing efficiency, and the line items teams forget (load balancers, logs, NAT/egress, cross-AZ).",
     "canonicalPath": "/guides/aws-ecs-ec2-vs-fargate-cost",
     "category": "AWS",
-    "slug": "aws-ecs-ec2-vs-fargate-cost"
+    "slug": "aws-ecs-ec2-vs-fargate-cost",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "logging"
+    ]
   },
   {
     "title": "ECS pricing (what to include in your cost model)",
     "description": "A practical ECS pricing guide: how costs differ between EC2 launch type and Fargate launch type, and what line items you must include (compute, load balancers, logs, data transfer, storage).",
     "canonicalPath": "/guides/aws-ecs-pricing",
     "category": "AWS",
-    "slug": "aws-ecs-pricing"
+    "slug": "aws-ecs-pricing",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "logging",
+      "storage"
+    ]
   },
   {
     "title": "ECS task sizing: how to pick CPU and memory (and estimate task count)",
     "description": "A practical ECS task sizing guide: how to choose task CPU/memory, estimate average resource demand, pick utilization targets, and avoid common autoscaling and cost pitfalls.",
     "canonicalPath": "/guides/aws-ecs-task-sizing",
     "category": "AWS",
-    "slug": "aws-ecs-task-sizing"
+    "slug": "aws-ecs-task-sizing",
+    "topics": []
   },
   {
     "title": "ECS vs EKS cost: a practical checklist (compute, overhead, and add-ons)",
     "description": "Compare ECS vs EKS cost with a consistent checklist: compute model, platform overhead, scaling behavior, and the line items that often dominate (load balancers, logs, data transfer).",
     "canonicalPath": "/guides/aws-ecs-vs-eks-cost",
     "category": "AWS",
-    "slug": "aws-ecs-vs-eks-cost"
+    "slug": "aws-ecs-vs-eks-cost",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "logging"
+    ]
   },
   {
     "title": "EKS control plane cost: how to model it and when it matters",
     "description": "A practical guide to modeling EKS-style control plane costs: fixed hourly fees, multi-cluster strategy, and how to keep dev/test clusters from inflating spend.",
     "canonicalPath": "/guides/aws-eks-control-plane-cost",
     "category": "AWS",
-    "slug": "aws-eks-control-plane-cost"
+    "slug": "aws-eks-control-plane-cost",
+    "topics": [
+      "kubernetes"
+    ]
   },
   {
     "title": "EKS node sizing: requests, overhead, and why packing is never perfect",
     "description": "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets and pod limits, and understand why real scheduling can require more nodes than the math minimum.",
     "canonicalPath": "/guides/aws-eks-node-sizing",
     "category": "AWS",
-    "slug": "aws-eks-node-sizing"
+    "slug": "aws-eks-node-sizing",
+    "topics": [
+      "kubernetes",
+      "requests"
+    ]
   },
   {
     "title": "EKS pricing: what to include in a realistic cost estimate",
     "description": "A practical EKS pricing checklist: nodes, control plane, load balancers, storage, logs/metrics, and data transfer - with calculators to estimate each part.",
     "canonicalPath": "/guides/aws-eks-pricing",
     "category": "AWS",
-    "slug": "aws-eks-pricing"
+    "slug": "aws-eks-pricing",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "logging",
+      "metrics",
+      "storage"
+    ]
   },
   {
     "title": "Estimate ALB LCU (and NLB NLCU) from metrics: quick methods",
     "description": "A practical guide to estimate ALB LCU and NLB NLCU from load balancer metrics: new connections, active connections, bytes processed, and rule evaluations. Includes a calculator workflow.",
     "canonicalPath": "/guides/aws-load-balancer-estimate-lcu",
     "category": "AWS",
-    "slug": "aws-load-balancer-estimate-lcu"
+    "slug": "aws-load-balancer-estimate-lcu",
+    "topics": [
+      "load-balancing",
+      "metrics"
+    ]
   },
   {
     "title": "Estimate API requests per month (RPS to monthly volume)",
     "description": "How to estimate API request volume for cost models: from RPS charts, from logs, and from daily traffic assumptions.",
     "canonicalPath": "/guides/aws-api-gateway-estimate-requests",
     "category": "AWS",
-    "slug": "aws-api-gateway-estimate-requests"
+    "slug": "aws-api-gateway-estimate-requests",
+    "topics": [
+      "logging",
+      "requests"
+    ]
   },
   {
     "title": "Estimate CloudTrail events per month (fast methods)",
     "description": "How to estimate CloudTrail event volume for cost models: from logs and metrics, and how to separate management vs data events.",
     "canonicalPath": "/guides/aws-cloudtrail-estimate-events",
     "category": "AWS",
-    "slug": "aws-cloudtrail-estimate-events"
+    "slug": "aws-cloudtrail-estimate-events",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "Estimate CloudWatch alarm count (avoid alarm sprawl)",
     "description": "How to estimate CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.",
     "canonicalPath": "/guides/aws-cloudwatch-alarms-estimate-alarm-count",
     "category": "AWS",
-    "slug": "aws-cloudwatch-alarms-estimate-alarm-count"
+    "slug": "aws-cloudwatch-alarms-estimate-alarm-count",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "Estimate CloudWatch custom metrics (quick methods)",
     "description": "A practical way to estimate CloudWatch custom metrics count: start from services x metrics, then multiply dimensions carefully to avoid high-cardinality surprises.",
     "canonicalPath": "/guides/aws-cloudwatch-metrics-estimate-custom-metrics",
     "category": "AWS",
-    "slug": "aws-cloudwatch-metrics-estimate-custom-metrics"
+    "slug": "aws-cloudwatch-metrics-estimate-custom-metrics",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "Estimate CloudWatch metrics API requests (dashboards and polling)",
     "description": "How to estimate CloudWatch-style metrics API requests: dashboards, GetMetricData polling, exporters, and automation. Use this to avoid surprise 'API requests' line items.",
     "canonicalPath": "/guides/aws-cloudwatch-metrics-estimate-api-requests",
     "category": "AWS",
-    "slug": "aws-cloudwatch-metrics-estimate-api-requests"
+    "slug": "aws-cloudwatch-metrics-estimate-api-requests",
+    "topics": [
+      "database",
+      "logging",
+      "metrics",
+      "requests"
+    ]
   },
   {
     "title": "Estimate DNS queries per month (Route 53 query volume)",
     "description": "How to estimate DNS query volume for Route 53 cost models: from metrics and logs, and what drives query spikes (TTL, retries, resolver behavior).",
     "canonicalPath": "/guides/aws-route-53-estimate-dns-queries",
     "category": "AWS",
-    "slug": "aws-route-53-estimate-dns-queries"
+    "slug": "aws-route-53-estimate-dns-queries",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "Estimate ECR storage (GB-month) from images and retention",
     "description": "How to estimate container registry storage cost: average image size, tag retention, and rebuild frequency. Includes a fast model, a better model, and common pitfalls.",
     "canonicalPath": "/guides/aws-ecr-estimate-storage-gb-month",
     "category": "AWS",
-    "slug": "aws-ecr-estimate-storage-gb-month"
+    "slug": "aws-ecr-estimate-storage-gb-month",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "Estimate email volume per month (transactional + marketing)",
     "description": "How to estimate monthly email volume for SES cost models: from user actions, campaigns, and retry factors. Includes a fast model, sanity checks, and validation tips.",
     "canonicalPath": "/guides/aws-ses-estimate-email-volume",
     "category": "AWS",
-    "slug": "aws-ses-estimate-email-volume"
+    "slug": "aws-ses-estimate-email-volume",
+    "topics": []
   },
   {
     "title": "Estimate Glacier/Deep Archive retrieval volume (GB and requests)",
     "description": "How to estimate archival retrieval costs: model GB restored per month and the number of objects retrieved (requests), plus common drivers like restores, rehydration, and analytics.",
     "canonicalPath": "/guides/aws-s3-glacier-estimate-retrieval",
     "category": "AWS",
-    "slug": "aws-s3-glacier-estimate-retrieval"
+    "slug": "aws-s3-glacier-estimate-retrieval",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "Estimate KMS requests per month (where they come from)",
     "description": "How to estimate AWS KMS request volume for cost models: measure and scale, then break down by top callers and operations. Includes validation tips and common pitfalls.",
     "canonicalPath": "/guides/aws-kms-estimate-requests",
     "category": "AWS",
-    "slug": "aws-kms-estimate-requests"
+    "slug": "aws-kms-estimate-requests",
+    "topics": [
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Estimate Logs Insights scanned GB (quick methods)",
     "description": "Practical ways to estimate Logs Insights scan volume: from query metrics, from typical query patterns, and from dataset size and time ranges. Includes validation tips and common pitfalls.",
     "canonicalPath": "/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb",
     "category": "AWS",
-    "slug": "aws-cloudwatch-logs-insights-estimate-scanned-gb"
+    "slug": "aws-cloudwatch-logs-insights-estimate-scanned-gb",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "Estimate NAT Gateway GB processed (quick methods)",
     "description": "Practical ways to estimate NAT Gateway GB processed per month: from metrics/flow logs, from Mbps charts, and from common traffic sources. Includes validation tips.",
     "canonicalPath": "/guides/aws-nat-gateway-estimate-gb-processed",
     "category": "AWS",
-    "slug": "aws-nat-gateway-estimate-gb-processed"
+    "slug": "aws-nat-gateway-estimate-gb-processed",
+    "topics": [
+      "logging",
+      "metrics",
+      "requests"
+    ]
   },
   {
     "title": "Estimate Parameter Store API calls per month (GetParameter volume)",
     "description": "How to estimate SSM Parameter Store API call volume for cost models: from metrics/logs, from runtime patterns, and how to account for deploy and churn effects.",
     "canonicalPath": "/guides/aws-ssm-parameter-store-estimate-api-calls",
     "category": "AWS",
-    "slug": "aws-ssm-parameter-store-estimate-api-calls"
+    "slug": "aws-ssm-parameter-store-estimate-api-calls",
+    "topics": [
+      "logging",
+      "metrics",
+      "requests"
+    ]
   },
   {
     "title": "Estimate RDS backup storage (GB-month) from retention and churn",
     "description": "A practical method to estimate RDS backup storage (GB-month): start from daily changed data, retention days, and sanity-check with snapshot sizes. Includes common mistakes that inflate backup cost.",
     "canonicalPath": "/guides/aws-rds-backup-storage-gb-month-estimate",
     "category": "AWS",
-    "slug": "aws-rds-backup-storage-gb-month-estimate"
+    "slug": "aws-rds-backup-storage-gb-month-estimate",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "Estimate Secrets Manager API calls per month (GetSecretValue volume)",
     "description": "How to estimate Secrets Manager API call volume for cost models: from metrics/logs and from runtime patterns, plus common multipliers like churn and retries.",
     "canonicalPath": "/guides/aws-secrets-manager-estimate-api-calls",
     "category": "AWS",
-    "slug": "aws-secrets-manager-estimate-api-calls"
+    "slug": "aws-secrets-manager-estimate-api-calls",
+    "topics": [
+      "logging",
+      "metrics",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "Estimate SNS deliveries per month (messages x subscribers)",
     "description": "How to estimate SNS delivery volume for cost models: from message counts, subscriber fan-out, filter policies, and retries.",
     "canonicalPath": "/guides/aws-sns-estimate-deliveries",
     "category": "AWS",
-    "slug": "aws-sns-estimate-deliveries"
+    "slug": "aws-sns-estimate-deliveries",
+    "topics": [
+      "messaging"
+    ]
   },
   {
     "title": "Estimate SQS requests (from messages and retries)",
     "description": "How to estimate billable SQS request volume: messages/month, requests per message, and how retries inflate costs. Includes validation tips and common pitfalls.",
     "canonicalPath": "/guides/aws-sqs-estimate-requests",
     "category": "AWS",
-    "slug": "aws-sqs-estimate-requests"
+    "slug": "aws-sqs-estimate-requests",
+    "topics": [
+      "messaging",
+      "requests"
+    ]
   },
   {
     "title": "Estimate VPC endpoint cost inputs: endpoint-hours and GB processed",
     "description": "How to estimate VPC interface endpoint (PrivateLink) cost inputs: count endpoints across AZs, estimate monthly hours, and estimate GB processed from NAT metrics, flow logs, or scenario models.",
     "canonicalPath": "/guides/aws-vpc-endpoints-estimate-hours-and-gb",
     "category": "AWS",
-    "slug": "aws-vpc-endpoints-estimate-hours-and-gb"
+    "slug": "aws-vpc-endpoints-estimate-hours-and-gb",
+    "topics": [
+      "logging",
+      "metrics",
+      "storage"
+    ]
   },
   {
     "title": "Estimate WAF request volume (CDN/LB to monthly requests)",
     "description": "How to estimate WAF request volume for cost models: from CDN/LB metrics, from logs, and what to do about bot spikes.",
     "canonicalPath": "/guides/aws-waf-estimate-requests",
     "category": "AWS",
-    "slug": "aws-waf-estimate-requests"
+    "slug": "aws-waf-estimate-requests",
+    "topics": [
+      "cdn",
+      "logging",
+      "metrics",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Fargate cost optimization (high-leverage fixes)",
     "description": "A practical Fargate cost optimization checklist: rightsize tasks, scale on real signals, reduce idle capacity, and avoid hidden networking and logging costs.",
     "canonicalPath": "/guides/aws-fargate-cost-optimization",
     "category": "AWS",
-    "slug": "aws-fargate-cost-optimization"
+    "slug": "aws-fargate-cost-optimization",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "Fargate pricing (what to include in your cost model)",
     "description": "A practical Fargate pricing guide: what drives compute cost (vCPU-hours + GB-hours), how to estimate running tasks, and the hidden line items that usually matter (logs, load balancers, data transfer).",
     "canonicalPath": "/guides/aws-fargate-pricing",
     "category": "AWS",
-    "slug": "aws-fargate-pricing"
+    "slug": "aws-fargate-pricing",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "logging"
+    ]
   },
   {
     "title": "Fargate vs EC2 cost: how to compare compute, overhead, and hidden line items",
     "description": "A practical guide to compare Fargate vs EC2 cost: normalize workload shape, model compute, account for idle capacity, and include the line items that often dominate (load balancers, logs, NAT/egress).",
     "canonicalPath": "/guides/aws-fargate-vs-ec2-cost",
     "category": "AWS",
-    "slug": "aws-fargate-vs-ec2-cost"
+    "slug": "aws-fargate-vs-ec2-cost",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "logging"
+    ]
   },
   {
     "title": "Fargate vs EKS cost: what usually decides the winner",
     "description": "Compare Fargate vs EKS cost with a practical checklist: compute unit economics, control plane and platform overhead, scaling behavior, and the line items that often dominate (logs, load balancers, data transfer).",
     "canonicalPath": "/guides/aws-fargate-vs-eks-cost",
     "category": "AWS",
-    "slug": "aws-fargate-vs-eks-cost"
+    "slug": "aws-fargate-vs-eks-cost",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "logging"
+    ]
   },
   {
     "title": "Glacier/Deep Archive cost optimization (reduce restores and requests)",
     "description": "A practical playbook to reduce archival storage costs: reduce restores, reduce small-object request volume, and avoid minimum duration penalties. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-s3-glacier-cost-optimization",
     "category": "AWS",
-    "slug": "aws-s3-glacier-cost-optimization"
+    "slug": "aws-s3-glacier-cost-optimization",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "gp2 vs gp3 cost: when gp3 saves money (and when it doesn’t)",
     "description": "A practical guide to compare gp2 vs gp3 cost: baseline storage pricing, performance add-ons (IOPS/throughput), and how to avoid overpaying for unused performance.",
     "canonicalPath": "/guides/aws-ebs-gp2-vs-gp3-cost",
     "category": "AWS",
-    "slug": "aws-ebs-gp2-vs-gp3-cost"
+    "slug": "aws-ebs-gp2-vs-gp3-cost",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "How to reduce logging and observability costs (without losing signal)",
     "description": "Practical techniques to reduce log and metrics costs: sampling, retention tiers, label hygiene, and source-side filtering - with calculators to quantify impact.",
     "canonicalPath": "/guides/aws-logging-cost-reduction",
     "category": "AWS",
-    "slug": "aws-logging-cost-reduction"
+    "slug": "aws-logging-cost-reduction",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "KMS cost optimization (reduce request volume safely)",
     "description": "A practical playbook to reduce AWS KMS costs: reduce request volume in hot paths, fix retry loops, and keep crypto patterns safe. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-kms-cost-optimization",
     "category": "AWS",
-    "slug": "aws-kms-cost-optimization"
+    "slug": "aws-kms-cost-optimization",
+    "topics": [
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "KMS pricing: what to model (keys + requests)",
     "description": "A practical AWS KMS pricing checklist: key-months, request volume, and the services and patterns that generate surprise KMS request bills.",
     "canonicalPath": "/guides/aws-kms-pricing",
     "category": "AWS",
-    "slug": "aws-kms-pricing"
+    "slug": "aws-kms-pricing",
+    "topics": [
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Lambda concurrency and cold starts (cost pitfalls)",
     "description": "How concurrency and cold starts affect Lambda-style cost models: tail latency, retries, and the hidden cost of noisy failures.",
     "canonicalPath": "/guides/aws-lambda-concurrency-and-cold-starts",
     "category": "AWS",
-    "slug": "aws-lambda-concurrency-and-cold-starts"
+    "slug": "aws-lambda-concurrency-and-cold-starts",
+    "topics": []
   },
   {
     "title": "Lambda vs Fargate cost: a practical comparison (unit economics)",
     "description": "How to compare Lambda vs Fargate cost using unit economics: cost per 1M requests, steady vs bursty traffic, and the line items that usually decide the winner (logs, transfer, idle time).",
     "canonicalPath": "/guides/aws-lambda-vs-fargate-cost",
     "category": "AWS",
-    "slug": "aws-lambda-vs-fargate-cost"
+    "slug": "aws-lambda-vs-fargate-cost",
+    "topics": [
+      "egress",
+      "logging",
+      "requests"
+    ]
   },
   {
     "title": "Load balancer cost optimization (high-leverage fixes)",
     "description": "A practical playbook to reduce load balancer costs: reduce LB-hours, reduce LCU/NLCU drivers, and avoid traffic amplification patterns. Includes validation steps and related calculators.",
     "canonicalPath": "/guides/aws-load-balancer-cost-optimization",
     "category": "AWS",
-    "slug": "aws-load-balancer-cost-optimization"
+    "slug": "aws-load-balancer-cost-optimization",
+    "topics": [
+      "load-balancing"
+    ]
   },
   {
     "title": "Load balancer costs: what to include beyond node spend",
     "description": "A practical guide to load balancer costs: fixed hourly charges, traffic-based components, and common patterns that increase spend in Kubernetes and web architectures.",
     "canonicalPath": "/guides/aws-load-balancer-cost",
     "category": "AWS",
-    "slug": "aws-load-balancer-cost"
+    "slug": "aws-load-balancer-cost",
+    "topics": [
+      "kubernetes",
+      "load-balancing"
+    ]
   },
   {
     "title": "Load balancer LCU/NLCU explained (for cost estimates)",
     "description": "A practical explanation of LCU/NLCU-style billing: what drives capacity units and how to estimate them for budgeting.",
     "canonicalPath": "/guides/aws-load-balancer-lcu-explained",
     "category": "AWS",
-    "slug": "aws-load-balancer-lcu-explained"
+    "slug": "aws-load-balancer-lcu-explained",
+    "topics": [
+      "load-balancing"
+    ]
   },
   {
     "title": "Logs Insights cost optimization (high-leverage fixes)",
     "description": "A short playbook to reduce Logs Insights scan costs: narrow queries, reduce refresh frequency, cut noisy logs, and avoid incident query loops.",
     "canonicalPath": "/guides/aws-cloudwatch-logs-insights-cost-optimization",
     "category": "AWS",
-    "slug": "aws-cloudwatch-logs-insights-cost-optimization"
+    "slug": "aws-cloudwatch-logs-insights-cost-optimization",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "NAT Gateway cost optimization (high-leverage fixes)",
     "description": "A practical playbook to reduce NAT Gateway spend: reduce GB processed, avoid NAT for common services, and remove traffic amplification patterns. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-nat-gateway-cost-optimization",
     "category": "AWS",
-    "slug": "aws-nat-gateway-cost-optimization"
+    "slug": "aws-nat-gateway-cost-optimization",
+    "topics": [
+      "requests"
+    ]
   },
   {
     "title": "NAT gateway costs: why they spike and how to estimate them",
     "description": "NAT gateways can create surprising bills because costs scale with both time and traffic. Learn a practical way to estimate and reduce NAT gateway spend.",
     "canonicalPath": "/guides/aws-nat-gateway-cost",
     "category": "AWS",
-    "slug": "aws-nat-gateway-cost"
+    "slug": "aws-nat-gateway-cost",
+    "topics": [
+      "requests"
+    ]
   },
   {
     "title": "NAT Gateway vs VPC endpoints cost: when PrivateLink wins",
     "description": "Compare NAT Gateway vs VPC endpoints (Interface/Gateway endpoints) cost. Learn when endpoint fees beat NAT GB processed, and how to model both without missing transfer line items.",
     "canonicalPath": "/guides/aws-nat-gateway-vs-vpc-endpoints-cost",
     "category": "AWS",
-    "slug": "aws-nat-gateway-vs-vpc-endpoints-cost"
+    "slug": "aws-nat-gateway-vs-vpc-endpoints-cost",
+    "topics": [
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "Parameter Store cost optimization (reduce API calls safely)",
     "description": "A high-leverage playbook to reduce SSM Parameter Store costs: cache parameters, reduce churn-driven fetches, and avoid per-request lookups. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ssm-parameter-store-cost-optimization",
     "category": "AWS",
-    "slug": "aws-ssm-parameter-store-cost-optimization"
+    "slug": "aws-ssm-parameter-store-cost-optimization",
+    "topics": [
+      "requests"
+    ]
   },
   {
     "title": "PrivateLink cost optimization: reduce endpoint-hours, GB processed, and operational sprawl",
     "description": "A practical PrivateLink optimization playbook: minimize endpoint-hours, reduce traffic volume, avoid cross-AZ transfer surprises, and keep endpoint sprawl under control across environments.",
     "canonicalPath": "/guides/aws-privatelink-cost-optimization",
     "category": "AWS",
-    "slug": "aws-privatelink-cost-optimization"
+    "slug": "aws-privatelink-cost-optimization",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "RDS backups and snapshots (how to estimate cost)",
     "description": "A practical approach to estimating RDS backup and snapshot storage: retention, growth, and the biggest planning mistakes.",
     "canonicalPath": "/guides/aws-rds-backups-and-snapshots",
     "category": "AWS",
-    "slug": "aws-rds-backups-and-snapshots"
+    "slug": "aws-rds-backups-and-snapshots",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "RDS snapshot retention policy: cost model and safe defaults",
     "description": "How to choose an RDS snapshot retention policy without surprise costs: model retention vs churn, avoid redundant snapshots, and set long-term retention intentionally.",
     "canonicalPath": "/guides/aws-rds-snapshot-retention-policy-cost",
     "category": "AWS",
-    "slug": "aws-rds-snapshot-retention-policy-cost"
+    "slug": "aws-rds-snapshot-retention-policy-cost",
+    "topics": [
+      "database"
+    ]
   },
   {
     "title": "RDS vs Aurora cost: what to compare (compute, storage, I/O, and retention)",
     "description": "A practical RDS vs Aurora cost comparison checklist. Compare unit economics, scaling model, storage growth, backups/retention, and the workload patterns that change the answer.",
     "canonicalPath": "/guides/aws-rds-vs-aurora-cost",
     "category": "AWS",
-    "slug": "aws-rds-vs-aurora-cost"
+    "slug": "aws-rds-vs-aurora-cost",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "Reserved vs on-demand: how to choose commitments using break-even analysis",
     "description": "A practical guide to choosing commitments: use break-even utilization and sensitivity analysis to decide when reserved pricing beats on-demand.",
     "canonicalPath": "/guides/aws-reserved-vs-on-demand",
     "category": "AWS",
-    "slug": "aws-reserved-vs-on-demand"
+    "slug": "aws-reserved-vs-on-demand",
+    "topics": []
   },
   {
     "title": "Route 53 cost optimization (reduce query volume and zone sprawl)",
     "description": "A practical playbook to reduce Route 53 costs: reduce DNS query volume, fix low TTL defaults, and avoid hosted zone sprawl across environments. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-route-53-cost-optimization",
     "category": "AWS",
-    "slug": "aws-route-53-cost-optimization"
+    "slug": "aws-route-53-cost-optimization",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "Route 53 pricing: what to model (zones, queries, health checks)",
     "description": "A practical Route 53 pricing checklist: hosted zones, DNS query volume, health checks, and the patterns that create surprise query bills.",
     "canonicalPath": "/guides/aws-route-53-pricing",
     "category": "AWS",
-    "slug": "aws-route-53-pricing"
+    "slug": "aws-route-53-pricing",
+    "topics": []
   },
   {
     "title": "S3 data transfer costs: egress, cross-region access, and common surprises",
     "description": "A practical guide to S3 data transfer costs: what counts as egress, how cross-region access shows up on bills, and how to estimate GB/month from your traffic patterns.",
     "canonicalPath": "/guides/aws-s3-data-transfer",
     "category": "AWS",
-    "slug": "aws-s3-data-transfer"
+    "slug": "aws-s3-data-transfer",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "S3 Glacier and Deep Archive pricing (storage, retrieval, minimum duration)",
     "description": "A practical pricing checklist for S3 Glacier/Deep Archive: storage GB-month, retrieval volume and requests, and minimum storage duration/early deletion fees.",
     "canonicalPath": "/guides/aws-s3-glacier-pricing",
     "category": "AWS",
-    "slug": "aws-s3-glacier-pricing"
+    "slug": "aws-s3-glacier-pricing",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "S3 pricing: a practical model for storage, requests, egress, and replication",
     "description": "A practical S3 pricing guide: what to include (GB-month, requests, egress, replication) and how to estimate the key inputs without copying price tables.",
     "canonicalPath": "/guides/aws-s3-pricing",
     "category": "AWS",
-    "slug": "aws-s3-pricing"
+    "slug": "aws-s3-pricing",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "S3 replication pricing: estimate replicated GB/month and total impact",
     "description": "A practical guide to S3 replication pricing: replication volume (changed data), extra destination storage, transfer-like charges, and when CRR vs SRR changes the bill.",
     "canonicalPath": "/guides/aws-s3-replication-pricing",
     "category": "AWS",
-    "slug": "aws-s3-replication-pricing"
+    "slug": "aws-s3-replication-pricing",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "S3 request costs: when GET/PUT/LIST becomes meaningful",
     "description": "S3 request costs are often tiny, but they can matter for workloads with many small objects or high metadata churn. Learn how to estimate request fees and when to care.",
     "canonicalPath": "/guides/aws-s3-request-costs",
     "category": "AWS",
-    "slug": "aws-s3-request-costs"
+    "slug": "aws-s3-request-costs",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "S3 storage classes: how they change cost (and when archive fees matter)",
     "description": "A practical guide to S3-like storage classes: why cheaper storage can come with retrieval/transition tradeoffs, and how to model cost with simple assumptions.",
     "canonicalPath": "/guides/aws-s3-storage-classes",
     "category": "AWS",
-    "slug": "aws-s3-storage-classes"
+    "slug": "aws-s3-storage-classes",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "Secrets Manager cost optimization (reduce API calls safely)",
     "description": "A high-leverage playbook to reduce Secrets Manager costs: cache secrets, avoid per-request lookups, and reduce churn-driven fetches. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-secrets-manager-cost-optimization",
     "category": "AWS",
-    "slug": "aws-secrets-manager-cost-optimization"
+    "slug": "aws-secrets-manager-cost-optimization",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "Secrets Manager pricing: what to model (secrets + API calls)",
     "description": "A practical Secrets Manager pricing checklist: secret-month baseline plus API request charges, and the common patterns that create request-driven cost spikes.",
     "canonicalPath": "/guides/aws-secrets-manager-pricing",
     "category": "AWS",
-    "slug": "aws-secrets-manager-pricing"
+    "slug": "aws-secrets-manager-pricing",
+    "topics": [
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "SES cost optimization (reduce volume, retries, and payload)",
     "description": "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ses-cost-optimization",
     "category": "AWS",
-    "slug": "aws-ses-cost-optimization"
+    "slug": "aws-ses-cost-optimization",
+    "topics": []
   },
   {
     "title": "SES pricing: what to model (send volume + payload size)",
     "description": "A practical AWS SES pricing checklist: emails sent, payload size (optional transfer), and common sources of cost spikes for product and marketing email.",
     "canonicalPath": "/guides/aws-ses-pricing",
     "category": "AWS",
-    "slug": "aws-ses-pricing"
+    "slug": "aws-ses-pricing",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "SNS cost optimization (reduce deliveries and retries)",
     "description": "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-sns-cost-optimization",
     "category": "AWS",
-    "slug": "aws-sns-cost-optimization"
+    "slug": "aws-sns-cost-optimization",
+    "topics": [
+      "messaging"
+    ]
   },
   {
     "title": "SNS pricing: what to model (publishes, deliveries, fan-out)",
     "description": "A practical SNS pricing checklist: publish requests, delivery requests by protocol mix, fan-out, and incident-driven retry spikes.",
     "canonicalPath": "/guides/aws-sns-pricing",
     "category": "AWS",
-    "slug": "aws-sns-pricing"
+    "slug": "aws-sns-pricing",
+    "topics": [
+      "messaging",
+      "requests"
+    ]
   },
   {
     "title": "SQS vs SNS cost: how to compare messaging unit economics",
     "description": "Compare SQS vs SNS cost with a practical checklist: request types, retries, fan-out, payload transfer, and the usage patterns that decide the bill.",
     "canonicalPath": "/guides/aws-sqs-vs-sns-cost",
     "category": "AWS",
-    "slug": "aws-sqs-vs-sns-cost"
+    "slug": "aws-sqs-vs-sns-cost",
+    "topics": [
+      "egress",
+      "messaging",
+      "requests"
+    ]
   },
   {
     "title": "SSM Parameter Store pricing: what to model (advanced params + API calls)",
     "description": "A practical Parameter Store pricing checklist: standard vs advanced parameters, API call volume, and the common patterns that create request-driven cost spikes.",
     "canonicalPath": "/guides/aws-ssm-parameter-store-pricing",
     "category": "AWS",
-    "slug": "aws-ssm-parameter-store-pricing"
+    "slug": "aws-ssm-parameter-store-pricing",
+    "topics": [
+      "requests"
+    ]
   },
   {
     "title": "VPC data transfer: how to estimate cross-zone, cross-region, and egress costs",
     "description": "A practical guide to VPC data transfer: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.",
     "canonicalPath": "/guides/aws-vpc-data-transfer",
     "category": "AWS",
-    "slug": "aws-vpc-data-transfer"
+    "slug": "aws-vpc-data-transfer",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "VPC endpoints cost optimization: reduce endpoint-hours and avoid transfer pitfalls",
     "description": "A practical playbook to reduce VPC interface endpoint costs: consolidate endpoints, right-size AZ coverage, reduce endpoint GB processed, and avoid cross-AZ transfer pitfalls.",
     "canonicalPath": "/guides/aws-vpc-endpoints-cost-optimization",
     "category": "AWS",
-    "slug": "aws-vpc-endpoints-cost-optimization"
+    "slug": "aws-vpc-endpoints-cost-optimization",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "VPC endpoints pricing: what to model (interface vs gateway endpoints)",
     "description": "A practical VPC endpoints pricing checklist: interface endpoint hours, per-GB processing, gateway endpoint differences, and the transfer pitfalls that cause surprises.",
     "canonicalPath": "/guides/aws-vpc-endpoints-pricing",
     "category": "AWS",
-    "slug": "aws-vpc-endpoints-pricing"
+    "slug": "aws-vpc-endpoints-pricing",
+    "topics": [
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "WAF cost optimization (reduce requests + rule sprawl)",
     "description": "A practical playbook to reduce WAF spend: cut evaluated requests, keep rule count tight, and avoid downstream logging waste.",
     "canonicalPath": "/guides/aws-waf-cost-optimization",
     "category": "AWS",
-    "slug": "aws-waf-cost-optimization"
+    "slug": "aws-waf-cost-optimization",
+    "topics": [
+      "logging",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "WAF cost spikes during attacks: how to budget request surges",
     "description": "A practical guide to WAF cost spikes during attacks: why request-based charges jump, how to model surge traffic, and how to reduce evaluated requests and logging volume safely.",
     "canonicalPath": "/guides/aws-waf-cost-spikes-during-attacks",
     "category": "AWS",
-    "slug": "aws-waf-cost-spikes-during-attacks"
+    "slug": "aws-waf-cost-spikes-during-attacks",
+    "topics": [
+      "logging",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Azure API Management pricing: model requests, transfer, and log volume",
     "description": "A practical API Management estimate: request volume, response transfer, and logs/observability. Includes a checklist to validate retries, payload size, and usage tiers.",
     "canonicalPath": "/guides/azure-api-management-pricing",
     "category": "Azure",
-    "slug": "azure-api-management-pricing"
+    "slug": "azure-api-management-pricing",
+    "topics": [
+      "egress",
+      "logging",
+      "requests"
+    ]
   },
   {
     "title": "Azure Application Gateway pricing: how to model L7 load balancer costs",
     "description": "Model Application Gateway costs using measurable drivers: hours, request volume, traffic processed, WAF, and logs — plus a validation checklist.",
     "canonicalPath": "/guides/azure-application-gateway-pricing",
     "category": "Azure",
-    "slug": "azure-application-gateway-pricing"
+    "slug": "azure-application-gateway-pricing",
+    "topics": [
+      "load-balancing",
+      "logging",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Azure Application Insights pricing: ingestion volume, sampling, and retention",
     "description": "A practical Application Insights estimate: telemetry volume (GB), sampling, retention, and query scans. Includes validation steps to prevent ingest spikes during incidents.",
     "canonicalPath": "/guides/azure-application-insights-pricing",
     "category": "Azure",
-    "slug": "azure-application-insights-pricing"
+    "slug": "azure-application-insights-pricing",
+    "topics": [
+      "metrics"
+    ]
   },
   {
     "title": "Azure bandwidth and egress costs: how to estimate outbound data transfer",
     "description": "A practical method to estimate outbound bandwidth costs: split by destination (internet, cross-region, CDN origin), validate units, and avoid double-counting.",
     "canonicalPath": "/guides/azure-bandwidth-egress-costs",
     "category": "Azure",
-    "slug": "azure-bandwidth-egress-costs"
+    "slug": "azure-bandwidth-egress-costs",
+    "topics": [
+      "cdn",
+      "egress"
+    ]
   },
   {
     "title": "Azure Blob Storage pricing: a practical cost model",
     "description": "Model Blob Storage cost without copying price tables: GB-month, operations, redundancy/replication, retrieval, and egress.",
     "canonicalPath": "/guides/azure-blob-storage-pricing",
     "category": "Azure",
-    "slug": "azure-blob-storage-pricing"
+    "slug": "azure-blob-storage-pricing",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "Azure CDN pricing: estimate bandwidth, requests, and cache fill",
     "description": "A practical Azure CDN estimate: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate, purge behavior, and big endpoints.",
     "canonicalPath": "/guides/azure-cdn-pricing",
     "category": "Azure",
-    "slug": "azure-cdn-pricing"
+    "slug": "azure-cdn-pricing",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "Azure Container Registry (ACR) pricing: storage + pulls + egress",
     "description": "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a simple way to estimate GB-month from retention.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
-    "slug": "azure-container-registry-pricing"
+    "slug": "azure-container-registry-pricing",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "Azure Cosmos DB pricing: a practical estimate (RU/s, storage, and egress)",
     "description": "A driver-based Cosmos DB estimate: RU/s capacity, stored GB, and data transfer. Includes a workflow to validate RU drivers and avoid underestimating burst and retries.",
     "canonicalPath": "/guides/azure-cosmos-db-pricing",
     "category": "Azure",
-    "slug": "azure-cosmos-db-pricing"
+    "slug": "azure-cosmos-db-pricing",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "Azure Event Hubs pricing: estimate throughput, events, and retention",
     "description": "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic and consumer replays.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
-    "slug": "azure-event-hubs-pricing"
+    "slug": "azure-event-hubs-pricing",
+    "topics": [
+      "egress",
+      "messaging"
+    ]
   },
   {
     "title": "Azure Front Door pricing: model requests, bandwidth, and origin traffic",
     "description": "A practical Azure Front Door cost model: request volume, edge bandwidth, and origin traffic (cache fill). Includes validation steps to avoid double-counting CDN vs origin egress.",
     "canonicalPath": "/guides/azure-front-door-pricing",
     "category": "Azure",
-    "slug": "azure-front-door-pricing"
+    "slug": "azure-front-door-pricing",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "Azure Functions pricing: what to include in a realistic estimate",
     "description": "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume — plus how to validate with real metrics.",
     "canonicalPath": "/guides/azure-functions-pricing",
     "category": "Azure",
-    "slug": "azure-functions-pricing"
+    "slug": "azure-functions-pricing",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "Azure Key Vault pricing: estimate operations, keys/secrets, and request spikes",
     "description": "A practical Key Vault cost model: key/secret baseline plus request volume. Includes validation steps for high-frequency crypto operations and cache misses.",
     "canonicalPath": "/guides/azure-key-vault-pricing",
     "category": "Azure",
-    "slug": "azure-key-vault-pricing"
+    "slug": "azure-key-vault-pricing",
+    "topics": [
+      "requests",
+      "security",
+      "storage"
+    ]
   },
   {
     "title": "Azure Kubernetes Service (AKS) pricing: what to include",
     "description": "AKS cost is more than node VMs: include node pools, networking/egress, storage, and observability. Use this checklist-style model to estimate safely.",
     "canonicalPath": "/guides/azure-aks-pricing",
     "category": "Azure",
-    "slug": "azure-aks-pricing"
+    "slug": "azure-aks-pricing",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "storage"
+    ]
   },
   {
     "title": "Azure Load Balancer pricing: L4 traffic and data processing model",
     "description": "A practical cost model for L4 load balancing: hours, traffic processed, and egress. Includes a workflow to estimate GB processed from RPS and payload size.",
     "canonicalPath": "/guides/azure-load-balancer-pricing",
     "category": "Azure",
-    "slug": "azure-load-balancer-pricing"
+    "slug": "azure-load-balancer-pricing",
+    "topics": [
+      "egress",
+      "load-balancing"
+    ]
   },
   {
     "title": "Azure Log Analytics pricing: ingestion, retention, and query costs",
     "description": "A practical model for Log Analytics-style costs: GB ingested, retention, and query/scan. Includes a method to estimate log GB from event rate and payload size.",
     "canonicalPath": "/guides/azure-log-analytics-pricing",
     "category": "Azure",
-    "slug": "azure-log-analytics-pricing"
+    "slug": "azure-log-analytics-pricing",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "Azure Monitor metrics pricing: estimate custom metrics, retention, and API calls",
     "description": "A practical metrics cost model: custom metrics volume, retention, dashboards/alerts, and API calls. Includes validation steps to avoid high-cardinality mistakes.",
     "canonicalPath": "/guides/azure-monitor-metrics-pricing",
     "category": "Azure",
-    "slug": "azure-monitor-metrics-pricing"
+    "slug": "azure-monitor-metrics-pricing",
+    "topics": [
+      "database",
+      "metrics",
+      "requests"
+    ]
   },
   {
     "title": "Azure NAT Gateway cost: why bills spike and how to model them",
     "description": "A practical NAT Gateway estimate: hourly baseline + GB processed (plus egress). Includes common failure patterns that multiply outbound traffic.",
     "canonicalPath": "/guides/azure-nat-gateway-cost",
     "category": "Azure",
-    "slug": "azure-nat-gateway-cost"
+    "slug": "azure-nat-gateway-cost",
+    "topics": [
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "Azure Private Link costs: model endpoint-hours and data processing",
     "description": "A practical private networking cost model: endpoint-hours plus data processed (GB). Includes validation steps to decide when Private Link beats NAT/internet egress for cost and security.",
     "canonicalPath": "/guides/azure-private-link-costs",
     "category": "Azure",
-    "slug": "azure-private-link-costs"
+    "slug": "azure-private-link-costs",
+    "topics": [
+      "egress",
+      "security"
+    ]
   },
   {
     "title": "Azure Service Bus pricing: estimate messaging cost from deliveries and payload size",
     "description": "A practical Service Bus estimate: message volume, deliveries/retries, and payload transfer. Includes validation steps for retries, dead-letter patterns, and fan-out.",
     "canonicalPath": "/guides/azure-service-bus-pricing",
     "category": "Azure",
-    "slug": "azure-service-bus-pricing"
+    "slug": "azure-service-bus-pricing",
+    "topics": [
+      "egress",
+      "messaging"
+    ]
   },
   {
     "title": "Azure SQL Database pricing: a practical way to estimate",
     "description": "Model managed database cost without price tables: compute baseline, storage GB-month, backups/retention, and network/egress. Includes a validation checklist.",
     "canonicalPath": "/guides/azure-sql-database-pricing",
     "category": "Azure",
-    "slug": "azure-sql-database-pricing"
+    "slug": "azure-sql-database-pricing",
+    "topics": [
+      "database",
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "CDN Costs Explained: bandwidth, requests, and origin egress",
     "description": "A practical CDN cost breakdown: what you pay for bandwidth ($/GB), request fees ($ per 10k/1M), cache fill, and origin egress. Includes estimation steps and common pitfalls.",
     "canonicalPath": "/guides/cdn-costs",
     "category": "CDN",
-    "slug": "cdn-costs"
+    "slug": "cdn-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "CDN request pricing: how to estimate $ per 10k / 1M requests",
     "description": "Some CDNs charge request fees in addition to bandwidth. Learn what counts as a billable request, how to estimate monthly requests, and how to model per-10k vs per-1M pricing.",
     "canonicalPath": "/guides/cdn-request-pricing",
     "category": "CDN",
-    "slug": "cdn-request-pricing"
+    "slug": "cdn-request-pricing",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "CloudFront vs Cloudflare CDN cost: what to compare (bandwidth, requests, origin egress)",
     "description": "A practical comparison checklist for CloudFront vs Cloudflare pricing. Compare bandwidth ($/GB), request fees, regions, cache fill/origin egress, and add-ons like WAF and logs.",
     "canonicalPath": "/guides/cloudfront-vs-cloudflare-cdn-cost",
     "category": "CDN",
-    "slug": "cloudfront-vs-cloudflare-cdn-cost"
+    "slug": "cloudfront-vs-cloudflare-cdn-cost",
+    "topics": [
+      "cdn",
+      "egress",
+      "logging",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "How to estimate CDN bandwidth (GB/month) from analytics or Mbps",
     "description": "A practical guide to estimating CDN bandwidth per month, including conversions from Mbps and common unit pitfalls (GB vs GiB).",
     "canonicalPath": "/guides/estimate-cdn-bandwidth-gb-per-month",
     "category": "CDN",
-    "slug": "estimate-cdn-bandwidth-gb-per-month"
+    "slug": "estimate-cdn-bandwidth-gb-per-month",
+    "topics": [
+      "cdn",
+      "egress"
+    ]
   },
   {
     "title": "Origin egress vs CDN bandwidth: what's the difference?",
     "description": "CDN bills often have two related but different bandwidth concepts: origin egress (from your origin) and CDN bandwidth (to end users). Learn how to model both without double-counting.",
     "canonicalPath": "/guides/origin-egress-vs-cdn-bandwidth",
     "category": "CDN",
-    "slug": "origin-egress-vs-cdn-bandwidth"
+    "slug": "origin-egress-vs-cdn-bandwidth",
+    "topics": [
+      "cdn",
+      "egress"
+    ]
   },
   {
     "title": "Artifact Registry pricing: storage + pulls + egress (a practical estimate)",
     "description": "Model Artifact Registry costs: storage (GB-month), download volume (pulls), and outbound transfer. Includes a workflow to estimate GB-month from retention.",
     "canonicalPath": "/guides/gcp-artifact-registry-pricing",
     "category": "GCP",
-    "slug": "gcp-artifact-registry-pricing"
+    "slug": "gcp-artifact-registry-pricing",
+    "topics": [
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "BigQuery cost estimation: storage, scans, and streaming (practical model)",
     "description": "Estimate BigQuery-style analytics costs with drivers you can measure: stored data (GB-month), scanned bytes, streaming ingestion, and partitioning/retention choices.",
     "canonicalPath": "/guides/gcp-bigquery-cost-estimation",
     "category": "GCP",
-    "slug": "gcp-bigquery-cost-estimation"
+    "slug": "gcp-bigquery-cost-estimation",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "Bigtable cost estimation: nodes, storage, and traffic (practical model)",
     "description": "A driver-based Bigtable estimate: node-hours, stored GB, and network transfer. Includes validation steps for hotspots, compactions, and peak throughput.",
     "canonicalPath": "/guides/gcp-bigtable-cost-estimation",
     "category": "GCP",
-    "slug": "gcp-bigtable-cost-estimation"
+    "slug": "gcp-bigtable-cost-estimation",
+    "topics": [
+      "database",
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "Cloud Armor pricing: model request volume and attack spikes",
     "description": "A practical WAF cost model: baseline traffic plus attack spikes. Includes validation steps for request surges, rule sets, and logging/analytics.",
     "canonicalPath": "/guides/gcp-cloud-armor-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-armor-pricing"
+    "slug": "gcp-cloud-armor-pricing",
+    "topics": [
+      "logging",
+      "requests",
+      "security"
+    ]
   },
   {
     "title": "Cloud CDN pricing: estimate bandwidth, requests, and origin egress",
     "description": "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate, big endpoints, and purge events.",
     "canonicalPath": "/guides/gcp-cloud-cdn-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-cdn-pricing"
+    "slug": "gcp-cloud-cdn-pricing",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
   },
   {
     "title": "Cloud Functions pricing: invocations, duration, and log volume",
     "description": "A practical Cloud Functions cost model: invocations, duration, networking/egress, and logs. Includes a validation checklist to avoid underestimating retries.",
     "canonicalPath": "/guides/gcp-cloud-functions-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-functions-pricing"
+    "slug": "gcp-cloud-functions-pricing",
+    "topics": [
+      "egress",
+      "logging"
+    ]
   },
   {
     "title": "Cloud Logging pricing: ingestion, retention, and query scans",
     "description": "A practical model for Cloud Logging-style costs: GB ingested, retention GB-month, and query/scan. Includes a fast way to estimate GB/month from event rate and payload size.",
     "canonicalPath": "/guides/gcp-cloud-logging-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-logging-pricing"
+    "slug": "gcp-cloud-logging-pricing",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "Cloud Monitoring metrics pricing: time series, sample rate, and retention",
     "description": "A practical metrics cost model: time series cardinality, sample rate, retention, and dashboards/alerts. Includes validation steps to prevent high-cardinality explosions.",
     "canonicalPath": "/guides/gcp-cloud-monitoring-metrics-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-monitoring-metrics-pricing"
+    "slug": "gcp-cloud-monitoring-metrics-pricing",
+    "topics": [
+      "database",
+      "metrics"
+    ]
   },
   {
     "title": "Cloud NAT cost: why it spikes and how to model outbound traffic",
     "description": "A practical Cloud NAT estimate: hourly baseline + data processed (plus egress). Includes common patterns that multiply outbound GB during incidents and deployments.",
     "canonicalPath": "/guides/gcp-cloud-nat-cost",
     "category": "GCP",
-    "slug": "gcp-cloud-nat-cost"
+    "slug": "gcp-cloud-nat-cost",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "Cloud Run pricing: a practical model (requests, CPU/memory time, and egress)",
     "description": "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, CPU/memory time, concurrency, outbound transfer, and logs.",
     "canonicalPath": "/guides/gcp-cloud-run-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-run-pricing"
+    "slug": "gcp-cloud-run-pricing",
+    "topics": [
+      "egress",
+      "logging",
+      "requests"
+    ]
   },
   {
     "title": "Cloud Spanner cost estimation: compute, storage, and query patterns",
     "description": "A practical Spanner estimate: provisioned compute capacity, stored GB-month, and cross-region/network patterns. Includes validation steps for peak load and query efficiency.",
     "canonicalPath": "/guides/gcp-cloud-spanner-cost-estimation",
     "category": "GCP",
-    "slug": "gcp-cloud-spanner-cost-estimation"
+    "slug": "gcp-cloud-spanner-cost-estimation",
+    "topics": [
+      "database",
+      "storage"
+    ]
   },
   {
     "title": "Cloud SQL pricing: compute, storage, backups, and network (practical estimate)",
     "description": "A driver-based Cloud SQL estimate: instance-hours, storage GB-month, backups/retention, and data transfer. Includes validation steps for growth and peak sizing.",
     "canonicalPath": "/guides/gcp-cloud-sql-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-sql-pricing"
+    "slug": "gcp-cloud-sql-pricing",
+    "topics": [
+      "database",
+      "egress",
+      "storage"
+    ]
   },
   {
     "title": "Dataflow pricing: model worker hours, throughput, and log volume",
     "description": "A practical data processing estimate: worker compute-hours, data processed, and logging/monitoring. Includes validation steps for autoscaling and backlog reprocessing.",
     "canonicalPath": "/guides/gcp-dataflow-pricing",
     "category": "GCP",
-    "slug": "gcp-dataflow-pricing"
+    "slug": "gcp-dataflow-pricing",
+    "topics": [
+      "logging",
+      "metrics"
+    ]
   },
   {
     "title": "GCP load balancing pricing: model hours, requests, and traffic processed",
     "description": "A driver-based approach to load balancer cost: hours, request volume, and GB processed/egress. Includes a workflow to estimate GB from RPS and response size.",
     "canonicalPath": "/guides/gcp-load-balancing-pricing",
     "category": "GCP",
-    "slug": "gcp-load-balancing-pricing"
+    "slug": "gcp-load-balancing-pricing",
+    "topics": [
+      "egress",
+      "load-balancing",
+      "requests"
+    ]
   },
   {
     "title": "GCP VPC egress costs: how to estimate outbound transfer",
     "description": "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert metrics to GB/month, and validate boundaries.",
     "canonicalPath": "/guides/gcp-vpc-egress-costs",
     "category": "GCP",
-    "slug": "gcp-vpc-egress-costs"
+    "slug": "gcp-vpc-egress-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "metrics"
+    ]
   },
   {
     "title": "Google Cloud Storage pricing: a practical model for storage, requests, and egress",
     "description": "Model GCS cost without copying price tables: GB-month, operations, retrieval rules, and outbound transfer. Includes a validation checklist.",
     "canonicalPath": "/guides/gcp-cloud-storage-pricing",
     "category": "GCP",
-    "slug": "gcp-cloud-storage-pricing"
+    "slug": "gcp-cloud-storage-pricing",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "Google Kubernetes Engine (GKE) pricing: a checklist-style estimate",
     "description": "GKE cost is not just nodes: include node pools, networking/egress, load balancing, storage, and logs/metrics. Validate requests/limits to avoid overpaying.",
     "canonicalPath": "/guides/gcp-gke-pricing",
     "category": "GCP",
-    "slug": "gcp-gke-pricing"
+    "slug": "gcp-gke-pricing",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "logging",
+      "metrics",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "Inter-zone transfer costs on GCP: where they come from and how to estimate",
     "description": "A practical checklist to estimate cross-zone data transfer: load balancers, multi-zone clusters, service-to-service chatter, and storage/database access patterns. Includes validation steps.",
     "canonicalPath": "/guides/gcp-inter-zone-transfer-costs",
     "category": "GCP",
-    "slug": "gcp-inter-zone-transfer-costs"
+    "slug": "gcp-inter-zone-transfer-costs",
+    "topics": [
+      "database",
+      "egress",
+      "load-balancing",
+      "storage"
+    ]
   },
   {
     "title": "Private Service Connect costs: endpoint-hours and data processed (practical model)",
     "description": "A practical private connectivity estimate: endpoint-hours plus data processed (GB). Includes validation steps to compare PSC vs NAT/internet egress and avoid paying for both paths.",
     "canonicalPath": "/guides/gcp-private-service-connect-costs",
     "category": "GCP",
-    "slug": "gcp-private-service-connect-costs"
+    "slug": "gcp-private-service-connect-costs",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "Pub/Sub pricing: estimate messages, deliveries, retries, and payload size",
     "description": "A practical Pub/Sub cost estimate: message volume, delivery attempts (retries), and payload transfer. Includes validation steps for fan-out and replays.",
     "canonicalPath": "/guides/gcp-pubsub-pricing",
     "category": "GCP",
-    "slug": "gcp-pubsub-pricing"
+    "slug": "gcp-pubsub-pricing",
+    "topics": [
+      "egress",
+      "messaging"
+    ]
   },
   {
     "title": "Cloud cost estimation checklist (avoid thin estimates)",
     "description": "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs, and network transfer. Includes validation steps and common pitfalls.",
     "canonicalPath": "/guides/cloud-cost-estimation-checklist",
     "category": "General",
-    "slug": "cloud-cost-estimation-checklist"
+    "slug": "cloud-cost-estimation-checklist",
+    "topics": [
+      "egress",
+      "logging",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "How to estimate replication GB/month from write volume",
     "description": "Replication cost is driven by changed data, not total stored GB. Learn how to estimate replicated GB/month from write throughput and change rates for S3-like storage.",
     "canonicalPath": "/guides/estimate-replication-gb-per-month-from-writes",
     "category": "General",
-    "slug": "estimate-replication-gb-per-month-from-writes"
+    "slug": "estimate-replication-gb-per-month-from-writes",
+    "topics": [
+      "storage"
+    ]
   },
   {
     "title": "Request-based pricing explained (APIs, CDN, and messaging)",
     "description": "A practical guide to request-based pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.",
     "canonicalPath": "/guides/request-based-pricing",
     "category": "General",
-    "slug": "request-based-pricing"
+    "slug": "request-based-pricing",
+    "topics": [
+      "cdn",
+      "requests"
+    ]
   },
   {
     "title": "EKS vs GKE vs AKS cost: a practical comparison checklist",
     "description": "Compare managed Kubernetes costs across EKS, GKE, and AKS by modeling the same line items: nodes, control plane, load balancers, storage, observability, and egress.",
     "canonicalPath": "/guides/eks-vs-gke-vs-aks-cost",
     "category": "Kubernetes",
-    "slug": "eks-vs-gke-vs-aks-cost"
+    "slug": "eks-vs-gke-vs-aks-cost",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "storage"
+    ]
   },
   {
     "title": "Kubernetes Cost Calculator: what to include (nodes, storage, egress, observability)",
     "description": "A practical checklist for estimating Kubernetes costs: node compute, control plane, load balancers, storage, egress, and observability. Includes a fast workflow and common pitfalls.",
     "canonicalPath": "/guides/kubernetes-cost-calculator",
     "category": "Kubernetes",
-    "slug": "kubernetes-cost-calculator"
+    "slug": "kubernetes-cost-calculator",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "storage"
+    ]
   },
   {
     "title": "Kubernetes cost model beyond nodes: the checklist most teams miss",
     "description": "A practical Kubernetes cost model checklist: control plane, load balancers, storage, logs/metrics, and egress - plus links to calculators to estimate each part.",
     "canonicalPath": "/guides/kubernetes-cost-model-beyond-nodes",
     "category": "Kubernetes",
-    "slug": "kubernetes-cost-model-beyond-nodes"
+    "slug": "kubernetes-cost-model-beyond-nodes",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "logging",
+      "metrics",
+      "storage"
+    ]
   },
   {
     "title": "Kubernetes requests & limits: practical sizing (and cost impact)",
     "description": "How to size clusters from requests, choose allocatable headroom, and use limits to reason about burst risk - with a calculator and common pitfalls.",
     "canonicalPath": "/guides/kubernetes-requests-limits",
     "category": "Kubernetes",
-    "slug": "kubernetes-requests-limits"
+    "slug": "kubernetes-requests-limits",
+    "topics": [
+      "kubernetes",
+      "requests"
+    ]
   },
   {
     "title": "Kubernetes requests vs limits: why requests drive node count",
     "description": "A practical explanation of Kubernetes requests vs limits for capacity planning and cost estimation, with common mistakes and quick sizing guidance.",
     "canonicalPath": "/guides/kubernetes-requests-vs-limits-for-sizing",
     "category": "Kubernetes",
-    "slug": "kubernetes-requests-vs-limits-for-sizing"
+    "slug": "kubernetes-requests-vs-limits-for-sizing",
+    "topics": [
+      "kubernetes",
+      "requests"
+    ]
   },
   {
     "title": "Estimate log ingestion volume (GB/day): quick methods",
     "description": "How to estimate log ingestion volume in GB/day from bytes, events/sec, or throughput - plus common pitfalls like compression, sampling, and verbose debug logs.",
     "canonicalPath": "/guides/estimate-log-ingestion-gb-per-day",
     "category": "Logging",
-    "slug": "estimate-log-ingestion-gb-per-day"
+    "slug": "estimate-log-ingestion-gb-per-day",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "Estimating log costs: ingestion, retention, and scan/search",
     "description": "A practical guide to modeling log bills: ingestion vs retention (GB-month), steady state, scan/search pricing, and the fastest levers to reduce cost.",
     "canonicalPath": "/guides/log-costs",
     "category": "Logging",
-    "slug": "log-costs"
+    "slug": "log-costs",
+    "topics": [
+      "logging"
+    ]
   },
   {
     "title": "Log retention storage cost: steady-state GB-month explained",
     "description": "How log retention turns GB/day into stored GB-month cost. Learn the steady-state model, retention tiers, and the fastest levers to reduce long-term log spend.",
     "canonicalPath": "/guides/log-retention-storage-cost",
     "category": "Logging",
-    "slug": "log-retention-storage-cost"
+    "slug": "log-retention-storage-cost",
+    "topics": [
+      "logging",
+      "storage"
+    ]
   },
   {
     "title": "Network transfer costs explained (egress, cross-region, cross-AZ)",
     "description": "A practical guide to network transfer costs: how to model internet egress, cross-region transfer, cross-AZ traffic, and CDN cache fill. Includes estimation steps and validation tips.",
     "canonicalPath": "/guides/network-transfer-costs",
     "category": "Networking",
-    "slug": "network-transfer-costs"
+    "slug": "network-transfer-costs",
+    "topics": [
+      "cdn",
+      "egress"
+    ]
   },
   {
     "title": "Understanding cloud egress costs",
     "description": "A practical guide to estimating egress: units, where bandwidth shows up, quick estimation formulas, and common billing pitfalls.",
     "canonicalPath": "/guides/egress-costs",
     "category": "Networking",
-    "slug": "egress-costs"
+    "slug": "egress-costs",
+    "topics": [
+      "egress"
+    ]
   },
   {
     "title": "Copy storage pricing: what you pay for when data moves",
     "description": "A practical guide to pricing storage copy operations (cross-region copy, replication, backups) across S3-like object storage: transfer, requests, and extra storage.",
     "canonicalPath": "/guides/copy-storage-pricing",
     "category": "Storage",
-    "slug": "copy-storage-pricing"
+    "slug": "copy-storage-pricing",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "S3 CRR vs SRR cost: what changes (transfer, storage, requests)",
     "description": "A practical cost comparison of S3 cross-region replication (CRR) vs same-region replication (SRR). Compare transfer/feature fees, extra replica storage, and request costs - with calculators.",
     "canonicalPath": "/guides/s3-crr-vs-srr-cost",
     "category": "Storage",
-    "slug": "s3-crr-vs-srr-cost"
+    "slug": "s3-crr-vs-srr-cost",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "S3 pricing explained: storage vs requests vs egress",
     "description": "A practical breakdown of S3-like object storage pricing: GB-month storage, request fees, and data egress - plus how to estimate each without missing hidden line items.",
     "canonicalPath": "/guides/s3-pricing-explained",
     "category": "Storage",
-    "slug": "s3-pricing-explained"
+    "slug": "s3-pricing-explained",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "S3 replication cost: how to estimate cross-region replication",
     "description": "A practical guide to estimating S3 replication cost: what data volume to count, which fees to expect, and how to model replica storage, requests, and transfer. Includes a fast checklist.",
     "canonicalPath": "/guides/s3-replication-cost",
     "category": "Storage",
-    "slug": "s3-replication-cost"
+    "slug": "s3-replication-cost",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   },
   {
     "title": "Storage costs explained: GB-month, requests, and replication",
     "description": "A practical guide to storage cost modeling: GB-month, request fees, retention, replication, and transfer. Includes estimation steps and common pitfalls.",
     "canonicalPath": "/guides/storage-costs",
     "category": "Storage",
-    "slug": "storage-costs"
+    "slug": "storage-costs",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
   }
 ];

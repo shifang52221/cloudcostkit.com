@@ -1,5 +1,7 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = "CDN Costs Explained: bandwidth, requests, and origin egress";
 const description =
@@ -26,6 +28,11 @@ const faqs = [
     a: "Use an effective blended rate ($/GB and $ per 10k/1M) for your expected mix, or run scenarios for multiple regions/tiers and sum them.",
   },
 ];
+
+const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.canonicalPath !== "/guides/cdn-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 12);
 ---
 <GuideLayout
   title={title}
@@ -126,6 +133,20 @@ const faqs = [
     <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
   </div>
+
+  {cdnGuides.length ? (
+    <>
+      <h2>More CDN guides</h2>
+      <div class="grid">
+        {cdnGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
 
   <p class="muted" style="margin-top:14px">
     Educational use only. Always confirm billable units (GB vs GiB, request class, per-10k vs per-1M) and regional

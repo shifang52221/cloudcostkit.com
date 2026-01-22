@@ -17,6 +17,48 @@ function classifyGuide({ fileName, canonicalPath }) {
   return "General";
 }
 
+function extractTopics({ fileName, canonicalPath, title, description }) {
+  const s = `${fileName} ${canonicalPath} ${title} ${description}`.toLowerCase();
+  const topics = new Set();
+
+  if (s.includes("egress") || s.includes("data transfer") || s.includes("transfer") || s.includes("bandwidth"))
+    topics.add("egress");
+  if (s.includes("cdn") || s.includes("cloudfront") || s.includes("front door") || s.includes("cloud cdn"))
+    topics.add("cdn");
+  if (s.includes("log") || s.includes("logging") || s.includes("cloudwatch") || s.includes("log analytics"))
+    topics.add("logging");
+  if (s.includes("metrics") || s.includes("monitor") || s.includes("application insights") || s.includes("insights"))
+    topics.add("metrics");
+  if (s.includes("kubernetes") || s.includes("eks") || s.includes("gke") || s.includes("aks")) topics.add("kubernetes");
+  if (
+    s.includes("database") ||
+    s.includes("rds") ||
+    s.includes("aurora") ||
+    s.includes("sql") ||
+    s.includes("spanner") ||
+    s.includes("bigtable")
+  )
+    topics.add("database");
+  if (
+    s.includes("queue") ||
+    s.includes("pub/sub") ||
+    s.includes("pubsub") ||
+    s.includes("sns") ||
+    s.includes("sqs") ||
+    s.includes("service bus") ||
+    s.includes("event hubs")
+  )
+    topics.add("messaging");
+  if (s.includes("api") || s.includes("gateway") || s.includes("requests") || s.includes("request")) topics.add("requests");
+  if (s.includes("load balancer") || s.includes("alb") || s.includes("nlb") || s.includes("application gateway"))
+    topics.add("load-balancing");
+  if (s.includes("storage") || s.includes("s3") || s.includes("blob") || s.includes("ecr") || s.includes("acr")) topics.add("storage");
+  if (s.includes("waf") || s.includes("armor") || s.includes("security") || s.includes("key vault") || s.includes("kms"))
+    topics.add("security");
+
+  return Array.from(topics).sort((a, b) => a.localeCompare(b));
+}
+
 function extractFirstStringLiteral(source, needle) {
   const idx = source.indexOf(needle);
   if (idx === -1) return null;
@@ -58,6 +100,7 @@ async function main() {
     const description = extractFirstStringLiteral(src, "const description") || "";
     const category = classifyGuide({ fileName, canonicalPath });
     const slug = canonicalPath.replace(/^\/guides\//, "").replace(/\/+$/, "");
+    const topics = extractTopics({ fileName, canonicalPath, title, description });
 
     guides.push({
       title,
@@ -65,6 +108,7 @@ async function main() {
       canonicalPath,
       category,
       slug,
+      topics,
     });
   }
 
@@ -82,6 +126,7 @@ async function main() {
     `  canonicalPath: string;\n` +
     `  category: string;\n` +
     `  slug: string;\n` +
+    `  topics: string[];\n` +
     `};\n\n` +
     `export const GUIDES: GuideLink[] = ${JSON.stringify(guides, null, 2)};\n`;
 

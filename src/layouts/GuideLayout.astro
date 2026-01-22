@@ -2,6 +2,8 @@
 import BaseLayout from "./BaseLayout.astro";
 import { SITE } from "../config/site";
 import { withTrailingSlash } from "../lib/url";
+import { GUIDES } from "../lib/guides.generated";
+import { TOOLS } from "../lib/tools";
 
 type Props = {
   title: string;
@@ -47,6 +49,106 @@ const faqSchema =
         })),
       }
     : null;
+
+const currentGuide = GUIDES.find((g) => g.canonicalPath === canonicalPath) ?? null;
+
+function tokenize(input: string) {
+  const stop = new Set([
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "by",
+    "cost",
+    "costs",
+    "estimate",
+    "estimating",
+    "estimation",
+    "for",
+    "from",
+    "how",
+    "in",
+    "is",
+    "it",
+    "of",
+    "on",
+    "or",
+    "pricing",
+    "to",
+    "what",
+    "with",
+  ]);
+
+  return Array.from(
+    new Set(
+      String(input || "")
+        .toLowerCase()
+        .split(/[^a-z0-9]+/g)
+        .map((t) => t.trim())
+        .filter((t) => t.length >= 3 && !stop.has(t)),
+    ),
+  );
+}
+
+const currentTokens = currentGuide ? tokenize(`${currentGuide.slug} ${title}`) : tokenize(`${canonicalPath} ${title}`);
+const currentTopics = currentGuide?.topics ?? [];
+
+function overlapCount(a: string[], b: string[]) {
+  if (!a.length || !b.length) return 0;
+  const set = new Set(a);
+  let count = 0;
+  for (const item of b) if (set.has(item)) count++;
+  return count;
+}
+
+const relatedGuides = currentGuide
+  ? GUIDES.filter((g) => g.canonicalPath !== currentGuide.canonicalPath)
+      .map((g) => {
+        const tokenOverlap = overlapCount(currentTokens, tokenize(`${g.slug} ${g.title}`));
+        const topicOverlap = overlapCount(currentTopics, g.topics ?? []);
+        const sameCategory = g.category === currentGuide.category ? 1 : 0;
+        const score = sameCategory * 3 + topicOverlap * 2 + tokenOverlap;
+        return { guide: g, score };
+      })
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score || a.guide.title.localeCompare(b.guide.title))
+      .slice(0, 6)
+      .map((x) => x.guide)
+  : [];
+
+const topicToTools: Record<string, string[]> = {
+  egress: [
+    "data-egress-cost-calculator",
+    "api-response-size-transfer-calculator",
+    "vpc-data-transfer-cost-calculator",
+    "cross-region-transfer-cost-calculator",
+  ],
+  cdn: ["cdn-cost-calculator", "cdn-bandwidth-cost-calculator", "cdn-request-cost-calculator"],
+  logging: [
+    "log-cost-calculator",
+    "log-ingestion-cost-calculator",
+    "log-retention-storage-cost-calculator",
+    "log-search-scan-cost-calculator",
+  ],
+  metrics: ["metrics-timeseries-cost-calculator", "cloudwatch-metrics-cost-calculator", "aws-cloudwatch-alarms-cost-calculator"],
+  kubernetes: ["kubernetes-cost-calculator", "kubernetes-node-cost-calculator", "kubernetes-observability-cost-calculator"],
+  requests: ["rps-to-monthly-requests-calculator", "api-request-cost-calculator", "cdn-request-cost-calculator"],
+};
+
+const desiredToolSlugs = Array.from(
+  new Set(
+    (currentTopics.length ? currentTopics : ["egress", "logging", "cdn"])
+      .flatMap((t) => topicToTools[t] ?? [])
+      .filter(Boolean),
+  ),
+);
+
+const relatedTools = desiredToolSlugs
+  .map((slug) => TOOLS.find((t) => t.slug === slug))
+  .filter((t): t is (typeof TOOLS)[number] => Boolean(t))
+  .slice(0, 6);
 ---
 <BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath}>
   <script
@@ -62,6 +164,36 @@ const faqSchema =
   <article class="card section prose">
     <h1 style="margin-top:0">{title}</h1>
     <slot />
+
+    {relatedGuides.length ? (
+      <>
+        <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
+        <h2 style="margin-top:0">Related guides</h2>
+        <div class="grid">
+          {relatedGuides.map((g) => (
+            <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+              <div class="tool-title">{g.title}</div>
+              <div class="tool-desc">{g.description}</div>
+            </a>
+          ))}
+        </div>
+      </>
+    ) : null}
+
+    {relatedTools.length ? (
+      <>
+        <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
+        <h2 style="margin-top:0">Related calculators</h2>
+        <div class="grid">
+          {relatedTools.map((t) => (
+            <a class="card2 tool col-6" href={withTrailingSlash(`/calculators/${t.slug}`)}>
+              <div class="tool-title">{t.title}</div>
+              <div class="tool-desc">{t.description}</div>
+            </a>
+          ))}
+        </div>
+      </>
+    ) : null}
 
     {faqs && faqs.length ? (
       <>
