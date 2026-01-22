@@ -60,7 +60,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS cost checklist: a simple budgeting framework",
-    "description": "A one-page AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN.",
+    "description": "A practical AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN - plus validation steps to avoid surprises.",
     "canonicalPath": "/guides/aws-cost-checklist",
     "category": "AWS",
     "slug": "aws-cost-checklist"
@@ -354,7 +354,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "EKS node sizing: requests, overhead, and why packing is never perfect",
-    "description": "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets, and understand why real scheduling can require more nodes than the math minimum.",
+    "description": "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets and pod limits, and understand why real scheduling can require more nodes than the math minimum.",
     "canonicalPath": "/guides/aws-eks-node-sizing",
     "category": "AWS",
     "slug": "aws-eks-node-sizing"
@@ -487,7 +487,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate SQS requests (from messages and retries)",
-    "description": "How to estimate billable SQS request volume: messages/month, requests per message, and how retries inflate costs.",
+    "description": "How to estimate billable SQS request volume: messages/month, requests per message, and how retries inflate costs. Includes validation tips and common pitfalls.",
     "canonicalPath": "/guides/aws-sqs-estimate-requests",
     "category": "AWS",
     "slug": "aws-sqs-estimate-requests"
