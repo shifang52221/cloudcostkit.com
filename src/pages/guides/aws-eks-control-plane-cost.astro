@@ -4,17 +4,44 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "EKS control plane cost: how to model it and when it matters";
 const description =
   "A practical guide to modeling EKS-style control plane costs: fixed hourly fees, multi-cluster strategy, and how to keep dev/test clusters from inflating spend.";
+const faqs = [
+  {
+    q: "What is the EKS control plane charge?",
+    a: "A fixed hourly fee per cluster (control plane). It's usually small for large production clusters, but it can dominate the bill if you run many small clusters.",
+  },
+  {
+    q: "When does it matter most?",
+    a: "When you have many environments (dev/test/stage), per-team clusters, or multi-region duplication. Control plane fees add linearly with cluster count.",
+  },
+  {
+    q: "How do I reduce control plane cost safely?",
+    a: "Consolidate non-prod into fewer shared clusters, schedule dev/test clusters to turn off, and use namespaces/policy for isolation when you don't need full cluster-level isolation.",
+  },
+  {
+    q: "Should I use one big cluster or many small clusters?",
+    a: "It's a trade-off: many clusters improve isolation and autonomy but increase fixed fees and operational overhead. For non-prod, fewer clusters is usually cheaper and simpler.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-eks-control-plane-cost"
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p>
     Managed Kubernetes control plane fees are often a fixed hourly line item. They are small for large production
     clusters, but they can dominate costs for small dev/test clusters—especially if you run many clusters.
   </p>
+
+  <h2>Quick estimation formula</h2>
+  <ul>
+    <li>
+      <strong>Control plane cost/month ~ clusters x $/hour x 730</strong>
+    </li>
+    <li>Then add node and add-on costs separately (nodes, storage, logs, load balancers, egress).</li>
+  </ul>
 
   <h2>When it matters</h2>
   <ul>
@@ -30,10 +57,18 @@ const description =
     <li>Use namespaces and policy to isolate teams when appropriate</li>
   </ul>
 
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Counting only nodes: the fixed fee still exists even with tiny node groups.</li>
+    <li>Ignoring add-ons: logs, metrics, and load balancers can exceed the control plane fee.</li>
+    <li>Multi-region duplication: cluster count grows quickly with region x environment.</li>
+  </ul>
+
   <h2>Related tools</h2>
-  <p>
+  <div class="btn-row">
     <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
     <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing guide</a>
-  </p>
+    <a class="btn" href="/guides/kubernetes-cost-calculator/">Kubernetes cost checklist</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
 </GuideLayout>
-

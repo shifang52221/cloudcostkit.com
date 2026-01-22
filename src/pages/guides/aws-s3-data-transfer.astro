@@ -4,31 +4,92 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "S3 data transfer costs: egress, cross-region access, and common surprises";
 const description =
   "A practical guide to S3 data transfer costs: what counts as egress, how cross-region access shows up on bills, and how to estimate GB/month from your traffic patterns.";
+const faqs = [
+  {
+    q: "Is S3 transfer usually more expensive than storage?",
+    a: "For many read-heavy systems, yes. Egress grows with downloads and deliveries, while stored GB grows slowly. It's common for transfer to dominate before storage does.",
+  },
+  {
+    q: "Does CloudFront bandwidth replace S3 egress?",
+    a: "Not automatically. CDN bandwidth is edge-to-user delivery. You may still pay S3 origin egress (cache fill) from S3 to CloudFront on cache misses and fills.",
+  },
+  {
+    q: "How do I estimate GB/month from requests?",
+    a: "Use average object/response size and request volume: requests/day x avg size -> GB/month. Validate with real bytes served from logs or metrics once available.",
+  },
+  {
+    q: "What are common double-counting mistakes?",
+    a: "Counting both CDN bandwidth and origin egress as the same GB, or mixing cross-region replication traffic with user download egress without separating boundaries.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-data-transfer" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-data-transfer"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
   <p>
     For many storage-heavy systems, S3 data transfer (egress) becomes the largest line item long before storage does.
     This guide helps you model transfer in a way that avoids double-counting and missed costs.
   </p>
 
-  <h2>What to include</h2>
+  <h2>Step 1: Identify what kind of transfer you have</h2>
   <ul>
     <li>Internet egress (downloads to end users or external systems)</li>
-    <li>Cross-region access patterns</li>
-    <li>Replication/copy traffic (if billed as transfer in your setup)</li>
+    <li>Cross-region access patterns (multi-region apps reading from S3)</li>
+    <li>Replication/copy traffic (CRR or replication features)</li>
+    <li>CDN origin egress (cache fill) if you use a CDN in front of S3</li>
   </ul>
 
-  <h2>How to estimate GB/month</h2>
+  <h2>Step 2: Estimate GB/month</h2>
   <p>
     Start from analytics if you have them. If you only have throughput charts, convert Mbps to GB/month using the Units
     Converter.
   </p>
+  <ul>
+    <li>
+      Throughput method: use <a href="/calculators/unit-converter/">Units Converter</a> to convert Mbps to GB/month.
+    </li>
+    <li>
+      Request method: convert from response sizes with{" "}
+      <a href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>.
+    </li>
+    <li>
+      Billing/metrics method: prefer measured bytes (billing exports, storage access logs, CDN metrics).
+    </li>
+  </ul>
+
+  <h2>Step 3: Price the right boundary</h2>
+  <ul>
+    <li>
+      Internet egress: <a href="/calculators/data-egress-cost-calculator/">data egress cost</a>
+    </li>
+    <li>
+      Cross-region: <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>
+    </li>
+    <li>
+      CDN bandwidth: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    </li>
+  </ul>
+
+  <h2>Validation checklist (avoid double counting)</h2>
+  <ul>
+    <li>
+      Separate <strong>CDN bandwidth</strong> (edge-to-user) from <strong>S3 origin egress</strong> (S3-to-CDN cache
+      fill). Guide: <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+    </li>
+    <li>Separate user downloads from replication traffic (different drivers and sometimes different pricing).</li>
+    <li>Validate units: GB vs GiB (use the Units Converter if you're unsure).</li>
+  </ul>
 
   <h2>Related calculators</h2>
-  <p>
+  <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
     <a class="btn" href="/calculators/s3-cost-calculator/">S3 cost calculator</a>
-  </p>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+    <a class="btn" href="/guides/s3-replication-cost/">Replication cost guide</a>
+  </div>
 </GuideLayout>
-

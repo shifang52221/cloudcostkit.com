@@ -4,22 +4,77 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Reserved vs on-demand: how to choose commitments using break-even analysis";
 const description =
   "A practical guide to choosing commitments: use break-even utilization and sensitivity analysis to decide when reserved pricing beats on-demand.";
+const faqs = [
+  {
+    q: "What is break-even utilization?",
+    a: "It's the minimum utilization where a committed option becomes cheaper than on-demand. If you are below the break-even point, you pay for unused committed capacity.",
+  },
+  {
+    q: "Why do commitments underperform in real life?",
+    a: "Because utilization changes: rightsizing, traffic seasonality, workload churn, and instance family changes can reduce coverage. The spreadsheet assumes stable usage; the real world often isn't stable.",
+  },
+  {
+    q: "Should I commit for dev/test?",
+    a: "Usually only if it's always-on and stable. For spiky dev/test, the safest win is scheduling and turning off idle capacity rather than committing.",
+  },
+  {
+    q: "How do I reduce risk when committing?",
+    a: "Start with partial coverage, prefer shorter terms when uncertainty is high, and review utilization monthly. Model a downside scenario (lower utilization) and confirm you still win.",
+  },
+];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-reserved-vs-on-demand" lastUpdated="2026-01-20">
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-reserved-vs-on-demand"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
   <p>
     Commitments can reduce cost, but only if you have sufficient steady utilization. Break-even analysis helps you decide
     where commitments make sense and where on-demand flexibility is worth it.
   </p>
 
-  <h2>Break-even intuition</h2>
+  <h2>Step 1: Define what you are committing</h2>
+  <ul>
+    <li><strong>Scope</strong>: one service vs multiple, one region vs many.</li>
+    <li><strong>Term</strong>: longer terms usually discount more but increase risk.</li>
+    <li><strong>Payment</strong>: upfront vs partial vs no upfront changes cash flow (and effective rate).</li>
+  </ul>
+
+  <h2>Step 2: Break-even intuition</h2>
   <p>
     Compare the effective hourly cost of a commitment to on-demand. The break-even point is the utilization where the
     committed option becomes cheaper.
   </p>
+  <ul>
+    <li>
+      If commitment hourly is <strong>60%</strong> of on-demand hourly, break-even utilization is roughly{" "}
+      <strong>60%</strong>.
+    </li>
+    <li>Below break-even, unused committed capacity becomes waste.</li>
+    <li>Above break-even, you win by replacing on-demand with committed coverage.</li>
+  </ul>
 
-  <h2>Use the calculator</h2>
-  <p>
-    <a class="btn" href="/calculators/reserved-vs-on-demand-break-even-calculator/">Reserved vs on-demand break-even</a>
-  </p>
+  <h2>Step 3: Model uncertainty (this is where most estimates fail)</h2>
+  <ul>
+    <li><strong>Utilization drops</strong>: rightsizing and autoscaling reduce baseline.</li>
+    <li><strong>Workload churn</strong>: new products shift usage to different shapes.</li>
+    <li><strong>Family/size changes</strong>: you may migrate to different instance families over time.</li>
+    <li><strong>Seasonality</strong>: peaks do not justify year-long commitments if troughs are low.</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Use a representative 30-90 day window to compute baseline utilization.</li>
+    <li>Model a downside scenario (for example, -20% utilization) and confirm you still win.</li>
+    <li>Commit gradually: start with partial coverage and expand after you see stability.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/reserved-vs-on-demand-break-even-calculator/">Break-even calculator</a>
+    <a class="btn" href="/guides/aws-ec2-cost-estimation/">EC2 cost estimation</a>
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute cost</a>
+  </div>
 </GuideLayout>
-
