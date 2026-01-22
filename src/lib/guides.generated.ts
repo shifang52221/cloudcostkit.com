@@ -81,7 +81,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS EBS cost optimization (high-leverage fixes)",
-    "description": "A short playbook to reduce EBS spend: right-size volumes, avoid over-provisioned IOPS/throughput, and manage snapshots intentionally.",
+    "description": "A practical playbook to reduce EBS spend: right-size volumes, avoid over-provisioned IOPS/throughput, and manage snapshots intentionally. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ebs-cost-optimization",
     "category": "AWS",
     "slug": "aws-ebs-cost-optimization"
@@ -193,7 +193,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "CloudTrail cost optimization (reduce high-volume drivers)",
-    "description": "A short playbook to reduce CloudTrail costs: control data event scope, reduce automated churn, and avoid downstream analysis waste.",
+    "description": "A practical playbook to reduce CloudTrail costs: control data event scope, reduce automated churn, and avoid downstream storage/query waste. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-cloudtrail-cost-optimization",
     "category": "AWS",
     "slug": "aws-cloudtrail-cost-optimization"
@@ -207,7 +207,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "CloudWatch alarms cost optimization (reduce alarm sprawl)",
-    "description": "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage.",
+    "description": "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-cloudwatch-alarms-cost-optimization",
     "category": "AWS",
     "slug": "aws-cloudwatch-alarms-cost-optimization"
@@ -263,14 +263,14 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "DynamoDB RCU/WCU explained (for cost estimates)",
-    "description": "Understand how reads/writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates.",
+    "description": "Understand how reads and writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-dynamodb-rcu-wcu-explained",
     "category": "AWS",
     "slug": "aws-dynamodb-rcu-wcu-explained"
   },
   {
     "title": "EBS gp3 IOPS and throughput (how to budget)",
-    "description": "How to think about gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and the common mistakes in estimates.",
+    "description": "How to budget gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and common mistakes in estimates. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ebs-gp3-iops-throughput",
     "category": "AWS",
     "slug": "aws-ebs-gp3-iops-throughput"
@@ -291,7 +291,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "ECR cost optimization (retention, smaller images, fewer pulls)",
-    "description": "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters.",
+    "description": "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ecr-cost-optimization",
     "category": "AWS",
     "slug": "aws-ecr-cost-optimization"
@@ -389,7 +389,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate CloudWatch alarm count (avoid alarm sprawl)",
-    "description": "How to estimate your CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.",
+    "description": "How to estimate CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.",
     "canonicalPath": "/guides/aws-cloudwatch-alarms-estimate-alarm-count",
     "category": "AWS",
     "slug": "aws-cloudwatch-alarms-estimate-alarm-count"
@@ -424,7 +424,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate email volume per month (transactional + marketing)",
-    "description": "How to estimate monthly email volume for SES cost models: from user actions, campaigns, and retry factors. Includes a fast model and sanity checks.",
+    "description": "How to estimate monthly email volume for SES cost models: from user actions, campaigns, and retry factors. Includes a fast model, sanity checks, and validation tips.",
     "canonicalPath": "/guides/aws-ses-estimate-email-volume",
     "category": "AWS",
     "slug": "aws-ses-estimate-email-volume"
@@ -438,21 +438,21 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate KMS requests per month (where they come from)",
-    "description": "How to estimate AWS KMS request volume for cost models: from metrics and logs, and how to identify the biggest request drivers across services.",
+    "description": "How to estimate AWS KMS request volume for cost models: measure and scale, then break down by top callers and operations. Includes validation tips and common pitfalls.",
     "canonicalPath": "/guides/aws-kms-estimate-requests",
     "category": "AWS",
     "slug": "aws-kms-estimate-requests"
   },
   {
     "title": "Estimate Logs Insights scanned GB (quick methods)",
-    "description": "Practical ways to estimate Logs Insights scan volume: from query metrics, from typical query patterns, and from dataset size and time ranges.",
+    "description": "Practical ways to estimate Logs Insights scan volume: from query metrics, from typical query patterns, and from dataset size and time ranges. Includes validation tips and common pitfalls.",
     "canonicalPath": "/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb",
     "category": "AWS",
     "slug": "aws-cloudwatch-logs-insights-estimate-scanned-gb"
   },
   {
     "title": "Estimate NAT Gateway GB processed (quick methods)",
-    "description": "Practical ways to estimate NAT Gateway GB processed per month: from metrics/flow logs, from Mbps charts, and from common traffic sources.",
+    "description": "Practical ways to estimate NAT Gateway GB processed per month: from metrics/flow logs, from Mbps charts, and from common traffic sources. Includes validation tips.",
     "canonicalPath": "/guides/aws-nat-gateway-estimate-gb-processed",
     "category": "AWS",
     "slug": "aws-nat-gateway-estimate-gb-processed"
@@ -536,7 +536,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Glacier/Deep Archive cost optimization (reduce restores and requests)",
-    "description": "A practical playbook to reduce archival storage costs: reduce restores, reduce small-object request volume, and avoid minimum duration penalties.",
+    "description": "A practical playbook to reduce archival storage costs: reduce restores, reduce small-object request volume, and avoid minimum duration penalties. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-s3-glacier-cost-optimization",
     "category": "AWS",
     "slug": "aws-s3-glacier-cost-optimization"
@@ -557,7 +557,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "KMS cost optimization (reduce request volume safely)",
-    "description": "A practical playbook to reduce AWS KMS costs: reduce request volume in hot paths, fix retry loops, and keep crypto patterns safe.",
+    "description": "A practical playbook to reduce AWS KMS costs: reduce request volume in hot paths, fix retry loops, and keep crypto patterns safe. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-kms-cost-optimization",
     "category": "AWS",
     "slug": "aws-kms-cost-optimization"
@@ -613,7 +613,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "NAT Gateway cost optimization (high-leverage fixes)",
-    "description": "A short playbook to reduce NAT Gateway spend: avoid NAT for common services, reduce image pulls, and keep traffic private where possible.",
+    "description": "A practical playbook to reduce NAT Gateway spend: reduce GB processed, avoid NAT for common services, and remove traffic amplification patterns. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-nat-gateway-cost-optimization",
     "category": "AWS",
     "slug": "aws-nat-gateway-cost-optimization"
@@ -634,7 +634,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Parameter Store cost optimization (reduce API calls safely)",
-    "description": "A high-leverage playbook to reduce SSM Parameter Store costs: cache parameters, reduce churn-driven fetches, and avoid per-request lookups.",
+    "description": "A high-leverage playbook to reduce SSM Parameter Store costs: cache parameters, reduce churn-driven fetches, and avoid per-request lookups. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ssm-parameter-store-cost-optimization",
     "category": "AWS",
     "slug": "aws-ssm-parameter-store-cost-optimization"
@@ -676,7 +676,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Route 53 cost optimization (reduce query volume and zone sprawl)",
-    "description": "A practical playbook to reduce Route 53 costs: reduce DNS query volume, fix low TTL defaults, and avoid zone sprawl across environments.",
+    "description": "A practical playbook to reduce Route 53 costs: reduce DNS query volume, fix low TTL defaults, and avoid hosted zone sprawl across environments. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-route-53-cost-optimization",
     "category": "AWS",
     "slug": "aws-route-53-cost-optimization"
@@ -732,7 +732,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Secrets Manager cost optimization (reduce API calls safely)",
-    "description": "A high-leverage playbook to reduce Secrets Manager costs: cache secrets, avoid per-request lookups, and reduce churn-driven fetches.",
+    "description": "A high-leverage playbook to reduce Secrets Manager costs: cache secrets, avoid per-request lookups, and reduce churn-driven fetches. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-secrets-manager-cost-optimization",
     "category": "AWS",
     "slug": "aws-secrets-manager-cost-optimization"
@@ -746,7 +746,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "SES cost optimization (reduce volume, retries, and payload)",
-    "description": "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms.",
+    "description": "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-ses-cost-optimization",
     "category": "AWS",
     "slug": "aws-ses-cost-optimization"
@@ -760,7 +760,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "SNS cost optimization (reduce deliveries and retries)",
-    "description": "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms.",
+    "description": "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-sns-cost-optimization",
     "category": "AWS",
     "slug": "aws-sns-cost-optimization"

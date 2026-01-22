@@ -3,27 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "SNS cost optimization (reduce deliveries and retries)";
 const description =
-  "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms.";
+  "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the biggest lever for SNS cost?",
+    a: "Reduce deliveries: lower fan-out, use filter policies, and avoid broadcasting to many endpoints when only a subset needs the message.",
+  },
+  {
+    q: "How do I prevent incident-driven SNS cost spikes?",
+    a: "Control alert storms (dedupe, rate limit) and fix delivery failures that trigger retries. Treat high retry volume as both a reliability and cost incident.",
+  },
+  {
+    q: "What commonly increases deliveries?",
+    a: "High fan-out topics, duplicated notifications, and retries to failing endpoints. A small failure rate at high volume can create a large delivery count.",
+  },
+  {
+    q: "How do I validate optimizations?",
+    a: "Track publishes, deliveries, and retry rate before/after. Validate that filtering and topic splits do not break consumers.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-sns-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the biggest lever for SNS cost?",
-      a: "Reduce deliveries: lower fan-out, use filter policies, and avoid broadcasting to many endpoints when only a subset needs the message.",
-    },
-    {
-      q: "How do I prevent incident-driven SNS cost spikes?",
-      a: "Control alert storms (dedupe, rate limit) and fix delivery failures that trigger retries. Treat high retry volume as both a reliability and cost incident.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    SNS costs scale mainly with <strong>deliveries</strong>. The best savings come from reducing unnecessary fan-out and
-    preventing retries during failures.
+  <p class="muted">
+    SNS costs scale mainly with deliveries. The best savings come from reducing unnecessary fan-out and preventing
+    retries during failures.
   </p>
 
   <h2>1) Reduce fan-out and unnecessary deliveries</h2>
@@ -46,10 +55,19 @@ const description =
     <li>Group alerts by incident window instead of per-event notifications.</li>
   </ul>
 
-  <h2>Quantify changes</h2>
-  <p>
-    Use <a href="/calculators/aws-sns-cost-calculator/">SNS Cost Calculator</a> to estimate savings from reduced publishes,
-    deliveries, or payload sizes.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate fan-out: average subscribers per publish after filter policies.</li>
+    <li>Track retry rate and endpoint failures; address failures before scaling up.</li>
+    <li>After changes, confirm consumers still receive required events.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-sns-cost-calculator/">SNS cost</a>
+    <a class="btn" href="/guides/aws-sns-pricing/">SNS pricing</a>
+    <a class="btn" href="/guides/aws-sns-estimate-deliveries/">Estimate deliveries</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
 </GuideLayout>
 

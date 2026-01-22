@@ -4,26 +4,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Estimate Glacier/Deep Archive retrieval volume (GB and requests)";
 const description =
   "How to estimate archival retrieval costs: model GB restored per month and the number of objects retrieved (requests), plus common drivers like restores, rehydration, and analytics.";
+const faqs = [
+  {
+    q: "What's the fastest way to estimate retrieval GB/month?",
+    a: "Start with expected restores per month x average restore size. If restores are triggered by analytics jobs, use job frequency x data restored per job.",
+  },
+  {
+    q: "How do I estimate retrieval requests?",
+    a: "Requests roughly track objects retrieved. If you retrieve 1,000,000 objects in a month, model about 1,000,000 retrieval requests (adjust for your tooling and batching).",
+  },
+  {
+    q: "Why do retrieval bills spike?",
+    a: "Backfills and audits can restore large volumes in a short time. Many small-object restores can also create large request counts even if GB is modest.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Use a representative window of restore jobs (counts and sizes), then compare against actual restore logs or billing once available.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-estimate-retrieval"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest way to estimate retrieval GB/month?",
-      a: "Start with expected restores per month x average restore size. If restores are triggered by analytics jobs, use job frequency x data scanned/restored.",
-    },
-    {
-      q: "How do I estimate retrieval requests?",
-      a: "Requests roughly track objects retrieved. If you retrieve 1,000,000 objects in a month, you should model about 1,000,000 retrieval requests (adjust for your tooling).",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    Retrieval cost is often the surprise with archival storage. Model both <strong>GB retrieved</strong> and <strong>request
-    count</strong> (objects retrieved).
+  <p class="muted">
+    Retrieval cost is often the surprise with archival storage. Model both GB retrieved and request count (objects
+    retrieved). The same GB retrieved can have very different cost depending on whether it is a few large objects or
+    millions of small objects.
   </p>
 
   <h2>Method 1: From restore events</h2>
@@ -35,13 +45,14 @@ const description =
   <h2>Method 2: From analytics workflows</h2>
   <ul>
     <li>If you rehydrate archives for analytics, model job frequency x data restored.</li>
-    <li>Large-scale backfills can dominate a single month’s cost.</li>
+    <li>Large-scale backfills can dominate a single month's cost.</li>
   </ul>
 
   <h2>Sanity checks</h2>
   <ul>
     <li>Many small objects can create very high request counts.</li>
     <li>Batching and packaging data into larger objects can reduce request charges.</li>
+    <li>Repeated rehydration suggests you may need a warmer tier or cached analysis copy.</li>
   </ul>
 
   <h2>Turn retrieval into cost</h2>
@@ -49,5 +60,13 @@ const description =
     Use <a href="/calculators/aws-s3-glacier-cost-calculator/">AWS S3 Glacier / Deep Archive Cost Calculator</a> with your
     retrieval GB/month and retrieval requests/month assumptions.
   </p>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-s3-glacier-pricing/">Archive pricing</a>
+    <a class="btn" href="/guides/aws-s3-glacier-cost-optimization/">Reduce archive costs</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Archive cost tool</a>
+  </div>
 </GuideLayout>
 

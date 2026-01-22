@@ -3,45 +3,55 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate KMS requests per month (where they come from)";
 const description =
-  "How to estimate AWS KMS request volume for cost models: from metrics and logs, and how to identify the biggest request drivers across services.";
+  "How to estimate AWS KMS request volume for cost models: measure and scale, then break down by top callers and operations. Includes validation tips and common pitfalls.";
+const faqs = [
+  {
+    q: "Why is KMS request estimation tricky?",
+    a: "Because many services generate KMS requests indirectly. Your app may not call KMS directly, but encrypted storage, databases, or secrets access can still generate significant KMS traffic.",
+  },
+  {
+    q: "What's the fastest path to a number?",
+    a: "Measure total KMS requests over a representative window and scale to monthly. Then break it down by top callers and operations.",
+  },
+  {
+    q: "What are common spike drivers?",
+    a: "Retries/timeouts, cold starts, pod churn, and per-request Decrypt patterns. High-QPS services can generate large request volume quickly.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Compare the estimated requests/month against billing/metrics for a real week, and confirm the top callers and operations match your architecture.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-kms-estimate-requests"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "Why is KMS request estimation tricky?",
-      a: "Because many services generate KMS requests indirectly. Your app may not call KMS directly, but encrypted storage, databases, or secrets access can still generate significant KMS traffic.",
-    },
-    {
-      q: "What’s the fastest path to a number?",
-      a: "Use a measured baseline: capture total KMS requests over a representative window and scale to monthly. Then break it down by top callers and operations.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    The biggest driver of KMS cost is usually <strong>request volume</strong>. Start with a measured total, then find the
-    biggest call sites.
+  <p class="muted">
+    The biggest driver of KMS cost is usually request volume. Start with a measured total, then identify the biggest
+    call sites so you know where optimization actually matters.
   </p>
 
-  <h2>Method 1: Measure and scale</h2>
+  <h2>Method 1: Measure and scale (best)</h2>
   <ul>
-    <li>Measure total KMS requests over 7/30 days and scale to monthly.</li>
+    <li>Measure total KMS requests over 7 or 30 days and scale to monthly.</li>
     <li>Separate by account/region if you have multiple deployments.</li>
+    <li>Prefer a representative window (avoid incident spikes).</li>
   </ul>
 
   <h2>Method 2: Break down by caller</h2>
   <ul>
-    <li>Identify top callers (applications, services, or roles) and their request rates.</li>
+    <li>Identify top callers (applications, services, roles) and their request rates.</li>
     <li>Look for hot paths: per-request crypto, secrets fetched on every request, or frequent re-encryption operations.</li>
   </ul>
 
   <h2>Method 3: Sanity checks</h2>
   <ul>
     <li>Retry loops and timeouts can multiply KMS calls.</li>
-    <li>High QPS services calling Decrypt frequently can dominate total requests.</li>
+    <li>High-QPS services calling Decrypt frequently can dominate total requests.</li>
     <li>Per-object or per-record encryption in tight loops creates large request volume.</li>
   </ul>
 
@@ -50,5 +60,13 @@ const description =
     Use <a href="/calculators/aws-kms-cost-calculator/">AWS KMS Cost Calculator</a> with your measured requests/month and
     effective $ per 10k requests.
   </p>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-kms-pricing/">KMS pricing</a>
+    <a class="btn" href="/guides/aws-kms-cost-optimization/">KMS optimization</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 

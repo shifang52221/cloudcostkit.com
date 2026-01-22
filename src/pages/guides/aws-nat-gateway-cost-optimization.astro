@@ -3,57 +3,71 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "NAT Gateway cost optimization (high-leverage fixes)";
 const description =
-  "A short playbook to reduce NAT Gateway spend: avoid NAT for common services, reduce image pulls, and keep traffic private where possible.";
+  "A practical playbook to reduce NAT Gateway spend: reduce GB processed, avoid NAT for common services, and remove traffic amplification patterns. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the fastest way to reduce NAT Gateway cost?",
+    a: "Reduce GB processed through NAT by keeping traffic private (endpoints/private access) and cutting large recurring downloads.",
+  },
+  {
+    q: "Why do container image pulls matter?",
+    a: "Large images pulled frequently by nodes behind NAT can drive high GB processed, which increases NAT processing charges.",
+  },
+  {
+    q: "Why do NAT bills spike during incidents?",
+    a: "Retries/timeouts can multiply traffic to external APIs, and autoscaling can trigger large downloads (images/updates). Both increase GB processed quickly.",
+  },
+  {
+    q: "What should I measure first?",
+    a: "Gateway-hours and GB processed. If GB processed is high, focus on traffic sources and private connectivity. If hours are high, focus on architecture and consolidation.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-nat-gateway-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest way to reduce NAT Gateway cost?",
-      a: "Reduce GB processed through NAT by keeping traffic private (endpoints/private access) and cutting large recurring downloads.",
-    },
-    {
-      q: "Why do container image pulls matter?",
-      a: "Large images pulled frequently by nodes behind NAT can drive high GB processed, which increases NAT processing charges.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
-    NAT Gateway spend is often “invisible” until it becomes a big line item. The good news is the cost drivers are
+    NAT Gateway spend is often invisible until it becomes a big line item. The good news is the cost drivers are
     straightforward: gateway-hours and GB processed.
   </p>
 
   <h2>1) Keep traffic private whenever possible</h2>
   <ul>
-    <li>Use private connectivity/endpoints for common services where available.</li>
+    <li>Use VPC endpoints / private connectivity for common services where available.</li>
     <li>Avoid routing internal or in-region traffic through NAT.</li>
+    <li>Prefer private subnets with endpoints over "everything goes out through NAT".</li>
   </ul>
 
   <h2>2) Reduce large recurring downloads</h2>
   <ul>
-    <li>Cache OS/package updates.</li>
+    <li>Cache OS/package updates where practical.</li>
     <li>Cache or pre-pull container images; reduce image size.</li>
-    <li>Avoid repeated downloads in auto-scaling events.</li>
+    <li>Avoid repeated downloads during autoscaling events.</li>
   </ul>
 
   <h2>3) Fix retry storms and noisy egress</h2>
-  <p>
-    Retries multiply traffic. Timeouts and aggressive retries to external APIs can drive GB processed faster than you
-    expect.
-  </p>
+  <ul>
+    <li>Retries multiply GB processed. Fix timeouts and aggressive retry policies.</li>
+    <li>Identify top external destinations (APIs/SaaS) and validate their traffic volume.</li>
+  </ul>
 
-  <h2>4) Validate with a calculator</h2>
-  <p>
-    Use <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a> to see how reducing GB
-    processed changes monthly cost.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Measure GB processed from NAT metrics or flow logs for a representative week.</li>
+    <li>Identify the top 3 traffic sources (images, updates, external APIs, logging).</li>
+    <li>After changes, confirm reduced GB processed and stable application behavior.</li>
+  </ul>
 
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-nat-gateway-cost/">Why NAT bills spike</a>,{" "}
-    <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
-  </p>
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate GB processed</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints optimization</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+  </div>
 </GuideLayout>
 

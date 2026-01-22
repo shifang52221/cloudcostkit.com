@@ -3,45 +3,57 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Glacier/Deep Archive cost optimization (reduce restores and requests)";
 const description =
-  "A practical playbook to reduce archival storage costs: reduce restores, reduce small-object request volume, and avoid minimum duration penalties.";
+  "A practical playbook to reduce archival storage costs: reduce restores, reduce small-object request volume, and avoid minimum duration penalties. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the biggest lever for archive storage cost?",
+    a: "Reduce retrieval frequency and retrieval volume. Storage is cheap, but repeated restores and rehydration can make retrieval dominate total cost.",
+  },
+  {
+    q: "How do I reduce retrieval request charges?",
+    a: "Store fewer, larger objects (where appropriate) and batch retrieval work. Many tiny-object restores can create huge request counts.",
+  },
+  {
+    q: "When do minimum duration fees matter?",
+    a: "When data is short-lived or overwritten frequently. Early deletion penalties can erase the apparent savings of cold tiers.",
+  },
+  {
+    q: "How do I validate the optimization?",
+    a: "Measure restore volume and request counts before/after, and confirm that the workflow still meets SLA (restore time and usability).",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the biggest lever for archive storage cost?",
-      a: "Reduce retrieval frequency and retrieval volume. Storage is cheap, but repeated restores and rehydration can make retrieval dominate total cost.",
-    },
-    {
-      q: "How do I reduce retrieval request charges?",
-      a: "Store fewer, larger objects (where appropriate) and batch retrieval work. Many tiny-object restores can create huge request counts.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    Archive storage is optimized for <strong>rare reads</strong>. If you frequently restore, you may be better served by a
-    warmer tier or by changing workflow patterns.
+  <p class="muted">
+    Archive storage is optimized for rare reads. If you frequently restore, you may be better served by a warmer tier or
+    by changing workflow patterns so you do fewer restores.
   </p>
 
   <h2>1) Reduce restores and rehydration</h2>
   <ul>
     <li>Cache restored datasets for a short time instead of re-restoring repeatedly.</li>
     <li>For frequent analytics, consider a warmer storage class or a separate analysis copy.</li>
+    <li>Avoid restoring "just in case" - restore based on explicit demand.</li>
   </ul>
 
   <h2>2) Reduce small-object request volume</h2>
   <ul>
     <li>Package small files into larger objects when it fits the access pattern.</li>
     <li>Batch retrieval and avoid per-file interactive restores.</li>
+    <li>Prefer workflows that read sequentially from fewer objects.</li>
   </ul>
 
   <h2>3) Avoid minimum duration penalties</h2>
   <ul>
     <li>Be mindful of minimum storage duration rules when deleting/overwriting.</li>
     <li>Use lifecycle policies intentionally to avoid churn-driven early deletion.</li>
+    <li>Keep short-lived data out of tiers with long minimum duration.</li>
   </ul>
 
   <h2>Quantify changes</h2>
@@ -49,5 +61,13 @@ const description =
     Use <a href="/calculators/aws-s3-glacier-cost-calculator/">S3 Glacier / Deep Archive Cost Calculator</a> to estimate
     savings from fewer restores or fewer retrieval requests.
   </p>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Archive cost tool</a>
+    <a class="btn" href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate retrieval</a>
+    <a class="btn" href="/guides/aws-s3-glacier-pricing/">Archive pricing</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+  </div>
 </GuideLayout>
 

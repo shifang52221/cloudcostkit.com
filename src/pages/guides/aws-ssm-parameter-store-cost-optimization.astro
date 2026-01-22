@@ -3,27 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Parameter Store cost optimization (reduce API calls safely)";
 const description =
-  "A high-leverage playbook to reduce SSM Parameter Store costs: cache parameters, reduce churn-driven fetches, and avoid per-request lookups.";
+  "A high-leverage playbook to reduce SSM Parameter Store costs: cache parameters, reduce churn-driven fetches, and avoid per-request lookups. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the biggest lever for Parameter Store cost?",
+    a: "Reduce API calls. Most spend is request-driven, especially from repeated GetParameter calls in hot paths or during churn events.",
+  },
+  {
+    q: "How do I reduce calls without risking stale config?",
+    a: "Cache with a reasonable TTL, reload on deploy, and implement a safe refresh mechanism. Avoid fetching on every request unless strictly necessary.",
+  },
+  {
+    q: "Why do costs spike in Kubernetes and serverless?",
+    a: "Pod churn and cold starts can trigger many fetches. If each instance fetches multiple parameters, request volume scales quickly.",
+  },
+  {
+    q: "How do I validate the optimization?",
+    a: "Track API calls/day before/after and confirm configuration refresh still works as expected (deploy reloads, TTL refresh, and rotation events).",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ssm-parameter-store-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the biggest lever for Parameter Store cost?",
-      a: "Reduce API calls. Most spend is request-driven, especially from repeated GetParameter calls in hot paths or during churn events.",
-    },
-    {
-      q: "How do I reduce calls without risking stale config?",
-      a: "Cache with a reasonable TTL, reload on deploy, and implement a safe refresh mechanism. Avoid fetching on every request unless strictly necessary.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    Parameter Store cost reduction is mostly about reducing <strong>GetParameter</strong> volume while keeping configuration
-    handling safe and reliable.
+  <p class="muted">
+    Parameter Store cost reduction is mostly about reducing GetParameter volume while keeping configuration handling safe
+    and reliable.
   </p>
 
   <h2>1) Cache parameters</h2>
@@ -45,10 +54,19 @@ const description =
     <li>Fix retry loops that multiply fetches during incidents.</li>
   </ul>
 
-  <h2>Quantify impact</h2>
-  <p>
-    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store Cost Calculator</a> to estimate
-    savings from fewer API calls or fewer advanced parameters.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Measure API calls/day for a representative week, then compare after changes.</li>
+    <li>Confirm refresh behavior: deploy reload, TTL refresh, and manual rotations.</li>
+    <li>Confirm failure modes: if Parameter Store is throttled, do you degrade safely?</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store cost</a>
+    <a class="btn" href="/guides/aws-ssm-parameter-store-estimate-api-calls/">Estimate API calls</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 

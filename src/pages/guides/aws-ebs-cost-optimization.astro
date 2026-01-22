@@ -3,51 +3,72 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS EBS cost optimization (high-leverage fixes)";
 const description =
-  "A short playbook to reduce EBS spend: right-size volumes, avoid over-provisioned IOPS/throughput, and manage snapshots intentionally.";
+  "A practical playbook to reduce EBS spend: right-size volumes, avoid over-provisioned IOPS/throughput, and manage snapshots intentionally. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the fastest way to cut EBS cost?",
+    a: "Right-size volume GB and remove over-provisioned IOPS/throughput. These changes reduce recurring spend immediately.",
+  },
+  {
+    q: "Can snapshots create recurring costs?",
+    a: "Yes. Snapshot storage becomes a steady monthly cost if retention is long or data churn is high.",
+  },
+  {
+    q: "Why do teams overpay for EBS performance?",
+    a: "They provision for peak 24/7. Peaks are often rare (backups, migrations, batch). Validate performance needs with real metrics before paying for permanent high IOPS/throughput.",
+  },
+  {
+    q: "How do I validate that rightsizing is safe?",
+    a: "Use a staged approach: shrink/adjust non-critical volumes first, validate latency and queue depth, and keep rollback options (snapshots/AMIs) for critical workloads.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-cost-optimization"
-  lastUpdated="2026-01-20"
-  faqs={[
-    {
-      q: "What’s the fastest way to cut EBS cost?",
-      a: "Right-size volume GB and remove over-provisioned IOPS/throughput. These changes reduce recurring spend immediately.",
-    },
-    {
-      q: "Can snapshots create recurring costs?",
-      a: "Yes. Snapshot storage can become a steady monthly cost if retention is long or data churn is high.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
-    EBS spend is usually “quiet but constant”. Small over-provisioning across many volumes becomes a big monthly bill.
+    EBS spend is often quiet but constant. Small over-provisioning across many volumes becomes a large monthly bill. The
+    best savings come from right-sizing capacity and paying for performance only where it is actually needed.
   </p>
 
   <h2>1) Right-size GB first</h2>
-  <p>
-    Identify volumes with low utilization and reduce size where safe. If you grow storage steadily, forecast it so you
-    don’t over-provision far ahead.
-  </p>
+  <ul>
+    <li>Identify volumes with low utilization and reduce size where safe.</li>
+    <li>Forecast growth so you don't over-provision far ahead.</li>
+    <li>Remove unused volumes left behind by old instances and experiments.</li>
+  </ul>
 
   <h2>2) Avoid paying for unused performance</h2>
-  <p>
-    If your volume type bills for provisioned IOPS/throughput, compare provisioned values to actual usage. Many teams pay
-    for peak performance 24/7 even though peaks are rare.
-  </p>
+  <ul>
+    <li>Compare provisioned IOPS/throughput to actual usage.</li>
+    <li>Keep a typical and peak scenario (peaks are often batch or maintenance windows).</li>
+    <li>Reduce provisioned performance and validate latency/queue depth.</li>
+  </ul>
 
   <h2>3) Treat snapshots as a policy, not a default</h2>
   <ul>
     <li>Set retention intentionally (keep only what you need).</li>
-    <li>Reduce churn (avoid rewriting large files daily if possible).</li>
-    <li>Audit snapshot policies and clean up unused snapshots.</li>
+    <li>Reduce churn where possible (churn drives snapshot growth).</li>
+    <li>Audit policies and clean up unused snapshots.</li>
   </ul>
 
-  <h2>4) Use a calculator to identify the biggest lever</h2>
-  <p>
-    Use <a href="/calculators/aws-ebs-cost-calculator/">AWS EBS Cost Calculator</a> to see whether storage or performance
-    charges dominate for your scenario, then optimize the right knob.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate storage utilization, IOPS, throughput, and latency for a representative week.</li>
+    <li>Compare peak windows (backups/migrations) separately from steady state.</li>
+    <li>After changes, confirm application SLOs and storage latency remain stable.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost</a>
+    <a class="btn" href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS/throughput</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+  </div>
 </GuideLayout>
 

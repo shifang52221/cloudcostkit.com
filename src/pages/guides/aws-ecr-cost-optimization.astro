@@ -3,27 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "ECR cost optimization (retention, smaller images, fewer pulls)";
 const description =
-  "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters.";
+  "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the biggest lever to reduce ECR cost?",
+    a: "Retention policies. Deleting old tags/images usually reduces stored GB-month more than any other change.",
+  },
+  {
+    q: "How can pulls create hidden costs?",
+    a: "Frequent CI pulls and cold starts can create large transfer volume, especially across billable network paths. Reducing redundant pulls and keeping traffic in-region can help.",
+  },
+  {
+    q: "Why do ECR bills spike?",
+    a: "CI rebuild frequency and tag retention. If pipelines push many images/day and retention is long, storage grows quickly. Multi-arch duplication can also add storage.",
+  },
+  {
+    q: "How do I validate improvements?",
+    a: "Measure stored GB-month and pull traffic for a representative week. After retention/image changes, confirm storage and pulls drop without breaking rollback needs.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecr-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the biggest lever to reduce ECR cost?",
-      a: "Retention policies. Deleting old tags/images usually reduces stored GB-month more than any other change.",
-    },
-    {
-      q: "How can pulls create hidden costs?",
-      a: "Frequent CI pulls and cold starts can create large transfer volume, especially across billable network paths. Reducing redundant pulls and keeping traffic in-region can help.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    ECR cost reduction is mostly about <strong>reducing stored GB-month</strong> and avoiding unnecessary transfer. The
-    highest impact changes are operational, not micro-optimizations.
+  <p class="muted">
+    ECR cost reduction is mostly about reducing stored GB-month and avoiding unnecessary transfer. The highest impact
+    changes are operational, not micro-optimizations.
   </p>
 
   <h2>1) Enforce retention policies</h2>
@@ -47,10 +56,19 @@ const description =
     <li>Use immutable tags/digests to avoid accidental cache misses.</li>
   </ul>
 
-  <h2>Quantify savings</h2>
-  <p>
-    Use <a href="/calculators/aws-ecr-cost-calculator/">AWS ECR Cost Calculator</a> to estimate savings from reducing stored
-    GB-month or egress GB/month.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Measure stored GB-month by repo and confirm retention is actually deleting.</li>
+    <li>Measure pull traffic: CI and autoscaling events often dominate.</li>
+    <li>Confirm rollback behavior still works after reducing retention.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost</a>
+    <a class="btn" href="/guides/aws-ecr-estimate-storage-gb-month/">Estimate storage GB-month</a>
+    <a class="btn" href="/guides/aws-ecr-pricing/">ECR pricing</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
 </GuideLayout>
 

@@ -3,27 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "EBS gp3 IOPS and throughput (how to budget)";
 const description =
-  "How to think about gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and the common mistakes in estimates.";
+  "How to budget gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and common mistakes in estimates. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "Should I always provision high IOPS/throughput?",
+    a: "No. Provision only what you need. Over-provisioned performance is one of the most common sources of unnecessary EBS spend.",
+  },
+  {
+    q: "What should I do if I don't know my IOPS needs?",
+    a: "Start with a baseline (typical + peak), then measure IOPS and throughput in production. Use the measured peak window to adjust your budget and provisioning.",
+  },
+  {
+    q: "Why do gp3 estimates go wrong?",
+    a: "Because teams provision peak performance 24/7. Peaks are often rare (backups, batch jobs, migrations). Budget with separate scenarios and validate with real metrics.",
+  },
+  {
+    q: "How do I validate gp3 performance settings?",
+    a: "Compare provisioned IOPS/throughput to actual utilization and latency. If utilization is consistently low, you can usually reduce provisioned values safely.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-gp3-iops-throughput"
-  lastUpdated="2026-01-20"
-  faqs={[
-    {
-      q: "Should I always provision high IOPS/throughput?",
-      a: "No. Provision only what you need for the workload. Over-provisioned performance is a common source of unnecessary spend.",
-    },
-    {
-      q: "What should I do if I don't know my IOPS needs?",
-      a: "Start with a baseline estimate, then measure IOPS and throughput in production. Budget a low/high scenario to understand sensitivity.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
-    gp3 makes it easy to pay for performance you don’t use. Budgeting is simpler if you treat performance as a separate
-    knob from storage.
+    gp3 makes it easy to pay for performance you don't use. Budgeting is simpler if you treat performance as a separate
+    knob from storage, and validate with measured IOPS/throughput once the workload runs.
   </p>
 
   <h2>1) Separate storage from performance</h2>
@@ -34,18 +43,25 @@ const description =
   </ul>
 
   <h2>2) Budget with two scenarios</h2>
-  <p>
-    Create a “typical” scenario and a “peak” scenario. Peak periods (batch jobs, backups, migrations) can require higher
-    throughput and IOPS.
-  </p>
+  <ul>
+    <li><strong>Typical</strong>: steady-state throughput and IOPS.</li>
+    <li><strong>Peak</strong>: batch jobs, backups, migrations, reindexing, or high-traffic events.</li>
+    <li>Do not pay peak 24/7 unless the workload is truly always at peak.</li>
+  </ul>
 
-  <h2>3) Use a calculator to sanity-check</h2>
-  <p>
-    Use <a href="/calculators/aws-ebs-cost-calculator/">AWS EBS Cost Calculator</a> and set IOPS/throughput prices to $0
-    if they don't apply to your chosen volume type.
-  </p>
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>,{" "}
-    <a href="/guides/aws-ebs-pricing/">EBS pricing</a>.
-  </p>
+  <h2>3) Validate with metrics (the part that prevents waste)</h2>
+  <ul>
+    <li>Compare actual IOPS and throughput against provisioned values.</li>
+    <li>Track latency and queue depth for the workload's peak window.</li>
+    <li>If utilization stays low, reduce provisioned performance and re-check latency.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
+    <a class="btn" href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3</a>
+    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
+    <a class="btn" href="/guides/aws-ebs-cost-optimization/">EBS cost optimization</a>
+  </div>
 </GuideLayout>
+

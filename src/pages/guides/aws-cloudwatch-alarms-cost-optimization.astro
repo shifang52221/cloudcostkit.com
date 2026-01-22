@@ -3,27 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "CloudWatch alarms cost optimization (reduce alarm sprawl)";
 const description =
-  "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage.";
+  "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the biggest lever to reduce alarm charges?",
+    a: "Reduce the number of alarms you maintain: remove duplicates, consolidate per-service alarms, and avoid per-tenant/per-pod alarms where a higher-level SLO alarm is sufficient.",
+  },
+  {
+    q: "When do high-resolution alarms make sense?",
+    a: "Use them sparingly for the few signals that truly require fast detection. For most metrics, a 1-minute period is enough and cheaper.",
+  },
+  {
+    q: "Why do alarm counts grow unexpectedly?",
+    a: "Alarm sprawl: teams duplicate alarms across environments, create per-entity alarms, and forget to delete alarms when services are retired.",
+  },
+  {
+    q: "How do I validate alarm reductions are safe?",
+    a: "Track alert outcomes (missed incidents vs noise), keep core SLO alarms, and validate coverage for critical user journeys and dependencies.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the biggest lever to reduce alarm charges?",
-      a: "Reduce the number of alarms you maintain: remove duplicates, consolidate per-service alarms, and avoid per-tenant/per-pod alarms where a higher-level SLO alarm is sufficient.",
-    },
-    {
-      q: "When do high-resolution alarms make sense?",
-      a: "Use them sparingly for the few signals that truly require fast detection. For most metrics, a 1-minute period is enough and cheaper.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    Alarm charges are usually linear in <strong>alarm count</strong>. The best savings come from controlling alarm
-    sprawl, especially across environments and auto-scaled resources.
+  <p class="muted">
+    Alarm charges are usually linear in alarm count. The best savings come from controlling alarm sprawl, especially
+    across environments and auto-scaled resources.
   </p>
 
   <h2>1) Reduce duplicates and dead alarms</h2>
@@ -35,19 +44,28 @@ const description =
   <h2>2) Avoid per-entity alarms</h2>
   <ul>
     <li>Prefer SLO-based alarms over per-pod/per-tenant alarms where possible.</li>
-    <li>Aggregate metrics before alarming (e.g., fleet-level error rate).</li>
+    <li>Aggregate metrics before alarming (for example, fleet-level error rate).</li>
   </ul>
 
   <h2>3) Right-size high-resolution usage</h2>
   <ul>
-    <li>Downgrade high-resolution alarms that don’t need fast evaluation.</li>
-    <li>Use composite alarms to reduce alert noise (but model their own cost).</li>
+    <li>Downgrade high-resolution alarms that don't need fast evaluation.</li>
+    <li>Use composite alarms to reduce alert noise (and model their cost).</li>
   </ul>
 
-  <h2>Quantify the impact</h2>
-  <p>
-    Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">CloudWatch Alarms Cost Calculator</a> to estimate
-    savings from reducing alarm count or high-resolution usage.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Inventory alarm count by environment and type (standard vs high-resolution vs composite).</li>
+    <li>Remove duplicates, then validate incident coverage against core SLOs.</li>
+    <li>Track noise: alert frequency and false positives should go down after consolidation.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarms cost</a>
+    <a class="btn" href="/guides/aws-cloudwatch-alarms-estimate-alarm-count/">Estimate alarm count</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>
+    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics optimization</a>
+  </div>
 </GuideLayout>
 

@@ -3,49 +3,75 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "DynamoDB RCU/WCU explained (for cost estimates)";
 const description =
-  "Understand how reads/writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates.";
+  "Understand how reads and writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "Why does item size matter for DynamoDB cost?",
+    a: "Capacity consumption is sensitive to item size. Larger items consume more read/write capacity and increase storage and transfer costs.",
+  },
+  {
+    q: "Do strongly consistent reads cost more?",
+    a: "They can consume more read capacity than eventually consistent reads. For estimates, model both scenarios if you are not sure.",
+  },
+  {
+    q: "What breaks DynamoDB estimates most often?",
+    a: "Hot partitions, retries/timeouts, and oversized items. These can multiply requests and capacity usage compared to the simple average model.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Measure real request rates and item sizes for a representative window, then compare predicted cost drivers against billing and throttling metrics.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-dynamodb-rcu-wcu-explained"
-  lastUpdated="2026-01-20"
-  faqs={[
-    {
-      q: "Why does item size matter for DynamoDB cost?",
-      a: "Capacity consumption is sensitive to item size. Larger items consume more read/write capacity and increase storage cost.",
-    },
-    {
-      q: "Do strongly consistent reads cost more?",
-      a: "They can consume more read capacity than eventually consistent reads. For estimates, model both scenarios if you aren’t sure.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
-    Even if you use on-demand pricing, it helps to understand RCU/WCU because the underlying driver is still “how much
-    work” the database does. The two most common estimate breakers are item size and hot partitions.
+    Even if you use on-demand pricing, it helps to understand RCU/WCU because the underlying driver is still how much
+    work the database does. The two most common estimate breakers are item size and hot partitions.
   </p>
 
   <h2>1) The two drivers: read work and write work</h2>
   <ul>
-    <li><strong>Reads</strong>: scale with request rate and item size.</li>
+    <li><strong>Reads</strong>: scale with request rate, item size, and consistency.</li>
     <li><strong>Writes</strong>: scale with write rate and item size.</li>
   </ul>
 
-  <h2>2) The practical approach for budgeting</h2>
-  <p>
-    If you don’t want to model RCUs/WCUs directly, estimate monthly read/write request volume and use an effective “$ per
-    1M read requests” and “$ per 1M write requests” that matches your region and plan.
-  </p>
-  <p>
-    Use <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a> for scenario planning.
+  <h2>2) Practical budgeting approach</h2>
+  <ul>
+    <li>Estimate monthly read and write request volume.</li>
+    <li>Estimate average item size (and consider a typical vs peak scenario).</li>
+    <li>Use a blended effective rate that matches your region and plan.</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a>
   </p>
 
   <h2>3) Common pitfalls that inflate cost</h2>
   <ul>
     <li><strong>Large items</strong>: bigger payloads increase both request cost and storage.</li>
-    <li><strong>Hot partitions</strong>: uneven access causes throttling/retries, which can multiply requests.</li>
+    <li><strong>Hot partitions</strong>: uneven access causes throttling and retries (more billable attempts).</li>
     <li><strong>Retries and timeouts</strong>: failures can turn 1 request into many billable attempts.</li>
+    <li><strong>Chatty access patterns</strong>: many small requests rather than batched reads/writes.</li>
   </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Measure request rates and item sizes for at least 7 days.</li>
+    <li>Check for hot keys/partitions and retry loops.</li>
+    <li>After changes, confirm throttling and retry volume drop.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-dynamodb-pricing/">DynamoDB pricing</a>
+    <a class="btn" href="/guides/aws-dynamodb-cost-optimization/">DynamoDB optimization</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 

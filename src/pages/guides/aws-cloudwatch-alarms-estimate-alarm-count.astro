@@ -3,27 +3,36 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate CloudWatch alarm count (avoid alarm sprawl)";
 const description =
-  "How to estimate your CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.";
+  "How to estimate CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.";
+const faqs = [
+  {
+    q: "Why do alarm counts grow unexpectedly?",
+    a: "Alarm sprawl: teams duplicate alarms across environments, create per-service or per-tenant alarms, and forget to delete alarms when services are retired.",
+  },
+  {
+    q: "Should I model peak alarms or average alarms?",
+    a: "Model alarm-months: the number of alarms that exist in the month. If alarms are created/destroyed automatically, use a representative average but validate the peak count.",
+  },
+  {
+    q: "What patterns create explosive alarm counts?",
+    a: "Per-pod/per-node alarms in Kubernetes, per-tenant alarms in multi-tenant systems, and one alarm per resource for auto-provisioned fleets.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Sample a few accounts/regions, count alarms by type, then extrapolate. Validate against the actual inventory once you have it.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-estimate-alarm-count"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "Why do alarm counts grow unexpectedly?",
-      a: "Alarm sprawl: teams duplicate alarms across environments, create per-service or per-tenant alarms, and forget to delete alarms when services are retired.",
-    },
-    {
-      q: "Should I model peak alarms or average alarms?",
-      a: "Model the maximum alarm count you maintain in the month (alarm-months). If alarms are created/destroyed automatically, use a representative average but validate the peak count.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    Alarm pricing is usually per-alarm-month, so you mainly need one number: <strong>how many alarms exist</strong> by
-    type.
+  <p class="muted">
+    Alarm pricing is usually per-alarm-month, so you mainly need one number: how many alarms exist by type. The goal is
+    not precision to the last alarm, but to avoid missing multiplicative patterns.
   </p>
 
   <h2>Step 1: Inventory by environment</h2>
@@ -41,7 +50,7 @@ const description =
 
   <h2>Step 3: Separate by alarm type</h2>
   <ul>
-    <li>Standard vs high-resolution vs composite (pricing can differ).</li>
+    <li>Standard vs high-resolution vs composite (pricing differs).</li>
     <li>Flag any high-resolution alarms that can be downgraded.</li>
   </ul>
 
@@ -50,5 +59,12 @@ const description =
     Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">AWS CloudWatch Alarms Cost Calculator</a> to translate
     counts into a monthly estimate using your $/alarm-month prices.
   </p>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-cloudwatch-alarms-cost-optimization/">Reduce alarm costs</a>
+    <a class="btn" href="/guides/aws-cloudwatch-alarms-pricing/">Alarm pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 

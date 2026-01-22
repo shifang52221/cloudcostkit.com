@@ -4,43 +4,52 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 const title = "Estimate DNS queries per month (Route 53 query volume)";
 const description =
   "How to estimate DNS query volume for Route 53 cost models: from metrics and logs, and what drives query spikes (TTL, retries, resolver behavior).";
+const faqs = [
+  {
+    q: "How do I convert queries/day to queries/month?",
+    a: "Queries/month ~ average queries/day x 30 (or multiply by days in the billing month). Use an average over a representative time window to smooth spikes.",
+  },
+  {
+    q: "What's the biggest driver of DNS query volume?",
+    a: "TTL and client behavior. Lower TTLs and chatty clients increase query volume. Incidents can also increase queries due to retries and repeated lookups.",
+  },
+  {
+    q: "Why do query counts spike during incidents?",
+    a: "Retries, timeouts, and service discovery churn can multiply lookups. Treat spikes as reliability signals, not just cost issues.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Use Route 53 query metrics or resolver logs for a representative week and scale to monthly, then compare against billing once available.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-estimate-dns-queries"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "How do I convert queries/day to queries/month?",
-      a: "Queries/month ≈ average queries/day x 30 (or multiply by days in the billing month). Use an average over a representative time window to smooth spikes.",
-    },
-    {
-      q: "What’s the biggest driver of DNS query volume?",
-      a: "TTL and client behavior. Lower TTLs and chatty clients increase query volume. Incidents can also increase queries due to retries and repeated lookups.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    DNS query charges are volume-based, so the key input is <strong>queries per month</strong>. The best estimates come
-    from measured query counts, not guesswork.
+  <p class="muted">
+    DNS query charges are volume-based, so the key input is queries per month. The best estimates come from measured
+    query counts, not guesswork.
   </p>
 
   <h2>Method 1: From Route 53 metrics</h2>
   <ul>
-    <li>Use query count metrics per hosted zone (or per record set if available) and roll up to a month.</li>
-    <li>Choose a window that represents typical load (e.g., last 30 days).</li>
+    <li>Use query count metrics per hosted zone and roll up to a month.</li>
+    <li>Choose a window that represents typical load (for example, last 30 days).</li>
   </ul>
 
   <h2>Method 2: From resolver logs</h2>
   <ul>
     <li>Count DNS requests from resolver logs, then roll up by day.</li>
-    <li>Segment by domain/service to identify the top query drivers.</li>
+    <li>Segment by domain/service to identify top query drivers.</li>
   </ul>
 
   <h2>Sanity checks</h2>
   <ul>
-    <li>Low TTLs increase query volume and reduce cache effectiveness.</li>
+    <li>Low TTL increases query volume and reduces cache effectiveness.</li>
     <li>Retry loops and service discovery churn can explode query rates.</li>
     <li>Kubernetes cluster size can multiply lookups if workloads resolve frequently.</li>
   </ul>
@@ -50,5 +59,12 @@ const description =
     Use <a href="/calculators/aws-route-53-cost-calculator/">AWS Route 53 Cost Calculator</a> with your query volume and
     effective $ per 1M queries pricing.
   </p>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-route-53-pricing/">Route 53 pricing</a>
+    <a class="btn" href="/guides/aws-route-53-cost-optimization/">Cost optimization</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 

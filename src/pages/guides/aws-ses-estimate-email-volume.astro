@@ -3,46 +3,57 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate email volume per month (transactional + marketing)";
 const description =
-  "How to estimate monthly email volume for SES cost models: from user actions, campaigns, and retry factors. Includes a fast model and sanity checks.";
+  "How to estimate monthly email volume for SES cost models: from user actions, campaigns, and retry factors. Includes a fast model, sanity checks, and validation tips.";
+const faqs = [
+  {
+    q: "What's the fastest model for transactional email volume?",
+    a: "Emails/month ~ monthly active users x average emails per user per month (password resets, receipts, alerts). Add a retry/duplicate factor if your system can resend.",
+  },
+  {
+    q: "How should I model marketing campaigns?",
+    a: "Campaign emails/month ~ recipients per campaign x campaigns per month. Include test sends and segment variations if they are significant.",
+  },
+  {
+    q: "Why do email volumes spike?",
+    a: "Incidents and retry loops. Alert storms and duplicate notification logic can multiply sends quickly.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Compare the estimate against a real week of send logs/metrics and scale to monthly. Validate separately for transactional vs marketing.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ses-estimate-email-volume"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest model for transactional email volume?",
-      a: "Emails/month ≈ monthly active users x average emails per user per month (password resets, receipts, alerts). Add a retry/duplicate factor if your system can resend.",
-    },
-    {
-      q: "How should I model marketing campaigns?",
-      a: "Campaign emails/month ≈ recipients per campaign x campaigns per month. Include test sends and segment variations if they are significant.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    For SES pricing, the key input is <strong>emails per month</strong>. Build the estimate from your product flows and
-    marketing calendar, then add a buffer for retries and duplicates.
+  <p class="muted">
+    For SES pricing, the key input is emails per month. Build the estimate from your product flows and marketing
+    calendar, then add a buffer for retries and duplicates.
   </p>
 
   <h2>Method 1: Transactional emails (product-driven)</h2>
   <ul>
-    <li>Receipts / confirmations: orders/month x emails per order.</li>
-    <li>Password resets / signups: events/month x emails per event.</li>
-    <li>Alerts / notifications: events/month x subscribers (if you notify multiple recipients).</li>
+    <li>Receipts/confirmations: orders/month x emails per order.</li>
+    <li>Password resets/signups: events/month x emails per event.</li>
+    <li>Alerts/notifications: events/month x recipients (if you notify multiple recipients).</li>
   </ul>
 
   <h2>Method 2: Marketing emails (campaign-driven)</h2>
   <ul>
     <li>Recipients per campaign x campaigns per month.</li>
     <li>Segment variants and A/B tests can multiply sends.</li>
+    <li>Include test sends if they are significant.</li>
   </ul>
 
   <h2>Retries and duplicates</h2>
   <ul>
     <li>Add a retry factor if you resend on timeouts or failures.</li>
     <li>Incident alert storms can spike volume (and cost) for a month.</li>
+    <li>Dedupe message IDs so retries do not generate duplicates.</li>
   </ul>
 
   <h2>Turn volume into cost</h2>
@@ -50,5 +61,12 @@ const description =
     Use <a href="/calculators/aws-ses-cost-calculator/">AWS SES Cost Calculator</a> with your volume estimate and effective
     $ per 1,000 emails pricing.
   </p>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-ses-pricing/">SES pricing</a>
+    <a class="btn" href="/guides/aws-ses-cost-optimization/">SES optimization</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 

@@ -3,33 +3,42 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "SES cost optimization (reduce volume, retries, and payload)";
 const description =
-  "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms.";
+  "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the biggest lever to reduce SES cost?",
+    a: "Reduce send volume and prevent duplicates. Most SES spend is linear in email count, so avoiding unnecessary sends and retries is the highest impact.",
+  },
+  {
+    q: "How do I prevent incident-driven cost spikes?",
+    a: "Dedupe and rate-limit notifications, fix retry loops, and add circuit breakers so failures don't trigger repeated sends.",
+  },
+  {
+    q: "Do payload size and attachments matter?",
+    a: "They can. If you send large templates or attachments, include payload size in your model and prefer links over attachments when possible.",
+  },
+  {
+    q: "How do I validate improvements?",
+    a: "Track emails sent, bounce/complaint rate, and retry volume before/after. Validate deliverability while reducing volume and retries.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ses-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the biggest lever to reduce SES cost?",
-      a: "Reduce send volume and prevent duplicates. Most SES spend is linear in email count, so avoiding unnecessary sends and retries is the highest impact.",
-    },
-    {
-      q: "How do I prevent incident-driven cost spikes?",
-      a: "Dedupe and rate-limit notifications, fix retry loops, and add circuit breakers so failures don’t trigger repeated sends.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
-  <p>
-    SES costs usually scale with <strong>emails sent</strong>. The best savings come from preventing duplicate sends,
-    controlling retries, and reducing the payload size when you include large templates or attachments.
+  <p class="muted">
+    SES costs usually scale with emails sent. The best savings come from preventing duplicate sends, controlling retries,
+    and reducing payload size when you include large templates or attachments.
   </p>
 
   <h2>1) Reduce volume and duplicates</h2>
   <ul>
     <li>Send fewer notifications by batching or digesting where appropriate.</li>
-    <li>Dedupe message IDs so retries don’t generate duplicate emails.</li>
+    <li>Dedupe message IDs so retries don't generate duplicate emails.</li>
     <li>Disable noisy non-prod email sending or route it to a sink.</li>
   </ul>
 
@@ -45,10 +54,19 @@ const description =
     <li>Prefer links to downloads instead of large attachments when possible.</li>
   </ul>
 
-  <h2>Quantify changes</h2>
-  <p>
-    Use <a href="/calculators/aws-ses-cost-calculator/">SES Cost Calculator</a> to estimate savings from reduced email
-    volume or smaller payloads.
-  </p>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Track sends/day and retry volume for a representative week, then compare after changes.</li>
+    <li>Validate deliverability (bounce/complaints) after changing templates and volume.</li>
+    <li>Confirm incident controls: rate limits and dedupe prevent alert storms.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ses-cost-calculator/">SES cost</a>
+    <a class="btn" href="/guides/aws-ses-pricing/">SES pricing</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 </GuideLayout>
 
