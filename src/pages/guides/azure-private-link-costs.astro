@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Private Link costs: model endpoint-hours and data processing";
+const description =
+  "A practical private networking cost model: endpoint-hours plus data processed (GB). Includes validation steps to decide when Private Link beats NAT/internet egress for cost and security.";
+
+const faqs = [
+  {
+    q: "What usually drives Private Link costs?",
+    a: "Endpoint-hours are the baseline. Data processed (GB) becomes meaningful when you move a lot of data through private endpoints.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Count endpoints × hours per month, then estimate GB/month through those endpoints. Compare that to NAT + egress paths.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate traffic boundaries (what goes through the endpoint), validate cross-zone/region patterns, and validate whether you’re paying for both endpoint and NAT paths.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-private-link-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Private Link-style networking typically charges for <strong>time</strong> (endpoint-hours) and <strong>volume</strong>
+    (GB processed). The decision is often a trade-off between security posture and cost, but you can model it with a simple
+    breakdown.
+  </p>
+
+  <h2>1) Endpoint-hours</h2>
+  <p>
+    Start with: <strong>number of endpoints × hours per month</strong>. Environment sprawl (dev/stage/prod, multiple regions)
+    can make endpoint-hours the dominant line item.
+  </p>
+
+  <h2>2) Data processed (GB/month)</h2>
+  <p>
+    Estimate how much data flows through private endpoints. If you access storage, registries, or databases privately,
+    processed GB can be significant.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Transfer cost model (GB/month)</a>.
+  </p>
+
+  <h2>3) Compare to NAT + internet egress</h2>
+  <p>
+    For cost comparisons, model two scenarios:
+    <strong>(A)</strong> internet egress via NAT and public endpoints, and <strong>(B)</strong> private endpoint traffic.
+    Then compare monthly baselines and how they scale with GB.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate what traffic actually uses Private Link vs public endpoints (routing/DNS matters).</li>
+    <li>Validate environment count and endpoint count (endpoint-hours scale with sprawl).</li>
+    <li>Validate GB/month and peak windows (deployments can spike registry pulls).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Transfer (GB/month)</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
+    <a class="btn" href="/guides/azure-nat-gateway-cost/">Azure NAT cost</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>
+

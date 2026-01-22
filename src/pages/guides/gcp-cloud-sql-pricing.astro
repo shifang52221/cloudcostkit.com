@@ -1,0 +1,77 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud SQL pricing: compute, storage, backups, and network (practical estimate)";
+const description =
+  "A driver-based Cloud SQL estimate: instance-hours, storage GB-month, backups/retention, and data transfer. Includes validation steps for growth and peak sizing.";
+
+const faqs = [
+  {
+    q: "What usually drives managed database cost?",
+    a: "Compute capacity and storage are the primary drivers. Backups/retention and network transfer become meaningful for long retention or cross-region access patterns.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate instance-hours (baseline + HA/replicas), average storage GB, and backup retention. Add a separate estimate for egress if clients are outside the region.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak CPU/memory/IO, validate storage growth rate, and validate backup retention and PITR settings.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-sql-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    Cloud SQL cost is typically “capacity + data”. The safest estimate breaks it into compute, storage, and backup/retention,
+    then validates peak usage and growth assumptions.
+  </p>
+
+  <h2>1) Compute (instance-hours)</h2>
+  <p>
+    Model baseline instance-hours per environment. If you run HA or read replicas, count them explicitly. For new workloads,
+    model two scenarios: baseline and peak.
+  </p>
+  <p>
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
+  </p>
+
+  <h2>2) Storage (GB-month)</h2>
+  <p>
+    Use average stored GB and model growth. If the dataset grows steadily, compute the monthly average rather than using
+    end-of-month size.
+  </p>
+  <p>
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>.
+  </p>
+
+  <h2>3) Backups and retention</h2>
+  <p>
+    Backup storage and retention can be a quiet driver. Model backup retention windows separately from primary storage, and
+    validate PITR settings.
+  </p>
+
+  <h2>4) Network transfer</h2>
+  <p>
+    If your clients read cross-region or from the public internet, network transfer may be billed. Split transfer by
+    destination and validate boundaries.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate peak CPU/memory/IO and plan headroom (avoid resizing churn).</li>
+    <li>Validate storage growth rate and retention policies for backups/snapshots.</li>
+    <li>Validate network paths (private vs public/cross-region) and billable transfer.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute</a>
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/gcp-bigquery-cost-estimation/">BigQuery estimate</a>
+  </div>
+</GuideLayout>
+

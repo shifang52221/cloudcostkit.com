@@ -2,11 +2,17 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = `Azure cost guides | ${SITE.name}`;
 const description =
-  "Azure cost estimation guides for Blob Storage, AKS, Azure Functions, networking (NAT/egress), load balancing, and logs.";
+  "Azure cost estimation guides for storage, networking (egress/private link), CDN/Front Door, observability/logs, and core managed services.";
 const slots = SITE.adsenseSlots;
+
+const azureGuides = GUIDES.filter((g) => g.category === "Azure")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title));
 ---
 <BaseLayout title={title} description={description} canonicalPath="/guides/azure">
   <section class="card hero">
@@ -20,47 +26,16 @@ const slots = SITE.adsenseSlots;
   </section>
 
   <section class="card section">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">
+      {azureGuides.length} Azure guides
+    </div>
     <div class="grid">
-      <a class="card2 tool col-6" href="/guides/azure-blob-storage-pricing/">
-        <div class="tool-title">Blob Storage pricing model</div>
-        <div class="tool-desc">GB-month + operations + replication + egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-functions-pricing/">
-        <div class="tool-title">Azure Functions pricing model</div>
-        <div class="tool-desc">Invocations + duration + logs + egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-container-registry-pricing/">
-        <div class="tool-title">ACR pricing model</div>
-        <div class="tool-desc">Storage, pulls, and transfer.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-aks-pricing/">
-        <div class="tool-title">AKS pricing checklist</div>
-        <div class="tool-desc">Nodes, egress, storage, and logs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-log-analytics-pricing/">
-        <div class="tool-title">Log Analytics pricing model</div>
-        <div class="tool-desc">Ingest, retain, and scan/query.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-application-gateway-pricing/">
-        <div class="tool-title">Application Gateway pricing</div>
-        <div class="tool-desc">Hours, requests, WAF, logs, and egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-load-balancer-pricing/">
-        <div class="tool-title">Load Balancer pricing</div>
-        <div class="tool-desc">Hours, traffic processed, and egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-nat-gateway-cost/">
-        <div class="tool-title">NAT Gateway cost</div>
-        <div class="tool-desc">Why it spikes and how to model outbound GB.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-bandwidth-egress-costs/">
-        <div class="tool-title">Bandwidth / egress costs</div>
-        <div class="tool-desc">Split by destination and validate boundaries.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/azure-sql-database-pricing/">
-        <div class="tool-title">Azure SQL Database estimate</div>
-        <div class="tool-desc">Compute + storage + backups + networking.</div>
-      </a>
+      {azureGuides.map((g) => (
+        <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+          <div class="tool-title">{g.title}</div>
+          <div class="tool-desc">{g.description}</div>
+        </a>
+      ))}
     </div>
   </section>
 
@@ -68,4 +43,3 @@ const slots = SITE.adsenseSlots;
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
 </BaseLayout>
-

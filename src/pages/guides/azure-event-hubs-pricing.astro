@@ -1,0 +1,74 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Event Hubs pricing: estimate throughput, events, and retention";
+const description =
+  "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic and consumer replays.";
+
+const faqs = [
+  {
+    q: "What usually drives Event Hubs cost?",
+    a: "Ingestion throughput and event volume are common drivers, with retention and replays becoming meaningful for long retention windows or heavy consumer backfills.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate events/second and average event size to get GB/day, then convert to GB/month. Add retention and replay multipliers if consumers reprocess data.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate burst traffic and consumer lag; replays and retries can multiply both ingestion and downstream processing costs.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-event-hubs-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Event streaming cost planning works best when you model <strong>bytes</strong> and <strong>replays</strong>. The same
+    stream can be read multiple times by consumers, and that is where estimates often break down.
+  </p>
+
+  <h2>1) Ingestion volume (GB/month)</h2>
+  <p>
+    Estimate <strong>events/second × bytes/event</strong> to get bytes/second, then convert to GB/day and GB/month. Model
+    top sources separately (audit logs, telemetry, clickstream) instead of using one blended average.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-ingestion-cost-calculator/">Ingestion calculator</a>.
+  </p>
+
+  <h2>2) Retention</h2>
+  <p>
+    Retention is the “how long do we keep data” multiplier. Long retention increases storage and makes replays/backfills
+    more likely.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>.
+  </p>
+
+  <h2>3) Consumer replays and downstream costs</h2>
+  <p>
+    The hidden cost is re-reading and processing the same data. If you have multiple consumer groups or frequent replays,
+    model a replay multiplier and validate consumer lag and backfill patterns.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate burst ingestion (peak events/sec) vs average; size partitions/capacity for peaks.</li>
+    <li>Validate consumer lag and replay/backfill frequency (multipliers matter).</li>
+    <li>Validate event size distribution (a few large events can dominate GB/month).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Ingestion</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan/query</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+  </div>
+</GuideLayout>
+

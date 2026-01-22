@@ -1,0 +1,73 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Inter-zone transfer costs on GCP: where they come from and how to estimate";
+const description =
+  "A practical checklist to estimate cross-zone data transfer: load balancers, multi-zone clusters, service-to-service chatter, and storage/database access patterns. Includes validation steps.";
+
+const faqs = [
+  {
+    q: "Why do inter-zone transfer costs appear?",
+    a: "They appear when traffic crosses zone boundaries: multi-zone clusters, cross-zone load balancing, or services calling each other across zones.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "List the top cross-zone flows and estimate GB/month per flow. Use a representative window and validate peaks.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate topology (which zones each service runs in), validate load balancer behavior, and validate chatty request patterns that create cross-zone traffic.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-inter-zone-transfer-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Inter-zone transfer is a common hidden cost in distributed systems. It is easiest to control when you identify the few
+    big cross-zone flows and either co-locate workloads or reduce chatty traffic patterns.
+  </p>
+
+  <h2>1) Common sources of cross-zone traffic</h2>
+  <ul>
+    <li>Cross-zone load balancing when backends are in multiple zones.</li>
+    <li>Multi-zone Kubernetes clusters with chatty east-west traffic.</li>
+    <li>Databases or caches accessed from another zone.</li>
+    <li>Service meshes and retries that amplify traffic volume.</li>
+  </ul>
+
+  <h2>2) Estimate GB/month per flow</h2>
+  <p>
+    For each major flow, estimate average Mbps or average response size × request volume. Then convert to monthly GB.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Transfer cost model</a>.
+  </p>
+
+  <h2>3) Control levers</h2>
+  <ul>
+    <li>Reduce retries/timeouts (they repeat full payload transfers).</li>
+    <li>Reduce chattiness (batch calls, compress payloads, cache responses).</li>
+    <li>Co-locate tightly coupled services within the same zone.</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate topology: which zones each service and database runs in.</li>
+    <li>Validate load balancer distribution and cross-zone behavior.</li>
+    <li>Validate retries and incident windows (multipliers matter).</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/gcp-vpc-egress-costs/">VPC egress costs</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+  </div>
+</GuideLayout>
+

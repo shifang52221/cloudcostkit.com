@@ -1,0 +1,81 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure API Management pricing: model requests, transfer, and log volume";
+const description =
+  "A practical API Management estimate: request volume, response transfer, and logs/observability. Includes a checklist to validate retries, payload size, and usage tiers.";
+
+const faqs = [
+  {
+    q: "What usually drives API gateway costs?",
+    a: "Request volume and data transfer are the most common drivers. Logging and analytics can dominate if you emit large logs per request.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Convert traffic (RPS) to monthly requests, estimate average response size to infer GB/month, then add log ingestion from bytes/request.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate request volume from a representative window and explicitly validate retry behavior (which multiplies requests and logs).",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-api-management-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    API Management pricing is easiest to estimate with a driver model: <strong>requests</strong>, <strong>transfer</strong>,
+    and <strong>logs</strong>. Underestimates usually come from retry storms, large payloads, or unbounded access logs.
+  </p>
+
+  <h2>1) Requests (per month)</h2>
+  <p>
+    Start from RPS, convert to monthly requests, then split by endpoint group if you have a large range of response sizes
+    (e.g., “small JSON” vs “large exports”).
+  </p>
+  <p>
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>,{" "}
+    <a href="/calculators/api-request-cost-calculator/">API request cost</a>.
+  </p>
+
+  <h2>2) Response transfer (GB/month)</h2>
+  <p>
+    Estimate transfer from response size and request volume. If you front your APIs with a CDN, keep CDN edge bandwidth
+    separate from origin egress and avoid double-counting.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>3) Logs and observability</h2>
+  <p>
+    Access logs and application logs scale with requests. A simple estimate is:
+    <strong>bytes logged per request × monthly requests</strong>. If you store logs for weeks, retention can become a large
+    secondary driver.
+  </p>
+  <p>
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate retry rates and timeouts (retries multiply requests, transfer, and logs).</li>
+    <li>Validate average response size using real traffic samples (model “big endpoints” separately).</li>
+    <li>Validate log bytes/request and retention window (don’t assume “logs are small”).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+</GuideLayout>
+

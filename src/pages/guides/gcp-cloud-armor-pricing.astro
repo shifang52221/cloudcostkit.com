@@ -1,0 +1,68 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud Armor pricing: model request volume and attack spikes";
+const description =
+  "A practical WAF cost model: baseline traffic plus attack spikes. Includes validation steps for request surges, rule sets, and logging/analytics.";
+
+const faqs = [
+  {
+    q: "What usually drives WAF cost?",
+    a: "Request volume is the main driver. Attack traffic (bots, DDoS) can multiply requests and create cost spikes if not budgeted.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly requests at baseline, then add an attack scenario (peak RPS × hours). Keep WAF request costs separate from CDN requests.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak request rates and incident windows, and validate whether WAF logs are enabled (logging can create extra costs).",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-armor-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    WAF cost estimation is a request-volume problem with a “tail risk”: attack spikes. A good estimate includes both a
+    baseline month and an incident scenario.
+  </p>
+
+  <h2>1) Baseline request volume</h2>
+  <p>
+    Convert RPS to monthly requests. If your traffic is seasonal, model the high-traffic month rather than the average month.
+  </p>
+  <p>
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+  </p>
+
+  <h2>2) Attack scenario (spike budget)</h2>
+  <p>
+    Model a realistic incident: peak RPS × hours/days. This captures bot surges and DDoS windows. Without this, WAF costs can
+    surprise you exactly when you’re under attack.
+  </p>
+
+  <h2>3) Logging and analytics</h2>
+  <p>
+    If you log every request during an incident, log ingestion can become a second spike driver. Model log ingestion and
+    retention separately.
+  </p>
+  <p>
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-retention-storage-cost-calculator/">Retention</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate peak RPS from historical incidents or provider analytics (budget for the tail).</li>
+    <li>Validate whether you log all requests or only blocked/sampled requests during incidents.</li>
+    <li>Validate WAF placement (edge vs origin) to avoid double-counting request charges.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN requests</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+</GuideLayout>
+

@@ -1,0 +1,66 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Dataflow pricing: model worker hours, throughput, and log volume";
+const description =
+  "A practical data processing estimate: worker compute-hours, data processed, and logging/monitoring. Includes validation steps for autoscaling and backlog reprocessing.";
+
+const faqs = [
+  {
+    q: "What usually drives Dataflow cost?",
+    a: "Worker compute-hours are usually the main driver. Backlog catch-up periods and autoscaling can create spike costs; logging/monitoring can become meaningful for verbose jobs.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate average workers × hours per month, then model a catch-up scenario for backlog processing. Add a separate estimate for log ingestion.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate autoscaling behavior, validate backlog windows (replays), and validate log volume per record/job stage.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-dataflow-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    Dataflow cost planning is essentially compute capacity planning with a backlog multiplier. Estimates fail when you only
+    model steady state and ignore catch-up windows where the pipeline processes historical data.
+  </p>
+
+  <h2>1) Worker compute-hours</h2>
+  <p>
+    Start with average workers × hours per month. Then model peaks: max workers during autoscaling and the duration of peak
+    windows.
+  </p>
+  <p>
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
+  </p>
+
+  <h2>2) Throughput and backlog scenarios</h2>
+  <p>
+    If a pipeline falls behind, it can run “hot” to catch up. Model a backlog scenario (e.g., 6 hours of catch-up at 3×
+    workers) rather than assuming perfect steady state.
+  </p>
+
+  <h2>3) Logs and monitoring</h2>
+  <p>
+    Verbose per-record logging can dominate cost at scale. Estimate log bytes per record and multiply by record volume.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-cost-calculator/">Log cost tools</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate autoscaling: average vs max workers and how often you hit max.</li>
+    <li>Validate backlog windows and reprocessing patterns (catch-up multipliers).</li>
+    <li>Validate log volume and sampling (avoid per-record logs at high volume).</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/gcp-bigquery-cost-estimation/">BigQuery estimate</a>
+    <a class="btn" href="/guides/gcp-cloud-logging-pricing/">Cloud Logging pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

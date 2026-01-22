@@ -1,0 +1,69 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Key Vault pricing: estimate operations, keys/secrets, and request spikes";
+const description =
+  "A practical Key Vault cost model: key/secret baseline plus request volume. Includes validation steps for high-frequency crypto operations and cache misses.";
+
+const faqs = [
+  {
+    q: "What usually drives Key Vault cost?",
+    a: "Operation volume is the common driver. Small per-request charges add up quickly if apps call Key Vault on every request without caching.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly operations by call path (get secret, decrypt, sign). Multiply by your effective per-request rate and validate with a representative traffic window.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate whether secrets/keys are cached, validate retry behavior, and validate which operations are called on the hot path.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-key-vault-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Key Vault cost estimation is mostly a <strong>request-based</strong> problem. If an application fetches secrets or performs
+    crypto operations on every request, costs can scale linearly with traffic.
+  </p>
+
+  <h2>1) Identify operation types</h2>
+  <p>
+    Separate your operations into buckets: secret reads, key operations (encrypt/decrypt), signing, certificate operations,
+    etc. Different operations can have different effective rates.
+  </p>
+
+  <h2>2) Estimate monthly operations</h2>
+  <p>
+    Find the driver metric: requests per month, container starts, or cron executions. Then map that driver to Key Vault calls.
+    If secrets are loaded once per pod start, the driver is “pod starts”, not “API requests”.
+  </p>
+  <p>
+    Tool: <a href="/calculators/api-request-cost-calculator/">API request cost (generic request math)</a>.
+  </p>
+
+  <h2>3) Avoid the common hot-path trap</h2>
+  <p>
+    The classic cost bug is an un-cached secret fetch in a request handler. Caching at the app layer or using managed
+    identities/token caches can reduce call volume by orders of magnitude.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate whether secrets/keys are cached and when caches expire.</li>
+    <li>Validate retry/timeouts to Key Vault (retries multiply operations).</li>
+    <li>Validate operation drivers (per request vs per startup vs per rotation job).</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+  </div>
+</GuideLayout>
+

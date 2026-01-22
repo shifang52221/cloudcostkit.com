@@ -2,11 +2,17 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = `GCP cost guides | ${SITE.name}`;
 const description =
-  "GCP cost estimation guides for Cloud Storage, GKE, Cloud Run/Functions, VPC egress, load balancing, Cloud Logging, and BigQuery-style analytics.";
+  "GCP cost estimation guides for storage, networking (egress/inter-zone), CDN, observability/logging, and core managed services.";
 const slots = SITE.adsenseSlots;
+
+const gcpGuides = GUIDES.filter((g) => g.category === "GCP")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title));
 ---
 <BaseLayout title={title} description={description} canonicalPath="/guides/gcp">
   <section class="card hero">
@@ -20,47 +26,16 @@ const slots = SITE.adsenseSlots;
   </section>
 
   <section class="card section">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">
+      {gcpGuides.length} GCP guides
+    </div>
     <div class="grid">
-      <a class="card2 tool col-6" href="/guides/gcp-cloud-storage-pricing/">
-        <div class="tool-title">Cloud Storage pricing model</div>
-        <div class="tool-desc">GB-month, operations, retrieval rules, and egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-cloud-run-pricing/">
-        <div class="tool-title">Cloud Run pricing model</div>
-        <div class="tool-desc">Requests, duration, logs, and egress.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-cloud-functions-pricing/">
-        <div class="tool-title">Cloud Functions pricing model</div>
-        <div class="tool-desc">Invocations, duration, and log volume.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-gke-pricing/">
-        <div class="tool-title">GKE pricing checklist</div>
-        <div class="tool-desc">Nodes, egress, storage, and logs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-cloud-logging-pricing/">
-        <div class="tool-title">Cloud Logging pricing</div>
-        <div class="tool-desc">Ingest, retain, and scan/query.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-cloud-nat-cost/">
-        <div class="tool-title">Cloud NAT cost</div>
-        <div class="tool-desc">Why it spikes and how to model outbound GB.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-load-balancing-pricing/">
-        <div class="tool-title">Load balancing pricing</div>
-        <div class="tool-desc">Hours, requests, and traffic processed.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-vpc-egress-costs/">
-        <div class="tool-title">VPC egress costs</div>
-        <div class="tool-desc">Split by destination and validate boundaries.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-artifact-registry-pricing/">
-        <div class="tool-title">Artifact Registry pricing</div>
-        <div class="tool-desc">Storage, pulls, and transfer.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/gcp-bigquery-cost-estimation/">
-        <div class="tool-title">BigQuery cost estimation</div>
-        <div class="tool-desc">Storage, scans, and streaming drivers.</div>
-      </a>
+      {gcpGuides.map((g) => (
+        <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+          <div class="tool-title">{g.title}</div>
+          <div class="tool-desc">{g.description}</div>
+        </a>
+      ))}
     </div>
   </section>
 
@@ -68,4 +43,3 @@ const slots = SITE.adsenseSlots;
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
 </BaseLayout>
-

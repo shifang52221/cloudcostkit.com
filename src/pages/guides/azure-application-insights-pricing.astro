@@ -1,0 +1,75 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Application Insights pricing: ingestion volume, sampling, and retention";
+const description =
+  "A practical Application Insights estimate: telemetry volume (GB), sampling, retention, and query scans. Includes validation steps to prevent ingest spikes during incidents.";
+
+const faqs = [
+  {
+    q: "What usually drives Application Insights cost?",
+    a: "Telemetry ingestion volume (GB) is usually the main driver. Retention and query volume become meaningful when you keep data longer or run frequent analytics.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate events per request, average event size, and request volume. Convert to GB/day and GB/month, then apply retention days.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate sampling rates, validate incident behavior (errors/retries multiply events), and validate retention settings for each telemetry type.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-application-insights-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Application Insights is a telemetry pipeline. Costs are predictable if you model it as:
+    <strong>events × size → GB ingested → retention storage → query scans</strong>.
+  </p>
+
+  <h2>1) Ingestion volume (GB/month)</h2>
+  <p>
+    A reliable first estimate is: <strong>requests × telemetry events per request × bytes per event</strong>. Model separate
+    lines for high-volume sources (requests, dependencies, exceptions, traces) rather than one blended average.
+  </p>
+  <p>
+    Tool: <a href="/calculators/log-ingestion-cost-calculator/">Log/telemetry ingestion</a>.
+  </p>
+
+  <h2>2) Sampling</h2>
+  <p>
+    Sampling is the biggest cost lever. If you sample traces at 10%, your ingestion can drop ~10×. During incidents,
+    exceptions and retries can multiply events, so sampling and filters matter.
+  </p>
+
+  <h2>3) Retention and query scans</h2>
+  <p>
+    Retention multiplies stored GB. Queries and dashboards can scan large windows repeatedly; model refresh frequency and
+    scan windows explicitly.
+  </p>
+  <p>
+    Tools: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Scan/query</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate sampling and filters (especially traces) and confirm what is kept vs dropped.</li>
+    <li>Validate incident behavior: errors/retries multiply telemetry events and ingestion volume.</li>
+    <li>Validate dashboards/alerts for wide time windows that scan lots of data frequently.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost tools</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Ingestion</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan</a>
+  </div>
+</GuideLayout>
+

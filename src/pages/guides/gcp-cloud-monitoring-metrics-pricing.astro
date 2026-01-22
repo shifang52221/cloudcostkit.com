@@ -1,0 +1,72 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud Monitoring metrics pricing: time series, sample rate, and retention";
+const description =
+  "A practical metrics cost model: time series cardinality, sample rate, retention, and dashboards/alerts. Includes validation steps to prevent high-cardinality explosions.";
+
+const faqs = [
+  {
+    q: "What usually drives metrics costs?",
+    a: "Cardinality (number of time series) is the biggest risk. Sample rate and long retention multiply volume, and dashboards/alerts can add repeated query load.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate time series count × samples per minute × retention days. Validate with a representative environment and scale up.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate unbounded labels (dimensions), validate sample rates, and validate dashboard refresh intervals that trigger repeated queries.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-monitoring-metrics-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Metrics systems are “time series × frequency × retention”. Costs spike when you accidentally create too many unique time
+    series (high cardinality) or when dashboards/alerts query wide time windows frequently.
+  </p>
+
+  <h2>1) Cardinality (time series count)</h2>
+  <p>
+    Cardinality is the primary risk. Labels like <strong>pod</strong>, <strong>path</strong>, or <strong>customerId</strong>
+    can create unbounded series counts. Model the number of unique label combinations explicitly.
+  </p>
+
+  <h2>2) Sample rate</h2>
+  <p>
+    Sample rate multiplies ingestion. A move from 60s to 10s increases samples ~6×. Model both normal and high-frequency
+    scenarios.
+  </p>
+
+  <h2>3) Retention</h2>
+  <p>
+    Long retention multiplies stored volume. Consider downsampling or reducing retention for high-resolution metrics.
+  </p>
+
+  <h2>4) Dashboards and alerts</h2>
+  <p>
+    Dashboards refreshing every minute and alerts scanning long windows can create repeated query load. Treat refresh rates
+    and time windows as explicit drivers.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate cardinality drivers and cap unbounded labels/dimensions.</li>
+    <li>Validate sample rates (emit/scrape intervals) and ensure they match your needs.</li>
+    <li>Validate dashboard refresh and alert windows (avoid repeated wide scans).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

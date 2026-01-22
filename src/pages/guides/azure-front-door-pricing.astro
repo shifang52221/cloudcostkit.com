@@ -1,0 +1,95 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Front Door pricing: model requests, bandwidth, and origin traffic";
+const description =
+  "A practical Azure Front Door cost model: request volume, edge bandwidth, and origin traffic (cache fill). Includes validation steps to avoid double-counting CDN vs origin egress.";
+
+const faqs = [
+  {
+    q: "What usually drives Front Door cost?",
+    a: "For most sites, bandwidth is the biggest driver. For API-heavy workloads, request volume and rule processing can become meaningful.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly edge GB, monthly requests, and cache hit rate (to infer origin egress). Then validate with a representative traffic window.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Validate cache hit rate, validate response sizes (top endpoints), and ensure you do not double-count edge bandwidth and origin egress.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-front-door-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Azure Front Door is essentially “edge delivery + routing”. The estimate becomes reliable when you split traffic into:
+    <strong>edge bandwidth</strong>, <strong>request volume</strong>, and <strong>origin egress (cache fill)</strong>.
+  </p>
+
+  <h2>1) Edge bandwidth (GB/month)</h2>
+  <p>
+    Start with a monthly bandwidth estimate to end users. If you already have metrics, use a representative window and
+    convert to GB/month. If you only have RPS, estimate average response size and multiply.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>.
+  </p>
+
+  <h2>2) Requests (per month)</h2>
+  <p>
+    Convert RPS to monthly requests and model peaks separately if you have bursty traffic. Many CDN/edge products charge per
+    10k/1M requests; keep units explicit to avoid order-of-magnitude errors.
+  </p>
+  <p>
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>,{" "}
+    <a href="/calculators/api-request-cost-calculator/">API request cost</a>.
+  </p>
+
+  <h2>3) Origin egress (cache fill)</h2>
+  <p>
+    If you cache at the edge, origin egress is roughly:
+    <strong>origin GB ≈ edge GB × (1 − hit rate)</strong>. Cache misses and purges can make origin egress spike, especially
+    for large objects and during deploys.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Double-counting edge bandwidth and origin egress (they are different legs).</li>
+    <li>Using average response size for an API with a heavy tail (model top endpoints separately).</li>
+    <li>Ignoring cache invalidations/purges and cold cache events (misses drive origin traffic).</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate cache hit rate and estimate origin GB from misses (cache fill).</li>
+    <li>Validate top endpoints by bandwidth and request volume (avoid blended averages).</li>
+    <li>Validate peak periods (deploys, incidents) where retries/purges increase requests and origin traffic.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Requests</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+  </div>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN cost basics</a>
+  </div>
+</GuideLayout>
+

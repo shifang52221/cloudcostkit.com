@@ -1,0 +1,64 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Pub/Sub pricing: estimate messages, deliveries, retries, and payload size";
+const description =
+  "A practical Pub/Sub cost estimate: message volume, delivery attempts (retries), and payload transfer. Includes validation steps for fan-out and replays.";
+
+const faqs = [
+  {
+    q: "What usually drives Pub/Sub cost?",
+    a: "Message volume and delivery attempts are the common drivers. Retries and multiple subscriptions (fan-out) can multiply deliveries.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate publishes per month, subscriptions per topic, average delivery attempts, and payload size. Model fan-out explicitly.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate retry rates, dead-letter/replay behavior, and payload size distribution for the top topics.",
+  },
+];
+---
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-pubsub-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+  <p>
+    Pub/Sub estimation is mostly “count the deliveries”. The biggest mistakes are underestimating retries and forgetting
+    fan-out: one publish can result in multiple deliveries across subscriptions.
+  </p>
+
+  <h2>1) Publish volume (per month)</h2>
+  <p>
+    Start with messages/second (or messages/day) and convert to monthly volume. If traffic is bursty, model peaks separately.
+  </p>
+
+  <h2>2) Fan-out and delivery attempts</h2>
+  <p>
+    If a topic has N subscriptions, one publish results in N deliveries. If delivery attempts average 1.2 due to retries,
+    your true deliveries are: <strong>publishes × subscriptions × attempts</strong>.
+  </p>
+
+  <h2>3) Payload size and transfer</h2>
+  <p>
+    Payload size matters if you move large messages. Multiply average payload size by deliveries to estimate monthly GB moved.
+    If subscribers are cross-region or external, model egress separately.
+  </p>
+  <p>
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate retry rates and DLQ/replay patterns (deliveries, not just publishes).</li>
+    <li>Validate fan-out (subscriptions) for each topic.</li>
+    <li>Validate payload size distribution (avoid assuming “small messages”).</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/gcp-cloud-logging-pricing/">Cloud Logging pricing</a>
+  </div>
+</GuideLayout>
+

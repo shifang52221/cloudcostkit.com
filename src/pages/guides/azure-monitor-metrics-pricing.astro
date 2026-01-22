@@ -1,0 +1,72 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Azure Monitor metrics pricing: estimate custom metrics, retention, and API calls";
+const description =
+  "A practical metrics cost model: custom metrics volume, retention, dashboards/alerts, and API calls. Includes validation steps to avoid high-cardinality mistakes.";
+
+const faqs = [
+  {
+    q: "What usually drives metrics costs?",
+    a: "Custom metric volume and high-cardinality dimensions are the common drivers. Dashboards and alert queries can add repeated scans/API usage.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate number of time series, samples per minute, and retention days. Add a separate estimate for dashboard refreshes and alerts.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate high-cardinality labels (dimensions), validate scrape/emit rates, and validate dashboard refresh intervals that trigger repeated queries.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-monitor-metrics-pricing"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Metrics systems are “time series × frequency × retention”. Costs spike when you accidentally create a huge number of
+    distinct series (high cardinality) or when dashboards/alerts query wide time windows frequently.
+  </p>
+
+  <h2>1) How many time series?</h2>
+  <p>
+    Time series count is the biggest design lever. A metric with labels like <strong>pod</strong>, <strong>container</strong>,
+    <strong>path</strong>, or <strong>customerId</strong> can explode cardinality. Model the number of unique combinations.
+  </p>
+
+  <h2>2) Sample rate</h2>
+  <p>
+    Sample rate (e.g., 10s vs 60s) multiplies ingestion volume. For planning, model both a “normal” and a “high-frequency”
+    scenario.
+  </p>
+
+  <h2>3) Retention</h2>
+  <p>
+    Retention is a storage multiplier. Long retention can be expensive if you store high-resolution data for months.
+  </p>
+
+  <h2>4) Dashboards, alerts, and API calls</h2>
+  <p>
+    Repeated queries (dashboards refreshing every minute, alert rules scanning 24h windows) can create significant query/API
+    load. Model refresh frequency explicitly.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate cardinality drivers (labels/dimensions) and cap unbounded labels.</li>
+    <li>Validate sample rates (emit/scrape intervals) and ensure they match your needs.</li>
+    <li>Validate dashboard refresh intervals and alert windows (avoid repeated wide scans).</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+

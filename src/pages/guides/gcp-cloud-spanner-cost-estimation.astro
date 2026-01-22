@@ -1,0 +1,76 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "Cloud Spanner cost estimation: compute, storage, and query patterns";
+const description =
+  "A practical Spanner estimate: provisioned compute capacity, stored GB-month, and cross-region/network patterns. Includes validation steps for peak load and query efficiency.";
+
+const faqs = [
+  {
+    q: "What usually drives Spanner cost?",
+    a: "Provisioned compute capacity is typically the main driver. Storage and multi-region/network patterns can add meaningful secondary costs.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate baseline capacity for steady state, then add a peak scenario. Model stored GB and growth, and include cross-region transfer if clients are distributed.",
+  },
+  {
+    q: "How do I validate?",
+    a: "Validate peak load windows, validate query efficiency, and validate storage growth and retention policies.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-spanner-cost-estimation"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p>
+    Spanner-like systems are capacity-planned. Cost estimation is reliable when you separate: <strong>provisioned capacity</strong>,
+    <strong>stored data</strong>, and <strong>distributed access patterns</strong>. Underestimates usually come from using
+    averages and ignoring peak load windows.
+  </p>
+
+  <h2>1) Provisioned capacity (baseline + peak)</h2>
+  <p>
+    Model a baseline and a peak scenario. If you autoscale or change capacity over time, estimate average capacity-hours per
+    month rather than a single static number.
+  </p>
+  <p>
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost (capacity math)</a>.
+  </p>
+
+  <h2>2) Storage and growth</h2>
+  <p>
+    Use average stored GB-month and model growth. If you keep history or large indexes, storage can grow faster than expected.
+  </p>
+  <p>
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>.
+  </p>
+
+  <h2>3) Distributed access and transfer</h2>
+  <p>
+    Multi-region deployments can introduce transfer and replication-related costs. If clients are cross-region, model outbound
+    GB/month separately and validate boundaries.
+  </p>
+  <p>
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate peak load windows and “incident behavior” (retries and timeouts multiply operations).</li>
+    <li>Validate query efficiency and indexes (inefficient queries can force higher capacity).</li>
+    <li>Validate storage growth, retention, and index overhead.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/gcp-cloud-sql-pricing/">Cloud SQL estimate</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+  </div>
+</GuideLayout>
+
