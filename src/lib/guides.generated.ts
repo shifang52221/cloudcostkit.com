@@ -1847,6 +1847,16 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "Networking costs explained: egress, transfer boundaries, NAT, and private connectivity",
+    "description": "A practical networking cost model: internet egress, cross-zone/region transfer, NAT/private endpoints, and how to validate boundaries to avoid double counting.",
+    "canonicalPath": "/guides/networking-costs",
+    "category": "General",
+    "slug": "networking-costs",
+    "topics": [
+      "egress"
+    ]
+  },
+  {
     "title": "Request-based pricing explained (APIs, CDN, and messaging)",
     "description": "A practical guide to request-based pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.",
     "canonicalPath": "/guides/request-based-pricing",
@@ -1855,6 +1865,18 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "cdn",
       "requests"
+    ]
+  },
+  {
+    "title": "Security costs explained: WAF, keys/secrets, and request-driven spikes",
+    "description": "A practical security cost model: WAF request-based pricing, key management (KMS/Key Vault) operations, secrets access patterns, and how bot traffic or high-frequency crypto can surprise budgets.",
+    "canonicalPath": "/guides/security-costs",
+    "category": "General",
+    "slug": "security-costs",
+    "topics": [
+      "requests",
+      "security",
+      "storage"
     ]
   },
   {
@@ -1896,6 +1918,20 @@ export const GUIDES: GuideLink[] = [
       "logging",
       "metrics",
       "storage"
+    ]
+  },
+  {
+    "title": "Kubernetes costs explained: nodes, egress, load balancers, and observability",
+    "description": "A practical Kubernetes cost model: node baseline, cluster add-ons, load balancers, egress/data transfer, and logs/metrics. Includes the most common mistakes and the best calculators.",
+    "canonicalPath": "/guides/kubernetes-costs",
+    "category": "Kubernetes",
+    "slug": "kubernetes-costs",
+    "topics": [
+      "egress",
+      "kubernetes",
+      "load-balancing",
+      "logging",
+      "metrics"
     ]
   },
   {

@@ -1,5 +1,7 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = "Storage costs explained: GB-month, requests, and replication";
 const description =
@@ -18,6 +20,11 @@ const faqs = [
     a: "For large datasets, GB-month dominates. For many small objects, request fees can matter. For multi-region setups, replication plus transfer can dominate.",
   },
 ];
+
+const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") && g.canonicalPath !== "/guides/storage-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 12);
 ---
 <GuideLayout
   title={title}
@@ -98,5 +105,18 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
   </div>
-</GuideLayout>
 
+  {storageGuides.length ? (
+    <>
+      <h2>More storage guides</h2>
+      <div class="grid">
+        {storageGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

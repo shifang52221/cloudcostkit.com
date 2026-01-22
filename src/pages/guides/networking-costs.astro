@@ -1,0 +1,87 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Networking costs explained: egress, transfer boundaries, NAT, and private connectivity";
+const description =
+  "A practical networking cost model: internet egress, cross-zone/region transfer, NAT/private endpoints, and how to validate boundaries to avoid double counting.";
+
+const faqs = [
+  {
+    q: "What counts as a networking cost?",
+    a: "Any traffic crossing a billing boundary: internet egress, cross-zone and cross-region transfer, NAT/private endpoints (endpoint-hours + GB processed), and sometimes load balancer traffic processed.",
+  },
+  {
+    q: "Why do networking bills spike?",
+    a: "Because these charges scale with traffic. Common spike causes are CDN cache misses (origin egress), retries during incidents, cross-zone service chatter, and image pulls/updates through NAT.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with GB/month for each boundary (internet, cross-zone, cross-region) and price them separately. Then add NAT/private endpoints based on endpoint-hours and GB processed.",
+  },
+];
+
+const networkingGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") && g.canonicalPath !== "/guides/networking-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/networking-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Most teams under-estimate networking because they model only internet egress. The reliable workflow is to list each
+    boundary and price it separately: internet, cross-zone, cross-region, CDN origin egress, plus NAT/private endpoints.
+  </p>
+
+  <h2>1) List your boundaries</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: bytes to end users or external services.</li>
+    <li><strong>Cross-zone</strong>: east-west traffic across zones/availability zones.</li>
+    <li><strong>Cross-region</strong>: replication, DR, multi-region reads.</li>
+    <li><strong>CDN origin egress</strong>: origin to CDN cache fill.</li>
+    <li><strong>NAT / private endpoints</strong>: endpoint-hours + GB processed.</li>
+  </ul>
+
+  <h2>2) Estimate GB/month (practical methods)</h2>
+  <ul>
+    <li>From provider billing exports (best).</li>
+    <li>From throughput charts (Mbps to GB/month).</li>
+    <li>From requests/day x average response size.</li>
+  </ul>
+
+  <h2>3) Price each boundary separately</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/egress-costs/">Egress costs</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Transfer boundaries</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN costs</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress calculator</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region calculator</a>
+  </div>
+
+  <h2>Provider-specific hubs</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>
+    <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure egress</a>
+    <a class="btn" href="/guides/gcp-vpc-egress-costs/">GCP VPC egress</a>
+  </div>
+
+  {networkingGuides.length ? (
+    <>
+      <h2>More networking guides</h2>
+      <div class="grid">
+        {networkingGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

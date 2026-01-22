@@ -1,0 +1,98 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Security costs explained: WAF, keys/secrets, and request-driven spikes";
+const description =
+  "A practical security cost model: WAF request-based pricing, key management (KMS/Key Vault) operations, secrets access patterns, and how bot traffic or high-frequency crypto can surprise budgets.";
+
+const faqs = [
+  {
+    q: "What usually drives security cost?",
+    a: "Most security line items are request-driven: WAF requests, key management operations, secrets reads, and audit log volume. Bot traffic and retries can multiply request volume quickly.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Estimate monthly request volume, then add WAF pricing (ACLs/rules + requests). For key management, estimate API/crypto operations per second and convert to monthly calls. Validate with a representative traffic window.",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Underestimating bot traffic, ignoring retries, treating crypto operations as negligible, and forgetting that enabling extra logging can add ingestion/retention cost.",
+  },
+];
+
+const securityGuides = GUIDES.filter((g) => (g.topics || []).includes("security") && g.canonicalPath !== "/guides/security-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/security-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Security spend tends to be request-driven. If traffic spikes, your security line items often spike first (WAF, keys,
+    secrets, logs). This hub links the pricing checklists and calculators that keep models grounded in measurable drivers.
+  </p>
+
+  <h2>1) WAF and bot traffic</h2>
+  <ul>
+    <li>Model WAF as baseline configuration + request volume.</li>
+    <li>Run a bot/spike scenario: a 10x request spike can dwarf baseline fees.</li>
+    <li>
+      Tool: <a href="/calculators/aws-waf-cost-calculator/">WAF cost calculator</a>
+    </li>
+  </ul>
+
+  <h2>2) Key management (KMS / Key Vault)</h2>
+  <ul>
+    <li>Costs scale with operations (encrypt/decrypt/sign/verify) and API calls.</li>
+    <li>Cache and batching decisions can change request volume by orders of magnitude.</li>
+    <li>
+      Tool: <a href="/calculators/aws-kms-cost-calculator/">KMS cost calculator</a>
+    </li>
+  </ul>
+
+  <h2>3) Secrets access patterns</h2>
+  <ul>
+    <li>Secrets costs often scale with secret-months and API calls.</li>
+    <li>Connection pooling and caching reduce secrets reads dramatically.</li>
+    <li>
+      Tool: <a href="/calculators/aws-secrets-manager-cost-calculator/">Secrets Manager cost</a>
+    </li>
+  </ul>
+
+  <h2>4) Logging and audit trails</h2>
+  <ul>
+    <li>Enabling verbose logging creates ingestion + retention cost.</li>
+    <li>
+      Hub: <a href="/guides/log-costs/">log costs</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-waf-cost-calculator/">WAF cost</a>
+    <a class="btn" href="/calculators/aws-kms-cost-calculator/">KMS cost</a>
+    <a class="btn" href="/calculators/aws-secrets-manager-cost-calculator/">Secrets</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log costs</a>
+  </div>
+
+  {securityGuides.length ? (
+    <>
+      <h2>More security guides</h2>
+      <div class="grid">
+        {securityGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>

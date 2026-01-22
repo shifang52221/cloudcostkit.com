@@ -1,0 +1,102 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
+
+const title = "Kubernetes costs explained: nodes, egress, load balancers, and observability";
+const description =
+  "A practical Kubernetes cost model: node baseline, cluster add-ons, load balancers, egress/data transfer, and logs/metrics. Includes the most common mistakes and the best calculators.";
+
+const faqs = [
+  {
+    q: "What usually drives Kubernetes cost?",
+    a: "Nodes (CPU/memory) are the anchor, but the surprises are usually egress/NAT, load balancers, and observability (logs + metrics). For managed Kubernetes, control plane and add-ons can matter in small clusters or many clusters.",
+  },
+  {
+    q: "How do I estimate quickly?",
+    a: "Start with node-hours from requests/limits and utilization, then add a network scenario (egress + NAT), a load balancer baseline, and an observability budget (log GB/day + metrics series).",
+  },
+  {
+    q: "What breaks estimates?",
+    a: "Over-allocating requests/limits, forgetting cross-AZ traffic patterns, ignoring NAT/egress, and letting metrics label cardinality explode.",
+  },
+];
+
+const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") && g.canonicalPath !== "/guides/kubernetes-costs")
+  .slice()
+  .sort((a, b) => a.title.localeCompare(b.title))
+  .slice(0, 18);
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/kubernetes-costs"
+  lastUpdated="2026-01-22"
+  faqs={faqs}
+>
+  <p class="muted">
+    Kubernetes bills are rarely just nodes. A planning-safe estimate includes: node baseline + network (egress/NAT) + load
+    balancers + logs/metrics. This hub links the key guides and calculators to avoid thin compute-only models.
+  </p>
+
+  <h2>1) Nodes (the baseline)</h2>
+  <ul>
+    <li>Translate app demand into node-hours (CPU + memory), then apply headroom and allocatable percent.</li>
+    <li>Validate requests/limits and packing assumptions (waste is the common leak).</li>
+    <li>
+      Tools: <a href="/calculators/kubernetes-node-cost-calculator/">node cost</a>,{" "}
+      <a href="/calculators/kubernetes-requests-limits-calculator/">requests vs limits</a>
+    </li>
+  </ul>
+
+  <h2>2) Egress, NAT, and cross-AZ traffic (the surprise bucket)</h2>
+  <ul>
+    <li>Model internet egress and cross-zone/region transfer separately.</li>
+    <li>NAT/egress costs spike during deployments, image pulls, and incident retries.</li>
+    <li>
+      Tools: <a href="/calculators/data-egress-cost-calculator/">egress</a>,{" "}
+      <a href="/calculators/vpc-data-transfer-cost-calculator/">transfer</a>
+    </li>
+  </ul>
+
+  <h2>3) Load balancers and ingress</h2>
+  <ul>
+    <li>Include hourly baseline plus request/GB processed drivers where applicable.</li>
+    <li>Multi-AZ load balancer patterns can create persistent cross-zone traffic.</li>
+    <li>
+      Tool: <a href="/calculators/aws-load-balancer-cost-calculator/">load balancer cost</a>
+    </li>
+  </ul>
+
+  <h2>4) Logs and metrics</h2>
+  <ul>
+    <li>Log GB/day x retention is often larger than teams expect.</li>
+    <li>Metrics cost is a cardinality problem: series count can explode with labels.</li>
+    <li>
+      Tools: <a href="/calculators/log-cost-calculator/">log costs</a>,{" "}
+      <a href="/calculators/metrics-timeseries-cost-calculator/">metrics series</a>
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost</a>
+    <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Node cost</a>
+    <a class="btn" href="/calculators/kubernetes-observability-cost-calculator/">Observability</a>
+    <a class="btn" href="/guides/metrics-costs/">Metrics cost hub</a>
+  </div>
+
+  {k8sGuides.length ? (
+    <>
+      <h2>More Kubernetes guides</h2>
+      <div class="grid">
+        {k8sGuides.map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  ) : null}
+</GuideLayout>
