@@ -137,7 +137,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS SQS cost optimization (high-leverage fixes)",
-    "description": "A short playbook to reduce SQS costs: reduce requests per message, avoid retry storms, batch operations, and fix poison messages.",
+    "description": "A practical playbook to reduce SQS costs: reduce requests per message, batch operations, avoid retry storms, and handle poison messages. Includes validation steps and related tools.",
     "canonicalPath": "/guides/aws-sqs-cost-optimization",
     "category": "AWS",
     "slug": "aws-sqs-cost-optimization"
@@ -417,7 +417,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate ECR storage (GB-month) from images and retention",
-    "description": "How to estimate container registry storage cost: average image size, tag retention, and rebuild frequency. Includes a fast model and common pitfalls.",
+    "description": "How to estimate container registry storage cost: average image size, tag retention, and rebuild frequency. Includes a fast model, a better model, and common pitfalls.",
     "canonicalPath": "/guides/aws-ecr-estimate-storage-gb-month",
     "category": "AWS",
     "slug": "aws-ecr-estimate-storage-gb-month"
@@ -585,7 +585,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Load balancer cost optimization (high-leverage fixes)",
-    "description": "A short playbook to reduce load balancer costs: reduce LB count, reduce capacity units, and avoid architectures that create excessive traffic.",
+    "description": "A practical playbook to reduce load balancer costs: reduce LB-hours, reduce LCU/NLCU drivers, and avoid traffic amplification patterns. Includes validation steps and related calculators.",
     "canonicalPath": "/guides/aws-load-balancer-cost-optimization",
     "category": "AWS",
     "slug": "aws-load-balancer-cost-optimization"

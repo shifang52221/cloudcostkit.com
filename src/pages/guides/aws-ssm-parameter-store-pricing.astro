@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ssm-parameter-store-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What typically drives Parameter Store cost?",
@@ -44,5 +44,18 @@ const description =
     Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">AWS SSM Parameter Store Cost Calculator</a> to model
     advanced parameters + API calls with your effective pricing.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Confirm how often applications fetch parameters (per request vs per startup).</li>
+    <li>Estimate calls/month from instance count and fetch frequency; validate with a real week of usage.</li>
+    <li>Watch for spike drivers: pod churn, cold starts, and retry loops.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store cost</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
+</GuideLayout>

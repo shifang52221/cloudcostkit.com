@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ses-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What typically drives SES cost?",
@@ -44,5 +44,18 @@ const description =
     Use <a href="/calculators/aws-ses-cost-calculator/">AWS SES Cost Calculator</a> to estimate send charges and optional
     transfer from average email size.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Separate transactional vs marketing volume (different variability and spike patterns).</li>
+    <li>Watch for incident spikes: alert storms and retry loops can multiply sends quickly.</li>
+    <li>Validate average email size if you include transfer/attachment assumptions.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ses-cost-calculator/">SES cost</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
+</GuideLayout>

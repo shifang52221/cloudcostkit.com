@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What usually drives Route 53 cost?",
@@ -44,5 +44,18 @@ const description =
     Use <a href="/calculators/aws-route-53-cost-calculator/">AWS Route 53 Cost Calculator</a> for a simple zones + queries + health checks model.
     Then refine query volume using metrics/logs from a representative time window.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate query volume from a representative window (avoid incident spikes).</li>
+    <li>Check TTL strategy: extremely low TTL increases query volume and cost.</li>
+    <li>Watch for retry storms and resolver misconfiguration during incidents.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-route-53-cost-calculator/">Route 53 cost</a>
+    <a class="btn" href="/guides/aws-route-53-estimate-dns-queries/">Estimate DNS queries</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
+</GuideLayout>

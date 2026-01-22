@@ -3,47 +3,66 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Load balancer cost optimization (high-leverage fixes)";
 const description =
-  "A short playbook to reduce load balancer costs: reduce LB count, reduce capacity units, and avoid architectures that create excessive traffic.";
+  "A practical playbook to reduce load balancer costs: reduce LB-hours, reduce LCU/NLCU drivers, and avoid traffic amplification patterns. Includes validation steps and related calculators.";
+const faqs = [
+  {
+    q: "What's the fastest lever for load balancer cost?",
+    a: "Reduce the number of load balancers (LB-hours). In Kubernetes, one load balancer per service patterns can create many always-on load balancers.",
+  },
+  {
+    q: "How do I reduce LCU/NLCU charges?",
+    a: "Reduce the drivers: requests, connections, bytes processed, and TLS overhead. Also fix retry storms and chatty clients that multiply traffic.",
+  },
+  {
+    q: "Why do load balancer bills spike during incidents?",
+    a: "Retries/timeouts can multiply requests and bytes. If clients retry aggressively, the load balancer sees higher request and connection volume even if success traffic is unchanged.",
+  },
+  {
+    q: "Should I optimize for LB-hours or LCUs first?",
+    a: "If you have many load balancers, start with LB-hours. If you have a few high-traffic load balancers, focus on LCUs/NLCUs and the traffic drivers.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-load-balancer-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest lever for load balancer cost?",
-      a: "Reduce the number of load balancers (LB-hours). In Kubernetes, “one LB per service” patterns can create lots of always-on LBs.",
-    },
-    {
-      q: "How do I reduce LCU/NLCU charges?",
-      a: "Reduce the drivers: requests, connections, bytes processed, and TLS overhead. Also fix retry storms and chatty clients that multiply traffic.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
-    Load balancer bills scale with always-on hours and usage. Most savings come from reducing LB count and reducing unit
-    usage (LCU/NLCU).
+    Load balancer bills usually scale with always-on hours and usage. Most savings come from reducing LB count and
+    reducing capacity-unit drivers (LCU/NLCU).
   </p>
 
-  <h2>1) Reduce the number of load balancers</h2>
+  <h2>1) Reduce the number of load balancers (LB-hours)</h2>
   <ul>
     <li>Consolidate services behind shared ingress where feasible.</li>
-    <li>Avoid “one LB per microservice” unless it’s required.</li>
-    <li>Remove unused LBs left behind by experiments and migrations.</li>
+    <li>Avoid one load balancer per microservice unless it is required.</li>
+    <li>Remove unused load balancers left behind by experiments and migrations.</li>
   </ul>
 
-  <h2>2) Reduce unit usage</h2>
+  <h2>2) Reduce unit usage (LCU / NLCU)</h2>
   <ul>
-    <li>Reduce payload sizes (compression, avoid huge downloads through LB).</li>
     <li>Fix retry storms and timeouts that multiply requests.</li>
     <li>Reduce chatty patterns and excessive short-lived connections.</li>
+    <li>Reduce payload sizes (compression, avoid large downloads through the load balancer where possible).</li>
+    <li>Use caching (CDN) for static assets so fewer bytes go through the load balancer.</li>
   </ul>
 
-  <h2>3) Validate with a calculator</h2>
-  <p>
-    Use <a href="/calculators/aws-load-balancer-cost-calculator/">AWS Load Balancer Cost Calculator</a> to see how reducing
-    LB count or unit usage changes your monthly bill.
-  </p>
+  <h2>3) Validate the estimate (before/after)</h2>
+  <ul>
+    <li>Track LB count and hours (how many load balancers are always on).</li>
+    <li>Track request rate, connection rate, and bytes processed (the capacity-unit drivers).</li>
+    <li>Re-check incident windows: spikes often come from retries and bot traffic.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/calculators/aws-load-balancer-estimate-lcu/">Estimate LCU/NLCU</a>
+    <a class="btn" href="/guides/aws-load-balancer-lcu-explained/">LCU explained</a>
+    <a class="btn" href="/guides/aws-alb-vs-nlb-cost/">ALB vs NLB</a>
+  </div>
 </GuideLayout>
 

@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What are the main cost components for archival storage?",
@@ -48,5 +48,19 @@ const description =
     storage + retrieval model. If your workload frequently deletes or replaces objects, add minimum-duration effects to
     your estimate.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate retrieval GB/month and retrieval request counts from restore jobs or access patterns.</li>
+    <li>Watch for small-object amplification: many objects means many retrieval requests.</li>
+    <li>Check minimum duration rules if data is short-lived or overwritten frequently.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Archive cost</a>
+    <a class="btn" href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate retrieval</a>
+    <a class="btn" href="/guides/aws-s3-glacier-cost-optimization/">Reduce archive costs</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+  </div>
+</GuideLayout>

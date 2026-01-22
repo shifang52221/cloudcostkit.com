@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "How are CloudWatch alarms commonly billed?",
@@ -47,5 +47,19 @@ const description =
     Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">AWS CloudWatch Alarms Cost Calculator</a> to estimate
     alarm charges from counts and pricing inputs, then add metrics/logs/dashboards if needed.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Count alarms by type (standard vs high-resolution vs composite) and confirm they are actually needed.</li>
+    <li>Remember adjacent costs: metrics, dashboards, logs ingestion, and notification delivery can dominate.</li>
+    <li>Watch for growth drivers: per-service alarms and per-dimension alarms scale with infrastructure size.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarms cost</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/guides/aws-logging-cost-reduction/">Reduce logging costs</a>
+  </div>
+</GuideLayout>

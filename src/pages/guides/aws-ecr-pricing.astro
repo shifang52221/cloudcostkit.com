@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecr-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What typically drives ECR cost?",
@@ -44,5 +44,19 @@ const description =
     Use <a href="/calculators/aws-ecr-cost-calculator/">AWS ECR Cost Calculator</a> for a simple storage + transfer model.
     Then refine egress based on where your clusters run and whether you replicate images across regions.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate storage with a few representative repos (average image size and retention window).</li>
+    <li>Validate transfer boundary: same region vs cross-region vs internet makes a huge difference.</li>
+    <li>Watch for spike drivers: CI rebuild frequency and multi-arch duplication.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost</a>
+    <a class="btn" href="/guides/aws-ecr-estimate-storage-gb-month/">Estimate storage GB-month</a>
+    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+  </div>
+</GuideLayout>

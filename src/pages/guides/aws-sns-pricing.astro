@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-sns-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What typically drives SNS cost?",
@@ -47,6 +47,21 @@ const description =
     Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS Cost Calculator</a> to estimate publish + delivery charges
     (plus optional transfer). Then refine deliveries with measurements and fan-out assumptions.
   </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate publishes/month and deliveries/month from a representative time window (avoid incident spikes).</li>
+    <li>Model fan-out after filter policies (matched deliveries, not subscribed endpoints).</li>
+    <li>Watch for spike drivers: alert storms, retries, and downstream endpoint failures.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-sns-cost-calculator/">SNS cost</a>
+    <a class="btn" href="/guides/aws-sqs-vs-sns-cost/">SQS vs SNS</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
 
   <p class="muted" style="margin-top:14px">
     Comparison: <a href="/guides/aws-sqs-vs-sns-cost/">SQS vs SNS cost</a>.

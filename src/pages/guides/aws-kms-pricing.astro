@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-kms-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-22"
   faqs={[
     {
       q: "What typically drives KMS cost?",
@@ -44,5 +44,18 @@ const description =
     Use <a href="/calculators/aws-kms-cost-calculator/">AWS KMS Cost Calculator</a> for a quick key + request estimate, then
     refine with measured request volume and caller breakdown.
   </p>
-</GuideLayout>
 
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Identify which services generate KMS calls (storage, secrets, databases, app crypto).</li>
+    <li>Estimate requests/month from workload volume, then validate with a real week of KMS metrics/billing.</li>
+    <li>Watch for spike drivers: retries/timeouts, cold starts, and high-frequency decrypt patterns.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-kms-cost-calculator/">KMS cost</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+  </div>
+</GuideLayout>

@@ -3,23 +3,32 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS SQS cost optimization (high-leverage fixes)";
 const description =
-  "A short playbook to reduce SQS costs: reduce requests per message, avoid retry storms, batch operations, and fix poison messages.";
+  "A practical playbook to reduce SQS costs: reduce requests per message, batch operations, avoid retry storms, and handle poison messages. Includes validation steps and related tools.";
+const faqs = [
+  {
+    q: "What's the fastest way to reduce SQS cost?",
+    a: "Reduce total requests: batch operations, reduce retries, and avoid excess Receive calls from aggressive polling patterns.",
+  },
+  {
+    q: "Why do poison messages cause bill spikes?",
+    a: "They can loop through retries and DLQ workflows, creating many billable receives/deletes and extra downstream work.",
+  },
+  {
+    q: "How do I estimate request volume?",
+    a: "Start from messages/month, then multiply by requests/message (Send + Receive + Delete plus retries). Validate with CloudWatch sent/received/deleted metrics.",
+  },
+  {
+    q: "What typically increases requests per message?",
+    a: "Retries, visibility timeout extensions, consumer failures, and designs where a single logical message triggers multiple API calls.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-sqs-cost-optimization"
-  lastUpdated="2026-01-21"
-  faqs={[
-    {
-      q: "What’s the fastest way to reduce SQS cost?",
-      a: "Reduce total requests: batch operations, reduce retries, and avoid excess Receive calls from polling patterns.",
-    },
-    {
-      q: "Why do poison messages cause bill spikes?",
-      a: "They can loop through retries and DLQ workflows, creating many billable receives/deletes and extra downstream work.",
-    },
-  ]}
+  lastUpdated="2026-01-22"
+  faqs={faqs}
 >
   <p class="muted">
     SQS spend scales with request volume. Most cost wins come from reducing how many API calls you make per successful
@@ -35,7 +44,7 @@ const description =
   <ul>
     <li>Use backoff and jitter on retries.</li>
     <li>Detect poison messages early and route them to a DLQ.</li>
-    <li>Improve timeouts so messages don’t get reprocessed repeatedly.</li>
+    <li>Improve timeouts so messages don't get reprocessed repeatedly.</li>
   </ul>
 
   <h2>3) Reduce unnecessary Receive traffic</h2>
@@ -45,9 +54,22 @@ const description =
   </p>
 
   <h2>4) Validate changes with a calculator</h2>
-  <p>
-    Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS Cost Calculator</a> to see how reducing “requests per
-    message” changes monthly cost, then confirm with your metrics.
-  </p>
+  <ul>
+    <li>
+      Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS Cost Calculator</a> to model requests per message and
+      see how cost changes.
+    </li>
+    <li>
+      Validate with metrics: NumberOfMessagesSent/Received/Deleted, and a representative week of volume.
+    </li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-sqs-estimate-requests/">Estimate SQS requests</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/aws-sqs-cost-calculator/">SQS cost calculator</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+  </div>
 </GuideLayout>
 
