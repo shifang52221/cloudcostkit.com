@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-data-transfer"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -35,56 +35,97 @@ const faqs = [
     This guide helps you model transfer in a way that avoids double-counting and missed costs.
   </p>
 
-  <h2>Step 1: Identify what kind of transfer you have</h2>
-  <ul>
-    <li>Internet egress (downloads to end users or external systems)</li>
-    <li>Cross-region access patterns (multi-region apps reading from S3)</li>
-    <li>Replication/copy traffic (CRR or replication features)</li>
-    <li>CDN origin egress (cache fill) if you use a CDN in front of S3</li>
-  </ul>
-
-  <h2>Step 2: Estimate GB/month</h2>
+  <h2>Step 1: Map the transfer boundary (draw the path)</h2>
   <p>
-    Start from analytics if you have them. If you only have throughput charts, convert Mbps to GB/month using the Units
-    Converter.
+    Transfer estimates fail when you do not define what is "inside" vs "outside" the billed boundary. Start by drawing a simple path for a real request:
+    client -&gt; CDN (optional) -&gt; origin (S3) -&gt; compute -&gt; other regions -&gt; external systems.
   </p>
   <ul>
     <li>
-      Throughput method: use <a href="/calculators/unit-converter/">Units Converter</a> to convert Mbps to GB/month.
+      <strong>Internet egress</strong>: S3 to the public internet (downloads to users, customers, partners)
     </li>
     <li>
-      Request method: convert from response sizes with{" "}
+      <strong>CDN origin egress (cache fill)</strong>: S3 to CDN on cache misses, revalidation, and edge fills
+    </li>
+    <li>
+      <strong>Cross-region reads</strong>: app in Region A reading a bucket in Region B
+    </li>
+    <li>
+      <strong>Replication/copy traffic</strong>: CRR/SRR, batch copies, migrations, backfills
+    </li>
+    <li>
+      <strong>Private networking paths</strong>: VPC endpoints, inter-AZ traffic, and "inside the cloud" flows that still show up as transfer usage types
+    </li>
+  </ul>
+
+  <h2>Step 2: Estimate GB/month (3 practical methods)</h2>
+  <p>Choose the method that matches what you can measure today. You can refine later.</p>
+  <ul>
+    <li>
+      <strong>Throughput method</strong>: if you have Mbps charts (APM, CDN analytics, load balancer metrics), convert Mbps to GB/month with{" "}
+      <a href="/calculators/unit-converter/">Units Converter</a>.
+    </li>
+    <li>
+      <strong>Request method</strong>: if you know requests/day and average bytes served, compute GB/month. Tool:{" "}
       <a href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>.
     </li>
     <li>
-      Billing/metrics method: prefer measured bytes (billing exports, storage access logs, CDN metrics).
+      <strong>Billing/log method</strong>: prefer measured bytes from CUR/Cost Explorer, S3 access logs, or CDN metrics. This avoids unit mistakes.
     </li>
   </ul>
 
-  <h2>Step 3: Price the right boundary</h2>
+  <h2>Step 3: Price the right line item (egress vs cross-region vs CDN)</h2>
   <ul>
     <li>
-      Internet egress: <a href="/calculators/data-egress-cost-calculator/">data egress cost</a>
+      <strong>Internet egress</strong>: <a href="/calculators/data-egress-cost-calculator/">data egress cost</a>
     </li>
     <li>
-      Cross-region: <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>
+      <strong>Cross-region</strong>: <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>
     </li>
     <li>
-      CDN bandwidth: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+      <strong>CDN bandwidth</strong>: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    </li>
+  </ul>
+  <p class="muted">
+    A common pattern is paying both: (1) CDN bandwidth (edge-to-user) and (2) origin egress (S3-to-CDN) on cache fill. They are not the same GB.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>User downloads</strong> = downloads/month * average object size (GB)
+    </li>
+    <li>
+      <strong>CDN cache fill</strong> = cache misses/month * average object size (GB) + revalidation traffic (if meaningful)
+    </li>
+    <li>
+      <strong>Cross-region reads</strong> = reads/month * average read size (GB) for each region boundary
+    </li>
+    <li>
+      <strong>Replication</strong> = changed data replicated (GB/month) + one-time backfill (if any)
     </li>
   </ul>
 
-  <h2>Validation checklist (avoid double counting)</h2>
+  <h2>Common pitfalls (transfer is easy to mis-price)</h2>
   <ul>
     <li>
       Separate <strong>CDN bandwidth</strong> (edge-to-user) from <strong>S3 origin egress</strong> (S3-to-CDN cache
       fill). Guide: <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
     </li>
-    <li>Separate user downloads from replication traffic (different drivers and sometimes different pricing).</li>
-    <li>Validate units: GB vs GiB (use the Units Converter if you're unsure).</li>
+    <li>Mixing <strong>replication</strong> traffic with user downloads. Replication is driven by writes/churn, not reads.</li>
+    <li>Forgetting the "inside cloud" boundary (cross-region reads, private networking, NAT/egress paths).</li>
+    <li>Using average object size without checking compression, partial responses, or range requests.</li>
+    <li>Unit errors: GB vs GiB and Mbps vs MB/s (use the Units Converter if you're unsure).</li>
   </ul>
 
-  <h2>Related calculators</h2>
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>In CUR/Cost Explorer, group by usage type and confirm your model maps to real transfer usage lines.</li>
+    <li>Compare your estimated GB/month to CDN analytics bytes served and to S3 access logs (if enabled).</li>
+    <li>Spot-check a top 1-3 endpoints/prefixes to confirm average response size assumptions.</li>
+  </ul>
+
+  <h2>Related calculators and guides</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
@@ -92,4 +133,18 @@ const faqs = [
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
     <a class="btn" href="/guides/s3-replication-cost/">Replication cost guide</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/ec2/pricing/on-demand/#Data_Transfer" target="_blank" rel="nofollow noopener">
+        AWS data transfer pricing (reference)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

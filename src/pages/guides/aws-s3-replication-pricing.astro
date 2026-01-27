@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-replication-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -31,19 +31,49 @@ const faqs = [
     and churn, not by total stored data.
   </p>
 
-  <h2>1) Estimate replication volume from writes</h2>
+  <h2>What to model (replication is not one number)</h2>
+  <ul>
+    <li>
+      <strong>Replicated GB/month</strong>: changed data replicated (steady-state driver)
+    </li>
+    <li>
+      <strong>One-time backfill</strong>: initial copy of existing objects (migration/enablement event)
+    </li>
+    <li>
+      <strong>Destination storage</strong>: replica storage GB-month (often the largest ongoing cost)
+    </li>
+    <li>
+      <strong>Request overhead</strong>: extra PUT/COPY/LIST and control-plane activity can show up for high-churn buckets
+    </li>
+    <li>
+      <strong>Region boundary</strong>: CRR can introduce transfer-like costs compared to SRR
+    </li>
+  </ul>
+
+  <h2>1) Estimate replication volume from writes (steady-state)</h2>
   <p>
     Use <a href="/guides/estimate-replication-gb-per-month-from-writes/">this guide</a> to estimate replicated GB/month
     from GB/day writes or PUT counts and object size.
   </p>
+  <p class="muted">
+    Replication volume tracks <strong>changed bytes</strong>. If your workload rewrites objects often (churn), replicated GB/month can be much larger than "new data added".
+  </p>
 
-  <h2>2) Price the per-GB replication line item</h2>
+  <h2>2) Price the per-GB replication line item (and keep backfill separate)</h2>
   <p>
     Use a per-GB assumption that matches your plan (feature fee, transfer-like pricing, or both):
   </p>
   <ul>
     <li><a href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a></li>
     <li><a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer cost</a></li>
+  </ul>
+  <ul>
+    <li>
+      Create a <strong>backfill scenario</strong> for the initial copy (bucket size at enablement time).
+    </li>
+    <li>
+      Create a <strong>steady-state scenario</strong> for replicated GB/month from writes/churn.
+    </li>
   </ul>
 
   <h2>3) Don't forget destination storage</h2>
@@ -58,19 +88,28 @@ const faqs = [
     <a href="/guides/s3-crr-vs-srr-cost/">S3 CRR vs SRR cost</a>.
   </p>
 
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using total bucket size as the monthly replication input (unless you are modeling a one-time backfill).</li>
+    <li>Missing churn: frequent overwrites and deletes create replicated bytes that do not show up as "growth".</li>
+    <li>Forgetting destination storage GB-month (replication is usually double storage).</li>
+    <li>Not separating CRR transfer-like effects from SRR.</li>
+    <li>Assuming replication is "free" operationally: backlog and retries during incidents can create peaks.</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>After enablement, reconcile replicated bytes and replica storage in CUR/Cost Explorer.</li>
+    <li>Validate replication volume by sampling writes/day and object sizes for a representative week.</li>
+    <li>Track one-time events separately (backfills, migrations, reprocessing).</li>
+  </ul>
+
   <h2>Related tools</h2>
   <p>
     <a class="btn" href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a>
     <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
     <a class="btn" href="/guides/s3-replication-cost/">S3 replication cost</a>
   </p>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Validate which boundary is billed: storage, requests, egress, replication, retrieval.</li>
-    <li>Separate CDN bandwidth from origin egress (cache fill) when using a CDN.</li>
-    <li>Validate units (GB vs GiB) and request units (per 1k/10k/1M).</li>
-  </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
@@ -79,5 +118,14 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing (replication and storage classes)
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>

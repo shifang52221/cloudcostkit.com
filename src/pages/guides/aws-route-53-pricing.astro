@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What usually drives Route 53 cost?",
@@ -19,6 +19,14 @@ const description =
       q: "Why do query charges grow over time?",
       a: "Low TTLs, service growth (more pods/instances), and resolver behavior can increase query volume. Incident-driven retries can also create sudden spikes.",
     },
+    {
+      q: "Should I estimate queries using RPS or from logs?",
+      a: "If you have query logs, use them. If not, RPS can be a good first pass. Convert RPS to monthly queries, then add a peak scenario for incidents and traffic spikes.",
+    },
+    {
+      q: "Do record types matter for pricing?",
+      a: "For first-pass budgets, query count is usually the key. But certain features (like health checks and advanced routing) can change the model, so treat them as separate line items.",
+    },
   ]}
 >
   <p>
@@ -26,7 +34,7 @@ const description =
     and (optionally) <strong>health checks</strong>. The best cost model starts with measured query volume.
   </p>
 
-  <h2>What to model</h2>
+  <h2>What to model (the 3 line items)</h2>
   <ul>
     <li>
       <strong>Hosted zones</strong>: how many zones you maintain across environments/accounts
@@ -39,23 +47,113 @@ const description =
     </li>
   </ul>
 
-  <h2>A fast estimate</h2>
+  <h2>How to get the inputs (without guessing)</h2>
+  <ul>
+    <li>
+      <strong>Zones</strong>: list public and private zones separately. In multi-account setups, zones often get duplicated across
+      environments.
+    </li>
+    <li>
+      <strong>Queries</strong>: prefer a measured window from query logs. If you do not have logs, start from DNS QPS/RPS and convert
+      to monthly.
+    </li>
+    <li>
+      <strong>Health checks</strong>: count them, and confirm whether you have per-endpoint checks, multi-region checks, or checks per
+      record.
+    </li>
+  </ul>
+
+  <h2>A fast estimate (2 scenarios, not 1)</h2>
   <p class="muted">
     Use <a href="/calculators/aws-route-53-cost-calculator/">AWS Route 53 Cost Calculator</a> for a simple zones + queries + health checks model.
     Then refine query volume using metrics/logs from a representative time window.
   </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate query volume from a representative window (avoid incident spikes).</li>
-    <li>Check TTL strategy: extremely low TTL increases query volume and cost.</li>
-    <li>Watch for retry storms and resolver misconfiguration during incidents.</li>
+    <li>
+      <strong>Baseline scenario</strong>: a typical week (exclude outage windows and launch days).
+    </li>
+    <li>
+      <strong>Peak scenario</strong>: incident retry storms, cache misses, or a short-lived traffic spike. This is what prevents a
+      budget from failing in real life.
+    </li>
+  </ul>
+
+  <h2>Query estimation methods</h2>
+  <h3>Method A: From query logs (best)</h3>
+  <ul>
+    <li>Enable Route 53 query logging and sample at least 7 days.</li>
+    <li>Compute: queries/day by hosted zone and top record names.</li>
+    <li>Use the peak day as a sanity check for incident windows.</li>
+  </ul>
+  <h3>Method B: From request rate (good first pass)</h3>
+  <ul>
+    <li>
+      Convert RPS/QPS to monthly queries using{" "}
+      <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+    </li>
+    <li>Apply a multiplier for retries and cache misses (use a separate peak scenario rather than one inflated average).</li>
+  </ul>
+
+  <h2>What usually causes surprise bills (and how to prevent them)</h2>
+  <ul>
+    <li>
+      <strong>Very low TTLs</strong>: every resolver cache refresh becomes a paid query. Low TTLs have a purpose, but treat them as a
+      cost decision.
+    </li>
+    <li>
+      <strong>Service scale-out</strong>: more pods/instances often means more DNS lookups (especially with chatty clients or short DNS
+      caches in runtimes).
+    </li>
+    <li>
+      <strong>Retry storms</strong>: outages can multiply DNS queries as clients retry or fail over. Keep a peak scenario in your model.
+    </li>
+    <li>
+      <strong>Health check sprawl</strong>: checks per endpoint and per environment add steady monthly cost and can be missed in budgets.
+    </li>
+    <li>
+      <strong>CNAME chains</strong>: not always a cost problem, but they can increase lookup behavior and worsen incident sensitivity.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Hosted zones cost</strong> = public zones + private zones (as applicable)
+    </li>
+    <li>
+      <strong>Query cost</strong> = standard queries/month (baseline) + standard queries/month (peak scenario)
+    </li>
+    <li>
+      <strong>Health checks cost</strong> = health checks/month (baseline) + any extra checks used only for peak events
+    </li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>In Cost Explorer / CUR, confirm you see distinct line items for hosted zones, queries, and health checks.</li>
+    <li>Compare baseline vs peak: if peak is not materially higher, you may be missing incident behavior in your model.</li>
+    <li>Audit the top record names from query logs and look for noisy internal service discovery patterns.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-route-53-cost-calculator/">Route 53 cost</a>
     <a class="btn" href="/guides/aws-route-53-estimate-dns-queries/">Estimate DNS queries</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/route53/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon Route 53 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html" target="_blank" rel="nofollow noopener">
+        Route 53 query logging
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

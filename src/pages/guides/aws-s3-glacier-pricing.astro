@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What are the main cost components for archival storage?",
@@ -19,6 +19,10 @@ const description =
       q: "Why do small objects increase cost?",
       a: "Because retrieval is billed on both GB and requests. Many small-object restores can create high request counts even if total GB is modest.",
     },
+    {
+      q: "What else should I include besides storage and retrieval?",
+      a: "For a realistic model, include transition/restore events (if applicable), minimum duration effects, and the operational workflow (how often you rehydrate and how long you keep restored copies).",
+    },
   ]}
 >
   <p>
@@ -26,7 +30,7 @@ const description =
     and how your data is packaged (large objects vs many small objects).
   </p>
 
-  <h2>What to model</h2>
+  <h2>What to model (the full archive cost picture)</h2>
   <ul>
     <li>
       <strong>Stored GB-month</strong>: average stored GB over the month
@@ -40,20 +44,67 @@ const description =
     <li>
       <strong>Minimum duration / early deletion</strong>: if you delete/overwrite before the minimum duration
     </li>
+    <li>
+      <strong>Transitions</strong>: how often objects move into archive (and whether you churn objects between tiers)
+    </li>
   </ul>
 
-  <h2>A fast estimate</h2>
+  <h2>How to estimate without copying price tables</h2>
+  <p>
+    You do not need a full price matrix to build a good budget. Build a model with stable inputs and validate with billing after one cycle:
+    average stored GB-month, restored GB/month, and objects restored/month (requests).
+  </p>
+
+  <h2>A fast estimate (baseline + peak)</h2>
   <p class="muted">
     Use <a href="/calculators/aws-s3-glacier-cost-calculator/">AWS S3 Glacier / Deep Archive Cost Calculator</a> for a
     storage + retrieval model. If your workload frequently deletes or replaces objects, add minimum-duration effects to
     your estimate.
   </p>
+  <ul>
+    <li>
+      <strong>Baseline</strong>: typical month restores and object counts.
+    </li>
+    <li>
+      <strong>Peak</strong>: audits, backfills, reprocessing, incident-driven restores.
+    </li>
+  </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using "total archive size" as the retrieval input (retrieval is about restored volume, not stored volume).</li>
+    <li>Ignoring object counts when archives contain many small files.</li>
+    <li>Short-lived data in tiers with minimum duration.</li>
+    <li>Frequent rehydration workflows that turn archive into a warm tier by accident.</li>
+    <li>Assuming all restores look like the average (backfills are usually the outlier).</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
   <ul>
     <li>Validate retrieval GB/month and retrieval request counts from restore jobs or access patterns.</li>
     <li>Watch for small-object amplification: many objects means many retrieval requests.</li>
     <li>Check minimum duration rules if data is short-lived or overwritten frequently.</li>
+    <li>After one billing cycle, reconcile usage types in CUR/Cost Explorer against your baseline and peak scenarios.</li>
+  </ul>
+
+  <h2>How to choose an archival class (latency vs retrieval frequency)</h2>
+  <p>
+    "Archive" is not one thing. The right class depends on how often you restore and how fast you need the data. If restores are part of a weekly workflow,
+    you may want a warmer tier or a cached analysis copy instead of treating restores as a routine operation.
+  </p>
+  <ul>
+    <li>
+      <strong>Latency requirement</strong>: seconds/minutes/hours to first byte changes your operational workflow (and what a "failed restore" means).
+    </li>
+    <li>
+      <strong>Restore volume</strong>: large backfills are usually the peak month; model that peak explicitly.
+    </li>
+    <li>
+      <strong>Object count</strong>: packaging many small files into fewer objects can reduce request-like fees and make restores operationally simpler.
+    </li>
+    <li>
+      <strong>Data lifetime</strong>: if you delete or overwrite frequently, minimum duration can erase savings.
+    </li>
   </ul>
 
   <h2>Related tools</h2>
@@ -63,4 +114,18 @@ const description =
     <a class="btn" href="/guides/aws-s3-glacier-cost-optimization/">Reduce archive costs</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing (Glacier / Deep Archive classes)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html" target="_blank" rel="nofollow noopener">
+        S3 storage classes overview
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

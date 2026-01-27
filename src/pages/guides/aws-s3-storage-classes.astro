@@ -27,12 +27,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-storage-classes"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
     Storage classes are a common source of confusion. Cheaper per-GB tiers can introduce retrieval, transition, and
     minimum storage duration effects that matter for bursty access patterns.
+  </p>
+
+  <h2>When storage classes change total cost</h2>
+  <p>
+    Storage classes are a trade: you pay less per GB-month in exchange for constraints (access latency, retrieval and transition fees,
+    and minimum storage duration). The correct choice depends on access pattern shape, not on "how cold it feels".
   </p>
 
   <h2>How to model storage classes safely</h2>
@@ -41,6 +47,25 @@ const faqs = [
     <li>Estimate average GB-month stored in each tier.</li>
     <li>Estimate retrieval GB/month for colder tiers.</li>
     <li>Model transitions if you move objects between tiers regularly.</li>
+  </ul>
+
+  <h2>Decision checklist (pick the right tier)</h2>
+  <ul>
+    <li>
+      <strong>Restore SLA</strong>: do you need seconds, minutes, or hours to access cold data?
+    </li>
+    <li>
+      <strong>Read frequency</strong>: monthly reads are different from weekly reads (archive can become expensive fast).
+    </li>
+    <li>
+      <strong>Object count</strong>: many small objects increase request-like costs and operational overhead.
+    </li>
+    <li>
+      <strong>Lifecycle churn</strong>: do you overwrite/delete frequently (minimum duration matters)?
+    </li>
+    <li>
+      <strong>Transition volume</strong>: how much data you move between tiers each month.
+    </li>
   </ul>
 
   <h2>When archive fees matter</h2>
@@ -56,6 +81,27 @@ const faqs = [
     <li>Ignoring retrieval: even small retrieval GB/month can matter at scale.</li>
     <li>Over-transitioning: moving objects too often creates transition fees.</li>
     <li>Forgetting transfer: delivery to users/CDNs can dominate storage cost.</li>
+    <li>Assuming archive is best for analytics datasets that are rehydrated repeatedly.</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Hot storage</strong> = GB-month (hot tier)
+    </li>
+    <li>
+      <strong>Warm storage</strong> = GB-month (warm tier) + transitions/month (if applicable)
+    </li>
+    <li>
+      <strong>Archive</strong> = GB-month (archive tier) + retrieval GB/month + retrieval requests/month
+    </li>
+  </ul>
+
+  <h2>How to validate a tiering plan</h2>
+  <ul>
+    <li>Run a 30-day access analysis: bytes retrieved and objects retrieved by prefix/age bucket.</li>
+    <li>Simulate a baseline and a peak month (backfills/audits) for retrieval volume.</li>
+    <li>After rollout, reconcile retrieval and transition usage types against the model.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -66,5 +112,13 @@ const faqs = [
     <a class="btn" href="/guides/aws-s3-pricing/">S3 pricing model</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs (general)</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing (storage classes, transitions, retrieval)
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

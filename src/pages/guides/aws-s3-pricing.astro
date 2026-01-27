@@ -17,32 +17,66 @@ const faqs = [
   {
     "q": "How do I validate?",
     "a": "Compare your estimate against a real week of metrics/billing and verify units and boundaries."
+  },
+  {
+    "q": "What is the most common S3 budgeting mistake?",
+    "a": "Ignoring data transfer boundaries: CDN bandwidth vs origin egress, cross-region reads, and replication traffic are easy to double-count or miss."
   }
 ];
 
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
     S3-like object storage pricing looks simple until you add data movement. A solid model covers four common buckets:
     <strong>storage</strong>, <strong>requests</strong>, <strong>egress</strong>, and <strong>replication/copy</strong>.
   </p>
+
+  <h2>0) Define what you are estimating (and for which month)</h2>
+  <ul>
+    <li>
+      <strong>Budget month</strong>: pick a month that reflects typical usage (or define baseline + peak).
+    </li>
+    <li>
+      <strong>Boundary</strong>: are you estimating "S3 only" or "S3 + delivery" (CDN, transfer, replication)?
+    </li>
+    <li>
+      <strong>Regions</strong>: cross-region patterns change the bill more than many teams expect.
+    </li>
+  </ul>
 
   <h2>1) Storage (GB-month)</h2>
   <p>
     Use average stored GB (GB-month). If your dataset grows, average is more accurate than end-of-month GB.
     Tool: <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>.
   </p>
+  <ul>
+    <li>
+      Split by tier if needed (hot / warm / archive). For tiering decisions, see <a href="/guides/aws-s3-storage-classes/">S3 storage classes</a>.
+    </li>
+    <li>
+      If lifecycle moves data to Glacier/Deep Archive, treat retrieval as a separate driver, not a footnote.
+    </li>
+  </ul>
 
   <h2>2) Requests (GET/PUT/LIST)</h2>
   <p>
     Requests are often small for large-object workloads, but can be material for millions of small objects.
     Tool: <a href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a>.
   </p>
+  <ul>
+    <li>Prefer measured counts from billing exports or access logs.</li>
+    <li>
+      If you only have RPS, convert with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+    </li>
+  </ul>
 
   <h2>3) Egress (data transfer out)</h2>
   <p>
     Egress is the most common surprise cost. If you read lots of data out of storage, $/GB transfer can dominate.
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
+  </p>
+  <p class="muted">
+    If you use a CDN, separate edge bandwidth from origin egress. Guide: <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
   </p>
 
   <h2>4) Replication and cross-region copy</h2>
@@ -52,6 +86,35 @@ const faqs = [
     <a href="/guides/estimate-replication-gb-per-month-from-writes/">estimate replication volume</a> and
     <a href="/calculators/s3-replication-cost-calculator/">S3 replication cost calculator</a>.
   </p>
+  <ul>
+    <li>Include destination storage (you usually store the data twice).</li>
+    <li>Keep a one-time backfill scenario separate from steady-state replication.</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Storage</strong> = average GB-month (split by tier if needed)
+    </li>
+    <li>
+      <strong>Requests</strong> = GET + PUT + LIST + other request classes (measured or derived from RPS)
+    </li>
+    <li>
+      <strong>Transfer</strong> = internet egress + cross-region reads + CDN origin egress (modeled separately)
+    </li>
+    <li>
+      <strong>Replication</strong> = replicated GB/month + destination storage + any one-time backfill
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Modeling only "bucket size" and missing transfer and replication.</li>
+    <li>Using one average for requests and missing short spikes (deploys, batch, incidents).</li>
+    <li>Double-counting CDN bandwidth and origin egress as the same GB.</li>
+    <li>Ignoring object-count effects (small objects increase request costs and operational overhead).</li>
+    <li>Forgetting that replication is driven by writes/churn, not total stored data.</li>
+  </ul>
 
   <h2>Related calculators</h2>
   <p>
@@ -60,11 +123,11 @@ const faqs = [
     <a class="btn" href="/guides/s3-pricing-explained/">S3 pricing explained</a>
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>How to validate the estimate</h2>
   <ul>
-    <li>Validate which boundary is billed: storage, requests, egress, replication, retrieval.</li>
-    <li>Separate CDN bandwidth from origin egress (cache fill) when using a CDN.</li>
-    <li>Validate units (GB vs GiB) and request units (per 1k/10k/1M).</li>
+    <li>In CUR/Cost Explorer, confirm distinct usage lines for storage, requests, and transfer exist as expected.</li>
+    <li>Validate units: GB vs GiB and request units (per 1k/10k/1M). Do not mix request classes.</li>
+    <li>Reconcile one representative week of logs/metrics against your baseline assumptions.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -74,5 +137,14 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>

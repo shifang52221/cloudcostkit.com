@@ -27,12 +27,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
     Archive storage is optimized for rare reads. If you frequently restore, you may be better served by a warmer tier or
     by changing workflow patterns so you do fewer restores.
+  </p>
+
+  <h2>Start with the real lever: reduce restores</h2>
+  <p>
+    Glacier/Deep Archive is not "cheap storage" if you repeatedly rehydrate the same data. Cost optimization is mostly a workflow problem:
+    avoid restores, reduce restored GB, and reduce the number of objects you retrieve.
   </p>
 
   <h2>1) Reduce restores and rehydration</h2>
@@ -41,6 +47,9 @@ const faqs = [
     <li>For frequent analytics, consider a warmer storage class or a separate analysis copy.</li>
     <li>Avoid restoring "just in case" - restore based on explicit demand.</li>
   </ul>
+  <p class="muted">
+    Practical pattern: keep "hot last 30 days" in a warm tier, keep long retention in archive, and only restore when you have a concrete job that needs it.
+  </p>
 
   <h2>2) Reduce small-object request volume</h2>
   <ul>
@@ -48,19 +57,62 @@ const faqs = [
     <li>Batch retrieval and avoid per-file interactive restores.</li>
     <li>Prefer workflows that read sequentially from fewer objects.</li>
   </ul>
+  <p class="muted">
+    Retrieval is billed on both GB and requests. The same 1 TB restored can be a few hundred objects or tens of millions of objects - and the request bill is very different.
+  </p>
 
-  <h2>3) Avoid minimum duration penalties</h2>
+  <h2>3) Avoid minimum duration and early deletion penalties</h2>
   <ul>
     <li>Be mindful of minimum storage duration rules when deleting/overwriting.</li>
     <li>Use lifecycle policies intentionally to avoid churn-driven early deletion.</li>
     <li>Keep short-lived data out of tiers with long minimum duration.</li>
   </ul>
 
-  <h2>Quantify changes</h2>
+  <h2>4) Choose a retrieval strategy (do not treat restores as "free")</h2>
+  <ul>
+    <li>
+      <strong>Batch work</strong>: do restores as a scheduled job, not ad-hoc clicks that restore the same data repeatedly.
+    </li>
+    <li>
+      <strong>Restore scope</strong>: restore only the prefixes/partitions you need for the job, not the entire archive.
+    </li>
+    <li>
+      <strong>Restore frequency</strong>: if you restore weekly, you may not be an archive workload anymore.
+    </li>
+  </ul>
+
+  <h2>5) Quantify changes (before you implement)</h2>
   <p>
     Use <a href="/calculators/aws-s3-glacier-cost-calculator/">S3 Glacier / Deep Archive Cost Calculator</a> to estimate
     savings from fewer restores or fewer retrieval requests.
   </p>
+  <ul>
+    <li>
+      Create a <strong>baseline scenario</strong> with current restores/month, restored GB/month, and retrieved objects/month.
+    </li>
+    <li>
+      Create an <strong>optimized scenario</strong> where you reduce restore frequency, batch objects, and avoid early deletion.
+    </li>
+    <li>
+      Use the calculator's <strong>Save scenario</strong> to compare the two without losing inputs.
+    </li>
+  </ul>
+
+  <h2>Common pitfalls (what breaks cost savings)</h2>
+  <ul>
+    <li>Archiving data that is actually read frequently (analytics, compliance audits, backfills).</li>
+    <li>Many tiny objects: request costs and operational complexity explode.</li>
+    <li>Transition churn: moving objects between tiers too often creates transition fees.</li>
+    <li>Short-lived data in tiers with long minimum duration.</li>
+    <li>Restoring the same dataset repeatedly because the workflow has no cache or persisted restored copy.</li>
+  </ul>
+
+  <h2>How to validate the optimization</h2>
+  <ul>
+    <li>Track restores/month and restored GB/month before and after (at least one full billing period).</li>
+    <li>Confirm the object-count effect: did you reduce retrieved objects/month, not just total GB?</li>
+    <li>Validate SLA: restore completion time and downstream job success rate should not regress.</li>
+  </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
@@ -69,5 +121,13 @@ const faqs = [
     <a class="btn" href="/guides/aws-s3-glacier-pricing/">Archive pricing</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing (storage classes, retrieval, transition fees)
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-estimate-retrieval"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -36,11 +36,27 @@ const faqs = [
     millions of small objects.
   </p>
 
-  <h2>Method 1: From restore events</h2>
+  <h2>Define "retrieval" for your workflow</h2>
+  <ul>
+    <li>
+      <strong>Restore</strong>: rehydrating an object so it becomes readable again.
+    </li>
+    <li>
+      <strong>Read after restore</strong>: your jobs scanning the restored data (often the real driver of how often you restore).
+    </li>
+    <li>
+      <strong>Object count</strong>: how many objects you restore, which maps to request-like fees and operational work.
+    </li>
+  </ul>
+
+  <h2>Method 1: From restore events (best if you have history)</h2>
   <ul>
     <li>Restores/month x average restore GB = retrieval GB/month.</li>
     <li>Objects restored/month approximates retrieval requests/month.</li>
   </ul>
+  <p class="muted">
+    If restores vary by day, do not use one average. Keep a baseline and a peak month (backfills and audits are typically the peak).
+  </p>
 
   <h2>Method 2: From analytics workflows</h2>
   <ul>
@@ -48,11 +64,35 @@ const faqs = [
     <li>Large-scale backfills can dominate a single month's cost.</li>
   </ul>
 
-  <h2>Sanity checks</h2>
+  <h2>Method 3: From object counts (when the request bill matters)</h2>
+  <p>
+    If your archive has many small objects, treat "objects restored/month" as a primary input, not an afterthought.
+    Even modest GB restored can become expensive if it is split into millions of objects.
+  </p>
+  <ul>
+    <li>List the top prefixes you restore from and estimate objects restored per job.</li>
+    <li>Multiply by job frequency to get objects/month.</li>
+    <li>Convert to cost using the archive calculator (it models GB and requests separately).</li>
+  </ul>
+
+  <h2>Sanity checks (to avoid underestimating)</h2>
   <ul>
     <li>Many small objects can create very high request counts.</li>
     <li>Batching and packaging data into larger objects can reduce request charges.</li>
     <li>Repeated rehydration suggests you may need a warmer tier or cached analysis copy.</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Retrieval GB/month</strong> = restores/month * GB per restore (baseline + peak scenario)
+    </li>
+    <li>
+      <strong>Retrieval requests/month</strong> = objects restored/month (baseline + peak scenario)
+    </li>
+    <li>
+      <strong>One-time event</strong> = backfill restores (GB) + backfill objects (requests)
+    </li>
   </ul>
 
   <h2>Turn retrieval into cost</h2>
@@ -60,13 +100,33 @@ const faqs = [
     Use <a href="/calculators/aws-s3-glacier-cost-calculator/">AWS S3 Glacier / Deep Archive Cost Calculator</a> with your
     retrieval GB/month and retrieval requests/month assumptions.
   </p>
+  <ul>
+    <li>Create a baseline scenario from the most typical month.</li>
+    <li>Create a peak scenario for audits/backfills and compare.</li>
+    <li>Use Copy inputs (JSON) to share assumptions with teammates during review.</li>
+  </ul>
 
-  <h2>Related reading</h2>
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>After the first month, reconcile your model with actual restore events and billing usage types.</li>
+    <li>Check whether your restores were concentrated in a few days (peaky usage) and keep the peak scenario.</li>
+    <li>Verify object-count assumptions by sampling one representative job and counting restored objects.</li>
+  </ul>
+
+  <h2>Related reading and tools</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-s3-glacier-pricing/">Archive pricing</a>
     <a class="btn" href="/guides/aws-s3-glacier-cost-optimization/">Reduce archive costs</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs</a>
     <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Archive cost tool</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing (archival classes, retrieval and transition fees)
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

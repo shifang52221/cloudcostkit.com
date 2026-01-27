@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-request-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -35,28 +35,66 @@ const faqs = [
     you have millions of small objects, frequent LIST/HEAD calls, or chatty pipelines.
   </p>
 
-  <h2>How to estimate request fees</h2>
+  <h2>What to model (requests are not one bucket)</h2>
   <ul>
-    <li>Collect request counts from logs/metrics/billing exports.</li>
-    <li>Convert RPS to monthly requests if needed.</li>
-    <li>Apply per-request-class pricing assumptions and sum.</li>
+    <li>
+      <strong>Read-like</strong>: GET/HEAD (often tied to user traffic and cache hit rate)
+    </li>
+    <li>
+      <strong>Write-like</strong>: PUT/COPY/POST (often tied to ingestion pipelines and churn)
+    </li>
+    <li>
+      <strong>Listing/metadata</strong>: LIST/Inventory-style scans (can be surprisingly expensive for large namespaces)
+    </li>
+  </ul>
+
+  <h2>How to estimate request fees (practical workflow)</h2>
+  <ul>
+    <li>Collect request counts from billing exports or access logs (preferred).</li>
+    <li>When you only have RPS, convert with the monthly request calculator.</li>
+    <li>Apply request-class pricing (do not blend classes into one number).</li>
+    <li>Add a peak scenario: deploys, backfills, and incidents often multiply requests.</li>
   </ul>
   <p>
     Tool: <a href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>GET/month</strong> = average GET RPS * seconds/month (baseline + peak)
+    </li>
+    <li>
+      <strong>PUT/month</strong> = objects written/month (or PUT RPS converted)
+    </li>
+    <li>
+      <strong>LIST/month</strong> = scans/month * (requests per scan) for your largest prefixes
+    </li>
+  </ul>
+
+  <h2>Common pitfalls (why request bills spike)</h2>
+  <ul>
+    <li>Retry loops and timeouts that multiply GET/HEAD during incidents.</li>
+    <li>LIST over huge prefixes (full scans) instead of using a manifest or index.</li>
+    <li>Many small objects: high requests per GB stored and per GB transferred.</li>
+    <li>Chatty SDK usage: repeated HEAD calls for metadata that could be cached.</li>
+    <li>Backfills and migrations that look like "one-time work" but run for weeks.</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
   <ul>
     <li>Confirm request unit pricing (per 1,000 / 10,000 / 1,000,000) for each request class.</li>
     <li>Separate request fees from transfer: high GET volume often also implies high egress.</li>
     <li>Look for a small number of noisy prefixes/endpoints driving most LIST/HEAD.</li>
+    <li>After the first month, reconcile billing usage types against your modeled request classes.</li>
   </ul>
 
-  <h2>Patterns that drive request spikes</h2>
+  <h2>Safe ways to reduce request costs</h2>
   <ul>
-    <li>Frequent LIST operations over large prefixes</li>
-    <li>Small-object workloads (higher requests per GB stored)</li>
-    <li>ETL pipelines that repeatedly scan metadata</li>
+    <li>Cache metadata (ETags, sizes) to reduce repeated HEAD calls.</li>
+    <li>Batch work: avoid per-object workflows when your access pattern allows it.</li>
+    <li>Replace full LIST scans with an index, manifest, or inventory output.</li>
+    <li>Fix retry storms (timeouts and missing jitter) before they become a request bill.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -67,4 +105,13 @@ const faqs = [
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
     <a class="btn" href="/guides/aws-s3-data-transfer/">S3 transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing (requests)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
