@@ -74,6 +74,17 @@ const faqs = [
     <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
   </p>
 
+  <h2>4) Retention, replays, and slow consumers (hidden multipliers)</h2>
+  <p>
+    Retention and replays change the cost shape. If a consumer falls behind, you may see bursts of redelivery, replay jobs,
+    and heavier "catch-up" months that do not look like your steady state.
+  </p>
+  <ul>
+    <li>DLQ and replay workflows: plan a separate replay month with higher attempts.</li>
+    <li>Ordering and exactly-once features can change throughput and retry behavior; validate for your workload.</li>
+    <li>Large topic payloads: split them out so a single big producer does not hide inside an average.</li>
+  </ul>
+
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
@@ -130,4 +141,3 @@ const faqs = [
     </li>
   </ul>
 </GuideLayout>
-

@@ -97,6 +97,22 @@ const faqs = [
     <li>Pin stateful backends to the same zone as the largest callers where possible.</li>
   </ul>
 
+  <h2>4) Quick diagnostics (fast checks that often explain the bill)</h2>
+  <ul>
+    <li>
+      Check if a service is multi-zone while its database/cache is single-zone (this creates a consistent cross-zone flow).
+    </li>
+    <li>
+      Check if cross-zone load balancing is enabled and whether backends are evenly spread across zones.
+    </li>
+    <li>
+      Check for retry storms during incidents: the same payload is transferred multiple times across zones.
+    </li>
+    <li>
+      Check deployments: container image pulls and artifact downloads can spike cross-zone traffic in short windows.
+    </li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Validate topology: which zones each service and database runs in.</li>
@@ -126,4 +142,3 @@ const faqs = [
     </li>
   </ul>
 </GuideLayout>
-

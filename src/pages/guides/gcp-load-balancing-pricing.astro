@@ -87,6 +87,10 @@ const faqs = [
     Tools: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>,{" "}
     <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>.
   </p>
+  <ul>
+    <li>For APIs, response size (not request count) is usually the better predictor of egress.</li>
+    <li>For file downloads, model the download endpoints separately to avoid hiding them in an average.</li>
+  </ul>
 
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
@@ -134,4 +138,3 @@ const faqs = [
     </li>
   </ul>
 </GuideLayout>
-

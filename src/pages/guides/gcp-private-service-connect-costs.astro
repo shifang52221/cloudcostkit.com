@@ -79,6 +79,17 @@ const faqs = [
     security risk, but it can increase baseline costs via endpoint-hours.
   </p>
 
+  <h2>4) Reduce endpoint sprawl (the baseline lever)</h2>
+  <p>
+    Endpoint-hours are predictable and easy to accidentally inflate. If you have many environments and regions, add a simple
+    governance rule: every endpoint must have an owner, a purpose, and a review date.
+  </p>
+  <ul>
+    <li>Remove unused endpoints after migrations (old and new paths often exist in parallel longer than planned).</li>
+    <li>Consolidate endpoints where possible (avoid one-off endpoints per team/service unless required).</li>
+    <li>Track endpoint inventory in IaC so drift does not create permanent baseline cost.</li>
+  </ul>
+
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
@@ -129,4 +140,3 @@ const faqs = [
     </li>
   </ul>
 </GuideLayout>
-
