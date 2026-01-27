@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Functions pricing: what to include in a realistic estimate";
 const description =
-  "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume - plus how to validate with real metrics.";
+  "A practical Azure Functions cost model: invocations, duration/memory, networking, and log volume - plus a validation checklist to catch retries, cold starts, and chatty dependencies.";
 
 const faqs = [
   {
@@ -12,11 +12,15 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly invocations, average duration, and payload sizes. Add a separate estimate for log ingestion and outbound data transfer.",
+    a: "Estimate monthly invocations and execution time, then add separate lines for outbound transfer and log ingestion/retention.",
+  },
+  {
+    q: "Why do Functions bills spike during incidents?",
+    a: "Retries, timeouts, and upstream latency multiply invocations and duration. Verbose logging during incidents can add a second spike.",
   },
   {
     q: "How do I validate the estimate?",
-    a: "Measure a representative window, then validate retries/timeouts (which multiply invocations) and confirm log volume per invocation.",
+    a: "Measure a representative window, then validate retries/timeouts, cold start behavior, and log bytes per invocation.",
   },
 ];
 ---
@@ -24,63 +28,147 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-functions-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Serverless bills are rarely “just compute”. A solid Azure Functions estimate separates the drivers you can measure:
-    <strong>invocations</strong>, <strong>duration</strong>, <strong>data transfer</strong>, and <strong>logs</strong>.
+    Serverless bills are rarely "just compute". A solid Azure Functions estimate separates measurable drivers:
+    <strong>invocations</strong>, <strong>duration</strong>, <strong>data transfer</strong>, and <strong>logs</strong>. If
+    you do one thing, do this: model <strong>baseline + peak</strong> instead of one average month.
   </p>
 
-  <h2>1) Invocation volume</h2>
+  <h2>0) Pick the right unit of analysis (what triggers what)</h2>
   <p>
-    Start with a monthly request estimate. If the function is triggered by HTTP, map traffic from RPS to monthly requests.
-    If it’s event-driven, use your queue/topic/event stream rates.
+    Before you do any math, decide what actually drives executions. Many teams accidentally use "API requests" when the real
+    driver is "queue messages" or "cron jobs".
   </p>
-  <p>
-    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
-  </p>
+  <ul>
+    <li>
+      <strong>HTTP-triggered</strong>: driver is request volume (RPS, requests/month).
+    </li>
+    <li>
+      <strong>Queue/topic/event-triggered</strong>: driver is message/event rate (events/s, events/day).
+    </li>
+    <li>
+      <strong>Timer/cron-triggered</strong>: driver is schedule count (runs/day).
+    </li>
+    <li>
+      <strong>Fan-out patterns</strong>: one trigger can create N downstream invocations (the hidden multiplier).
+    </li>
+  </ul>
 
-  <h2>2) Duration and concurrency</h2>
+  <h2>1) Invocation volume (requests/month)</h2>
   <p>
-    Duration is the multiplier. Use a percentile (p50 and p95) instead of a single average so you can model “normal” vs
-    “spiky” periods. Spikes often come from upstream latency, retries, or cold starts.
+    Convert your driver into monthly invocations. If HTTP-triggered, convert RPS to requests/month. If event-driven, do the
+    same conversion from events/s to events/month and then multiply by any "fan-out" behavior.
   </p>
+  <p class="muted">
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+  </p>
+  <ul>
+    <li>
+      Keep a separate line for <strong>retries</strong>. A 2x retry rate doubles both invocations and downstream dependencies.
+    </li>
+    <li>
+      Include <strong>non-user traffic</strong> (health checks, bots, cron pings) if it hits your functions.
+    </li>
+  </ul>
 
-  <h2>3) Networking and payload size</h2>
+  <h2>2) Duration and memory (the compute multiplier)</h2>
   <p>
-    Outbound data transfer can become a major cost driver when functions call external APIs, return large responses, or
-    stream data. Estimate response size and outbound volume separately.
+    Duration is the multiplier that turns invocations into compute. Model at least two percentiles (p50 and p95) so you can
+    capture normal behavior and slow-path behavior. Slow paths are usually caused by upstream latency (DB, APIs), cold starts,
+    and throttling.
   </p>
+  <ul>
+    <li>
+      Track <strong>work per invocation</strong>: CPU-bound work scales differently than I/O-bound waiting.
+    </li>
+    <li>
+      If you batch messages, model both <strong>message rate</strong> and <strong>messages per invocation</strong>.
+    </li>
+    <li>
+      If you use durable/workflow functions, treat orchestration and activity calls as separate invocation buckets.
+    </li>
+  </ul>
+
+  <h2>3) Networking and payload size (egress is often the surprise)</h2>
   <p>
+    Outbound data transfer can become a major driver when functions call external APIs, return large responses, or stream
+    data. Estimate response size and outbound volume separately from compute so you can see what really dominates.
+  </p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
     <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
   </p>
+  <ul>
+    <li>
+      Model <strong>external calls</strong> as their own line item (API calls, DB calls) because retries amplify them.
+    </li>
+    <li>
+      Split traffic by destination if needed: same-region, cross-region, and internet have different billing behavior.
+    </li>
+  </ul>
 
-  <h2>4) Logs and observability</h2>
+  <h2>4) Logs and observability (ingestion + retention + scan)</h2>
   <p>
-    Logging cost scales with log volume and retention. If each invocation logs a few KB and you have millions of invocations,
-    log ingestion can exceed compute. Model ingestion, storage, and any query/scan cost separately.
+    Logging scales with volume. If each invocation logs a few KB and you have millions of invocations, log ingestion can
+    exceed compute. Model ingestion, retention storage, and any query/scan cost separately.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
     <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
     <a href="/calculators/log-search-scan-cost-calculator/">Search/scan</a>.
   </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate invocation drivers during incident windows (retries and timeouts multiply costs).</li>
-    <li>Validate average response size and outbound transfer (especially for public APIs).</li>
-    <li>Validate log volume per invocation (sample real logs and multiply by invocation count).</li>
+    <li>
+      Separate <strong>platform logs</strong> (access/diagnostics) from <strong>application logs</strong> (structured logs).
+    </li>
+    <li>
+      Keep a peak scenario: incident logging often increases volume by 2-10x.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Invocations/month</strong> = baseline + peak (include retries and fan-out)
+    </li>
+    <li>
+      <strong>Compute</strong> = invocations/month * avg duration (p50/p95) * memory tier (if applicable)
+    </li>
+    <li>
+      <strong>Egress GB/month</strong> = invocations/month * avg response size (GB) + external API egress
+    </li>
+    <li>
+      <strong>Log GB/month</strong> = invocations/month * avg log bytes/invocation (sample real payloads)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using one average duration instead of modeling the slow path (p95 matters).</li>
+    <li>Ignoring retries/timeouts, which multiply invocations, duration, and dependency calls.</li>
+    <li>Putting secret fetches or config calls on the hot path (see Key Vault guide).</li>
+    <li>Returning large payloads without modeling transfer/egress separately.</li>
+    <li>Verbose logs per invocation (log ingestion dominates at scale).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Measure invocations and duration over a representative window (baseline + peak).</li>
+    <li>Validate retry rates and timeout behavior during incident windows.</li>
+    <li>Sample real log payload size and multiply by invocation volume.</li>
+    <li>Validate response sizes/top endpoints by bytes (avoid blended averages).</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
-    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/azure-key-vault-pricing/">Key Vault operations</a>
   </div>
 
   <h2>Related reading</h2>
@@ -90,4 +178,19 @@ const faqs = [
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/functions/" target="_blank" rel="nofollow noopener">
+        Azure Functions pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/azure-functions/" target="_blank" rel="nofollow noopener">
+        Azure Functions documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

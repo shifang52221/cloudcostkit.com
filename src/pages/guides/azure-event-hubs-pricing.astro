@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Event Hubs pricing: estimate throughput, events, and retention";
 const description =
-  "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic and consumer replays.";
+  "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic, consumer lag, and replay/backfill multipliers.";
 
 const faqs = [
   {
@@ -18,49 +18,104 @@ const faqs = [
     q: "How do I validate?",
     a: "Validate burst traffic and consumer lag; replays and retries can multiply both ingestion and downstream processing costs.",
   },
+  {
+    q: "What's the most common under-budgeting mistake?",
+    a: "Ignoring replays/backfills and assuming consumers read each event once; many pipelines read the same data multiple times.",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/azure-event-hubs-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     Event streaming cost planning works best when you model <strong>bytes</strong> and <strong>replays</strong>. The same
-    stream can be read multiple times by consumers, and that is where estimates often break down.
+    stream can be read multiple times by consumers, and that replay multiplier is where estimates often break down.
   </p>
+
+  <h2>0) Define the stream scope</h2>
+  <ul>
+    <li>
+      <strong>Producers</strong>: which services emit events and at what peak rate.
+    </li>
+    <li>
+      <strong>Consumers</strong>: number of consumer groups and whether they reprocess data.
+    </li>
+    <li>
+      <strong>Retention</strong>: how long data is kept and how often replays happen.
+    </li>
+  </ul>
 
   <h2>1) Ingestion volume (GB/month)</h2>
   <p>
-    Estimate <strong>events/second × bytes/event</strong> to get bytes/second, then convert to GB/day and GB/month. Model
+    Estimate <strong>events/second * bytes/event</strong> to get bytes/second, then convert to GB/day and GB/month. Model
     top sources separately (audit logs, telemetry, clickstream) instead of using one blended average.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/log-ingestion-cost-calculator/">Ingestion calculator</a>.
   </p>
+  <ul>
+    <li>
+      Keep a <strong>peak scenario</strong>: ingestion spikes during incidents, deploys, and backfills.
+    </li>
+    <li>
+      Track event size distribution: a small fraction of "large events" can dominate GB/month.
+    </li>
+  </ul>
 
   <h2>2) Retention</h2>
   <p>
-    Retention is the “how long do we keep data” multiplier. Long retention increases storage and makes replays/backfills
+    Retention is the "how long do we keep data" multiplier. Long retention increases stored data and makes replays/backfills
     more likely.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>.
   </p>
 
   <h2>3) Consumer replays and downstream costs</h2>
   <p>
-    The hidden cost is re-reading and processing the same data. If you have multiple consumer groups or frequent replays,
-    model a replay multiplier and validate consumer lag and backfill patterns.
+    The hidden cost is re-reading and processing the same data. If you have multiple consumer groups, frequent replays, or
+    backfills, model a replay multiplier and validate consumer lag patterns.
   </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate burst ingestion (peak events/sec) vs average; size partitions/capacity for peaks.</li>
-    <li>Validate consumer lag and replay/backfill frequency (multipliers matter).</li>
-    <li>Validate event size distribution (a few large events can dominate GB/month).</li>
+    <li>
+      <strong>Replay multiplier</strong>: how many times the same day of data is reprocessed (debugging, re-indexing, ML training).
+    </li>
+    <li>
+      <strong>Downstream</strong>: compute, logs, and data transfer in the consumer pipelines often dominate the Event Hubs line item.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Ingest GB/month</strong> = events/sec * bytes/event * seconds/month / 1e9 (approx)
+    </li>
+    <li>
+      <strong>Retention</strong> = ingest GB/day * retention days (order-of-magnitude)
+    </li>
+    <li>
+      <strong>Replay GB/month</strong> = ingest GB/month * replay multiplier (if consumers reprocess)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using average events/sec and missing burst traffic (capacity and cost depend on peaks).</li>
+    <li>Ignoring consumer groups and replays/backfills (multipliers matter).</li>
+    <li>Using one blended bytes/event when a few event types dominate size.</li>
+    <li>Missing downstream cost: logs and compute in consumers can exceed the streaming bill.</li>
+    <li>Keeping long retention by default "just in case".</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate peak ingestion vs average; keep the peak scenario in the model.</li>
+    <li>Validate consumer lag and replay/backfill frequency.</li>
+    <li>Validate retention settings and whether stored data is actually used.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -70,5 +125,18 @@ const faqs = [
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan/query</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/event-hubs/" target="_blank" rel="nofollow noopener">
+        Azure Event Hubs pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/event-hubs/" target="_blank" rel="nofollow noopener">
+        Event Hubs documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

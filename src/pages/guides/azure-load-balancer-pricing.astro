@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Load Balancer pricing: L4 traffic and data processing model";
 const description =
-  "A practical cost model for L4 load balancing: hours, traffic processed, and egress. Includes a workflow to estimate GB processed from RPS and payload size.";
+  "A practical cost model for Azure Load Balancer: hours, data processed, and egress boundaries. Includes a workflow to estimate GB processed from RPS and payload size, plus a validation checklist for peaks and retries.";
 
 const faqs = [
   {
@@ -15,8 +15,12 @@ const faqs = [
     a: "Convert request rate and average response size to monthly GB, then model load balancer hours and egress separately.",
   },
   {
+    q: "What is the most common mistake?",
+    a: "Mixing up 'GB processed' with 'internet egress' and double-counting transfer, or using one blended response size when a few endpoints dominate bytes.",
+  },
+  {
     q: "How do I validate?",
-    a: "Validate peak traffic, validate retry storms, and validate internal vs internet traffic boundaries for egress billing.",
+    a: "Validate peak traffic, validate retries/timeouts, and validate internal vs internet traffic boundaries for egress billing.",
   },
 ];
 ---
@@ -24,41 +28,107 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-load-balancer-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     L4 load balancer estimates are easiest when you treat them like a network device: it runs for a number of hours and it
-    processes a volume of traffic. Split traffic into internal vs internet-facing.
+    processes a volume of traffic. The two keys are: (1) split <strong>internal</strong> vs <strong>internet-facing</strong>,
+    and (2) model <strong>baseline + peak</strong>.
   </p>
 
-  <h2>1) Hours</h2>
-  <p>Count load balancers per environment and multiply by hours per month.</p>
+  <h2>0) Confirm you are modeling the right product</h2>
+  <ul>
+    <li>
+      <strong>Azure Load Balancer</strong> is L4 (TCP/UDP). It does not do HTTP routing like an L7 gateway.
+    </li>
+    <li>
+      If you do HTTP routing, TLS termination, WAF, or path-based rules, you may be using a different L7 product; model that
+      separately.
+    </li>
+  </ul>
+
+  <h2>1) Hours (count your load balancers)</h2>
+  <p>
+    Count load balancers per environment (prod/stage/dev) and multiply by hours per month. If you have multiple front doors
+    (regions, active-active), include them explicitly.
+  </p>
 
   <h2>2) Traffic processed (GB)</h2>
   <p>
-    Estimate monthly GB processed by converting RPS and average response size into total transfer. If you have multiple
-    endpoints, model the highest-volume ones separately.
+    Estimate monthly GB processed by converting request volume and average payload sizes into transfer. If you have multiple
+    endpoints, model the highest-volume ones separately so heavy-tail endpoints do not disappear into a blended average.
   </p>
-  <p>
-    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>,{" "}
-    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to requests</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/unit-converter/">Unit converter</a>.
   </p>
-
-  <h2>3) Egress</h2>
-  <p>
-    If traffic exits to the internet, egress is often the material line item. Treat egress as independent from load balancer
-    “GB processed” and validate what is billed.
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate internal vs internet traffic boundaries and where egress billing applies.</li>
-    <li>Validate peak traffic and burst behavior (autoscaling and capacity planning depend on peaks).</li>
-    <li>Validate retries/timeouts that multiply both request volume and transfer volume.</li>
+    <li>
+      <strong>Baseline</strong>: normal RPS and normal payload sizes.
+    </li>
+    <li>
+      <strong>Peak</strong>: incident traffic, autoscaling surges, and retry storms (can be 2-10x on both requests and bytes).
+    </li>
+  </ul>
+
+  <h2>3) Egress (the boundary that matters)</h2>
+  <p>
+    If traffic exits to the internet, egress is often the material line item. Treat egress as independent from "GB processed"
+    and validate what is billed (internal traffic may be priced differently than internet-facing traffic).
+  </p>
+  <p class="muted">Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.</p>
+  <ul>
+    <li>
+      Split by destination if needed: same-region, cross-region, and internet.
+    </li>
+    <li>
+      If your service returns large files, model that endpoint separately; it can dominate egress even at low RPS.
+    </li>
+  </ul>
+
+  <h2>4) Hidden multipliers to check</h2>
+  <ul>
+    <li>
+      <strong>Retries/timeouts</strong>: multiply requests and bytes (and downstream dependencies).
+    </li>
+    <li>
+      <strong>Health probes</strong>: usually small, but on large fleets they add background traffic (and noisy metrics).
+    </li>
+    <li>
+      <strong>Cross-zone/cross-region</strong>: if your architecture hairpins traffic, you may pay for extra transfer legs.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>GB processed/month</strong> = requests/month * avg payload GB (split top endpoints)
+    </li>
+    <li>
+      <strong>Egress GB/month</strong> = subset of GB that leaves to billed destinations (internet/cross-region)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Double-counting egress and GB processed as if they are the same thing.</li>
+    <li>Using one blended response size when a few endpoints dominate bytes.</li>
+    <li>Modeling only average traffic and ignoring peak periods that drive capacity and cost.</li>
+    <li>Ignoring retries/timeouts that multiply request volume and transfer.</li>
+    <li>Assuming all traffic is "internal" without validating egress boundaries.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate peak traffic windows (deploys/incidents) and include them as a separate scenario.</li>
+    <li>Validate retries/timeouts in client and server logs.</li>
+    <li>Validate response sizes for top endpoints (bytes, not just request counts).</li>
+    <li>Validate which traffic is billed as egress (internet/cross-region vs internal).</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -67,6 +137,21 @@ const faqs = [
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/load-balancer/" target="_blank" rel="nofollow noopener">
+        Azure Load Balancer pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/load-balancer/" target="_blank" rel="nofollow noopener">
+        Azure Load Balancer documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

@@ -3,20 +3,24 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Cosmos DB pricing: a practical estimate (RU/s, storage, and egress)";
 const description =
-  "A driver-based Cosmos DB estimate: RU/s capacity, stored GB, and data transfer. Includes a workflow to validate RU drivers and avoid underestimating burst and retries.";
+  "A driver-based Cosmos DB estimate: RU/s capacity, stored GB, and data transfer. Includes a workflow to validate RU drivers and avoid underestimating burst, hot partitions, and retries.";
 
 const faqs = [
   {
     q: "What usually drives Cosmos DB cost?",
-    a: "Provisioned capacity (RU/s) is often the primary driver, with storage and data transfer as secondary lines depending on the workload.",
+    a: "Provisioned capacity (RU/s) is often the primary driver, with storage and data transfer as secondary lines depending on workload and regions.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate RU/s from the highest-traffic container(s), then add stored GB and outbound transfer. Use peak RU demand, not only averages.",
+    a: "Estimate RU/s from your highest-traffic containers and peak windows, then add stored GB and outbound transfer. Use peak RU demand, not only averages.",
   },
   {
     q: "How do I validate the estimate?",
-    a: "Validate RU consumption and throttling from a representative window, and validate that retries/timeouts do not multiply RU consumption.",
+    a: "Validate RU consumption and throttling for a representative window, and validate that retries/timeouts do not multiply RU consumption.",
+  },
+  {
+    q: "What's the most common under-budgeting mistake?",
+    a: "Using average RU and ignoring peak demand and hot partitions; Cosmos capacity is sized to peaks and skewed partitions.",
   },
 ];
 ---
@@ -24,63 +28,117 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-cosmos-db-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Cosmos DB pricing becomes manageable when you separate the drivers: <strong>capacity</strong>, <strong>storage</strong>,
-    and <strong>data movement</strong>. Most surprises happen when RU demand is bursty or when retries amplify read/write
-    volume.
+    Cosmos DB pricing becomes manageable when you separate the drivers: <strong>capacity (RU/s)</strong>,{" "}
+    <strong>storage</strong>, and <strong>data movement</strong>. Most surprises happen when RU demand is bursty, partitions
+    are skewed (hot partition), or retries amplify read/write volume.
   </p>
+
+  <h2>0) Define the scope (containers, regions, and workloads)</h2>
+  <ul>
+    <li>
+      <strong>Top containers</strong>: identify the few containers that handle most traffic (budget them separately).
+    </li>
+    <li>
+      <strong>Regions</strong>: multi-region reads/writes can change both RU patterns and transfer.
+    </li>
+    <li>
+      <strong>Peak windows</strong>: deploys, backfills, and incidents often define the RU peak.
+    </li>
+  </ul>
 
   <h2>1) Capacity (RU/s)</h2>
   <p>
-    RU/s is capacity planning. Build an estimate from your top operations (reads, writes, queries) and use a peak-demand
-    window. If you’re migrating, start with a baseline and a high-usage scenario rather than a single average.
+    RU/s is capacity planning. Build an estimate from the operations that dominate your workload (reads, writes, queries)
+    and use a peak-demand window. If you're migrating, keep two scenarios: baseline and high-usage (peak) rather than one
+    average.
   </p>
-  <p>
-    Tip: treat “retries” as a multiplier. If a read is retried 3× during incidents, your RU and request volume can triple.
-  </p>
+  <ul>
+    <li>
+      <strong>Hot partitions</strong> raise RU needs: one key or one partition range can dominate.
+    </li>
+    <li>
+      <strong>Retry multiplier</strong>: if a request is retried 3x during incidents, RU and request volume can triple.
+    </li>
+    <li>
+      <strong>Query shape</strong> matters: "simple point reads" vs "wide scans" can have very different RU behavior.
+    </li>
+  </ul>
 
   <h2>2) Storage (GB-month)</h2>
   <p>
-    Storage is usually the easy line item. Use average stored GB and model growth separately. If you retain history or store
-    large documents, storage can become material over time.
+    Storage is usually the straightforward line. Use average stored GB and model growth separately. If you retain history
+    or store large documents, storage becomes material over time.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/storage-pricing-calculator/">Storage pricing</a>,{" "}
     <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>.
   </p>
 
   <h2>3) Networking and egress</h2>
   <p>
-    If your application reads from other regions or serves clients from multiple geographies, data transfer can add
-    meaningful cost. Model outbound GB/month by destination.
+    If your application serves users across geographies or reads across regions, data transfer can be meaningful. Model
+    outbound GB/month by destination and do not blend internet and cross-region paths.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
   </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>RU baseline</strong> = typical peak RU/s for top containers
+    </li>
+    <li>
+      <strong>RU peak</strong> = incident/backfill peak RU/s (keep separate)
+    </li>
+    <li>
+      <strong>Storage</strong> = avg GB-month + growth (GB/month)
+    </li>
+    <li>
+      <strong>Transfer</strong> = internet egress GB/month + cross-region GB/month (modeled separately)
+    </li>
+  </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
     <li>Estimating RU from averages and ignoring peaks (capacity is set by peak demand).</li>
-    <li>Ignoring retries/timeouts that multiply operations (and therefore RU consumption).</li>
-    <li>Not separating the top containers/queries (one hot partition can dominate).</li>
+    <li>Ignoring skew: one hot partition or one hot query dominates RU.</li>
+    <li>Retry storms: timeouts and client retries multiply RU consumption.</li>
+    <li>Blending all containers into one model (budget the top containers separately).</li>
+    <li>Missing transfer boundaries in multi-region deployments.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>How to validate the estimate</h2>
   <ul>
     <li>Validate RU consumption and throttling during a representative peak window.</li>
-    <li>Validate retry rates and incident behavior (retries multiply RU and request volume).</li>
+    <li>Validate retry behavior and incident multipliers (retries multiply RU and requests).</li>
     <li>Validate growth rate and retention policies for stored data.</li>
+    <li>Reconcile your model against one billing cycle and keep the peak scenario.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/api-request-cost-calculator/">Requests</a>
     <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Requests math</a>
     <a class="btn" href="/guides/azure-sql-database-pricing/">Azure SQL estimate</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/cosmos-db/" target="_blank" rel="nofollow noopener">
+        Azure Cosmos DB pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/cosmos-db/" target="_blank" rel="nofollow noopener">
+        Cosmos DB documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

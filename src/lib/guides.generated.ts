@@ -1403,7 +1403,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Container Registry (ACR) pricing: storage + pulls + egress",
-    "description": "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a simple way to estimate GB-month from retention.",
+    "description": "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a workflow to estimate GB-month from retention and validate layer sharing.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
     "slug": "azure-container-registry-pricing",
@@ -1416,7 +1416,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Cosmos DB pricing: a practical estimate (RU/s, storage, and egress)",
-    "description": "A driver-based Cosmos DB estimate: RU/s capacity, stored GB, and data transfer. Includes a workflow to validate RU drivers and avoid underestimating burst and retries.",
+    "description": "A driver-based Cosmos DB estimate: RU/s capacity, stored GB, and data transfer. Includes a workflow to validate RU drivers and avoid underestimating burst, hot partitions, and retries.",
     "canonicalPath": "/guides/azure-cosmos-db-pricing",
     "category": "Azure",
     "slug": "azure-cosmos-db-pricing",
@@ -1427,7 +1427,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Event Hubs pricing: estimate throughput, events, and retention",
-    "description": "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic and consumer replays.",
+    "description": "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic, consumer lag, and replay/backfill multipliers.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
@@ -1439,31 +1439,31 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Front Door pricing: model requests, bandwidth, and origin traffic",
-    "description": "A practical Azure Front Door cost model: request volume, edge bandwidth, and origin traffic (cache fill). Includes validation steps to avoid double-counting CDN vs origin egress.",
+    "description": "A practical Azure Front Door cost model: edge bandwidth, request volume, logging, and origin traffic (cache fill). Includes a checklist to validate hit rate and avoid double-counting egress.",
     "canonicalPath": "/guides/azure-front-door-pricing",
     "category": "Azure",
     "slug": "azure-front-door-pricing",
     "topics": [
       "cdn",
       "egress",
+      "logging",
       "requests"
     ]
   },
   {
     "title": "Azure Functions pricing: what to include in a realistic estimate",
-    "description": "A practical Azure Functions pricing model: invocations, duration/GB-s, networking, and log volume - plus how to validate with real metrics.",
+    "description": "A practical Azure Functions cost model: invocations, duration/memory, networking, and log volume - plus a validation checklist to catch retries, cold starts, and chatty dependencies.",
     "canonicalPath": "/guides/azure-functions-pricing",
     "category": "Azure",
     "slug": "azure-functions-pricing",
     "topics": [
       "logging",
-      "metrics",
       "serverless"
     ]
   },
   {
     "title": "Azure Key Vault pricing: estimate operations, keys/secrets, and request spikes",
-    "description": "A practical Key Vault cost model: key/secret baseline plus request volume. Includes validation steps for high-frequency crypto operations and cache misses.",
+    "description": "A practical Key Vault cost model: baseline objects (keys/secrets/certs) plus operation volume. Includes a workflow to map traffic to Key Vault calls and validate caching, retries, and hot-path mistakes.",
     "canonicalPath": "/guides/azure-key-vault-pricing",
     "category": "Azure",
     "slug": "azure-key-vault-pricing",
@@ -1488,35 +1488,36 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Load Balancer pricing: L4 traffic and data processing model",
-    "description": "A practical cost model for L4 load balancing: hours, traffic processed, and egress. Includes a workflow to estimate GB processed from RPS and payload size.",
+    "description": "A practical cost model for Azure Load Balancer: hours, data processed, and egress boundaries. Includes a workflow to estimate GB processed from RPS and payload size, plus a validation checklist for peaks and retries.",
     "canonicalPath": "/guides/azure-load-balancer-pricing",
     "category": "Azure",
     "slug": "azure-load-balancer-pricing",
     "topics": [
       "egress",
+      "kubernetes",
       "load-balancing"
     ]
   },
   {
     "title": "Azure Log Analytics pricing: ingestion, retention, and query costs",
-    "description": "A practical model for Log Analytics-style costs: GB ingested, retention, and query/scan. Includes a method to estimate log GB from event rate and payload size.",
+    "description": "A practical model for Log Analytics-style costs: GB ingested, retention storage, and query/scan behavior. Includes a method to estimate log GB from event rate and payload size, plus a validation checklist for high-volume sources.",
     "canonicalPath": "/guides/azure-log-analytics-pricing",
     "category": "Azure",
     "slug": "azure-log-analytics-pricing",
     "topics": [
       "backup",
-      "logging"
+      "logging",
+      "storage"
     ]
   },
   {
     "title": "Azure Monitor metrics pricing: estimate custom metrics, retention, and API calls",
-    "description": "A practical metrics cost model: custom metrics volume, retention, dashboards/alerts, and API calls. Includes validation steps to avoid high-cardinality mistakes.",
+    "description": "A practical metrics cost model: time series count, sample rate, retention, and dashboard/alert query behavior. Includes validation steps to avoid high-cardinality mistakes.",
     "canonicalPath": "/guides/azure-monitor-metrics-pricing",
     "category": "Azure",
     "slug": "azure-monitor-metrics-pricing",
     "topics": [
       "backup",
-      "database",
       "metrics",
       "requests"
     ]

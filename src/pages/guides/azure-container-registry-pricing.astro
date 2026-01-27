@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Container Registry (ACR) pricing: storage + pulls + egress";
 const description =
-  "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a simple way to estimate GB-month from retention.";
+  "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a workflow to estimate GB-month from retention and validate layer sharing.";
 
 const faqs = [
   {
@@ -16,7 +16,11 @@ const faqs = [
   },
   {
     q: "How do I validate?",
-    a: "Validate the true image size on disk (compressed layers), confirm retention policies, and sample real pull counts during peak build periods.",
+    a: "Validate the true image size on disk (compressed layers), confirm retention policies, and sample real pull counts during peak build periods and scale-outs.",
+  },
+  {
+    q: "What's the most common cost mistake?",
+    a: "Assuming storage equals tags * size (layer sharing changes the math), and forgetting that pull storms happen during node churn and CI spikes.",
   },
 ];
 ---
@@ -24,42 +28,107 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-container-registry-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Container registries are “storage + transfer”. A clean estimate separates what you store from what you pull, and splits
-    transfer by where it goes (same region, cross-region, internet).
+    Container registries are "storage + transfer". A clean estimate separates what you store from what you pull, and splits
+    transfer by where it goes (same region, cross-region, internet). Most surprises come from retention drift and pull
+    storms (CI peaks, autoscaling, node churn).
   </p>
+
+  <h2>0) Define your registry scope</h2>
+  <ul>
+    <li>
+      <strong>Environments</strong>: prod + staging + dev registries (or one shared registry with multiple repos).
+    </li>
+    <li>
+      <strong>Regions</strong>: cross-region clusters and geo-replication change transfer patterns.
+    </li>
+    <li>
+      <strong>Consumers</strong>: AKS nodes, VM scale sets, and external runners can each have different pull behavior.
+    </li>
+  </ul>
 
   <h2>1) Storage (GB-month)</h2>
   <p>
-    Build a GB-month estimate from your retention policy: average image size × number of tags retained × number of repos.
-    If tags share layers, storage is less than “tags × size”, so validate with real registry stats when possible.
+    Build a GB-month estimate from retention: average image size * tags retained * repos. Then adjust with reality: images
+    share layers, so storage is often less than "tags * size" when tags reuse common layers.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/object-storage-cost-calculator/">Storage cost (GB-month)</a>.
   </p>
+  <ul>
+    <li>
+      If you store many versions, keep a separate line for "base images" and "app images" (they behave differently).
+    </li>
+    <li>
+      Model a growth rate if you keep long-lived tags (release tags, hotfix branches, multiple architectures).
+    </li>
+  </ul>
 
-  <h2>2) Pull volume</h2>
+  <h2>2) Pull volume (the hidden spike)</h2>
   <p>
     Pulls scale with CI/CD, autoscaling, and node churn. A good first model is:
-    <strong>deployments per day × pulls per deployment × image size</strong>. Add a multiplier for cache misses.
+    <strong>deployments/day * pulls per deployment * image size</strong>. Add a multiplier for cache misses and fresh nodes.
   </p>
+  <ul>
+    <li>
+      <strong>CI peaks</strong>: parallel builds and frequent pipeline retries can create pull storms.
+    </li>
+    <li>
+      <strong>Cluster scale-outs</strong>: new nodes pull many images at once (worst during incidents).
+    </li>
+    <li>
+      <strong>Warm caches</strong>: node-local caching can reduce pulls dramatically; do not assume every pod pull hits ACR.
+    </li>
+  </ul>
 
   <h2>3) Data transfer (egress)</h2>
   <p>
-    Transfer is often the hidden part: cross-region cluster pulls, external runners, or edge nodes. Split outbound transfer
-    by destination and validate where billing applies.
+    Transfer is often the second bill: cross-region pulls, external runners, and any delivery outside your region. Split
+    outbound transfer by destination and validate which paths are billed.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>4) Cross-region and geo-replication effects</h2>
   <ul>
-    <li>Validate retention policy and garbage collection (old tags/layers can keep storage high).</li>
-    <li>Validate pull counts during peak CI windows and during cluster scale-out events.</li>
+    <li>
+      If clusters pull from a registry in another region, model that as cross-region transfer, not "free internal traffic".
+    </li>
+    <li>
+      If you enable geo-replication, treat replication as its own line item (replicated data and any operational overhead).
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Storage GB-month</strong> = avg stored GB over month (validate with registry stats if possible)
+    </li>
+    <li>
+      <strong>Pull GB/month</strong> = pulls/month * avg image size (GB) (baseline + peak)
+    </li>
+    <li>
+      <strong>Egress GB/month</strong> = pull GB to destinations that are billed as outbound (cross-region/internet)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Retention drift: old tags and layers kept forever.</li>
+    <li>Assuming tags * size equals storage (layer sharing changes the math).</li>
+    <li>Ignoring CI and scale-out peaks (pull storms are the peak scenario).</li>
+    <li>Cross-region pulls hidden inside "it’s internal" assumptions.</li>
+    <li>Missing that egress can dominate if you pull from outside the region.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate retention policy and garbage collection behavior (old layers keep storage high).</li>
+    <li>Sample pull counts during peak CI windows and cluster scale-out events.</li>
     <li>Validate where transfer is billed (same-region vs cross-region vs internet).</li>
   </ul>
 
@@ -68,7 +137,20 @@ const faqs = [
     <a class="btn" href="/calculators/object-storage-cost-calculator/">GB-month</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
-    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+    <a class="btn" href="/guides/azure-aks-pricing/">AKS pricing</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/container-registry/" target="_blank" rel="nofollow noopener">
+        Azure Container Registry pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/container-registry/" target="_blank" rel="nofollow noopener">
+        Azure Container Registry documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

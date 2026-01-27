@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Monitor metrics pricing: estimate custom metrics, retention, and API calls";
 const description =
-  "A practical metrics cost model: custom metrics volume, retention, dashboards/alerts, and API calls. Includes validation steps to avoid high-cardinality mistakes.";
+  "A practical metrics cost model: time series count, sample rate, retention, and dashboard/alert query behavior. Includes validation steps to avoid high-cardinality mistakes.";
 
 const faqs = [
   {
@@ -15,8 +15,12 @@ const faqs = [
     a: "Estimate number of time series, samples per minute, and retention days. Add a separate estimate for dashboard refreshes and alerts.",
   },
   {
+    q: "What is the most common mistake?",
+    a: "Accidentally creating unbounded cardinality (e.g., customerId, requestId, pod name) which explodes time series count and cost.",
+  },
+  {
     q: "How do I validate?",
-    a: "Validate high-cardinality labels (dimensions), validate scrape/emit rates, and validate dashboard refresh intervals that trigger repeated queries.",
+    a: "Validate label/dimension cardinality, validate emit/scrape rates, and validate dashboard refresh intervals and alert windows that trigger repeated queries.",
   },
 ];
 ---
@@ -24,29 +28,49 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-monitor-metrics-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Metrics systems are “time series × frequency × retention”. Costs spike when you accidentally create a huge number of
-    distinct series (high cardinality) or when dashboards/alerts query wide time windows frequently.
+    Metrics systems are "time series * frequency * retention". Costs spike when you accidentally create a huge number of
+    distinct series (high cardinality) or when dashboards/alerts query wide time windows frequently. A good estimate makes
+    cardinality explicit instead of hoping it stays small.
   </p>
 
-  <h2>1) How many time series?</h2>
+  <h2>0) Define what a "time series" is in your model</h2>
   <p>
-    Time series count is the biggest design lever. A metric with labels like <strong>pod</strong>, <strong>container</strong>,
-    <strong>path</strong>, or <strong>customerId</strong> can explode cardinality. Model the number of unique combinations.
+    A time series is a unique metric name plus a unique combination of dimension/label values. If you add dimensions like{" "}
+    <strong>pod</strong>, <strong>container</strong>, <strong>path</strong>, or <strong>customerId</strong>, the number of
+    unique combinations can explode.
   </p>
 
-  <h2>2) Sample rate</h2>
+  <h2>1) Estimate time series count (cardinality)</h2>
   <p>
-    Sample rate (e.g., 10s vs 60s) multiplies ingestion volume. For planning, model both a “normal” and a “high-frequency”
-    scenario.
+    Model cardinality explicitly. A simple approximation is:
+    <strong>time_series ~= metrics * (dim1_values * dim2_values * ...)</strong>.
+  </p>
+  <ul>
+    <li>
+      Good dimensions: environment, region, service (bounded sets).
+    </li>
+    <li>
+      Dangerous dimensions: userId, requestId, URL path, pod name (unbounded or high churn).
+    </li>
+    <li>
+      If you need per-entity detail, consider sampling or aggregating before emitting metrics.
+    </li>
+  </ul>
+
+  <h2>2) Sample rate (frequency)</h2>
+  <p>
+    Sample rate multiplies ingestion volume. Going from 60s to 10s is a 6x increase. For planning, model both a "normal"
+    and a "high-frequency" scenario (and justify why you need high frequency).
   </p>
 
   <h2>3) Retention</h2>
   <p>
-    Retention is a storage multiplier. Long retention can be expensive if you store high-resolution data for months.
+    Retention is a storage multiplier. Long retention can be expensive if you store high-resolution data for months. A common
+    pattern is: keep high-res for days, downsample or keep aggregates for weeks/months.
   </p>
 
   <h2>4) Dashboards, alerts, and API calls</h2>
@@ -54,19 +78,72 @@ const faqs = [
     Repeated queries (dashboards refreshing every minute, alert rules scanning 24h windows) can create significant query/API
     load. Model refresh frequency explicitly.
   </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate cardinality drivers (labels/dimensions) and cap unbounded labels.</li>
-    <li>Validate sample rates (emit/scrape intervals) and ensure they match your needs.</li>
-    <li>Validate dashboard refresh intervals and alert windows (avoid repeated wide scans).</li>
+    <li>
+      A dashboard refreshing every minute is 1,440 refreshes/day.
+    </li>
+    <li>
+      An alert evaluating every minute with a 24h window repeatedly scans the same historical data.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Time series</strong> = metrics * product(dim value counts)
+    </li>
+    <li>
+      <strong>Samples/month</strong> = time series * samples/minute * minutes/month
+    </li>
+    <li>
+      <strong>Retention</strong> = retention days (split high-res vs downsampled if applicable)
+    </li>
+    <li>
+      <strong>Query load</strong> = dashboards/day + alerts/day (include refresh cadence)
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/metrics-timeseries-cost-calculator/">Time series cost calculator</a>.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Unbounded or high-churn dimensions (customerId, requestId, pod name) causing cardinality explosion.</li>
+    <li>Using high-frequency sampling everywhere instead of only where it adds value.</li>
+    <li>Keeping long retention for high-resolution data by default.</li>
+    <li>Dashboards/alerts querying wide windows with very frequent refresh.</li>
+    <li>Emitting per-request metrics (too granular) instead of aggregating.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>List top dimensions and estimate their unique value counts (bounded vs unbounded).</li>
+    <li>Validate emit/scrape intervals across environments (dev often differs from prod).</li>
+    <li>Audit dashboards: refresh intervals, time windows, and number of panels (queries multiply).</li>
+    <li>Audit alerts: evaluation frequency and window sizes (avoid repeated wide scans).</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series</a>
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alerts math</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/azure-log-analytics-pricing/">Log Analytics</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/monitor/" target="_blank" rel="nofollow noopener">
+        Azure Monitor pricing (logs/metrics)
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/azure-monitor/metrics/" target="_blank" rel="nofollow noopener">
+        Azure Monitor metrics documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

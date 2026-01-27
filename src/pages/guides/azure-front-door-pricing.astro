@@ -3,20 +3,24 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Front Door pricing: model requests, bandwidth, and origin traffic";
 const description =
-  "A practical Azure Front Door cost model: request volume, edge bandwidth, and origin traffic (cache fill). Includes validation steps to avoid double-counting CDN vs origin egress.";
+  "A practical Azure Front Door cost model: edge bandwidth, request volume, logging, and origin traffic (cache fill). Includes a checklist to validate hit rate and avoid double-counting egress.";
 
 const faqs = [
   {
     q: "What usually drives Front Door cost?",
-    a: "For most sites, bandwidth is the biggest driver. For API-heavy workloads, request volume and rule processing can become meaningful.",
+    a: "For most sites, bandwidth is the biggest driver. For API-heavy workloads, request volume, WAF/rules, and logging can become meaningful.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly edge GB, monthly requests, and cache hit rate (to infer origin egress). Then validate with a representative traffic window.",
+    a: "Estimate monthly edge GB, monthly edge requests, and cache hit rate (to infer origin egress). Add a separate line for logs and any WAF/rules usage.",
   },
   {
     q: "How do I validate the estimate?",
-    a: "Validate cache hit rate, validate response sizes (top endpoints), and ensure you do not double-count edge bandwidth and origin egress.",
+    a: "Validate cache hit rate (overall and by path), top endpoints by bytes, peak windows (deploys/incidents), and log payload size.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Treating Front Door as one blended GB and forgetting that purges/deploys can temporarily crush hit rate and spike origin traffic.",
   },
 ];
 ---
@@ -24,56 +28,125 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-front-door-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Azure Front Door is essentially “edge delivery + routing”. The estimate becomes reliable when you split traffic into:
-    <strong>edge bandwidth</strong>, <strong>request volume</strong>, and <strong>origin egress (cache fill)</strong>.
+    Azure Front Door is "edge delivery + routing + (optional) caching/WAF". A reliable estimate splits costs into explicit
+    drivers: <strong>edge bandwidth</strong>, <strong>request volume</strong>, <strong>origin traffic (cache fill)</strong>,
+    and operational add-ons like <strong>WAF/rules</strong> and <strong>logging</strong>.
   </p>
+
+  <h2>0) Define the boundary (edge vs origin)</h2>
+  <ul>
+    <li>
+      <strong>Edge bandwidth</strong>: bytes delivered from Front Door to end users.
+    </li>
+    <li>
+      <strong>Origin egress</strong>: bytes from your origin to Front Door on cache fill (cache misses).
+    </li>
+    <li>
+      <strong>Requests</strong>: request count at the edge; keep a separate count for origin if your origin pricing cares.
+    </li>
+  </ul>
+  <p class="muted">Most "surprise bills" are cache miss spikes (origin egress), not steady-state edge delivery.</p>
 
   <h2>1) Edge bandwidth (GB/month)</h2>
   <p>
-    Start with a monthly bandwidth estimate to end users. If you already have metrics, use a representative window and
-    convert to GB/month. If you only have RPS, estimate average response size and multiply.
+    Start with monthly bandwidth to end users. If you already have metrics, use a representative window (not just a good
+    day) and convert to GB/month. If you only have RPS, estimate response sizes and multiply by request volume.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
-    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>.
+    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>,{" "}
+    <a href="/calculators/unit-converter/">Unit converter</a>.
   </p>
+  <ul>
+    <li>
+      Split out any "heavy tail" endpoints (downloads, exports, media) instead of blending one average response size.
+    </li>
+    <li>
+      Keep a <strong>peak scenario</strong> (bot traffic, incident traffic, marketing spikes) to avoid underestimating.
+    </li>
+  </ul>
 
   <h2>2) Requests (per month)</h2>
   <p>
-    Convert RPS to monthly requests and model peaks separately if you have bursty traffic. Many CDN/edge products charge per
-    10k/1M requests; keep units explicit to avoid order-of-magnitude errors.
+    Convert RPS to monthly requests and model peaks separately if you have bursty traffic. Keep units explicit (per 10k vs
+    per 1M) and include retries/timeouts, which multiply both request count and bandwidth.
   </p>
-  <p>
-    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>,{" "}
-    <a href="/calculators/api-request-cost-calculator/">API request cost</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
+    <a href="/calculators/api-request-cost-calculator/">Request cost</a>.
   </p>
+  <ul>
+    <li>
+      If you use rules/rewrites/routing, keep a separate "rules touched" estimate (not every request triggers complex
+      rules).
+    </li>
+    <li>
+      If you have multiple hostnames and routes, track them separately: traffic distribution changes which paths cache well.
+    </li>
+  </ul>
 
   <h2>3) Origin egress (cache fill)</h2>
   <p>
-    If you cache at the edge, origin egress is roughly:
-    <strong>origin GB ≈ edge GB × (1 − hit rate)</strong>. Cache misses and purges can make origin egress spike, especially
-    for large objects and during deploys.
+    If you cache at the edge, origin egress is driven by misses. A practical estimate is:
+    <strong>origin GB ~= edge GB * (1 - hit rate)</strong>. Purges, deploys, and low TTLs reduce hit rate and can cause
+    short-lived origin spikes.
   </p>
+  <p class="muted">Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.</p>
+  <ul>
+    <li>
+      Model large objects separately: one download path can dominate origin GB even when overall hit rate looks healthy.
+    </li>
+    <li>
+      Track "cold cache" events: a full purge plus a large deployment can temporarily turn most traffic into origin fills.
+    </li>
+  </ul>
+
+  <h2>4) Logging (often the hidden bill)</h2>
   <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
+    Access logs and diagnostics can become significant at scale. Treat logging as its own pipeline:{" "}
+    <strong>events * bytes/event</strong> becomes <strong>GB ingested</strong>, then retention and query scans.
   </p>
+  <p class="muted">
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Search/scan</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Edge requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>Edge GB/month</strong> = requests/month * avg response size (split top endpoints)
+    </li>
+    <li>
+      <strong>Origin GB/month</strong> ~= edge GB/month * (1 - hit rate) (model purge/deploy periods separately)
+    </li>
+    <li>
+      <strong>Log GB/month</strong> = log events/month * bytes/event (sample real payloads)
+    </li>
+  </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
     <li>Double-counting edge bandwidth and origin egress (they are different legs).</li>
-    <li>Using average response size for an API with a heavy tail (model top endpoints separately).</li>
+    <li>Using one blended response size when a few endpoints dominate bytes.</li>
     <li>Ignoring cache invalidations/purges and cold cache events (misses drive origin traffic).</li>
+    <li>Forgetting logging volume (verbose logs per request can dominate).</li>
+    <li>Not modeling peaks (bots/incidents/releases) that multiply requests and cache misses.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>How to validate</h2>
   <ul>
-    <li>Validate cache hit rate and estimate origin GB from misses (cache fill).</li>
-    <li>Validate top endpoints by bandwidth and request volume (avoid blended averages).</li>
-    <li>Validate peak periods (deploys, incidents) where retries/purges increase requests and origin traffic.</li>
+    <li>Validate cache hit rate overall and by path, then estimate origin GB from misses.</li>
+    <li>Validate top endpoints by bytes and request volume (avoid blended averages).</li>
+    <li>Validate peak periods (deploys/incidents) where retries/purges increase requests and origin traffic.</li>
+    <li>Validate log payload size by sampling real logs, then multiply by request volume.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -82,14 +155,34 @@ const faqs = [
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
     <a class="btn" href="/calculators/api-request-cost-calculator/">Requests</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
   </div>
 
   <h2>Related reading</h2>
   <div class="btn-row">
+    <a class="btn" href="/guides/cdn-costs/">CDN cost basics</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/cdn-costs/">CDN cost basics</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/frontdoor/" target="_blank" rel="nofollow noopener">
+        Azure Front Door pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/frontdoor/" target="_blank" rel="nofollow noopener">
+        Azure Front Door documentation
+      </a>
+    </li>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/web-application-firewall/" target="_blank" rel="nofollow noopener">
+        Azure Web Application Firewall pricing (if enabled)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Key Vault pricing: estimate operations, keys/secrets, and request spikes";
 const description =
-  "A practical Key Vault cost model: key/secret baseline plus request volume. Includes validation steps for high-frequency crypto operations and cache misses.";
+  "A practical Key Vault cost model: baseline objects (keys/secrets/certs) plus operation volume. Includes a workflow to map traffic to Key Vault calls and validate caching, retries, and hot-path mistakes.";
 
 const faqs = [
   {
@@ -12,7 +12,11 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly operations by call path (get secret, decrypt, sign). Multiply by your effective per-request rate and validate with a representative traffic window.",
+    a: "Map your workload to Key Vault operations (get secret, decrypt, sign), estimate monthly operations per type, then model baseline + peak.",
+  },
+  {
+    q: "What is the most common cost mistake?",
+    a: "Fetching secrets/keys on the hot path (per request) instead of caching, which can increase operation volume by orders of magnitude.",
   },
   {
     q: "How do I validate?",
@@ -24,46 +28,143 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-key-vault-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Key Vault cost estimation is mostly a <strong>request-based</strong> problem. If an application fetches secrets or performs
-    crypto operations on every request, costs can scale linearly with traffic.
+    Key Vault cost estimation is mostly a <strong>request-based</strong> problem. If an application fetches secrets or
+    performs crypto operations on every request, costs can scale linearly with traffic. The fastest way to make cost
+    predictable is to map "what calls Key Vault" to a clear driver metric.
   </p>
 
-  <h2>1) Identify operation types</h2>
+  <h2>0) Identify operation types (do not blend)</h2>
   <p>
-    Separate your operations into buckets: secret reads, key operations (encrypt/decrypt), signing, certificate operations,
-    etc. Different operations can have different effective rates.
+    Split calls into buckets. Different operation types behave differently, and different call paths cache differently.
   </p>
-
-  <h2>2) Estimate monthly operations</h2>
-  <p>
-    Find the driver metric: requests per month, container starts, or cron executions. Then map that driver to Key Vault calls.
-    If secrets are loaded once per pod start, the driver is “pod starts”, not “API requests”.
-  </p>
-  <p>
-    Tool: <a href="/calculators/api-request-cost-calculator/">API request cost (generic request math)</a>.
-  </p>
-
-  <h2>3) Avoid the common hot-path trap</h2>
-  <p>
-    The classic cost bug is an un-cached secret fetch in a request handler. Caching at the app layer or using managed
-    identities/token caches can reduce call volume by orders of magnitude.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate whether secrets/keys are cached and when caches expire.</li>
-    <li>Validate retry/timeouts to Key Vault (retries multiply operations).</li>
-    <li>Validate operation drivers (per request vs per startup vs per rotation job).</li>
+    <li>
+      <strong>Secrets</strong>: get secret, list secrets (list calls can be surprisingly expensive if done often).
+    </li>
+    <li>
+      <strong>Keys</strong>: decrypt/encrypt, sign/verify, wrap/unwrap.
+    </li>
+    <li>
+      <strong>Certificates</strong>: reads, renewals, and rotation workflows.
+    </li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>1) Choose the real driver (per request vs per startup)</h2>
+  <p>
+    The most important modeling decision is whether calls happen per request or per "startup" event. A secret loaded once
+    per pod start is a totally different cost model than a secret fetched on every API request.
+  </p>
+  <ul>
+    <li>
+      <strong>Per request</strong>: driver is API requests/month (most expensive if un-cached).
+    </li>
+    <li>
+      <strong>Per instance/pod start</strong>: driver is starts/day (scale-outs + deploys create peaks).
+    </li>
+    <li>
+      <strong>Per rotation job</strong>: driver is rotation frequency (e.g., daily/weekly/monthly).
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a> (for per-request models).
+  </p>
+
+  <h2>2) Estimate monthly operations (baseline + peak)</h2>
+  <p>
+    Build two scenarios. Baseline is normal traffic with warm caches. Peak is a deploy/scale-out/incident window with cold
+    caches and retries.
+  </p>
+  <ul>
+    <li>
+      <strong>Baseline ops/month</strong> = driver events/month * ops per event (by operation type).
+    </li>
+    <li>
+      <strong>Peak ops/month</strong> = baseline + (deploys + scale-outs + incident retries) * ops per event.
+    </li>
+    <li>
+      If crypto operations are in a tight loop, estimate using <strong>TPS</strong> (transactions per second) and convert to
+      monthly.
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/api-request-cost-calculator/">Request cost</a> (generic request math).
+  </p>
+
+  <h2>3) Prevent the hot-path trap (caching strategy)</h2>
+  <p>
+    The classic cost bug is an un-cached secret fetch in a request handler. Fixing it usually costs less engineering time
+    than one month of a scaled-out bill.
+  </p>
+  <ul>
+    <li>
+      Cache secrets/config in-memory with a TTL that matches your rotation policy.
+    </li>
+    <li>
+      Avoid "list secrets" patterns in hot paths; resolve identifiers once and cache.
+    </li>
+    <li>
+      If you rotate secrets frequently, model the rotation job as a separate bucket (it can create short spikes).
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Driver events/month</strong> = API requests OR pod starts OR rotation runs
+    </li>
+    <li>
+      <strong>Secret ops/month</strong> = driver events/month * secret ops per event (baseline + peak)
+    </li>
+    <li>
+      <strong>Crypto ops/month</strong> = TPS * seconds/month (baseline + peak)
+    </li>
+    <li>
+      <strong>Retries multiplier</strong> = 1 + retry_rate (apply to the buckets affected)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Fetching secrets/keys per request instead of caching.</li>
+    <li>Ignoring deploy/scale-out peaks (cold caches cause bursts).</li>
+    <li>Not modeling retries/timeouts (they multiply operation volume).</li>
+    <li>Using one blended operation rate instead of separating secret vs crypto vs certificate calls.</li>
+    <li>Hidden hot paths like middleware/auth filters that call Key Vault for every request.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Identify the hot path: grep your code for Key Vault client calls and map them to endpoints/jobs.</li>
+    <li>Validate caching behavior (TTL, cache misses, and cache warm-up during deploys).</li>
+    <li>Validate retry behavior during incidents (timeouts amplify calls).</li>
+    <li>Validate which operation types dominate (secrets vs crypto) and optimize the right bucket.</li>
+  </ul>
+
+  <h2>Related tools</h2>
   <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request math</a>
+    <a class="btn" href="/calculators/unit-converter/">Units</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/azure-functions-pricing/">Functions (hot paths)</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/key-vault/" target="_blank" rel="nofollow noopener">
+        Azure Key Vault pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/key-vault/" target="_blank" rel="nofollow noopener">
+        Azure Key Vault documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

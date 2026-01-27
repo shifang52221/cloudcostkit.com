@@ -12,55 +12,115 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly edge GB and requests, then estimate origin GB from cache hit rate (misses drive cache fill).",
+    a: "Estimate monthly edge GB and edge requests, then estimate origin GB from cache hit rate (misses drive cache fill).",
   },
   {
     q: "How do I validate?",
-    a: "Validate cache hit rate and top endpoints by bytes, and validate that purges and deploys don’t trigger large cache misses.",
+    a: "Validate cache hit rate and top endpoints by bytes, and validate that purges and deploys don't trigger large cache misses.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Double-counting edge bandwidth and origin egress as the same GB, or using one blended average response size for endpoints with a heavy tail.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/azure-cdn-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/azure-cdn-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    CDN pricing becomes predictable when you split traffic into: <strong>edge bandwidth</strong>, <strong>edge requests</strong>,
-    and <strong>origin egress</strong>. Most surprise bills come from cache misses and origin traffic (cache fill), not from
-    steady-state cache hits.
+    CDN pricing becomes predictable when you split traffic into three drivers: <strong>edge bandwidth</strong>,{" "}
+    <strong>edge requests</strong>, and <strong>origin egress</strong> (cache fill). Most surprise bills come from cache
+    misses and cold-cache events, not from steady-state hits.
+  </p>
+
+  <h2>0) Define the boundary (edge vs origin)</h2>
+  <ul>
+    <li>
+      <strong>Edge bandwidth</strong>: bytes delivered from CDN to end users.
+    </li>
+    <li>
+      <strong>Origin egress</strong>: bytes from your origin to CDN on cache miss/fill.
+    </li>
+    <li>
+      <strong>Requests</strong>: count requests at the edge, and keep a separate estimate for origin requests if your origin pricing cares.
+    </li>
+  </ul>
+  <p class="muted">
+    In many architectures you pay for both legs: CDN edge delivery plus origin egress on cache fill.
   </p>
 
   <h2>1) Edge bandwidth (GB/month)</h2>
   <p>
-    Use a representative traffic window. If you only have RPS, multiply by average response size (and model large endpoints
-    separately).
+    Use a representative traffic window. If you only have RPS, estimate transfer from response size and request volume.
+    If you have a few very large endpoints (downloads, exports), model them separately.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>,{" "}
     <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
   </p>
 
   <h2>2) Requests (per month)</h2>
   <p>
-    Requests matter for lots of small objects. Convert RPS to monthly requests and ensure you match pricing units (per 10k,
-    per 1M, etc).
+    Requests matter for lots of small objects and API-heavy traffic. Convert RPS to monthly requests and keep pricing units
+    explicit (per 10k vs per 1M).
   </p>
-  <p>
-    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>,{" "}
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
     <a href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>.
   </p>
+  <ul>
+    <li>
+      Split into at least two buckets if needed: <strong>API-like</strong> (high RPS, small payloads) and{" "}
+      <strong>download-like</strong> (lower RPS, large payloads).
+    </li>
+    <li>
+      Keep a <strong>peak scenario</strong> for bot spikes and incident traffic.
+    </li>
+  </ul>
 
   <h2>3) Origin egress (cache fill)</h2>
   <p>
-    Origin egress is driven by cache misses. A practical estimate is: <strong>origin GB ≈ edge GB × (1 − hit rate)</strong>.
-    Purges, deploys, and low TTLs reduce hit rate and increase cache fill.
+    Origin egress is driven by cache misses. A practical estimate is:
+    <strong> origin GB ≈ edge GB * (1 - hit rate)</strong>. Purges, deploys, and low TTLs reduce hit rate and increase cache
+    fill.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
   </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate cache hit rate and how it changes during deploys/purges.</li>
-    <li>Validate top endpoints by bytes and requests (avoid blended averages).</li>
-    <li>Validate origin egress separately from edge bandwidth to avoid double-counting.</li>
+    <li>
+      Model large objects separately: one media/export path can dominate origin GB even when overall hit rate looks good.
+    </li>
+    <li>
+      Track hit rate during deploys/purges. Cold cache events are often the root cause of origin spikes.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Edge requests/month</strong> = baseline + peak
+    </li>
+    <li>
+      <strong>Edge GB/month</strong> = requests/month * avg response size (GB) (split big endpoints separately)
+    </li>
+    <li>
+      <strong>Origin GB/month</strong> ≈ edge GB/month * (1 - hit rate)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Double-counting edge bandwidth and origin egress.</li>
+    <li>Using one blended response size when a few endpoints dominate bytes.</li>
+    <li>Ignoring purge/deploy behavior and cold-cache events.</li>
+    <li>Mixing request pricing units (per 10k vs per 1M).</li>
+    <li>Assuming hit rate is stable; it varies by path, TTL, and cache key configuration.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate hit rate and top endpoints by bytes and requests (avoid blended averages).</li>
+    <li>Validate origin egress separately from edge bandwidth.</li>
+    <li>After one billing cycle, reconcile edge vs origin legs and keep a peak scenario for incident windows.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -70,5 +130,18 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/azure-front-door-pricing/">Front Door pricing</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/cdn/" target="_blank" rel="nofollow noopener">
+        Azure CDN pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/cdn/" target="_blank" rel="nofollow noopener">
+        Azure CDN documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>
