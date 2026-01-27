@@ -41,7 +41,7 @@ const description =
       a: "It's an average month length. For a specific billing cycle, adjust by changing your GB/day or your per-GB assumptions.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/log-retention-storage-cost-calculator", label: "Log retention storage" },
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
@@ -52,6 +52,15 @@ const description =
   ]}
 >
   <LogIngestionCostCalculatorComponent client:load />
+
+  <div class="prose" style="margin-top:16px">
+    <h2 style="margin:0 0 10px">Steady-state retention math (why it works)</h2>
+    <p class="muted" style="margin:0">
+      With a fixed retention window, stored logs are roughly “the last N days” of data. That’s why retained GB can be
+      approximated as <strong>GB/day × retention days</strong>. If your ingestion is seasonal, model a baseline and peak
+      month separately.
+    </p>
+  </div>
 
   <div class="prose" style="margin-top:16px">
     <h2 style="margin:0 0 10px">Practical knobs</h2>
@@ -92,4 +101,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

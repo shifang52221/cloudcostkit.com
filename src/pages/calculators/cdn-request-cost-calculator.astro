@@ -47,7 +47,7 @@ const description =
       a: "Transport protocols can change connection behavior, but billing is usually based on requests rather than connections. Use your CDN's definition of a billable request."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
@@ -58,6 +58,26 @@ const description =
   ]}
 >
   <CdnRequestCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">What to split into separate scenarios (request classes)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Static vs dynamic</strong>: some CDNs price them differently.</li>
+      <li><strong>Cache hit vs miss</strong>: misses also create origin load and origin egress.</li>
+      <li><strong>Regions</strong>: if pricing varies by geography, model your top regions separately and add them up.</li>
+    </ul>
+    <p class="muted" style="margin-top:10px">
+      Use the “Pricing unit” selector in the calculator to enter $/10k or $/1M directly (it keeps the same effective rate).
+    </p>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">When request fees spike</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Bot traffic</strong>: more requests with little bandwidth change.</li>
+      <li><strong>Chatty clients</strong>: many small API calls per page view.</li>
+      <li><strong>Cache busting</strong>: query-string churn and low TTLs can increase request volume.</li>
+    </ul>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>

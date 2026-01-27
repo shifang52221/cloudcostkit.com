@@ -56,7 +56,7 @@ const description =
       a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
     { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
@@ -97,6 +97,21 @@ const description =
     </p>
   </div>
   <CdnRequestCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Build scenarios (baseline vs peak)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Baseline</strong>: typical month (normal traffic, normal cache behavior).</li>
+      <li><strong>Peak</strong>: launches, incidents, seasonal spikes (often where request fees surprise teams).</li>
+      <li>
+        If pricing is tiered, run separate scenarios for each tier/region mix and sum the totals rather than using one
+        average rate.
+      </li>
+    </ul>
+    <p class="muted" style="margin-top:10px">
+      Tip: use the new “Save scenario” button at the top to keep a baseline and peak link you can revisit.
+    </p>
+  </div>
 
   <div class="prose" style="margin-top:18px">
     <h2>3) Common pitfalls</h2>
@@ -142,4 +157,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

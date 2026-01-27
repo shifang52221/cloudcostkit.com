@@ -10,7 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/api-response-size-transfer-calculator"
-  intro="If you know your request volume and typical response size, you can estimate transfer and then model egress/CDN cost."
+  intro="Estimate monthly response transfer from request volume and typical response size. Useful for budgeting bandwidth/egress and spotting payload bloat."
   examples={[
     "2,000,000 requests/day with 15 KB average responses ~ ~870 GB/month (estimate).",
   ]}
@@ -37,7 +37,7 @@ const description =
       a: "No. This models response payloads. If uploads are significant, model them separately."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
     { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
@@ -45,6 +45,31 @@ const description =
   ]}
 >
   <ApiResponseTransferCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">What “response size” should include</h2>
+    <ul>
+      <li><strong>Payload bytes</strong>: JSON/HTML/media returned by the endpoint (usually the dominant part).</li>
+      <li><strong>Compression</strong>: measure the <em>compressed</em> bytes over the wire if you use gzip/brotli.</li>
+      <li><strong>Headers</strong>: often small, but can matter if you have many small responses.</li>
+    </ul>
+
+    <h2>How to measure average response size (without guessing)</h2>
+    <ul>
+      <li>From access logs: average <strong>bytes sent</strong> by route (p50/p95 is better than mean).</li>
+      <li>From APM: sample response body sizes for hot endpoints and exclude outliers (large downloads).</li>
+      <li>
+        Separate “small API” and “large download” endpoints; mixing them produces an average that fits neither.
+      </li>
+    </ul>
+
+    <h2>Common multipliers (why bandwidth is higher than payload math)</h2>
+    <ul>
+      <li><strong>Retries/timeouts</strong>: incident windows can multiply responses per user action.</li>
+      <li><strong>Cache misses</strong>: if every request hits origin, your origin bandwidth follows the full request volume.</li>
+      <li><strong>Pagination</strong>: chatty clients that pull many pages inflate transfer quickly.</li>
+    </ul>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>

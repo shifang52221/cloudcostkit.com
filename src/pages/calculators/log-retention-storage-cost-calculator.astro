@@ -37,7 +37,7 @@ const description =
       a: "Model each log stream separately (app logs, access logs, audit logs), then sum the results.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
@@ -46,6 +46,17 @@ const description =
   ]}
 >
   <LogRetentionStorageCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Retention defaults that keep costs predictable</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Prod: 7–14 days hot retention, longer only for critical/audit logs.</li>
+      <li>Staging: 3–7 days (enough for debugging, not enough to create surprise bills).</li>
+      <li>Dev: 1–3 days (noisy logs are common; short retention prevents drift).</li>
+    </ul>
+    <p class="muted" style="margin-top:10px">
+      If you must keep logs long-term, archive to cheaper storage and keep only a small hot window indexed.
+    </p>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
@@ -77,4 +88,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

@@ -146,9 +146,23 @@ function removeH2Section(html, headingText) {
   return String(html || "").replace(re, " ");
 }
 
+function removeSectionById(html, id) {
+  const escaped = String(id || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`<section\\b[^>]*\\bid=[\"']${escaped}[\"'][^>]*>[\\s\\S]*?<\\/section>`, "gi");
+  return String(html || "").replace(re, " ");
+}
+
+function removeDivById(html, id) {
+  const escaped = String(id || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`<div\\b[^>]*\\bid=[\"']${escaped}[\"'][^>]*>[\\s\\S]*?<\\/div>`, "gi");
+  return String(html || "").replace(re, " ");
+}
+
 function removeCommonBlocks(html, category) {
   let s = String(html || "");
   if (category === "calculator") {
+    s = removeSectionById(s, "calc-toolbar");
+    s = removeDivById(s, "calc-scenarios");
     s = removeH2Section(s, "How to get your inputs");
     s = removeH2Section(s, "Common mistakes");
     s = removeH2Section(s, "Validate after changes");

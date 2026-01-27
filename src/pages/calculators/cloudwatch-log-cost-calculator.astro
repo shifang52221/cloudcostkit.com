@@ -39,7 +39,7 @@ const description =
       a: "Reduce noisy logs at source, shorten retention for low-value logs, and avoid retaining high-volume debug logs in hot storage.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/log-cost-calculator", label: "Log cost calculator (generic)" },
     { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost calculator" },
@@ -59,6 +59,18 @@ const description =
     <h2>2) Retention storage</h2>
   </div>
   <LogRetentionStorageCostCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">CloudWatch-specific gotchas to model separately</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Query/scan</strong>: if you use Logs Insights heavily, scan volume can be a separate line item.</li>
+      <li><strong>Subscription filters</strong>: forwarding logs can move data into another system that also charges ingestion.</li>
+      <li><strong>High-cardinality fields</strong>: can increase downstream costs when you index/aggregate.</li>
+    </ul>
+    <p class="muted" style="margin-top:10px">
+      Use this page for the “baseline” ingestion + retention model, then add scan/exports as separate scenarios.
+    </p>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
@@ -90,4 +102,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

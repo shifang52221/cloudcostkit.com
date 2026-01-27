@@ -41,7 +41,7 @@ const description =
       a: "Reduce log verbosity/fields, sample logs for high-volume endpoints, and shorten retention for noisy logs.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/aws-api-gateway-access-logs-cost", label: "Guide: API Gateway access logs cost" },
     { href: "/calculators/aws-api-gateway-cost-calculator", label: "API Gateway cost calculator" },
@@ -50,6 +50,27 @@ const description =
   ]}
 >
   <AwsApiGatewayAccessLogCostCalculatorComponent client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to estimate bytes per log line (quick, reliable)</h2>
+    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Export 100–1,000 log lines from a representative day.</li>
+      <li>Compute average bytes/line (and p95 if you want a peak scenario).</li>
+      <li>
+        Re-check after changing log format: adding headers, user agents, and long paths can materially increase bytes per
+        request.
+      </li>
+    </ol>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">High-leverage fixes for access log costs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Log only the fields you use (drop large headers and rarely-used fields).</li>
+      <li>Sample noisy endpoints (health checks, bots) instead of logging every request.</li>
+      <li>Shorten retention for high-volume access logs and archive cold data if required.</li>
+    </ul>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
@@ -81,4 +102,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

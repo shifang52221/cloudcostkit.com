@@ -6,7 +6,7 @@ import AdSlot from "../../components/AdSlot.astro";
 
 const title = `Networking calculators | ${SITE.name}`;
 const description =
-  "Networking cost calculators for egress, CDN bandwidth/requests, API requests, and transfer boundaries (cross-region, cross-AZ).";
+  "Networking cost calculators for egress, transfer boundaries (cross-region, cross-AZ), NAT vs endpoints, and CDN edge vs origin egress.";
 const slots = SITE.adsenseSlots;
 
 const tools = TOOLS.filter((t) => t.category === "Networking");
@@ -14,7 +14,7 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
 <BaseLayout title={title} description={description} canonicalPath="/calculators/networking">
   <section class="card hero">
     <h1>Networking calculators</h1>
-    <p>Model bandwidth and request-driven networking costs using explicit boundaries and effective rates.</p>
+    <p>Model networking costs by making boundaries explicit (internet, cross-region, cross-AZ) and using effective rates.</p>
     <div class="btn-row" style="margin-top:12px">
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/guides/networking-costs/">Guide: networking costs</a>
@@ -43,6 +43,25 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
     </section>
   </section>
 
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Quick workflow (get a defensible estimate)</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Measure GB/month for each boundary (internet, cross-region, cross-AZ) from logs/metrics if possible.</li>
+        <li>Pick an effective $/GB for each boundary (region and tier matter).</li>
+        <li>Model a baseline month and a peak month (incidents and launches amplify traffic).</li>
+      </ol>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">What to validate in billing</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Which line item is the real driver (egress, inter-AZ, inter-region, NAT processed GB, endpoint-hours).</li>
+        <li>Whether your estimate matches a representative month (then adjust assumptions, not the math).</li>
+        <li>Whether caches and locality behave as intended (cache hit rate, AZ affinity, regional routing).</li>
+      </ul>
+    </section>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} networking tools</div>
     <div class="grid">
@@ -59,4 +78,3 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
     <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
   </section>
 </BaseLayout>
-

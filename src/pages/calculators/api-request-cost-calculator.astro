@@ -37,7 +37,7 @@ const description =
       a: "Convert from RPS using the RPS to Monthly Requests tool, or use your analytics."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -45,6 +45,23 @@ const description =
   ]}
 >
   <ApiRequestCostCalculatorComponent client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Billable requests: the detail that changes the estimate</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Confirm what the provider counts as a billable request (cache hits, errors, internal calls can differ).</li>
+      <li>Split request classes if pricing differs (for example, authenticated vs unauthenticated, edge vs origin).</li>
+      <li>Keep a baseline and peak scenario: retries and incident behavior can multiply request counts.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How teams reduce request-driven cost</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Caching</strong>: reduce repeat calls (browser, edge/CDN, server-side caching).</li>
+      <li><strong>Batching</strong>: fewer round trips for chatty clients.</li>
+      <li><strong>Payload shaping</strong>: smaller responses often unlock caching and reduce downstream compute too.</li>
+    </ul>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>

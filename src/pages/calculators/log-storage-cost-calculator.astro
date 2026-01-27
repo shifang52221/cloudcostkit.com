@@ -42,7 +42,7 @@ const description =
       a: "It depends on the vendor. Some bill based on compressed stored size; others bill based on ingested volume. Check your provider's billing definition.",
     },
   ]}
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
@@ -51,6 +51,18 @@ const description =
   ]}
 >
   <LogRetentionStorageCostCalculator client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Retention tiers (hot vs cold) — a practical model</h2>
+    <p class="muted" style="margin-top:8px">
+      If you keep “hot” logs for fast search and “cold” logs for compliance, model them as separate tiers with different
+      retention days and different $/GB-month rates.
+    </p>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Hot tier: 7–14 days for troubleshooting and dashboards.</li>
+      <li>Cold tier: 90–365 days for audits and investigations (often cheaper storage).</li>
+      <li>Only index what you search; indexing everything is a common hidden multiplier.</li>
+    </ul>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>

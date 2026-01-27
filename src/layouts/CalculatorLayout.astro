@@ -159,41 +159,203 @@ const schemas = [breadcrumbSchema, faqSchema].filter(Boolean);
   <section class="card hero">
     <h1>{title}</h1>
     <p>{intro}</p>
-    <div class="btn-row" style="margin-top:12px; align-items:center">
-      <button class="btn" type="button" id="copy-share-link">Copy share link</button>
-      <span class="muted" id="copy-share-link-status" aria-live="polite" style="font-size:13px"></span>
+    <section id="calc-toolbar" class="btn-row" style="margin-top:12px; align-items:center">
+      <button class="btn" type="button" id="calc-copy-link">Copy link</button>
+      <button class="btn" type="button" id="calc-reset">Reset</button>
+      <button class="btn" type="button" id="calc-save">Save scenario</button>
+      <button class="btn" type="button" id="calc-copy-inputs">Copy inputs</button>
+      <span class="muted" id="calc-toolbar-status" aria-live="polite" style="font-size:13px"></span>
+    </section>
+
+    <div id="calc-scenarios" class="muted" style="margin-top:10px; font-size:13px; display:none">
+      <div style="font-weight:800; margin-bottom:6px">Saved scenarios</div>
+      <div id="calc-scenarios-list"></div>
     </div>
   </section>
 
   <script is:inline type="text/javascript">
     (function () {
-      var btn = document.getElementById("copy-share-link");
-      var status = document.getElementById("copy-share-link-status");
-      if (!btn) return;
+      var btnCopy = document.getElementById("calc-copy-link");
+      var btnReset = document.getElementById("calc-reset");
+      var btnSave = document.getElementById("calc-save");
+      var btnCopyInputs = document.getElementById("calc-copy-inputs");
+      var status = document.getElementById("calc-toolbar-status");
+      var scenariosWrap = document.getElementById("calc-scenarios");
+      var scenariosList = document.getElementById("calc-scenarios-list");
+      if (!btnCopy) return;
       function setStatus(msg) {
         if (!status) return;
         status.textContent = msg || "";
       }
-      btn.addEventListener("click", function () {
+      function toast(msg) {
+        setStatus(msg);
+        setTimeout(function () {
+          setStatus("");
+        }, 1200);
+      }
+      function copyText(text) {
         try {
-          var url = window.location.href;
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard
-              .writeText(url)
-              .then(function () {
-                setStatus("Copied");
-                setTimeout(function () {
-                  setStatus("");
-                }, 1200);
-              })
-              .catch(function () {
-                window.prompt("Copy link:", url);
-              });
-          } else {
-            window.prompt("Copy link:", url);
-          }
+          if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
         } catch (e) {}
+        try {
+          window.prompt("Copy:", text);
+        } catch (e) {}
+        return Promise.resolve();
+      }
+      function storageKeyForScenarios(pathname) {
+        return "cck:calc:scenarios:" + String(pathname || "/");
+      }
+      function loadScenarios() {
+        try {
+          var raw = window.localStorage.getItem(storageKeyForScenarios(window.location.pathname));
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          return parsed.filter(function (x) {
+            return x && typeof x === "object" && typeof x.url === "string";
+          });
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveScenarios(list) {
+        try {
+          window.localStorage.setItem(storageKeyForScenarios(window.location.pathname), JSON.stringify(list || []));
+        } catch (e) {}
+      }
+      function renderScenarios() {
+        if (!scenariosWrap || !scenariosList) return;
+        var items = loadScenarios();
+        if (!items.length) {
+          scenariosWrap.style.display = "none";
+          scenariosList.innerHTML = "";
+          return;
+        }
+        scenariosWrap.style.display = "";
+        var html = items
+          .slice()
+          .sort(function (a, b) {
+            return (b.createdAt || 0) - (a.createdAt || 0);
+          })
+          .slice(0, 8)
+          .map(function (s, idx) {
+            var name = String(s.name || "Scenario " + (idx + 1));
+            var safeName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return (
+              '<div style="display:flex; gap:10px; align-items:center; margin:4px 0">' +
+              '<span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">' +
+              safeName +
+              "</span>" +
+              '<a href="' +
+              s.url +
+              '" style="text-decoration:underline">Open</a>' +
+              '<button type="button" data-del="' +
+              encodeURIComponent(s.url) +
+              '" style="background:transparent; border:0; color:rgba(255,255,255,0.8); cursor:pointer; text-decoration:underline">Delete</button>' +
+              "</div>"
+            );
+          })
+          .join("");
+        scenariosList.innerHTML = html;
+
+        var delButtons = scenariosList.querySelectorAll("button[data-del]");
+        for (var i = 0; i < delButtons.length; i++) {
+          delButtons[i].addEventListener("click", function (e) {
+            try {
+              var u = decodeURIComponent(String(e.target && e.target.getAttribute("data-del") || ""));
+              var next = loadScenarios().filter(function (s) {
+                return s && s.url !== u;
+              });
+              saveScenarios(next);
+              renderScenarios();
+              toast("Deleted");
+            } catch (err) {}
+          });
+        }
+      }
+
+      btnCopy.addEventListener("click", function () {
+        var url = window.location.href;
+        copyText(url)
+          .then(function () {
+            toast("Copied");
+          })
+          .catch(function () {
+            window.prompt("Copy link:", url);
+          });
       });
+
+      if (btnCopyInputs) {
+        btnCopyInputs.addEventListener("click", function () {
+          try {
+            var url = new URL(window.location.href);
+            var inputs = {};
+            url.searchParams.forEach(function (v, k) {
+              inputs[k] = v;
+            });
+            var payload = JSON.stringify(
+              {
+                tool: window.location.pathname,
+                createdAt: new Date().toISOString(),
+                inputs: inputs,
+              },
+              null,
+              2,
+            );
+            copyText(payload).then(function () {
+              toast("Copied");
+            });
+          } catch (e) {}
+        });
+      }
+
+      if (btnReset) {
+        btnReset.addEventListener("click", function () {
+          try {
+            var pathname = window.location.pathname;
+            try {
+              var prefix = "cck:calc:" + pathname + ":";
+              for (var i = window.localStorage.length - 1; i >= 0; i--) {
+                var k = window.localStorage.key(i);
+                if (k && k.indexOf(prefix) === 0) window.localStorage.removeItem(k);
+              }
+            } catch (e) {}
+            window.location.assign(pathname);
+          } catch (e) {}
+        });
+      }
+
+      if (btnSave) {
+        btnSave.addEventListener("click", function () {
+          try {
+            var name = window.prompt("Scenario name:", "");
+            if (!name) return;
+            var url = window.location.href;
+            var items = loadScenarios();
+            var existing = items.filter(function (s) {
+              return s && s.url === url;
+            });
+            if (existing.length) {
+              existing[0].name = name;
+              existing[0].createdAt = Date.now();
+              saveScenarios(items);
+              renderScenarios();
+              toast("Updated");
+              return;
+            }
+            items.push({ name: name, url: url, createdAt: Date.now() });
+            items = items.slice().sort(function (a, b) {
+              return (b.createdAt || 0) - (a.createdAt || 0);
+            });
+            if (items.length > 30) items = items.slice(0, 30);
+            saveScenarios(items);
+            renderScenarios();
+            toast("Saved");
+          } catch (e) {}
+        });
+      }
+
+      renderScenarios();
     })();
   </script>
 

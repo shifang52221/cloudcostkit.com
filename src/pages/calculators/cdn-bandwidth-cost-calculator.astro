@@ -55,7 +55,7 @@ const description =
       a: "If your plan includes free allowances, subtract them from GB/month before applying $/GB, or use an effective blended rate."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/estimate-cdn-bandwidth-gb-per-month", label: "Guide: Estimate GB/month" },
@@ -65,12 +65,31 @@ const description =
     { href: "/calculators/unit-converter", label: "Units converter" },
   ]}
 >
+  <div class="prose">
+    <h2 style="margin-top:0">When bandwidth dominates (and how to avoid under-budgeting)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Large objects (images/video) and global audiences push bandwidth up fast.</li>
+      <li>Compression and image optimization can change GB/month materially.</li>
+      <li>Peak events can add a “second month” of bandwidth in a few days.</li>
+    </ul>
+  </div>
+
   <DataEgressCostCalculator
     transferLabel="CDN bandwidth (GB / month)"
     priceLabel="CDN price ($ / GB)"
     defaultGbPerMonth={4000}
     defaultPricePerGbUsd={0.06}
   client:load />
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Estimate GB/month from Mbps (quick conversion)</h2>
+    <p class="muted" style="margin-top:8px">
+      If you start from average throughput, convert Mbps to GB/month first, then paste the result into the calculator.
+      Use <a href="/calculators/unit-converter/">Units Converter</a> for a precise conversion and to avoid GB vs GiB mixups.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      If you have a traffic curve (p50/p95), run two scenarios and save them so you can compare a typical month vs a peak month.
+    </p>
+  </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>

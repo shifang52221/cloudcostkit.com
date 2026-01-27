@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 function normalizeKey(key: string): string {
   return key.replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -52,6 +52,10 @@ export function useNumberParamState(key: string, defaultValue: number): [number,
     return defaultValue;
   });
 
+  const setSafeValue = useCallback((next: number) => {
+    setValue((prev) => (Number.isFinite(next) ? next : prev));
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -72,7 +76,7 @@ export function useNumberParamState(key: string, defaultValue: number): [number,
     } catch {}
   }, [defaultValue, normalizedKey, value]);
 
-  return [value, setValue];
+  return [value, setSafeValue];
 }
 
 export function useBooleanParamState(key: string, defaultValue: boolean): [boolean, (v: boolean) => void] {

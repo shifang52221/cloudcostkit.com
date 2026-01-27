@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useNumberParamState } from "./useNumberParamState";
+import { useStringParamState } from "./useNumberParamState";
 import { estimateRequestCostPer10k } from "../../lib/calc/requests";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -7,6 +8,7 @@ import { clamp } from "../../lib/math";
 export function CdnRequestCostCalculator() {
   const [requestsPerMonth, setRequestsPerMonth] = useNumberParamState("CdnRequestCost.requestsPerMonth", 300_000_000);
   const [pricePer10kUsd, setPricePer10kUsd] = useNumberParamState("CdnRequestCost.pricePer10kUsd", 0.0075);
+  const [pricingUnit, setPricingUnit] = useStringParamState("CdnRequestCost.pricingUnit", "per10k", ["per10k", "per1m"] as const);
 
   const result = useMemo(() => {
     return estimateRequestCostPer10k({
@@ -14,6 +16,10 @@ export function CdnRequestCostCalculator() {
       pricePer10kUsd: clamp(pricePer10kUsd, 0, 1e9),
     });
   }, [requestsPerMonth, pricePer10kUsd]);
+
+  const priceInputLabel = pricingUnit === "per1m" ? "Price ($ / 1M requests)" : "Price ($ / 10k requests)";
+  const priceInputValue = pricingUnit === "per1m" ? pricePer10kUsd * 100 : pricePer10kUsd;
+  const effectivePer1m = pricePer10kUsd * 100;
 
   return (
     <div className="calc-grid">
@@ -32,15 +38,30 @@ export function CdnRequestCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Price ($ / 10k requests)</div>
+            <div className="label">Pricing unit</div>
+            <select value={pricingUnit} onChange={(e) => setPricingUnit(String(e.target.value))}>
+              <option value="per10k">$ per 10k</option>
+              <option value="per1m">$ per 1M</option>
+            </select>
+            <div className="hint">Per 1M is 100× per 10k.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">{priceInputLabel}</div>
             <input
               type="number"
               inputMode="decimal"
-              value={pricePer10kUsd}
+              value={priceInputValue}
               min={0}
               step={0.0001}
-              onChange={(e) => setPricePer10kUsd(+e.target.value)}
+              onChange={(e) => {
+                const next = +e.target.value;
+                if (pricingUnit === "per1m") setPricePer10kUsd(next / 100);
+                else setPricePer10kUsd(next);
+              }}
             />
+            <div className="hint">
+              Effective rate: {formatCurrency2(effectivePer1m)} / 1M requests
+            </div>
           </div>
 
           <div className="field field-6">
@@ -51,6 +72,7 @@ export function CdnRequestCostCalculator() {
                 onClick={() => {
                   setRequestsPerMonth(300_000_000);
                   setPricePer10kUsd(0.0075);
+                  setPricingUnit("per10k");
                 }}
               >
                 Reset example
@@ -76,4 +98,3 @@ export function CdnRequestCostCalculator() {
     </div>
   );
 }
-
