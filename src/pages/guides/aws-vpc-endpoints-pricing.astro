@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-vpc-endpoints-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -32,7 +32,7 @@ const faqs = [
     any data transfer boundaries in your architecture.
   </p>
 
-  <h2>What to model</h2>
+  <h2>What to model (interface vs gateway endpoints)</h2>
   <ul>
     <li>
       <strong>Interface endpoints</strong>: endpoint-hours (endpoints x AZs x hours) and sometimes a per-GB processing fee.
@@ -44,18 +44,74 @@ const faqs = [
       <strong>Transfer boundaries</strong>: cross-AZ/cross-region paths can create separate transfer line items.
     </li>
   </ul>
+  <p class="muted">
+    The same "private access" goal can be achieved with different endpoint types. Always model the endpoint line item and the transfer path together.
+  </p>
 
-  <h2>Fast estimate</h2>
+  <h2>Interface vs gateway endpoints: decision points</h2>
+  <ul>
+    <li>
+      <strong>Interface endpoints</strong> (PrivateLink): great when you need private access to many AWS services, but they add endpoint-hours per AZ and can multiply quickly across environments.
+    </li>
+    <li>
+      <strong>Gateway endpoints</strong>: a different mechanism with a different cost model. Treat them separately and verify which services in your architecture can use them.
+    </li>
+    <li>
+      <strong>Path matters</strong>: if clients in one AZ consistently talk to endpoints in another AZ, you can introduce cross-AZ transfer even if the endpoint line item looks correct.
+    </li>
+  </ul>
+
+  <h2>Fast estimate (baseline + scenario)</h2>
   <p class="muted">
     Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> for a
     first-pass estimate of endpoint-hours + per-GB processing.
   </p>
+  <ul>
+    <li>
+      Baseline: current NAT GB processed and current endpoint inventory (if any).
+    </li>
+    <li>
+      Scenario: endpoints added + NAT traffic reduced + any expected cross-AZ path changes.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Endpoint-hours</strong> = endpoints * AZs per endpoint * hours/month
+    </li>
+    <li>
+      <strong>Endpoint GB processed</strong> = GB/month expected to flow through endpoints
+    </li>
+    <li>
+      <strong>Endpoint cost</strong> = hourly baseline + per-GB processing (if applicable)
+    </li>
+  </ul>
+  <p class="muted">
+    Quick sanity check: if you add many endpoints across 3 AZs, the hourly baseline can dominate even when GB processed is modest. Model the hours first, then refine GB.
+  </p>
+
+  <h2>NAT break-even checklist</h2>
+  <ul>
+    <li>How much NAT GB processed is actually AWS-service traffic that can move to endpoints?</li>
+    <li>How many endpoints will you deploy (and in how many AZs) across prod/staging/dev?</li>
+    <li>Will endpoint routing change traffic locality (cross-AZ) or keep it AZ-local?</li>
+    <li>Do you need endpoints everywhere, or only in a subset of VPCs and accounts?</li>
+  </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
     <li>Forgetting that interface endpoints scale with the number of AZs you use.</li>
     <li>Moving traffic across AZs or regions and creating new transfer charges.</li>
     <li>Assuming endpoints replace NAT costs without validating the traffic mix.</li>
+    <li>Counting endpoints once while they exist in multiple VPCs and environments.</li>
+  </ul>
+
+  <h2>How to validate the pricing model</h2>
+  <ul>
+    <li>Reconcile endpoint-hours in billing against endpoints * AZs * hours.</li>
+    <li>Spot-check the top destinations and verify they are the services you intended to route through endpoints.</li>
+    <li>After rollout, compare NAT GB processed and endpoint GB processed as a before/after sanity check.</li>
   </ul>
 
   <h2>Related guides</h2>
@@ -67,18 +123,18 @@ const faqs = [
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <a href="https://aws.amazon.com/privatelink/pricing/" target="_blank" rel="nofollow noopener">
+        AWS PrivateLink pricing (interface endpoints)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints.html" target="_blank" rel="nofollow noopener">
+        VPC endpoints documentation
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
 
 </GuideLayout>

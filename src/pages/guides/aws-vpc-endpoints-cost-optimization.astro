@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-vpc-endpoints-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -31,12 +31,28 @@ const faqs = [
     the multipliers (endpoints x AZs) and validating your traffic path.
   </p>
 
+  <h2>What to model (endpoint-hours + GB processed + transfer boundaries)</h2>
+  <ul>
+    <li>
+      <strong>Endpoint-hours</strong>: endpoints * AZs per endpoint * hours/month (the main baseline)
+    </li>
+    <li>
+      <strong>GB processed</strong>: traffic through endpoints (often a smaller driver than hours, but can matter at scale)
+    </li>
+    <li>
+      <strong>Transfer</strong>: cross-AZ paths can create separate transfer charges if clients are not AZ-local
+    </li>
+  </ul>
+
   <h2>1) Consolidate endpoints (reduce endpoint count)</h2>
   <ul>
     <li>Inventory which services actually require interface endpoints.</li>
     <li>Avoid duplicating endpoints across many VPCs/environments without need.</li>
     <li>Prefer shared patterns where appropriate (with clear ownership and guardrails).</li>
   </ul>
+  <p class="muted">
+    A good forcing function is: "What breaks if we remove this endpoint?" If nothing breaks, you might be paying for a default you no longer need.
+  </p>
 
   <h2>2) Right-size AZ coverage (reduce the AZ multiplier)</h2>
   <ul>
@@ -44,12 +60,20 @@ const faqs = [
     <li>Only use 3 AZs when the workload's resiliency requirements justify it.</li>
     <li>Validate that your architecture actually benefits from the extra AZ.</li>
   </ul>
+  <p class="muted">
+    Endpoint-hours scale with AZs. If you attach endpoints everywhere "just in case", you pay that multiplier forever.
+  </p>
 
   <h2>3) Reduce endpoint GB processed (the traffic lever)</h2>
   <ul>
     <li>Stop retry storms: timeouts and retries can multiply traffic.</li>
     <li>Reduce repeated large downloads (package mirrors, container image caching).</li>
     <li>Use caching to cut repeated API calls where safe.</li>
+  </ul>
+  <ul>
+    <li>
+      If the traffic is S3/ECR/STS heavy, validate whether a gateway endpoint (where applicable) or caching layer reduces interface endpoint usage.
+    </li>
   </ul>
 
   <h2>4) Avoid cross-AZ transfer surprises</h2>
@@ -67,6 +91,27 @@ const faqs = [
     Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> to
     model endpoint-hours + per-GB processing. Run scenarios for endpoint count and AZs.
   </p>
+  <ul>
+    <li>Create a baseline scenario for current endpoints and AZ coverage.</li>
+    <li>Create an optimized scenario with fewer endpoints and right-sized AZs.</li>
+    <li>Compare against <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a> to find break-even.</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Adding endpoints for every service without validating who uses them.</li>
+    <li>Paying the 3-AZ multiplier while most workloads effectively run in 2 AZs.</li>
+    <li>Creating new cross-AZ traffic when clients route to endpoints in other AZs.</li>
+    <li>Assuming endpoints always save money compared to NAT without checking the traffic mix.</li>
+    <li>Ignoring operational overhead: DNS, policies, and ownership across many VPCs.</li>
+  </ul>
+
+  <h2>How to validate the optimization</h2>
+  <ul>
+    <li>Reconcile endpoint-hours in billing against endpoints * AZs * hours.</li>
+    <li>Spot-check "GB processed" with flow logs or NAT metrics to confirm the traffic moved as expected.</li>
+    <li>After changes, re-check cross-AZ transfer usage. Endpoint changes can shift traffic paths.</li>
+  </ul>
 
   <h2>Related guides</h2>
   <div class="btn-row">
@@ -76,18 +121,18 @@ const faqs = [
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <a href="https://aws.amazon.com/privatelink/pricing/" target="_blank" rel="nofollow noopener">
+        AWS PrivateLink pricing (interface endpoints)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html" target="_blank" rel="nofollow noopener">
+        PrivateLink documentation
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
 
 </GuideLayout>

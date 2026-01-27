@@ -759,13 +759,12 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate Parameter Store API calls per month (GetParameter volume)",
-    "description": "How to estimate SSM Parameter Store API call volume for cost models: from metrics/logs, from runtime patterns, and how to account for deploy and churn effects.",
+    "description": "How to estimate SSM Parameter Store API call volume for cost models: measure from billing/logs, derive from runtime patterns, and account for deploy + churn multipliers.",
     "canonicalPath": "/guides/aws-ssm-parameter-store-estimate-api-calls",
     "category": "AWS",
     "slug": "aws-ssm-parameter-store-estimate-api-calls",
     "topics": [
       "logging",
-      "metrics",
       "requests"
     ]
   },

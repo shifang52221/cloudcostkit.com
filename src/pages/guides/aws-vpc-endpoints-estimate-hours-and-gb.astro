@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-vpc-endpoints-estimate-hours-and-gb"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -40,6 +40,14 @@ const faqs = [
   <p class="muted">
     Endpoint-hours = endpoints x AZs per endpoint x hours/month.
   </p>
+  <ul>
+    <li>
+      For ephemeral environments, estimate active hours/month (for example: 8 hours/day * weekdays) rather than assuming a full month.
+    </li>
+    <li>
+      If you plan to deploy endpoints per VPC per environment, include that multiplier explicitly (prod + staging + dev).
+    </li>
+  </ul>
 
   <h2>2) Estimate GB processed</h2>
   <ul>
@@ -49,6 +57,19 @@ const faqs = [
     <li>From flow logs: roll up bytes for the relevant destinations and convert to GB/month.</li>
     <li>From scenarios: start with 30% / 60% / 90% of NAT GB processed as a sensitivity model.</li>
   </ul>
+  <p class="muted">
+    The goal is not to be perfect on day one. Build scenarios and tighten the estimate once you have flow logs and a billing cycle.
+  </p>
+
+  <h2>Worked scenario example</h2>
+  <ul>
+    <li>
+      <strong>Endpoint-hours</strong>: 6 endpoints * 3 AZ * 730 hours/month = 13,140 endpoint-hours/month
+    </li>
+    <li>
+      <strong>GB processed</strong>: 4 TB/month AWS-service traffic moving off NAT into endpoints (model low/medium/high)
+    </li>
+  </ul>
 
   <h2>3) Turn inputs into cost</h2>
   <p>
@@ -56,6 +77,25 @@ const faqs = [
     endpoint-hours + per-GB processing, and compare against{" "}
     <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>.
   </p>
+  <ul>
+    <li>Save a baseline scenario (NAT-heavy) and an endpoint scenario (endpoints + reduced NAT GB).</li>
+    <li>Do not forget transfer: endpoint decisions can change cross-AZ paths and create transfer line items.</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Counting endpoints but forgetting the AZ multiplier (interface endpoints are per AZ).</li>
+    <li>Assuming 100% of NAT traffic moves to endpoints (many destinations remain public internet).</li>
+    <li>Not separating one-time spikes (image pulls, migrations) from steady-state traffic.</li>
+    <li>Missing cross-AZ effects when clients route to endpoints in other AZs.</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>Compare endpoint-hours in billing to endpoints * AZs * hours. Large gaps usually mean inventory mistakes.</li>
+    <li>Use flow logs to validate the GB processed order of magnitude and the top destinations.</li>
+    <li>After rollout, reconcile NAT GB processed and endpoint GB processed as a before/after.</li>
+  </ul>
 
   <h2>Related guides</h2>
   <div class="btn-row">
@@ -66,18 +106,18 @@ const faqs = [
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <a href="https://aws.amazon.com/privatelink/pricing/" target="_blank" rel="nofollow noopener">
+        AWS PrivateLink pricing (interface endpoints)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html" target="_blank" rel="nofollow noopener">
+        PrivateLink documentation
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
 
 </GuideLayout>

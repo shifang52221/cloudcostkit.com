@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-ssm-parameter-store-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -35,12 +35,28 @@ const faqs = [
     and reliable.
   </p>
 
-  <h2>1) Cache parameters</h2>
+  <h2>What drives Parameter Store cost</h2>
+  <ul>
+    <li>
+      <strong>API calls</strong>: the main variable driver (GetParameter/GetParameters, PutParameter, List*).
+    </li>
+    <li>
+      <strong>Parameter tier</strong>: advanced parameter count can add a steady baseline in some setups.
+    </li>
+    <li>
+      <strong>Churn events</strong>: deploys, autoscaling, and cold starts can multiply startup fetches.
+    </li>
+  </ul>
+
+  <h2>1) Cache parameters (the biggest lever)</h2>
   <ul>
     <li>Fetch parameters once per process startup and cache in memory.</li>
-    <li>Add a TTL refresh for long-running services (minutes, not seconds).</li>
-    <li>Batch with GetParameters where possible.</li>
+    <li>Add a TTL refresh for long-running services (minutes, not seconds), and refresh before expiry.</li>
+    <li>Batch with GetParameters where possible (avoid one call per parameter).</li>
   </ul>
+  <p class="muted">
+    A safe pattern is "cache + jittered refresh": refresh on a timer with small jitter so a fleet restart does not create a thundering herd of API calls.
+  </p>
 
   <h2>2) Avoid per-request lookups</h2>
   <ul>
@@ -54,11 +70,41 @@ const faqs = [
     <li>Fix retry loops that multiply fetches during incidents.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>4) Reduce noisy control-plane calls</h2>
+  <ul>
+    <li>Avoid frequent List* operations in hot paths (treat them as "administrative" work).</li>
+    <li>Prefer a small, well-scoped set of parameters rather than broad prefix scans.</li>
+    <li>Keep write churn (PutParameter) intentional: unnecessary updates can trigger reload waves.</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Calls/month</strong> = (startup fetches/month * params per startup) + (refresh fetches/month * params per refresh) + (writes/month)
+    </li>
+    <li>
+      <strong>Peak multiplier</strong> = incident retries + deployment churn + autoscaling churn
+    </li>
+  </ul>
+  <p class="muted">
+    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store cost calculator</a> to turn calls/month into dollars with your effective $ per 10k requests.
+  </p>
+
+  <h2>Common pitfalls (cost + reliability)</h2>
+  <ul>
+    <li>Fetching parameters on every HTTP request.</li>
+    <li>Over-short TTLs that cause constant refresh traffic.</li>
+    <li>Cold starts multiplying calls (serverless and Kubernetes rollouts).</li>
+    <li>Retry storms when SSM is throttled or temporarily unavailable.</li>
+    <li>Scanning parameter prefixes repeatedly (List* loops) instead of caching a resolved map.</li>
+  </ul>
+
+  <h2>How to validate the optimization</h2>
   <ul>
     <li>Measure API calls/day for a representative week, then compare after changes.</li>
     <li>Confirm refresh behavior: deploy reload, TTL refresh, and manual rotations.</li>
     <li>Confirm failure modes: if Parameter Store is throttled, do you degrade safely?</li>
+    <li>In Cost Explorer / CUR, reconcile request usage types against your calls/day model.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -68,5 +114,18 @@ const faqs = [
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/systems-manager/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Systems Manager pricing (Parameter Store)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html" target="_blank" rel="nofollow noopener">
+        Systems Manager Parameter Store documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

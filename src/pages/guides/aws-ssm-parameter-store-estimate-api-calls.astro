@@ -3,69 +3,131 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate Parameter Store API calls per month (GetParameter volume)";
 const description =
-  "How to estimate SSM Parameter Store API call volume for cost models: from metrics/logs, from runtime patterns, and how to account for deploy and churn effects.";
+  "How to estimate SSM Parameter Store API call volume for cost models: measure from billing/logs, derive from runtime patterns, and account for deploy + churn multipliers.";
+const faqs = [
+  {
+    q: "What's the fastest way to estimate API calls/month?",
+    a: "Start from a measured baseline over 7 or 30 days and scale to monthly. If you cannot measure yet, estimate startups/month x calls per startup, then add refresh and retry scenarios.",
+  },
+  {
+    q: "Why do API calls multiply quickly?",
+    a: "Deployments, restarts, and autoscaling can trigger many fetches. If you fetch parameters per request, call volume grows with traffic and failures multiply it further.",
+  },
+  {
+    q: "Do batch APIs change the estimate?",
+    a: "Yes. If you use GetParameters or GetParametersByPath effectively, you can reduce calls even if you read many parameters.",
+  },
+  {
+    q: "Should I model a peak scenario?",
+    a: "Yes. Cost spikes are usually caused by churn (rollouts, autoscaling) and retries (timeouts). A peak scenario prevents under-budgeting.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ssm-parameter-store-estimate-api-calls"
-  lastUpdated="2026-01-22"
-  faqs={[
-    {
-      q: "What’s the fastest way to estimate API calls/month?",
-      a: "Start from a measured baseline over 7 or 30 days and scale to monthly. If you can’t measure yet, estimate instances x fetches per instance x restarts per month.",
-    },
-    {
-      q: "Why do API calls multiply quickly?",
-      a: "Because each deployment, restart, or pod scale event can fetch many parameters. If you fetch parameters on every request, call volume grows with traffic as well.",
-    },
-  ]}
+  lastUpdated="2026-01-27"
+  faqs={faqs}
 >
   <p>
     Parameter Store costs are frequently request-driven, so the key input is <strong>API calls per month</strong> (often
-    dominated by GetParameter(s)).
+    dominated by GetParameter, GetParameters, and related reads). This page gives you three estimation methods and a
+    template you can copy/paste into a budget review.
   </p>
 
-  <h2>Method 1: From measured metrics</h2>
+  <h2>What counts as an API call (so you don't miscount)</h2>
   <ul>
-    <li>Measure total Parameter Store API calls over a representative window (7/30 days) and scale to monthly.</li>
-    <li>Break down by account/region/environment if applicable.</li>
-  </ul>
-
-  <h2>Method 2: From runtime pattern</h2>
-  <ul>
-    <li>Instances/month = average running instances + restarts + autoscaling churn.</li>
-    <li>Calls/instance = parameters fetched per process start (or per request if you do that).</li>
     <li>
-      <strong>API calls/month ≈ instances/month x calls/instance</strong>
+      <strong>GetParameter</strong>: one call per parameter read (worst-case if you read many keys individually)
+    </li>
+    <li>
+      <strong>GetParameters / GetParametersByPath</strong>: one call can return multiple values (best-case if you batch and cache)
+    </li>
+    <li>
+      <strong>DescribeParameters / List*</strong>: control-plane style calls that can accidentally run in loops
     </li>
   </ul>
 
-  <h2>Common multipliers</h2>
+  <h2>Method 1: From measured usage (best)</h2>
   <ul>
-    <li>Fetching parameters on every HTTP request or background job iteration.</li>
-    <li>Short-lived containers with frequent cold starts.</li>
-    <li>Retry loops on timeouts and transient errors.</li>
+    <li>Measure total Parameter Store calls over a representative window (7/30 days) and scale to monthly.</li>
+    <li>Break down by account/region/environment so one noisy cluster does not hide in the average.</li>
+    <li>If you have CloudTrail, count SSM API events for Parameter Store APIs as an evidence path.</li>
+  </ul>
+
+  <h2>Method 2: From runtime pattern (good for planning)</h2>
+  <p>
+    This method is reliable when you fetch parameters on startup and refresh on a TTL. It is also the easiest method to
+    review with engineers because it mirrors real behavior.
+  </p>
+  <ul>
+    <li>
+      <strong>Startups/month</strong> = average running instances + restarts + autoscaling churn (in Kubernetes, include rollouts)
+    </li>
+    <li>
+      <strong>Calls/startup</strong> = parameters read on startup (lower if you batch)
+    </li>
+    <li>
+      <strong>Refresh calls/month</strong> = refreshes/month * calls/refresh (if you refresh config on a TTL)
+    </li>
+  </ul>
+  <p class="muted">
+    Quick formula: calls/month = startups/month * calls/startup + refreshes/month * calls/refresh.
+  </p>
+
+  <h2>Method 3: From traffic (only if you fetch in request paths)</h2>
+  <p>
+    Fetching parameters on each request is usually a cost and reliability anti-pattern, but if it exists today, your
+    call volume scales with traffic and failures.
+  </p>
+  <ul>
+    <li>requests/month (app) * parameters fetched per request (app) = parameter fetch calls/month (worst-case)</li>
+    <li>
+      Convert RPS to monthly requests with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+    </li>
+  </ul>
+
+  <h2>Common multipliers (the spike drivers)</h2>
+  <ul>
+    <li>Over-short TTL refresh loops (refreshing far more frequently than needed).</li>
+    <li>Deploy waves that restart the fleet in a narrow window (churn peaks).</li>
+    <li>Retry storms on timeouts and throttling (missing jitter and backoff).</li>
+    <li>Prefix scans (Describe/List) run repeatedly instead of caching resolved values.</li>
   </ul>
 
   <h2>Turn calls into cost</h2>
   <p>
-    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store Cost Calculator</a> with your API
-    calls/month and $ per 10k pricing.
+    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store cost calculator</a> with your
+    calls/month and effective $ per 10k requests. Save a baseline and a peak scenario so your estimate survives real
+    deploys and incidents.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>How to validate the estimate</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>After rollout, compare your modeled calls/month to actual usage types in Cost Explorer / CUR.</li>
+    <li>Spot-check one service: count calls on startup and during steady state to confirm your calls/startup assumption.</li>
+    <li>Confirm pricing units (Parameter Store requests are typically priced per 10k).</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store cost</a>
+    <a class="btn" href="/guides/aws-ssm-parameter-store-pricing/">Pricing checklist</a>
+    <a class="btn" href="/guides/aws-ssm-parameter-store-cost-optimization/">Reduce costs</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/systems-manager/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Systems Manager pricing (Parameter Store)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html" target="_blank" rel="nofollow noopener">
+        Systems Manager Parameter Store documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

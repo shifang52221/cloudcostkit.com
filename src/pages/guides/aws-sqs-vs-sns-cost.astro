@@ -23,13 +23,19 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-sqs-vs-sns-cost"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     SQS vs SNS cost comparisons go wrong when you compare list prices without normalizing the workload. The winner is
     usually decided by <strong>how many deliveries happen</strong>, <strong>how many requests per message you create</strong>,
     and whether <strong>retries</strong> are controlled.
+  </p>
+
+  <h2>Normalize the workload first (same flow, same assumptions)</h2>
+  <p>
+    Before you compare costs, write down one concrete message flow (producer -&gt; routing -&gt; consumers) and count how many
+    operations happen per published message. Do this for a baseline and a peak scenario (deploys, incidents, backfills).
   </p>
 
   <h2>What to model</h2>
@@ -41,22 +47,55 @@ const faqs = [
     <li>Payload size and any transfer fees</li>
   </ul>
 
-  <h2>Use calculators for a baseline</h2>
+  <h2>Fast baseline (use calculators, then refine)</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-sqs-cost-calculator/">SQS cost calculator</a>
     <a class="btn" href="/calculators/aws-sns-cost-calculator/">SNS cost calculator</a>
   </div>
+  <p class="muted">
+    Keep the estimate honest by saving two scenarios: baseline traffic and peak traffic. Messaging cost spikes are usually driven by retries and fan-out, not by slow organic growth.
+  </p>
+
+  <h2>Worked comparison template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Published messages/month</strong> = producer volume (baseline + peak)
+    </li>
+    <li>
+      <strong>SNS deliveries/month</strong> = published messages/month * subscribers per message * (1 + delivery retry factor)
+    </li>
+    <li>
+      <strong>SQS requests/month</strong> = messages delivered to queues/month * requests per message (Send + Receive + Delete + extras)
+    </li>
+  </ul>
 
   <h2>When SNS costs spike</h2>
   <ul>
     <li>High fan-out: deliveries multiply fast.</li>
     <li>Retries/redelivery loops: failures multiply deliveries.</li>
+    <li>Verbose delivery targets: multiple protocols/targets per message increase total delivery count.</li>
   </ul>
 
   <h2>When SQS costs spike</h2>
   <ul>
     <li>Multiple receives per message due to timeouts and visibility settings.</li>
     <li>High retry counts and poison-message loops.</li>
+    <li>Backfills and replays that keep re-queueing the same payloads.</li>
+  </ul>
+
+  <h2>Common decision pitfalls (cost and architecture)</h2>
+  <ul>
+    <li>Comparing one-to-many fan-out (SNS) against one-to-one processing (SQS) without normalizing deliveries.</li>
+    <li>Ignoring consumer behavior: visibility timeouts and retries often matter more than list price.</li>
+    <li>Forgetting downstream costs: Lambda, logging, and data transfer can dominate the messaging line item.</li>
+    <li>Using one "average" and missing peaks. Spikes drive real bills and real outages.</li>
+  </ul>
+
+  <h2>How to validate the comparison</h2>
+  <ul>
+    <li>Pull one week of real publish/delivery metrics and scale to monthly as a sanity check.</li>
+    <li>Confirm retry behavior: delivery retries (SNS) and receive retries (SQS) are modeled as explicit multipliers.</li>
+    <li>Verify payload size assumptions with logs (bytes per message and batch size in consumers).</li>
   </ul>
 
   <p class="muted" style="margin-top:14px">
@@ -64,18 +103,25 @@ const faqs = [
     <a href="/guides/aws-sns-estimate-deliveries/">Estimate SNS deliveries</a>.
   </p>
 
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
-  </ul>
-
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/sqs/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon SQS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/sns/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon SNS pricing
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>
