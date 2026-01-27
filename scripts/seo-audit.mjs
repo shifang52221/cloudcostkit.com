@@ -564,7 +564,10 @@ async function audit(baseUrl, { concurrency = 8 } = {}) {
       });
     }
 
-    if (p.redirect_chain && p.redirect_chain.length > 1) {
+    const redirectHops = Array.isArray(p.redirect_chain)
+      ? p.redirect_chain.filter((h) => Number(h.status) >= 300 && Number(h.status) < 400).length
+      : 0;
+    if (redirectHops >= 2) {
       issues.push({
         type: "redirect_chain",
         url: p.url,
@@ -741,6 +744,7 @@ async function audit(baseUrl, { concurrency = 8 } = {}) {
     baseUrl,
     generated_at: new Date().toISOString(),
     sitemaps: sitemapUrls,
+    from_sitemap_urls: fromSitemap,
     counts: {
       urls_total: allUrls.length,
       urls_from_sitemap: fromSitemap.length,
@@ -764,6 +768,12 @@ function toCsvRow(values) {
   return values.map(esc).join(",");
 }
 
+function truncateForCsv(input, maxLen) {
+  const s = input == null ? "" : String(input);
+  if (s.length <= maxLen) return s;
+  return `${s.slice(0, Math.max(0, maxLen - 1))}…`;
+}
+
 async function main() {
   const baseUrl = process.argv[2] || DEFAULT_BASE_URL;
   const concurrency = Math.max(2, Number(process.env.CONCURRENCY || 10));
@@ -775,43 +785,113 @@ async function main() {
 
   await writeFile(path.join(outRoot, "report.json"), JSON.stringify(report, null, 2), "utf8");
 
-  const pagesCsv = [
+  const pagesCsvHeader = [
     toCsvRow([
       "url",
+      "in_sitemap",
       "status",
       "final_url",
       "category",
       "title",
+      "title_length",
       "description",
+      "description_length",
       "canonical",
       "robots",
+      "hreflang_count",
+      "hreflang_json",
       "main_content_words",
       "main_unique_words",
       "main_simhash64",
       "internal_links_count",
+      "internal_links_sample_json",
       "schema_blocks_count",
       "schema_errors_count",
     ]),
-    ...report.pages.map((p) =>
-      toCsvRow([
+  ];
+
+  const computedFromSitemap = new Set(report.from_sitemap_urls || []);
+
+  const pagesCsv = [
+    ...pagesCsvHeader,
+    ...report.pages.map((p) => {
+      const hreflangJson = JSON.stringify(p.hreflang || []);
+      const internalLinks = Array.isArray(p.internal_links) ? p.internal_links : [];
+      const internalLinksSample = internalLinks.slice().sort().slice(0, 12);
+      return toCsvRow([
         p.url,
+        computedFromSitemap.has(p.url) ? "true" : "false",
         p.status,
         p.final_url,
         p.category,
         p.title || "",
+        (p.title || "").trim().length,
         p.description || "",
+        (p.description || "").trim().length,
         p.canonical || "",
         p.robots || "",
+        Array.isArray(p.hreflang) ? p.hreflang.length : 0,
+        truncateForCsv(hreflangJson, 2500),
         p.main_content_words,
         p.main_unique_words,
         p.main_simhash64 || "",
         (p.internal_links || []).length,
+        truncateForCsv(JSON.stringify(internalLinksSample), 2500),
         p.schema_blocks_count,
         (p.schema_errors || []).length,
-      ]),
-    ),
+      ]);
+    }),
   ].join("\n");
   await writeFile(path.join(outRoot, "pages.csv"), pagesCsv, "utf8");
+
+  // URL classification list (step 1 output)
+  const urlsCsv = [
+    toCsvRow(["url", "category", "in_sitemap", "status", "final_url"]),
+    ...report.pages.map((p) => toCsvRow([p.url, p.category, computedFromSitemap.has(p.url) ? "true" : "false", p.status, p.final_url])),
+  ].join("\n");
+  await writeFile(path.join(outRoot, "urls.csv"), urlsCsv, "utf8");
+
+  // Per-category page tables (step 2 output "by class")
+  const byCategory = new Map();
+  for (const p of report.pages) {
+    const k = p.category || "unknown";
+    const arr = byCategory.get(k) || [];
+    arr.push(p);
+    byCategory.set(k, arr);
+  }
+  for (const [cat, arr] of byCategory.entries()) {
+    const catCsv = [
+      ...pagesCsvHeader,
+      ...arr.map((p) => {
+        const hreflangJson = JSON.stringify(p.hreflang || []);
+        const internalLinks = Array.isArray(p.internal_links) ? p.internal_links : [];
+        const internalLinksSample = internalLinks.slice().sort().slice(0, 12);
+        return toCsvRow([
+          p.url,
+          computedFromSitemap.has(p.url) ? "true" : "false",
+          p.status,
+          p.final_url,
+          p.category,
+          p.title || "",
+          (p.title || "").trim().length,
+          p.description || "",
+          (p.description || "").trim().length,
+          p.canonical || "",
+          p.robots || "",
+          Array.isArray(p.hreflang) ? p.hreflang.length : 0,
+          truncateForCsv(hreflangJson, 2500),
+          p.main_content_words,
+          p.main_unique_words,
+          p.main_simhash64 || "",
+          internalLinks.length,
+          truncateForCsv(JSON.stringify(internalLinksSample), 2500),
+          p.schema_blocks_count,
+          (p.schema_errors || []).length,
+        ]);
+      }),
+    ].join("\n");
+    await writeFile(path.join(outRoot, `pages.${cat}.csv`), catCsv, "utf8");
+  }
 
   const issuesCsv = [
     toCsvRow(["priority", "type", "url", "evidence", "fix"]),
@@ -840,7 +920,9 @@ async function main() {
     ``,
     `Files:`,
     `- report.json`,
+    `- urls.csv`,
     `- pages.csv`,
+    ...Array.from(byCategory.keys()).sort().map((c) => `- pages.${c}.csv`),
     `- issues.csv`,
     `- batches.json`,
   ].join("\n");
