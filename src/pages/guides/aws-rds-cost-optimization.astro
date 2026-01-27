@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-rds-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What's the #1 lever for RDS cost?",
@@ -19,6 +19,10 @@ const description =
       q: "How do backups affect monthly cost?",
       a: "Backup GB-month can become a steady recurring cost with long retention and high churn. Treat it as a separate budget line.",
     },
+    {
+      q: "What should I measure before making changes?",
+      a: "Start with billing (top RDS line items) and confirm the resource drivers with metrics: CPU, free storage, IOPS, and connections for a representative window.",
+    },
   ]}
 >
   <p class="muted">
@@ -26,12 +30,27 @@ const description =
     architecture changes.
   </p>
 
+  <h2>0) Identify the real driver first (billing → metrics)</h2>
+  <ul>
+    <li>
+      In Cost Explorer, filter to <strong>Amazon RDS</strong> and group by <strong>Usage type</strong>. Identify the top 2–3
+      line items (compute, storage, backup storage, I/O).
+    </li>
+    <li>
+      For the top line items, confirm the operational drivers from a representative 30–90 day window (CPU, storage growth,
+      read/write IOPS, connections).
+    </li>
+  </ul>
+
   <h2>1) Right-size instances (and use schedules where possible)</h2>
   <ul>
     <li>Downsize over-provisioned instances after measuring CPU/IO/memory headroom.</li>
     <li>Use non-prod schedules (stop/scale down) if supported by your ops model.</li>
     <li>For stable workloads, compare on-demand vs commitments and use an effective $/hour in your budget model.</li>
   </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-reserved-vs-on-demand/">Reserved vs on-demand (break-even)</a>.
+  </p>
 
   <h2>2) Control storage growth</h2>
   <p>
@@ -39,6 +58,10 @@ const description =
     <a href="/calculators/database-storage-growth-cost-calculator/">Database Storage Growth Calculator</a> to forecast the
     next 3-12 months.
   </p>
+  <ul>
+    <li>Set clear storage SLOs: growth rate, maximum allocated storage, and alert thresholds.</li>
+    <li>Delete or archive cold data (especially in non-prod) before buying larger instances.</li>
+  </ul>
 
   <h2>3) Treat backups as a first-class cost</h2>
   <ul>
@@ -49,38 +72,51 @@ const description =
   <p>
     Related: <a href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>.
   </p>
+  <p class="muted">
+    If backup storage is already high, start by auditing manual snapshots and long-lived copies. Tool:{" "}
+    <a href="/guides/aws-rds-backup-storage-gb-month-estimate/">estimate backup GB-month</a>.
+  </p>
 
   <h2>4) Avoid expensive I/O patterns</h2>
   <p>
     If your storage pricing charges for I/O, optimize query patterns and indexes, and avoid full table scans. Model I/O
     as "low / high" scenarios in the calculator to see sensitivity.
   </p>
+  <ul>
+    <li>Fix top queries first (indexing, query plans, caching) before scaling instance size.</li>
+    <li>Watch incident-driven patterns: retry storms can multiply reads/writes and grow backups quickly.</li>
+    <li>If you change storage type/IOPS, validate latency and throughput under peak load.</li>
+  </ul>
 
-  <h2>5) Sanity-check with a simple calculator</h2>
+  <h2>5) Compare architecture options (only when the simple levers are done)</h2>
+  <ul>
+    <li>
+      If read scaling is the pain point, compare read replicas vs moving to an architecture that fits your scaling model.
+    </li>
+    <li>
+      If operational overhead is dominating, Aurora may win even if list price is higher. Related:{" "}
+      <a href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>.
+    </li>
+  </ul>
+
+  <h2>6) Sanity-check with a simple calculator</h2>
   <p>
     Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> to break your budget into compute,
     storage, backups, and I/O so you can see which lever matters most.
   </p>
 
-  <h2>Related guides</h2>
+  <h2>Validation checklist (prove savings without breaking reliability)</h2>
+  <ul>
+    <li>After changes, confirm performance SLOs (latency, error rate) and DB health metrics remain acceptable.</li>
+    <li>In Cost Explorer, compare the top RDS line items before/after (same workload window) to confirm the savings.</li>
+    <li>For backup/retention changes, validate restore capability (test restores) before shortening policies.</li>
+  </ul>
+
+  <h2>Next steps</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
     <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>
-    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
-  </div>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
-  </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-rds-snapshot-retention-policy-cost/">Snapshot retention policy</a>
   </div>
 
 </GuideLayout>

@@ -21,13 +21,17 @@ const faqs = [
     q: "How do I validate the estimate?",
     a: "Use Route 53 query metrics or resolver logs for a representative week and scale to monthly, then compare against billing once available.",
   },
+  {
+    q: "Should I use resolver logs or Route 53 metrics?",
+    a: "Route 53 hosted zone metrics are the fastest for authoritative query volume; resolver logs are best when you need attribution (which services/FQDNs are driving the cost).",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-estimate-dns-queries"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -35,24 +39,54 @@ const faqs = [
     query counts, not guesswork.
   </p>
 
-  <h2>Method 1: From Route 53 metrics</h2>
+  <h2>Method 1: From Route 53 hosted zone metrics (fastest)</h2>
   <ul>
     <li>Use query count metrics per hosted zone and roll up to a month.</li>
     <li>Choose a window that represents typical load (for example, last 30 days).</li>
+    <li>
+      If you have multiple zones (prod/staging/dev), estimate each separately so you can see which zone drives the bill.
+    </li>
   </ul>
 
-  <h2>Method 2: From resolver logs</h2>
+  <h2>Method 2: From resolver logs (best for attribution)</h2>
   <ul>
     <li>Count DNS requests from resolver logs, then roll up by day.</li>
     <li>Segment by domain/service to identify top query drivers.</li>
+    <li>Use this method when you suspect one noisy service, namespace, or environment is dominating volume.</li>
+  </ul>
+  <ul>
+    <li>Separate successful answers vs NXDOMAIN. NXDOMAIN bursts are a common incident pattern and cost driver.</li>
+    <li>Rank by FQDN so you can fix the top 5–10 names instead of guessing.</li>
   </ul>
 
-  <h2>Sanity checks</h2>
+  <h2>Method 3: From request rate (when you don’t have DNS telemetry)</h2>
+  <p>
+    If you know average request rate, you can approximate DNS queries as:
+    <br />
+    <strong>queries/month ≈ requests/month × DNS lookups per request</strong>
+  </p>
+  <p class="muted">
+    This method is crude but useful early. Tighten it later using metrics/logs because caching and TTL can change lookups
+    dramatically.
+  </p>
+
+  <h2>Worked example (convert telemetry to a budget input)</h2>
+  <ul>
+    <li>If you measure <strong>10 million queries/day</strong>, then queries/month ≈ 10M × 30 = <strong>300M</strong>.</li>
+    <li>Feed 300M into a “$/1M queries” calculator and keep a peak scenario if incidents spike queries.</li>
+  </ul>
+
+  <h2>Sanity checks (avoid common estimation errors)</h2>
   <ul>
     <li>Low TTL increases query volume and reduces cache effectiveness.</li>
     <li>Retry loops and service discovery churn can explode query rates.</li>
     <li>Kubernetes cluster size can multiply lookups if workloads resolve frequently.</li>
+    <li>Blue/green rollouts can temporarily double query volume (two stacks resolving simultaneously).</li>
   </ul>
+  <p class="muted">
+    If your estimate is unstable, it usually means caching behavior changed (TTL, resolvers) or there is an incident
+    pattern (timeouts/retries) that needs fixing anyway.
+  </p>
 
   <h2>Turn volume into cost</h2>
   <p>
@@ -60,11 +94,24 @@ const faqs = [
     effective $ per 1M queries pricing.
   </p>
 
-  <h2>Related reading</h2>
+  <h2>Next steps</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-route-53-pricing/">Route 53 pricing</a>
     <a class="btn" href="/guides/aws-route-53-cost-optimization/">Cost optimization</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/route53/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon Route 53 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/route-53-metrics-viewing.html" target="_blank" rel="nofollow noopener">
+        Route 53 query metrics
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

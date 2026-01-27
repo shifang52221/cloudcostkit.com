@@ -21,13 +21,17 @@ const faqs = [
     q: "How do I reduce risk when committing?",
     a: "Start with partial coverage, prefer shorter terms when uncertainty is high, and review utilization monthly. Model a downside scenario (lower utilization) and confirm you still win.",
   },
+  {
+    q: "Reserved Instances vs Savings Plans — which is better?",
+    a: "It depends on what you want to commit. Savings Plans are often simpler for compute coverage; Reserved Instances can be useful when you want instance-level commitments. The key is still utilization and stability.",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-reserved-vs-on-demand"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -41,6 +45,9 @@ const faqs = [
     <li><strong>Term</strong>: longer terms usually discount more but increase risk.</li>
     <li><strong>Payment</strong>: upfront vs partial vs no upfront changes cash flow (and effective rate).</li>
   </ul>
+  <p class="muted">
+    A commitment decision is mostly a <strong>risk decision</strong> (stability) disguised as a pricing decision.
+  </p>
 
   <h2>Step 2: Break-even intuition</h2>
   <p>
@@ -55,6 +62,9 @@ const faqs = [
     <li>Below break-even, unused committed capacity becomes waste.</li>
     <li>Above break-even, you win by replacing on-demand with committed coverage.</li>
   </ul>
+  <p class="muted">
+    Quick formula: <strong>break-even utilization ≈ committed effective rate ÷ on-demand rate</strong>.
+  </p>
 
   <h2>Step 3: Model uncertainty (this is where most estimates fail)</h2>
   <ul>
@@ -64,6 +74,25 @@ const faqs = [
     <li><strong>Seasonality</strong>: peaks do not justify year-long commitments if troughs are low.</li>
   </ul>
 
+  <h2>Worked example (spot the hidden risk)</h2>
+  <p>
+    If on-demand is <strong>$1.00/hour</strong> and your committed effective rate is <strong>$0.60/hour</strong>, the
+    break-even point is ~60% utilization. If you expect 80% utilization, you likely win. If you expect 50% utilization
+    after rightsizing and seasonality, you likely lose.
+  </p>
+
+  <h2>A practical workflow (how teams avoid commitment regret)</h2>
+  <ol>
+    <li>Measure baseline hours for 30–90 days (by region and instance family).</li>
+    <li>Exclude workloads you plan to migrate or resize soon (uncertain usage shouldn’t be committed).</li>
+    <li>Choose a conservative coverage target (for example, 30–60% of baseline), not 100%.</li>
+    <li>Review monthly: if coverage is stable, increase gradually; if not, stop and re-evaluate.</li>
+  </ol>
+  <p class="muted">
+    The goal is not “maximum discount” — it’s <strong>stable realized savings</strong> without locking the team into the
+    wrong shape.
+  </p>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Use a representative 30-90 day window to compute baseline utilization.</li>
@@ -71,10 +100,24 @@ const faqs = [
     <li>Commit gradually: start with partial coverage and expand after you see stability.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Next steps</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/reserved-vs-on-demand-break-even-calculator/">Break-even calculator</a>
     <a class="btn" href="/guides/aws-ec2-cost-estimation/">EC2 cost estimation</a>
     <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute cost</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/ec2/pricing/reserved-instances/" target="_blank" rel="nofollow noopener">
+        Reserved Instances overview
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/savingsplans/" target="_blank" rel="nofollow noopener">
+        Savings Plans overview
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

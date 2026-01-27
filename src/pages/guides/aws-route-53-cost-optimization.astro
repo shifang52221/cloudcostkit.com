@@ -21,13 +21,17 @@ const faqs = [
     q: "How do I validate the optimization?",
     a: "Measure query volume for a representative window, change TTLs/records, then confirm query volume and incident behavior improve without breaking rollout/failover needs.",
   },
+  {
+    q: "What else can add Route 53 cost besides queries?",
+    a: "Hosted zones (zone-month charges), health checks, and query logging/monitoring can add meaningful recurring cost. Identify which driver dominates before optimizing.",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -35,11 +39,26 @@ const faqs = [
     misconfiguration or an incident that also impacts reliability.
   </p>
 
+  <h2>0) Identify your cost driver (queries vs zones vs health checks)</h2>
+  <ul>
+    <li>
+      In Cost Explorer, filter <strong>Service</strong> to Amazon Route 53 and group by <strong>Usage type</strong>.
+    </li>
+    <li>
+      If query charges dominate, focus on caching/TTL and “chatty” patterns. If zone-month dominates, focus on consolidating
+      and cleaning up zones. If health checks dominate, audit checks and intervals.
+    </li>
+  </ul>
+
   <h2>1) Use sane TTLs</h2>
   <ul>
     <li>Increase TTLs for stable records to improve cache hit rate.</li>
     <li>Keep low TTL only for records that require fast changes (failover/blue-green).</li>
   </ul>
+  <p class="muted">
+    A useful pattern is “high TTL by default” and “low TTL only for failover records”, so the exception is explicit and
+    reviewable.
+  </p>
 
   <h2>2) Reduce chatty DNS patterns</h2>
   <ul>
@@ -47,12 +66,42 @@ const faqs = [
     <li>Cache service discovery results where appropriate.</li>
     <li>Audit Kubernetes/CoreDNS behavior if you see very high lookup rates.</li>
   </ul>
+  <ul>
+    <li>Watch for “per-request DNS lookups” in hot paths (HTTP clients that resolve on every request).</li>
+    <li>Use resolver/query logs to identify the top FQDNs and services driving volume.</li>
+  </ul>
+
+  <h2>2b) Remove hidden query multipliers</h2>
+  <ul>
+    <li>
+      Reduce CNAME chains. Multiple CNAME hops can multiply lookups per user request (and add latency).
+    </li>
+    <li>
+      Tune negative caching for NXDOMAIN bursts (often caused by misconfigured search domains or typos).
+    </li>
+    <li>
+      In container platforms, review resolver config (search domains, ndots) if you see unexpected query amplification.
+    </li>
+  </ul>
 
   <h2>3) Reduce zone and record sprawl</h2>
   <ul>
     <li>Delete unused hosted zones and old environment domains.</li>
     <li>Consolidate duplicate records across accounts where possible.</li>
     <li>Retire legacy records left behind by migrations.</li>
+  </ul>
+  <p class="muted">
+    If every environment has its own hosted zone, confirm you truly need that isolation. Subdomains and delegations can
+    keep environments clean without multiplying hosted zones.
+  </p>
+
+  <h2>4) Be intentional about “extras” (health checks and logging)</h2>
+  <ul>
+    <li>Audit Route 53 health checks: remove obsolete checks and validate check intervals.</li>
+    <li>
+      If you enable query logging, budget the downstream log ingestion + retention cost (logs are often more expensive than
+      queries).
+    </li>
   </ul>
 
   <h2>Validation checklist</h2>
@@ -62,12 +111,25 @@ const faqs = [
     <li>Re-check during incidents: repeated failures often create query spikes.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Next steps</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-route-53-cost-calculator/">Route 53 cost</a>
     <a class="btn" href="/guides/aws-route-53-estimate-dns-queries/">Estimate DNS queries</a>
     <a class="btn" href="/guides/aws-route-53-pricing/">Route 53 pricing</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/route53/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon Route 53 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html" target="_blank" rel="nofollow noopener">
+        Route 53 developer guide
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

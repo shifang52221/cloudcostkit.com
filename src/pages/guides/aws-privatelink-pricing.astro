@@ -17,60 +17,147 @@ const faqs = [
     q: "Is PrivateLink always cheaper than NAT?",
     a: "Not always, but it often wins when you have high NAT GB processed to AWS services that can be accessed privately. You need to compare both using your traffic mix.",
   },
+  {
+    q: "What is the most common PrivateLink billing surprise?",
+    a: "Accidentally multiplying endpoints across AZs (or accounts/VPCs) and underestimating GB processed. A design that feels small can generate many billed endpoint-hours.",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-privatelink-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    PrivateLink helps keep service traffic private. Cost modeling is straightforward if you separate: endpoint-hours,
-    data processed, and any transfer boundaries in your design (cross-AZ/cross-region).
+    PrivateLink helps keep service traffic private. Cost modeling is straightforward if you separate three things:
+    <strong> endpoint-hours</strong>, <strong>data processed</strong>, and <strong>transfer boundaries</strong> in your
+    design (cross-AZ / cross-region).
+  </p>
+
+  <h2>What you pay for (the inputs that matter)</h2>
+  <ul>
+    <li>
+      <strong>Interface endpoint-hours</strong>: billed per endpoint per AZ per hour. If you attach one endpoint to 3 AZs,
+      you pay 3x endpoint-hours.
+    </li>
+    <li>
+      <strong>Data processed (GB)</strong>: billed per GB that traverses the interface endpoint (use measured traffic, not
+      guesses).
+    </li>
+    <li>
+      <strong>Transfer boundaries</strong>: PrivateLink does not remove all transfer costs. Cross-AZ/cross-region designs
+      can add transfer line items that dominate the total.
+    </li>
+  </ul>
+
+  <h2>A simple monthly model (fast and accurate enough for planning)</h2>
+  <p class="muted">
+    Endpoint-hours ≈ (sum of <strong>endpoint AZ attachments</strong>) × <strong>hours in month</strong> (use 730 as a
+    planning default).
+  </p>
+  <p class="muted">
+    Cost ≈ (endpoint-hours × $/endpoint-hour) + (processed GB × $/GB) + transfer charges (if any).
   </p>
 
   <h2>1) Model the consumer side (interface endpoints)</h2>
   <ul>
-    <li>How many endpoints you deploy (per service).</li>
-    <li>How many AZs you attach per endpoint.</li>
-    <li>How much data (GB/month) flows through the endpoints.</li>
+    <li>
+      Count endpoints by <strong>service</strong> (S3, STS, ECR, your own services, etc). Cost scales with how many
+      distinct endpoints you create.
+    </li>
+    <li>
+      Count AZ attachments per endpoint. A “standard” 3-AZ VPC often means 3 billed endpoints even if the traffic is
+      small.
+    </li>
+    <li>
+      Estimate processed GB/month using evidence: <strong>VPC Flow Logs</strong>, load balancer bytes, or observed client
+      throughput. Include a peak scenario.
+    </li>
   </ul>
 
   <h2>2) Model provider-side implications (if you publish an endpoint service)</h2>
   <p class="muted">
-    If you are the service provider, the key is to understand traffic scale and the downstream infrastructure required to
-    serve it (load balancers, targets, logs, and monitoring).
+    If you are the provider, PrivateLink itself is usually not the bill — your bill is the infrastructure that serves
+    the traffic (load balancers, targets, logging, and any transfer within your architecture).
   </p>
+  <ul>
+    <li>
+      If you front the service with a load balancer, include its hourly + LCU/bytes pricing (and any cross-zone traffic
+      you enable).
+    </li>
+    <li>
+      If your service targets live in multiple AZs, confirm whether the traffic pattern causes cross-AZ data transfer.
+    </li>
+    <li>
+      If you turn on high-volume logs (flow logs, LB logs), account for log ingestion + retention costs.
+    </li>
+  </ul>
 
   <h2>3) Compare against NAT and internet egress</h2>
   <p>
     PrivateLink frequently competes with NAT or public endpoints. Use the same traffic assumptions and compare:
     endpoint-hours + per-GB processing vs NAT gateway-hours + NAT GB processed (plus any egress where applicable).
   </p>
+  <p class="muted">
+    Tooling: <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC interface endpoint cost</a> and{" "}
+    <a href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>.
+  </p>
 
-  <h2>Related guides</h2>
+  <h2>Worked example (sanity check your estimate)</h2>
+  <p>
+    Suppose you create <strong>4 endpoints</strong> and attach each to <strong>3 AZs</strong>. That is{" "}
+    <strong>12 endpoint-AZ attachments</strong>. For a 730-hour planning month, endpoint-hours ≈{" "}
+    <strong>12 × 730 = 8,760</strong>. Then add processed GB/month and apply your region pricing.
+  </p>
+
+  <h2>Common pitfalls (where surprise bills come from)</h2>
+  <ul>
+    <li>Creating endpoints per VPC/account without noticing the multiplier across environments.</li>
+    <li>Always using 3 AZs even when the workload can safely run in 2 AZs (availability vs cost trade-off).</li>
+    <li>Underestimating processed GB because you only look at “app payload” and ignore retries, timeouts, and backfills.</li>
+    <li>Assuming PrivateLink eliminates cross-AZ transfer; cross-AZ service design can still create transfer charges.</li>
+    <li>Comparing against NAT without including NAT GB processed and NAT hourly.</li>
+    <li>Turning on verbose logs (flow logs / LB logs) without budgeting ingestion + retention.</li>
+  </ul>
+
+  <h2>How to validate in billing (fast, reliable)</h2>
+  <ul>
+    <li>
+      In Cost Explorer, filter <strong>Service</strong> to Amazon VPC and group by <strong>Usage type</strong>. Search for
+      usage types containing “endpoint”.
+    </li>
+    <li>
+      Confirm that billed endpoint-hours roughly match your expected (endpoint AZ attachments × hours). If the billed
+      number is higher, you likely have more endpoints or more AZ attachments than you thought.
+    </li>
+    <li>
+      For GB processed, cross-check with VPC Flow Logs (bytes) for the subnets that host the endpoint ENIs or with
+      workload telemetry.
+    </li>
+  </ul>
+
+  <h2>Next steps</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
     <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>
     <a class="btn" href="/guides/aws-privatelink-cost-optimization/">PrivateLink cost optimization</a>
-    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <a href="https://aws.amazon.com/privatelink/pricing/" target="_blank" rel="nofollow noopener">
+        AWS PrivateLink pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/vpc/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon VPC pricing (endpoints / transfer context)
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
 
 </GuideLayout>

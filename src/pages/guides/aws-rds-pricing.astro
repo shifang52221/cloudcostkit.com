@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-rds-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What are the core RDS cost components?",
@@ -19,6 +19,14 @@ const description =
       q: "Is Multi-AZ \"free\"?",
       a: "No. High availability typically means additional instance and storage costs. Model it explicitly as more instances and/or storage where applicable.",
     },
+    {
+      q: "What is the most common RDS budgeting mistake?",
+      a: "Ignoring backup storage (GB-month) and HA/replicas. Many teams model one instance + one storage number and miss the steady backup and duplicate capacity costs.",
+    },
+    {
+      q: "How should I model prices if I don't know the region yet?",
+      a: "Pick one target region as the default and run a sensitivity check (±20–30%). Most cost planning errors come from wrong usage assumptions, not small region price differences.",
+    },
   ]}
 >
   <p class="muted">
@@ -26,17 +34,59 @@ const description =
     compute + storage + backups + (optional) I/O.
   </p>
 
+  <h2>RDS cost components (checklist)</h2>
+  <ul>
+    <li>
+      <strong>Compute</strong>: instance-hours for primary + read replicas + any standby capacity (Multi-AZ).
+    </li>
+    <li>
+      <strong>DB storage</strong>: GB-month (and sometimes provisioned IOPS/throughput depending on storage type).
+    </li>
+    <li>
+      <strong>Backup storage</strong>: GB-month for automated backups + manual snapshots + copied snapshots.
+    </li>
+    <li>
+      <strong>I/O</strong>: only for pricing models that charge per request; otherwise treat as performance risk, not a
+      billing line.
+    </li>
+    <li>
+      <strong>Extras</strong>: monitoring/log exports, data transfer between AZs/regions, and encryption-related
+      operations (varies by setup).
+    </li>
+  </ul>
+
   <h2>1) Start with compute (instance hours)</h2>
   <p>
     For budgeting, model <strong>instances x hours/month x $/hour</strong>. If you have read replicas or Multi-AZ, model
     them as extra instances.
   </p>
+  <ul>
+    <li>
+      If you scale by environment (prod vs staging), budget each environment separately. Non-prod often wins most from
+      schedules and right-sizing.
+    </li>
+    <li>
+      If you plan to commit (Reserved Instances / Savings Plans), use an <strong>effective $/hour</strong> and validate
+      break-even utilization. Related:{" "}
+      <a href="/guides/aws-reserved-vs-on-demand/">Reserved vs on-demand</a>.
+    </li>
+  </ul>
 
   <h2>2) Add database storage (GB-month)</h2>
   <p>
     Storage is typically billed per GB-month. Use your expected allocated storage (or average used storage if your plan
     bills that way).
   </p>
+  <ul>
+    <li>
+      Storage type matters. Some options add line items for <strong>provisioned IOPS</strong> and{" "}
+      <strong>throughput</strong>.
+    </li>
+    <li>
+      Model <strong>growth</strong> over 3–12 months. Storage growth frequently beats compute as the long-term driver.
+      Tool: <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
+    </li>
+  </ul>
 
   <h2>3) Model backups and snapshots</h2>
   <p>
@@ -46,11 +96,23 @@ const description =
   <p>
     Next: <a href="/guides/aws-rds-backups-and-snapshots/">Backups & snapshots (how to estimate)</a>.
   </p>
+  <ul>
+    <li>Split backups into operational retention (days/weeks) vs long-term snapshots (months/years).</li>
+    <li>Confirm whether you copy snapshots cross-region or cross-account (often overlooked in budgets).</li>
+    <li>
+      If you already have an RDS footprint, validate from Cost Explorer before trusting a forward estimate: backup storage
+      is visible as a usage-based line item.
+    </li>
+  </ul>
 
   <h2>4) Include I/O only if your pricing model charges for it</h2>
   <p>
     Some storage models charge per I/O request. If you don't have a reliable I/O estimate, run two scenarios: \"low
     I/O\" and \"high I/O\".
+  </p>
+  <p class="muted">
+    Even when I/O is “free” in pricing, I/O patterns still matter because they drive instance sizing and performance
+    risk.
   </p>
 
   <h2>5) Use a calculator for fast scenario planning</h2>
@@ -59,26 +121,54 @@ const description =
     backups + I/O with your own pricing assumptions.
   </p>
 
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
-    <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>
-    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
-    <a class="btn" href="/guides/aws-rds-snapshot-retention-policy-cost/">Snapshot retention policy (cost)</a>
-  </div>
+  <h2>Worked example (build a defensible budget)</h2>
+  <ol>
+    <li>Choose instance class and count (primary + replicas/standbys).</li>
+    <li>Choose storage GB and expected monthly growth.</li>
+    <li>Estimate backup storage using churn × retention (add long-term snapshots separately).</li>
+    <li>Add a peak scenario (batch jobs, incidents) to understand downside risk.</li>
+  </ol>
+  <p class="muted">
+    If you can’t justify the inputs in one sentence each (“where this number comes from”), the estimate will not survive
+    budget review.
+  </p>
 
-  <h2>Validation checklist</h2>
+  <h2>How to validate after you deploy (so the model stays true)</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      In Cost Explorer, filter <strong>Service</strong> to Amazon RDS and group by <strong>Usage type</strong> to see the
+      top drivers (instance-hours, storage, backup storage, I/O if applicable).
+    </li>
+    <li>
+      Cross-check storage and growth from RDS metrics and your DB telemetry. If growth differs, fix the model (not the
+      spreadsheet).
+    </li>
+    <li>
+      If backup storage is higher than expected, audit retention settings and manual snapshots. Related:{" "}
+      <a href="/guides/aws-rds-snapshot-retention-policy-cost/">snapshot retention cost model</a>.
+    </li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Next steps</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-rds-backups-and-snapshots/">Backups and snapshots</a>
+    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
+    <a class="btn" href="/guides/aws-rds-cost-optimization/">RDS cost optimization</a>
+    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/rds/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon RDS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Billing.html" target="_blank" rel="nofollow noopener">
+        RDS billing and usage concepts
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>

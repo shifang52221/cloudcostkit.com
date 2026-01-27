@@ -17,13 +17,17 @@ const faqs = [
     q: "When does RDS usually win?",
     a: "When the workload is simple and predictable and you do not need Aurora-specific capabilities. If you can right-size instances and control retention, RDS estimates can be very stable.",
   },
+  {
+    q: "What should I compare besides list price?",
+    a: "Compare the whole operating model: scaling behavior, storage growth, backup/retention, and how incidents and peaks change the bill. Normalize to the same workload and validate with measured usage.",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-rds-vs-aurora-cost"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -31,12 +35,16 @@ const faqs = [
     to compare apples-to-apples: compute hours, average storage, retention, and at least one peak scenario.
   </p>
 
-  <h2>1) Normalize compute usage</h2>
+  <h2>1) Normalize compute usage (baseline + peak)</h2>
   <ul>
     <li>Instances x hours/month (provisioned)</li>
     <li>Average capacity and peak capacity (serverless)</li>
     <li>Read replicas and HA (model as additional instances/capacity)</li>
   </ul>
+  <p class="muted">
+    If you can’t explain how capacity changes during incidents or batch jobs, add a “peak month” scenario. Peaks often
+    decide the real-world winner.
+  </p>
 
   <h2>2) Normalize storage and growth</h2>
   <p>
@@ -45,6 +53,10 @@ const faqs = [
   <p class="muted">
     Tool: <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
   </p>
+  <ul>
+    <li>Use the same growth rate assumptions for both options.</li>
+    <li>Include “cleanup” scenarios (data archiving, retention trimming) if you plan them.</li>
+  </ul>
 
   <h2>3) Normalize backups/retention (the common surprise)</h2>
   <p>
@@ -56,11 +68,37 @@ const faqs = [
     <a href="/guides/aws-rds-snapshot-retention-policy-cost/">snapshot retention policy</a>.
   </p>
 
-  <h2>4) Include workload-driven "high usage" scenarios</h2>
+  <h2>4) Map workload shape to pricing levers (the “why” behind the numbers)</h2>
+  <ul>
+    <li>
+      If your pricing model charges per I/O request (common in some Aurora configurations), estimate I/O sensitivity and
+      validate from metrics where possible.
+    </li>
+    <li>
+      If your workload is read-heavy, include replicas/reader capacity explicitly (don’t assume read scaling is free).
+    </li>
+    <li>
+      If you need higher availability, model the extra capacity and any cross-AZ behavior consistently in both options.
+    </li>
+  </ul>
+
+  <h2>5) Include workload-driven "high usage" scenarios</h2>
   <ul>
     <li>Batch jobs and backfills</li>
     <li>Retry storms during incidents</li>
     <li>Large periodic index rebuilds / vacuum / maintenance windows</li>
+  </ul>
+
+  <h2>Decision shortcuts (when one option is usually safer)</h2>
+  <ul>
+    <li>
+      If the workload is predictable and you can right-size + control retention, <strong>RDS</strong> often yields a more
+      stable budget.
+    </li>
+    <li>
+      If operational overhead or scaling complexity is the pain point, <strong>Aurora</strong> can win even if list price
+      is higher (time, reliability, and incident cost are real).
+    </li>
   </ul>
 
   <h2>Practical next step</h2>
@@ -69,25 +107,32 @@ const faqs = [
     backups model, then layer Aurora-specific scenarios on top.
   </p>
 
-  <h2>Related guides</h2>
+  <h2>Validation checklist (so the comparison isn’t theoretical)</h2>
+  <ul>
+    <li>Run both a baseline month and a peak month scenario (batch + incident windows).</li>
+    <li>Validate backup storage and growth assumptions from billing/telemetry on the current system.</li>
+    <li>Document what changes your answer (I/O-heavy workload, retention policy, peak scaling) for future reviews.</li>
+  </ul>
+
+  <h2>Next steps</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-aurora-pricing/">Aurora pricing</a>
     <a class="btn" href="/guides/aws-aurora-serverless-v2-pricing/">Aurora Serverless v2</a>
     <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <a href="https://aws.amazon.com/rds/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon RDS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/rds/aurora/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon Aurora pricing
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
 
 </GuideLayout>
