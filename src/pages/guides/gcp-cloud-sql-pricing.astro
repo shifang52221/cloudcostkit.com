@@ -1,69 +1,127 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud SQL pricing: compute, storage, backups, and network (practical estimate)";
+const title = "Cloud SQL pricing: instance-hours, storage, backups, and network (practical estimate)";
 const description =
-  "A driver-based Cloud SQL estimate: instance-hours, storage GB-month, backups/retention, and data transfer. Includes validation steps for growth and peak sizing.";
+  "A driver-based Cloud SQL estimate: instance-hours (HA + replicas), storage GB-month, backups/retention, and data transfer. Includes a worked template, common pitfalls, and validation steps for peak sizing and growth.";
 
 const faqs = [
   {
     q: "What usually drives managed database cost?",
-    a: "Compute capacity and storage are the primary drivers. Backups/retention and network transfer become meaningful for long retention or cross-region access patterns.",
+    a: "Provisioned compute capacity and primary storage are the primary drivers. Backups/retention and network transfer become meaningful for long retention or cross-region access patterns.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate instance-hours (baseline + HA/replicas), average storage GB, and backup retention. Add a separate estimate for egress if clients are outside the region.",
+    a: "Estimate instance-hours (including HA/replicas), average storage GB-month, and backup retention. Add a separate line item for outbound transfer if clients are outside the region.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Sizing from average utilization and forgetting HA/replicas and retention. The bill follows provisioned capacity, not average CPU.",
   },
   {
     q: "How do I validate?",
-    a: "Validate peak CPU/memory/IO, validate storage growth rate, and validate backup retention and PITR settings.",
+    a: "Validate peak CPU/memory/IO, validate storage growth rate, validate backup/PITR retention, and validate network paths (private vs public/cross-region).",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-sql-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-sql-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Cloud SQL cost is typically “capacity + data”. The safest estimate breaks it into compute, storage, and backup/retention,
-    then validates peak usage and growth assumptions.
+    Cloud SQL cost is easiest to estimate when you treat it as "capacity + data": instance-hours for compute, GB-month for
+    storage and backups, and a separate transfer line item when clients are cross-region or external.
   </p>
 
-  <h2>1) Compute (instance-hours)</h2>
+  <h2>0) What to measure (inputs you can actually validate)</h2>
+  <ul>
+    <li>
+      <strong>Instance-hours</strong>: primary + HA + replicas (baseline and peak months).
+    </li>
+    <li>
+      <strong>Storage GB-month</strong>: average data + index size across the month.
+    </li>
+    <li>
+      <strong>Backups/PITR</strong>: backup GB-month and retention settings.
+    </li>
+    <li>
+      <strong>Transfer</strong>: outbound GB/month by destination (internet vs cross-region).
+    </li>
+  </ul>
+
+  <h2>1) Compute: instance-hours (primary, HA, replicas)</h2>
   <p>
-    Model baseline instance-hours per environment. If you run HA or read replicas, count them explicitly. For new workloads,
-    model two scenarios: baseline and peak.
+    Model each instance separately and keep baseline vs peak months distinct. If you run HA or read replicas, count them
+    explicitly because they are provisioned capacity.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
   </p>
+  <ul>
+    <li>Baseline: steady traffic, normal query mix.</li>
+    <li>Peak: batch jobs, migrations, index builds, incident retries.</li>
+    <li>Headroom: avoid resizing churn by budgeting realistic peak capacity.</li>
+  </ul>
 
-  <h2>2) Storage (GB-month)</h2>
+  <h2>2) Storage: average GB-month (data + indexes)</h2>
   <p>
-    Use average stored GB and model growth. If the dataset grows steadily, compute the monthly average rather than using
-    end-of-month size.
+    Use average GB-month rather than end-of-month size. For growing datasets, end-of-month overstates cost; for shrinking
+    datasets, it understates cost.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>.
   </p>
-
-  <h2>3) Backups and retention</h2>
-  <p>
-    Backup storage and retention can be a quiet driver. Model backup retention windows separately from primary storage, and
-    validate PITR settings.
-  </p>
-
-  <h2>4) Network transfer</h2>
-  <p>
-    If your clients read cross-region or from the public internet, network transfer may be billed. Split transfer by
-    destination and validate boundaries.
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate peak CPU/memory/IO and plan headroom (avoid resizing churn).</li>
-    <li>Validate storage growth rate and retention policies for backups/snapshots.</li>
-    <li>Validate network paths (private vs public/cross-region) and billable transfer.</li>
+    <li>Track index overhead separately if possible; it is rarely zero.</li>
+    <li>Include staging/non-prod copies if they persist long-term.</li>
+  </ul>
+
+  <h2>3) Backups and retention (quiet multiplier)</h2>
+  <p>
+    Backup retention is a multiplier: the longer you keep backups, the more backup GB-month accumulates even without traffic
+    growth. Treat backup retention as its own control knob.
+  </p>
+  <ul>
+    <li>Write down retention windows (days/months) and any compliance requirements.</li>
+    <li>Plan restore validation: a real drill often reveals that "restore" is not just a button.</li>
+  </ul>
+
+  <h2>4) Network transfer (cross-region and external clients)</h2>
+  <p>
+    Network cost shows up when clients are outside the region or when analytics jobs pull large result sets. Split transfer
+    by destination and validate whether traffic is private or public.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Instance-hours</strong> = primary + HA + replicas (baseline + peak)
+    </li>
+    <li>
+      <strong>Primary storage</strong> = avg GB-month (data + indexes)
+    </li>
+    <li>
+      <strong>Backup storage</strong> = backup GB-month (retention window)
+    </li>
+    <li>
+      <strong>Egress</strong> = outbound GB/month (split by destination)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Forgetting HA/replicas (capacity doubles before any traffic increase).</li>
+    <li>Using end-of-month storage size instead of average GB-month (misstates cost for growing datasets).</li>
+    <li>Long backup retention and PITR storage growing silently.</li>
+    <li>Cross-region clients or large query exports creating surprise egress.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate peak CPU/memory/IO and the heaviest query patterns.</li>
+    <li>Validate storage growth rate and index overhead.</li>
+    <li>Validate backup retention and any PITR settings.</li>
+    <li>Validate network paths (private vs public/cross-region) and billable transfer boundaries.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -73,5 +131,19 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/gcp-bigquery-cost-estimation/">BigQuery estimate</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/sql/pricing" target="_blank" rel="nofollow noopener">
+        Cloud SQL pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/sql/docs" target="_blank" rel="nofollow noopener">
+        Cloud SQL documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

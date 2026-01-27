@@ -1,64 +1,133 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Pub/Sub pricing: estimate messages, deliveries, retries, and payload size";
+const title = "Pub/Sub pricing: deliveries, retries, fan-out, and payload transfer (practical estimate)";
 const description =
-  "A practical Pub/Sub cost estimate: message volume, delivery attempts (retries), and payload transfer. Includes validation steps for fan-out and replays.";
+  "A practical Pub/Sub estimate: publish volume, fan-out (subscriptions), delivery attempts (retries), retention/replay scenarios, and payload transfer. Includes a worked template, pitfalls, and validation steps.";
 
 const faqs = [
   {
     q: "What usually drives Pub/Sub cost?",
-    a: "Message volume and delivery attempts are the common drivers. Retries and multiple subscriptions (fan-out) can multiply deliveries.",
+    a: "Message volume and delivery attempts are common drivers. Retries and multiple subscriptions (fan-out) multiply deliveries.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate publishes per month, subscriptions per topic, average delivery attempts, and payload size. Model fan-out explicitly.",
+    a: "Estimate publishes/month, subscriptions per topic, average delivery attempts, and payload size. Model fan-out and replay months explicitly.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Counting publishes but not deliveries. Fan-out plus retries means deliveries can be several times larger than publishes.",
   },
   {
     q: "How do I validate?",
-    a: "Validate retry rates, dead-letter/replay behavior, and payload size distribution for the top topics.",
+    a: "Validate retry rates, dead-letter/replay behavior, and payload size distribution for the top topics (not a blended average).",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-pubsub-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-pubsub-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Pub/Sub estimation is mostly “count the deliveries”. The biggest mistakes are underestimating retries and forgetting
+    Pub/Sub estimation is mostly "count the deliveries". The biggest mistakes are underestimating retries and forgetting
     fan-out: one publish can result in multiple deliveries across subscriptions.
   </p>
 
-  <h2>1) Publish volume (per month)</h2>
+  <h2>0) What to measure</h2>
+  <ul>
+    <li>
+      <strong>Publishes/month</strong>: baseline and peak.
+    </li>
+    <li>
+      <strong>Fan-out</strong>: subscriptions per topic (deliveries per publish).
+    </li>
+    <li>
+      <strong>Attempts</strong>: average delivery attempts (retries, redeliveries, replays).
+    </li>
+    <li>
+      <strong>Payload size</strong>: average bytes per message (split large topics separately).
+    </li>
+  </ul>
+
+  <h2>1) Publish volume (baseline and peak)</h2>
   <p>
     Start with messages/second (or messages/day) and convert to monthly volume. If traffic is bursty, model peaks separately.
   </p>
+  <p class="muted">
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">Rate to monthly volume</a>.
+  </p>
 
-  <h2>2) Fan-out and delivery attempts</h2>
+  <h2>2) Fan-out and delivery attempts (the multiplier)</h2>
   <p>
     If a topic has N subscriptions, one publish results in N deliveries. If delivery attempts average 1.2 due to retries,
-    your true deliveries are: <strong>publishes × subscriptions × attempts</strong>.
+    your true deliveries are: <strong>publishes x subscriptions x attempts</strong>.
   </p>
+  <ul>
+    <li>Keep a separate "replay month" scenario if you reprocess history or DLQ messages.</li>
+    <li>If you use push delivery, validate HTTP retry/backoff behavior; it can multiply attempts.</li>
+  </ul>
 
   <h2>3) Payload size and transfer</h2>
   <p>
-    Payload size matters if you move large messages. Multiply average payload size by deliveries to estimate monthly GB moved.
-    If subscribers are cross-region or external, model egress separately.
+    Payload size matters when you move large messages. Multiply average payload size by deliveries to estimate monthly GB
+    moved. If subscribers are cross-region or external, model egress separately.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>,{" "}
     <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
   </p>
 
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Publishes/month</strong> = baseline + peak
+    </li>
+    <li>
+      <strong>Subscriptions/topic</strong> = fan-out
+    </li>
+    <li>
+      <strong>Avg attempts</strong> = 1 + retry factor (include replay months)
+    </li>
+    <li>
+      <strong>Deliveries/month</strong> = publishes x subscriptions x attempts
+    </li>
+    <li>
+      <strong>GB moved/month</strong> = deliveries x avg payload size (split large topics separately)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Counting publishes but not deliveries (fan-out multiplies).</li>
+    <li>Ignoring retries and DLQ replays (attempts are the multiplier).</li>
+    <li>Assuming all topics have small payloads (split large topics separately).</li>
+    <li>Cross-region subscribers creating egress you did not budget.</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Validate retry rates and DLQ/replay patterns (deliveries, not just publishes).</li>
-    <li>Validate fan-out (subscriptions) for each topic.</li>
-    <li>Validate payload size distribution (avoid assuming “small messages”).</li>
+    <li>Validate fan-out (subscriptions) for each top topic.</li>
+    <li>Validate payload size distribution and identify large topics/endpoints.</li>
   </ul>
 
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/gcp-dataflow-pricing/">Dataflow pricing</a>
     <a class="btn" href="/guides/gcp-cloud-logging-pricing/">Cloud Logging pricing</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/pubsub/pricing" target="_blank" rel="nofollow noopener">
+        Pub/Sub pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/pubsub/docs" target="_blank" rel="nofollow noopener">
+        Pub/Sub documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

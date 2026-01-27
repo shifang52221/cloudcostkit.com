@@ -1742,20 +1742,20 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud Spanner cost estimation: compute, storage, and query patterns",
-    "description": "A practical Spanner estimate: provisioned compute capacity, stored GB-month, and cross-region/network patterns. Includes validation steps for peak load and query efficiency.",
+    "title": "Cloud Spanner cost estimation: capacity, storage, backups, and multi-region traffic",
+    "description": "Estimate Spanner cost using measurable drivers: provisioned capacity (baseline + peak), stored GB-month (data + indexes), backups/retention, and multi-region/network patterns. Includes a worked template, common pitfalls, and validation steps.",
     "canonicalPath": "/guides/gcp-cloud-spanner-cost-estimation",
     "category": "GCP",
     "slug": "gcp-cloud-spanner-cost-estimation",
     "topics": [
-      "compute",
+      "backup",
       "database",
       "storage"
     ]
   },
   {
-    "title": "Cloud SQL pricing: compute, storage, backups, and network (practical estimate)",
-    "description": "A driver-based Cloud SQL estimate: instance-hours, storage GB-month, backups/retention, and data transfer. Includes validation steps for growth and peak sizing.",
+    "title": "Cloud SQL pricing: instance-hours, storage, backups, and network (practical estimate)",
+    "description": "A driver-based Cloud SQL estimate: instance-hours (HA + replicas), storage GB-month, backups/retention, and data transfer. Includes a worked template, common pitfalls, and validation steps for peak sizing and growth.",
     "canonicalPath": "/guides/gcp-cloud-sql-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-sql-pricing",
@@ -1768,8 +1768,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Dataflow pricing: model worker hours, throughput, and log volume",
-    "description": "A practical data processing estimate: worker compute-hours, data processed, and logging/monitoring. Includes validation steps for autoscaling and backlog reprocessing.",
+    "title": "Dataflow pricing: worker hours, backlog catch-up, and observability (practical model)",
+    "description": "Estimate Dataflow cost using measurable drivers: worker compute-hours, backlog catch-up scenarios (replays/backfills), data processed, and logs/metrics. Includes a worked template, pitfalls, and validation steps for autoscaling and replay patterns.",
     "canonicalPath": "/guides/gcp-dataflow-pricing",
     "category": "GCP",
     "slug": "gcp-dataflow-pricing",
@@ -1780,8 +1780,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "GCP load balancing pricing: model hours, requests, and traffic processed",
-    "description": "A driver-based approach to load balancer cost: hours, request volume, and GB processed/egress. Includes a workflow to estimate GB from RPS and response size.",
+    "title": "GCP load balancing pricing: hours, requests, traffic processed, and egress",
+    "description": "A driver-based approach to load balancer cost: hours, request volume, traffic processed, and (separately) outbound egress. Includes a worked estimate template, pitfalls, and a workflow to estimate GB from RPS and response size.",
     "canonicalPath": "/guides/gcp-load-balancing-pricing",
     "category": "GCP",
     "slug": "gcp-load-balancing-pricing",
@@ -1792,32 +1792,30 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "GCP VPC egress costs: how to estimate outbound transfer",
-    "description": "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert metrics to GB/month, and validate boundaries.",
+    "title": "GCP VPC egress costs: estimate outbound transfer by destination (practical workflow)",
+    "description": "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert usage to GB/month, and validate boundaries. Includes a worked template, pitfalls, and optimization levers.",
     "canonicalPath": "/guides/gcp-vpc-egress-costs",
     "category": "GCP",
     "slug": "gcp-vpc-egress-costs",
     "topics": [
       "cdn",
-      "egress",
-      "metrics"
+      "egress"
     ]
   },
   {
-    "title": "Google Cloud Storage pricing: a practical model for storage, requests, and egress",
-    "description": "Model GCS cost without copying price tables: GB-month, operations, retrieval rules, and outbound transfer. Includes a validation checklist.",
+    "title": "Google Cloud Storage pricing: storage class, operations, retrieval, replication, and egress",
+    "description": "Model Cloud Storage cost without copying price tables: storage GB-month by class, operations (GET/PUT/LIST), retrieval and minimum storage duration rules, replication patterns, and outbound transfer. Includes a worked template, pitfalls, and validation checklist.",
     "canonicalPath": "/guides/gcp-cloud-storage-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-storage-pricing",
     "topics": [
       "egress",
-      "requests",
       "storage"
     ]
   },
   {
-    "title": "Google Kubernetes Engine (GKE) pricing: a checklist-style estimate",
-    "description": "GKE cost is not just nodes: include node pools, networking/egress, load balancing, storage, and logs/metrics. Validate requests/limits to avoid overpaying.",
+    "title": "Google Kubernetes Engine (GKE) pricing: nodes, networking, storage, and observability",
+    "description": "GKE cost is not just nodes: include node pools, autoscaling, requests/limits (bin packing), load balancing/egress, storage, and logs/metrics. Includes a worked estimate template, pitfalls, and validation steps to keep clusters right-sized.",
     "canonicalPath": "/guides/gcp-gke-pricing",
     "category": "GCP",
     "slug": "gcp-gke-pricing",
@@ -1831,8 +1829,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Inter-zone transfer costs on GCP: where they come from and how to estimate",
-    "description": "A practical checklist to estimate cross-zone data transfer: load balancers, multi-zone clusters, service-to-service chatter, and storage/database access patterns. Includes validation steps.",
+    "title": "Inter-zone transfer costs on GCP: identify flows, estimate GB/month, and reduce churn",
+    "description": "A practical checklist to estimate cross-zone data transfer: load balancers, multi-zone clusters, east-west chatter, and storage/database access patterns. Includes a worked template, validation steps, and control levers.",
     "canonicalPath": "/guides/gcp-inter-zone-transfer-costs",
     "category": "GCP",
     "slug": "gcp-inter-zone-transfer-costs",
@@ -1845,7 +1843,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Private Service Connect costs: endpoint-hours and data processed (practical model)",
-    "description": "A practical private connectivity estimate: endpoint-hours plus data processed (GB). Includes validation steps to compare PSC vs NAT/internet egress and avoid paying for both paths.",
+    "description": "A practical private connectivity estimate: endpoint-hours plus data processed (GB). Includes a worked template, pitfalls, and validation steps to compare PSC vs NAT/internet egress and avoid paying for both paths.",
     "canonicalPath": "/guides/gcp-private-service-connect-costs",
     "category": "GCP",
     "slug": "gcp-private-service-connect-costs",
@@ -1854,12 +1852,13 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Pub/Sub pricing: estimate messages, deliveries, retries, and payload size",
-    "description": "A practical Pub/Sub cost estimate: message volume, delivery attempts (retries), and payload transfer. Includes validation steps for fan-out and replays.",
+    "title": "Pub/Sub pricing: deliveries, retries, fan-out, and payload transfer (practical estimate)",
+    "description": "A practical Pub/Sub estimate: publish volume, fan-out (subscriptions), delivery attempts (retries), retention/replay scenarios, and payload transfer. Includes a worked template, pitfalls, and validation steps.",
     "canonicalPath": "/guides/gcp-pubsub-pricing",
     "category": "GCP",
     "slug": "gcp-pubsub-pricing",
     "topics": [
+      "backup",
       "egress",
       "messaging"
     ]

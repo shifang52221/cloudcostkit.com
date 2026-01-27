@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Spanner cost estimation: compute, storage, and query patterns";
+const title = "Cloud Spanner cost estimation: capacity, storage, backups, and multi-region traffic";
 const description =
-  "A practical Spanner estimate: provisioned compute capacity, stored GB-month, and cross-region/network patterns. Includes validation steps for peak load and query efficiency.";
+  "Estimate Spanner cost using measurable drivers: provisioned capacity (baseline + peak), stored GB-month (data + indexes), backups/retention, and multi-region/network patterns. Includes a worked template, common pitfalls, and validation steps.";
 
 const faqs = [
   {
     q: "What usually drives Spanner cost?",
-    a: "Provisioned compute capacity is typically the main driver. Storage and multi-region/network patterns can add meaningful secondary costs.",
+    a: "Provisioned compute capacity is typically the main driver. Storage (data + indexes), backups/retention, and multi-region/network traffic can add meaningful secondary costs.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate baseline capacity for steady state, then add a peak scenario. Model stored GB and growth, and include cross-region transfer if clients are distributed.",
+    a: "Estimate baseline capacity, add a peak scenario, then model average storage GB-month (including indexes) and a separate line item for cross-region traffic if applicable.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Sizing from averages and ignoring the slow path: retries, timeouts, and inefficient queries can push you into higher provisioned capacity than expected.",
   },
   {
     q: "How do I validate?",
-    a: "Validate peak load windows, validate query efficiency, and validate storage growth and retention policies.",
+    a: "Validate peak load windows, query efficiency, storage/index growth, and cross-zone/cross-region traffic using a representative window (not a quiet day).",
   },
 ];
 ---
@@ -24,53 +28,137 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-spanner-cost-estimation"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Spanner-like systems are capacity-planned. Cost estimation is reliable when you separate: <strong>provisioned capacity</strong>,
-    <strong>stored data</strong>, and <strong>distributed access patterns</strong>. Underestimates usually come from using
-    averages and ignoring peak load windows.
+    Spanner-like databases are capacity-planned. Reliable cost estimation comes from separating four drivers:{" "}
+    <strong>provisioned capacity</strong>, <strong>stored data + indexes</strong>, <strong>backups/retention</strong>, and{" "}
+    <strong>multi-region/network patterns</strong>. Underestimates usually come from using averages and ignoring peak windows
+    (and the slow path).
   </p>
 
-  <h2>1) Provisioned capacity (baseline + peak)</h2>
-  <p>
-    Model a baseline and a peak scenario. If you autoscale or change capacity over time, estimate average capacity-hours per
-    month rather than a single static number.
-  </p>
-  <p>
-    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost (capacity math)</a>.
-  </p>
-
-  <h2>2) Storage and growth</h2>
-  <p>
-    Use average stored GB-month and model growth. If you keep history or large indexes, storage can grow faster than expected.
-  </p>
-  <p>
-    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>.
-  </p>
-
-  <h2>3) Distributed access and transfer</h2>
-  <p>
-    Multi-region deployments can introduce transfer and replication-related costs. If clients are cross-region, model outbound
-    GB/month separately and validate boundaries.
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
+  <h2>0) What to measure (the inputs that matter)</h2>
   <ul>
-    <li>Validate peak load windows and “incident behavior” (retries and timeouts multiply operations).</li>
-    <li>Validate query efficiency and indexes (inefficient queries can force higher capacity).</li>
-    <li>Validate storage growth, retention, and index overhead.</li>
+    <li>
+      <strong>Capacity baseline + peak</strong>: capacity-hours per month (or equivalent) across normal and peak periods.
+    </li>
+    <li>
+      <strong>Average storage GB-month</strong>: data GB + index overhead, averaged across the month (not end-of-month size).
+    </li>
+    <li>
+      <strong>Backups/retention</strong>: backup GB-month and retention windows.
+    </li>
+    <li>
+      <strong>Traffic topology</strong>: which clients/services are cross-zone or cross-region.
+    </li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>1) Capacity: baseline vs peak (capacity-hours)</h2>
+  <p>
+    Model at least two scenarios: a baseline month and a peak month. If you scale capacity over time, estimate capacity-hours
+    rather than using one static number.
+  </p>
+  <ul>
+    <li>Baseline: steady reads/writes plus background work.</li>
+    <li>Peak: deployments, reprocessing/backfills, incident retry storms.</li>
+    <li>Slow path: p95 queries and timeouts are often what forces headroom.</li>
+  </ul>
+  <p class="muted">
+    Tool (for capacity-hours math): <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
+  </p>
+
+  <h2>2) Storage: data + index overhead (GB-month)</h2>
+  <p>
+    Storage is predictable if you model growth and index overhead explicitly. The safest approximation is to treat indexes as
+    a separate multiplier (even a rough percentage is better than ignoring it).
+  </p>
+  <ul>
+    <li>Data GB: current size and monthly growth rate.</li>
+    <li>Index overhead: estimate as a % of data if you do not have exact numbers.</li>
+    <li>Average GB-month: use mid-month average for linear growth, not end-of-month size.</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>.
+  </p>
+
+  <h2>3) Backups and retention</h2>
+  <p>
+    Backups are typically billed separately from primary storage. Long retention and compliance requirements can turn backups
+    into a meaningful line item even when the primary dataset is stable.
+  </p>
+  <ul>
+    <li>Keep retention settings explicit (days/months).</li>
+    <li>Plan for restore validation (you need a realistic drill, not just a checkbox).</li>
+  </ul>
+
+  <h2>4) Multi-region patterns: transfer and replication</h2>
+  <p>
+    Distributed topologies change the bill shape. If readers/writers are cross-region, model outbound transfer separately and
+    avoid blending it into "capacity".
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>,{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>.
+  </p>
+  <ul>
+    <li>Separate inter-zone vs inter-region so you target the right optimization lever.</li>
+    <li>If you front services with a CDN, avoid double-counting edge bandwidth and origin egress.</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Capacity</strong> = baseline + peak (capacity-hours/month)
+    </li>
+    <li>
+      <strong>Primary storage</strong> = avg (data + index) GB-month
+    </li>
+    <li>
+      <strong>Backups</strong> = backup GB-month (retention window)
+    </li>
+    <li>
+      <strong>Network transfer</strong> = outbound GB/month (split inter-zone vs inter-region)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Sizing from averages and ignoring peak windows (deploys, backfills, incident retries).</li>
+    <li>Ignoring inefficient queries and index patterns (the slow path drives headroom).</li>
+    <li>Using end-of-month storage instead of average GB-month for growing datasets.</li>
+    <li>Forgetting multi-region client traffic and cross-region replication patterns.</li>
+    <li>Long backup retention silently growing month over month.</li>
+  </ul>
+
+  <h2>How to validate (practical checklist)</h2>
+  <ul>
+    <li>Validate peak windows and incident behavior (retries and timeouts multiply operations).</li>
+    <li>Validate query efficiency before you buy more capacity (slow queries, hot keys, missing indexes).</li>
+    <li>Validate storage growth, retention policies, and index overhead.</li>
+    <li>Validate cross-zone/cross-region traffic using flow logs or service metrics.</li>
+  </ul>
+
+  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/gcp-cloud-sql-pricing/">Cloud SQL estimate</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Capacity math</a>
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/spanner/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Spanner pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/spanner/docs" target="_blank" rel="nofollow noopener">
+        Cloud Spanner documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

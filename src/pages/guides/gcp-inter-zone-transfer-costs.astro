@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Inter-zone transfer costs on GCP: where they come from and how to estimate";
+const title = "Inter-zone transfer costs on GCP: identify flows, estimate GB/month, and reduce churn";
 const description =
-  "A practical checklist to estimate cross-zone data transfer: load balancers, multi-zone clusters, service-to-service chatter, and storage/database access patterns. Includes validation steps.";
+  "A practical checklist to estimate cross-zone data transfer: load balancers, multi-zone clusters, east-west chatter, and storage/database access patterns. Includes a worked template, validation steps, and control levers.";
 
 const faqs = [
   {
     q: "Why do inter-zone transfer costs appear?",
-    a: "They appear when traffic crosses zone boundaries: multi-zone clusters, cross-zone load balancing, or services calling each other across zones.",
+    a: "They appear when traffic crosses zone boundaries inside a region: multi-zone clusters, cross-zone load balancing, or services calling each other across zones.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "List the top cross-zone flows and estimate GB/month per flow. Use a representative window and validate peaks.",
+    a: "List the top cross-zone flows and estimate GB/month per flow using either average Mbps or requests x payload size. Keep baseline and peak windows separate.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Assuming cross-zone traffic is small. In multi-zone clusters, east-west calls plus retries can be a steady, high-volume background cost.",
   },
   {
     q: "How do I validate?",
-    a: "Validate topology (which zones each service runs in), validate load balancer behavior, and validate chatty request patterns that create cross-zone traffic.",
+    a: "Validate topology (which zones each service runs in), validate load balancer behavior, and validate chatty request patterns and retry storms that create cross-zone traffic.",
   },
 ];
 ---
@@ -24,7 +28,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-inter-zone-transfer-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -32,28 +36,65 @@ const faqs = [
     big cross-zone flows and either co-locate workloads or reduce chatty traffic patterns.
   </p>
 
-  <h2>1) Common sources of cross-zone traffic</h2>
+  <h2>0) Definitions (so you measure the right thing)</h2>
   <ul>
-    <li>Cross-zone load balancing when backends are in multiple zones.</li>
-    <li>Multi-zone Kubernetes clusters with chatty east-west traffic.</li>
-    <li>Databases or caches accessed from another zone.</li>
-    <li>Service meshes and retries that amplify traffic volume.</li>
+    <li>
+      <strong>Inter-zone</strong>: traffic crossing zones inside the same region.
+    </li>
+    <li>
+      <strong>Inter-region</strong>: traffic crossing regions (often a different magnitude and different fixes).
+    </li>
+    <li>
+      <strong>Internet egress</strong>: outbound traffic to the public internet or external networks.
+    </li>
   </ul>
 
-  <h2>2) Estimate GB/month per flow</h2>
+  <h2>1) Common sources of cross-zone traffic</h2>
+  <ul>
+    <li>Cross-zone load balancing when backends span multiple zones.</li>
+    <li>Multi-zone Kubernetes clusters with chatty east-west traffic.</li>
+    <li>Databases/caches accessed from another zone.</li>
+    <li>Service meshes and retries that amplify traffic volume.</li>
+    <li>Deployments: image pulls and artifact fetches (bursty, but large).</li>
+  </ul>
+
+  <h2>2) Estimate GB/month per flow (start with the top 5)</h2>
   <p>
-    For each major flow, estimate average Mbps or average response size × request volume. Then convert to monthly GB.
+    The fastest method is to identify a handful of major flows and estimate each flow's GB/month. You can estimate from
+    either Mbps metrics or from requests x average payload size.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
     <a href="/calculators/data-egress-cost-calculator/">Transfer cost model</a>.
   </p>
+  <ul>
+    <li>Keep baseline vs peak separate; retries during incidents create multiplier effects.</li>
+    <li>Split large endpoints (downloads/exports) so they do not disappear into a blended average.</li>
+  </ul>
 
-  <h2>3) Control levers</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Flow</strong>: source zone(s) -&gt; destination zone(s)
+    </li>
+    <li>
+      <strong>Requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>Avg bytes/request</strong> = payload + headers (estimate or measure)
+    </li>
+    <li>
+      <strong>GB/month</strong> = requests/month x avg bytes/request
+    </li>
+  </ul>
+
+  <h2>3) Control levers (match to the flow)</h2>
   <ul>
     <li>Reduce retries/timeouts (they repeat full payload transfers).</li>
-    <li>Reduce chattiness (batch calls, compress payloads, cache responses).</li>
+    <li>Reduce chattiness (batch calls, cache responses, compress payloads).</li>
     <li>Co-locate tightly coupled services within the same zone.</li>
+    <li>Pin stateful backends to the same zone as the largest callers where possible.</li>
   </ul>
 
   <h2>Validation checklist</h2>
@@ -61,13 +102,28 @@ const faqs = [
     <li>Validate topology: which zones each service and database runs in.</li>
     <li>Validate load balancer distribution and cross-zone behavior.</li>
     <li>Validate retries and incident windows (multipliers matter).</li>
+    <li>Validate deployment traffic (artifact/image pulls) as a separate peak window.</li>
   </ul>
 
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/gcp-vpc-egress-costs/">VPC egress costs</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+    <a class="btn" href="/guides/gcp-gke-pricing/">GKE pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/vpc/network-pricing" target="_blank" rel="nofollow noopener">
+        VPC network pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/vpc/docs" target="_blank" rel="nofollow noopener">
+        VPC documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

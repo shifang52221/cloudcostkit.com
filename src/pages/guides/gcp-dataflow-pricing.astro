@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Dataflow pricing: model worker hours, throughput, and log volume";
+const title = "Dataflow pricing: worker hours, backlog catch-up, and observability (practical model)";
 const description =
-  "A practical data processing estimate: worker compute-hours, data processed, and logging/monitoring. Includes validation steps for autoscaling and backlog reprocessing.";
+  "Estimate Dataflow cost using measurable drivers: worker compute-hours, backlog catch-up scenarios (replays/backfills), data processed, and logs/metrics. Includes a worked template, pitfalls, and validation steps for autoscaling and replay patterns.";
 
 const faqs = [
   {
@@ -12,55 +12,134 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate average workers × hours per month, then model a catch-up scenario for backlog processing. Add a separate estimate for log ingestion.",
+    a: "Estimate average workers and hours per month, then add a catch-up scenario for backlog processing. Add a separate estimate for log ingestion and retention.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Estimating only steady state. Real costs are driven by spikes: backlog catch-up, reprocessing, and noisy logs during incidents.",
   },
   {
     q: "How do I validate?",
-    a: "Validate autoscaling behavior, validate backlog windows (replays), and validate log volume per record/job stage.",
+    a: "Validate autoscaling behavior, validate backlog windows (replays), validate data size per record, and validate log volume per stage in a representative window.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-dataflow-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-dataflow-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Dataflow cost planning is essentially compute capacity planning with a backlog multiplier. Estimates fail when you only
-    model steady state and ignore catch-up windows where the pipeline processes historical data.
+    Dataflow cost planning is compute capacity planning with a backlog multiplier. The safest model treats "normal processing"
+    and "catch-up/replay" as separate scenarios and adds observability costs explicitly.
   </p>
 
-  <h2>1) Worker compute-hours</h2>
+  <h2>0) Pick your unit of analysis</h2>
+  <ul>
+    <li>
+      <strong>Compute-hours</strong>: average workers and hours per month (baseline + peak).
+    </li>
+    <li>
+      <strong>Catch-up scenario</strong>: extra workers and hours during backlog/backfill months.
+    </li>
+    <li>
+      <strong>Data processed</strong>: sanity check for throughput and unexpected growth.
+    </li>
+    <li>
+      <strong>Logs/metrics</strong>: per-record/per-stage logging multiplied by volume.
+    </li>
+  </ul>
+
+  <h2>1) Worker compute-hours (baseline and peak)</h2>
   <p>
-    Start with average workers × hours per month. Then model peaks: max workers during autoscaling and the duration of peak
-    windows.
+    Start with average workers x hours per month. Then model peaks: max workers during autoscaling and the duration of those
+    windows. Separate batch jobs from streaming jobs if you run both.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
   </p>
+  <ul>
+    <li>Baseline: normal day-to-day processing.</li>
+    <li>Peak: high-volume windows, large joins/reshuffles, or upstream bursts.</li>
+    <li>Non-prod: always-on staging jobs can be a real monthly line item.</li>
+  </ul>
 
-  <h2>2) Throughput and backlog scenarios</h2>
+  <h2>2) Backlog catch-up and replay patterns</h2>
   <p>
-    If a pipeline falls behind, it can run “hot” to catch up. Model a backlog scenario (e.g., 6 hours of catch-up at 3×
-    workers) rather than assuming perfect steady state.
+    Pipelines fall behind: upstream outages, schema changes, DLQ replays, or backfills. Model a "catch-up month" where you
+    run hotter to recover, instead of assuming perfect steady state.
+  </p>
+  <ul>
+    <li>
+      Backfill month: rerun historical data after a logic fix.
+    </li>
+    <li>
+      Replay storm: upstream retries cause input duplication.
+    </li>
+    <li>
+      Large shuffle: wide transformations create a temporary throughput bottleneck.
+    </li>
+  </ul>
+
+  <h2>3) Observability: logs, metrics, retention, and scanning</h2>
+  <p>
+    Verbose per-record logging can exceed compute cost at scale. Model log ingestion explicitly and add retention/scan cost
+    if you query logs heavily during incidents.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-storage-cost-calculator/">Log retention storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>.
   </p>
 
-  <h2>3) Logs and monitoring</h2>
-  <p>
-    Verbose per-record logging can dominate cost at scale. Estimate log bytes per record and multiply by record volume.
-  </p>
-  <p>
-    Tool: <a href="/calculators/log-cost-calculator/">Log cost tools</a>.
-  </p>
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Baseline workers</strong> = avg workers x hours/month
+    </li>
+    <li>
+      <strong>Peak workers</strong> = max workers x peak hours/month
+    </li>
+    <li>
+      <strong>Catch-up month</strong> = extra workers x catch-up hours (backlog/backfill)
+    </li>
+    <li>
+      <strong>Log GB/month</strong> = records/month x bytes logged/record (baseline + incident)
+    </li>
+  </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Only modeling steady state and ignoring catch-up windows (backlog multiplier).</li>
+    <li>Assuming one average record size; schema changes can increase payload size.</li>
+    <li>Per-record logs at high throughput (log cost dominates).</li>
+    <li>Not splitting environments/regions (sprawl multiplies always-on jobs).</li>
+  </ul>
+
+  <h2>How to validate</h2>
   <ul>
     <li>Validate autoscaling: average vs max workers and how often you hit max.</li>
-    <li>Validate backlog windows and reprocessing patterns (catch-up multipliers).</li>
+    <li>Validate backlog windows and replay patterns (catch-up multipliers).</li>
+    <li>Validate record size and the largest transformations (they change throughput).</li>
     <li>Validate log volume and sampling (avoid per-record logs at high volume).</li>
   </ul>
 
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/gcp-bigquery-cost-estimation/">BigQuery estimate</a>
+    <a class="btn" href="/guides/gcp-pubsub-pricing/">Pub/Sub pricing</a>
     <a class="btn" href="/guides/gcp-cloud-logging-pricing/">Cloud Logging pricing</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/dataflow/pricing" target="_blank" rel="nofollow noopener">
+        Dataflow pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/dataflow/docs" target="_blank" rel="nofollow noopener">
+        Dataflow documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

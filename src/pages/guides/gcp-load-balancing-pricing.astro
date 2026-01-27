@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "GCP load balancing pricing: model hours, requests, and traffic processed";
+const title = "GCP load balancing pricing: hours, requests, traffic processed, and egress";
 const description =
-  "A driver-based approach to load balancer cost: hours, request volume, and GB processed/egress. Includes a workflow to estimate GB from RPS and response size.";
+  "A driver-based approach to load balancer cost: hours, request volume, traffic processed, and (separately) outbound egress. Includes a worked estimate template, pitfalls, and a workflow to estimate GB from RPS and response size.";
 
 const faqs = [
   {
@@ -12,11 +12,15 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly requests and average response size to get monthly GB, then split load balancer vs egress as separate lines.",
+    a: "Estimate monthly requests and average response size to get monthly GB, then split load balancer processing vs internet egress as separate lines.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Mixing load balancer charges and egress into one number. Treat 'LB processing' and 'egress' as separate drivers so you can optimize the right lever.",
   },
   {
     q: "How do I validate?",
-    a: "Validate peak traffic and retry storms, and validate whether traffic is served via CDN (changing origin egress).",
+    a: "Validate peak traffic and retry storms, validate whether traffic is served via CDN, and validate heavy endpoints (downloads/exports) separately.",
   },
 ];
 ---
@@ -24,38 +28,88 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-load-balancing-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Load balancer estimates get accurate when you treat them as: hours + requests + traffic processed. Egress is usually a
-    separate, often larger line item for public services.
+    Load balancer estimates get accurate when you treat them as: hours + requests + traffic processed. For public services,
+    internet egress is usually a separate (often larger) line item. Splitting these drivers also makes optimization obvious.
   </p>
 
-  <h2>1) Hours</h2>
-  <p>Count load balancers and hours per month per environment.</p>
-
-  <h2>2) Requests</h2>
-  <p>Convert RPS to monthly requests and split high-volume endpoints if needed.</p>
+  <h2>0) Decide what you are pricing</h2>
   <p>
-    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>.
+    Different load balancer types have different billing units. For budgeting, most teams can start with these measurable
+    drivers:
   </p>
-
-  <h2>3) Traffic processed and egress</h2>
-  <p>
-    Use average response size to estimate GB transferred. Split origin egress vs CDN edge bandwidth and validate cache hit
-    rate behavior if you use a CDN.
-  </p>
-  <p>
-    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
-    <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate peak traffic and burst behavior (capacity and scaling depend on peaks).</li>
-    <li>Validate retries/timeouts that multiply request volume and transfer volume.</li>
-    <li>Validate CDN usage and avoid double-counting origin egress and edge bandwidth.</li>
+    <li>
+      <strong>Hours</strong>: how many LBs (and environments) are always on.
+    </li>
+    <li>
+      <strong>Requests</strong>: baseline + peak requests/month (include retries).
+    </li>
+    <li>
+      <strong>Traffic processed</strong>: GB/month through the LB (response size is the key input).
+    </li>
+    <li>
+      <strong>Egress</strong>: outbound GB/month to the internet (or cross-region if applicable).
+    </li>
+  </ul>
+
+  <h2>1) Hours (count always-on infrastructure)</h2>
+  <p>Count load balancers and hours per month per environment (prod, staging, dev).</p>
+  <ul>
+    <li>Always-on staging environments add up quickly.</li>
+    <li>Count internal and external LBs separately if you use both.</li>
+  </ul>
+
+  <h2>2) Requests (baseline and peak)</h2>
+  <p>Convert RPS to monthly requests and split heavy endpoints if needed.</p>
+  <p class="muted">
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+  </p>
+
+  <h2>3) Traffic processed: estimate GB from response size</h2>
+  <p>
+    If you know requests/month and average response bytes, you can estimate transfer. Keep a separate line item for heavy
+    endpoints so they do not disappear into a blended average.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
+  </p>
+
+  <h2>4) Egress: separate it from LB processing</h2>
+  <p>
+    Internet egress is often larger than LB processing for public services. If you use a CDN, keep origin egress (cache fill)
+    separate from edge bandwidth to avoid double-counting.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>,{" "}
+    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>LB hours</strong> = LB count x hours/month (prod + non-prod)
+    </li>
+    <li>
+      <strong>Requests</strong> = baseline + peak requests/month (include retries)
+    </li>
+    <li>
+      <strong>Traffic processed</strong> = requests/month x avg response bytes (split heavy endpoints)
+    </li>
+    <li>
+      <strong>Egress</strong> = outbound GB/month (internet + cross-region if applicable)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Not splitting LB processing vs egress (leads to the wrong optimization).</li>
+    <li>Using one average response size and missing a heavy-tail endpoint.</li>
+    <li>Not modeling peak windows and retry storms (multipliers matter).</li>
+    <li>Double-counting CDN edge bandwidth and origin egress.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -65,5 +119,19 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/load-balancing/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Load Balancing pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/load-balancing/docs" target="_blank" rel="nofollow noopener">
+        Cloud Load Balancing documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

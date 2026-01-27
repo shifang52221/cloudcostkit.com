@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Google Kubernetes Engine (GKE) pricing: a checklist-style estimate";
+const title = "Google Kubernetes Engine (GKE) pricing: nodes, networking, storage, and observability";
 const description =
-  "GKE cost is not just nodes: include node pools, networking/egress, load balancing, storage, and logs/metrics. Validate requests/limits to avoid overpaying.";
+  "GKE cost is not just nodes: include node pools, autoscaling, requests/limits (bin packing), load balancing/egress, storage, and logs/metrics. Includes a worked estimate template, pitfalls, and validation steps to keep clusters right-sized.";
 
 const faqs = [
   {
@@ -12,64 +12,127 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate node-hours by pool, then add separate estimates for egress, storage GB-month, and log ingestion.",
+    a: "Estimate node-hours by pool, then add separate estimates for egress, storage GB-month, and log ingestion/retention.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Over-requesting CPU/memory so pods do not pack well. Poor bin packing inflates node count even when actual usage is low.",
   },
   {
     q: "How do I validate?",
-    a: "Validate workload requests/limits and overhead, then validate outbound GB and log volume in a representative window.",
+    a: "Validate workload requests/limits and overhead, validate outbound GB and peak periods, and validate log bytes per request and retention.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-gke-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-gke-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    GKE planning gets accurate when you treat it as a stack: compute (nodes), networking, storage, and observability. This
-    checklist gives you a safe baseline for budgeting and an audit path for an existing bill.
+    GKE planning gets accurate when you treat it as a stack: compute (nodes), networking (LB/egress/inter-zone), storage, and
+    observability. The goal is not just to estimate, but to keep the cluster right-sized as traffic and workloads change.
   </p>
 
-  <h2>1) Node pools (instance-hours)</h2>
-  <p>Model each pool: instance type, min/max nodes, and average hours per month.</p>
+  <h2>0) What to model (drivers you can validate)</h2>
+  <ul>
+    <li>
+      <strong>Node pools</strong>: instance type, min/max nodes, and average node-hours per month.
+    </li>
+    <li>
+      <strong>Bin packing</strong>: requests/limits, kube-system overhead, and DaemonSets.
+    </li>
+    <li>
+      <strong>Networking</strong>: load balancers, internet egress, inter-zone traffic, and private connectivity.
+    </li>
+    <li>
+      <strong>Storage</strong>: PV GB-month, snapshots, and retention windows.
+    </li>
+    <li>
+      <strong>Logs/metrics</strong>: ingestion volume, retention, and scan/search behavior during incidents.
+    </li>
+  </ul>
+
+  <h2>1) Node pools: instance-hours (baseline and peak)</h2>
   <p>
+    Model each pool separately and keep baseline vs peak months distinct. Scale-out events often do not average out in
+    practice (marketing, seasonality, incident retries).
+  </p>
+  <p class="muted">
     Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
   </p>
 
-  <h2>2) Packing (requests/limits)</h2>
+  <h2>2) Requests/limits: the bin packing multiplier</h2>
   <p>
-    Requests drive how many pods fit on a node. Over-requesting is a common cost leak. Validate overhead (kube-system,
-    DaemonSets) and reserved capacity.
+    Requests determine how many pods fit on a node. Over-requesting is one of the most common cost leaks. Validate overhead
+    (kube-system, DaemonSets) and reserve capacity explicitly.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests/limits helper</a>.
   </p>
+  <ul>
+    <li>For CPU-bound workloads, right-sized CPU requests can reduce nodes dramatically.</li>
+    <li>For memory-bound workloads, use p95 memory to avoid OOM churn.</li>
+  </ul>
 
-  <h2>3) Egress and load balancing</h2>
+  <h2>3) Networking: load balancers, egress, and inter-zone traffic</h2>
   <p>
-    Internet-facing services often have material egress. Split egress by destination and validate whether traffic is served
-    via CDN (which changes origin egress).
+    Internet-facing services often have meaningful egress. Multi-zone clusters also generate inter-zone east-west traffic
+    that does not show up as "internet bandwidth" but still affects the bill.
   </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>,{" "}
+    <a href="/guides/gcp-load-balancing-pricing/">Load balancing pricing</a>,{" "}
+    <a href="/guides/gcp-inter-zone-transfer-costs/">Inter-zone transfer</a>.
   </p>
 
-  <h2>4) Storage</h2>
-  <p>Persistent volumes are a GB-month driver. Include snapshots/backups and validate retention windows.</p>
+  <h2>4) Storage: PVs, snapshots, retention</h2>
   <p>
+    Persistent volumes are a GB-month driver. Snapshots/backups and retention windows add a quiet multiplier, especially for
+    stateful workloads.
+  </p>
+  <p class="muted">
     Tool: <a href="/calculators/storage-pricing-calculator/">Storage pricing (generic)</a>.
   </p>
 
-  <h2>5) Logs and metrics</h2>
+  <h2>5) Observability: logs and metrics</h2>
   <p>
     Logging and metrics scale with pod count and verbosity. If each request emits multiple log lines, log ingestion can
-    exceed compute. Estimate ingestion and retention explicitly.
+    exceed compute. Model ingestion and retention explicitly.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/log-cost-calculator/">Log cost tools</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
   <ul>
-    <li>Validate node utilization vs requested resources (look for over-requesting and bin-packing gaps).</li>
+    <li>
+      <strong>Nodes</strong> = sum(node pool avg node-hours/month) (baseline + peak)
+    </li>
+    <li>
+      <strong>Bin packing</strong> = effective pods/node based on requests/limits (headroom + overhead)
+    </li>
+    <li>
+      <strong>Egress</strong> = outbound GB/month (internet + cross-region) + inter-zone GB/month
+    </li>
+    <li>
+      <strong>Storage</strong> = PV GB-month + snapshot GB-month (retention)
+    </li>
+    <li>
+      <strong>Logs</strong> = log GB/month + retention/scan assumptions
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Over-requesting CPU/memory so pods cannot pack (node count inflates).</li>
+    <li>Not splitting system overhead (DaemonSets and kube-system are real capacity).</li>
+    <li>Ignoring egress and load balancers (often the second-largest driver after nodes).</li>
+    <li>Verbose logs per request and long retention windows.</li>
+    <li>Underestimating inter-zone east-west traffic in multi-zone clusters.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate node utilization vs requested resources (find over-requesting and bin packing gaps).</li>
     <li>Validate outbound GB by destination and peak periods (deployments, incidents, scale-outs).</li>
-    <li>Validate log volume per request and retention policies.</li>
+    <li>Validate log bytes per request and retention policies.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -79,5 +142,19 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/kubernetes-engine/pricing" target="_blank" rel="nofollow noopener">
+        GKE pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/kubernetes-engine/docs" target="_blank" rel="nofollow noopener">
+        GKE documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

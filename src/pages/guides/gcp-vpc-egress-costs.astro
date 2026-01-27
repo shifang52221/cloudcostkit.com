@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "GCP VPC egress costs: how to estimate outbound transfer";
+const title = "GCP VPC egress costs: estimate outbound transfer by destination (practical workflow)";
 const description =
-  "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert metrics to GB/month, and validate boundaries.";
+  "A practical method to estimate GCP outbound transfer: split by destination (internet, cross-region, inter-zone, CDN origin), convert usage to GB/month, and validate boundaries. Includes a worked template, pitfalls, and optimization levers.";
 
 const faqs = [
   {
@@ -12,7 +12,11 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly outbound GB by destination using a blended effective rate, then refine by splitting the top traffic flows.",
+    a: "Estimate monthly outbound GB by destination using a blended effective rate, then refine by splitting the top traffic flows (heavy endpoints, replication, east-west chatter).",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Not splitting by destination. You cannot optimize 'egress' as one number because internet, inter-zone, and inter-region have different fixes.",
   },
   {
     q: "How do I validate?",
@@ -20,23 +24,24 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/gcp-vpc-egress-costs"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-vpc-egress-costs" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
     Transfer costs are easiest to control when you split traffic into billable categories and validate boundaries. This guide
     is a practical workflow you can apply before you deploy or when you see an unexpected bill.
   </p>
 
+  <h2>0) Why egress bills surprise teams</h2>
+  <ul>
+    <li>Distributed systems create cross-zone and cross-region traffic that is invisible from app-level metrics.</li>
+    <li>Retries/timeouts multiply payload transfer during incidents.</li>
+    <li>CDN usage changes the shape of origin egress vs edge bandwidth.</li>
+  </ul>
+
   <h2>1) Split traffic into destinations</h2>
   <ul>
     <li>Internet egress (end users, SaaS, third-party APIs)</li>
-    <li>Cross-region (replication, DR, multi-region services)</li>
-    <li>Cross-zone / inter-zone (distributed services)</li>
+    <li>Inter-region (replication, DR, multi-region services)</li>
+    <li>Inter-zone (east-west traffic in multi-zone systems)</li>
     <li>Origin egress to CDN (cache fill)</li>
   </ul>
 
@@ -45,23 +50,64 @@ const faqs = [
     Use a representative time window and convert to monthly GB. If you only have RPS, multiply by average response size to
     approximate transfer volume.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
-    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>.
+    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
   </p>
+  <ul>
+    <li>Split heavy endpoints (downloads/exports) so they do not disappear into one average.</li>
+    <li>Keep baseline vs peak months separate (incident retry storms are a real multiplier).</li>
+  </ul>
 
   <h2>3) Apply effective blended rates for planning</h2>
   <p>
     For early budgeting, a blended effective rate per GB is fine. The real value is the breakdown: it tells you what to
-    cache, compress, or route differently.
+    cache, compress, co-locate, or route differently.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost calculator</a>.
   </p>
 
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Internet egress GB/month</strong> = end-user + third-party APIs (baseline + peak)
+    </li>
+    <li>
+      <strong>Inter-zone GB/month</strong> = top east-west flows (LB, service mesh, database calls)
+    </li>
+    <li>
+      <strong>Inter-region GB/month</strong> = replication + DR + multi-region reads
+    </li>
+    <li>
+      <strong>CDN origin GB/month</strong> = cache fill traffic (separate from edge bandwidth)
+    </li>
+  </ul>
+
+  <h2>Optimization levers (match the lever to the destination)</h2>
+  <ul>
+    <li>
+      Internet: CDN, compression, reduce payload size, avoid heavy-tail endpoints.
+    </li>
+    <li>
+      Inter-zone: co-locate chatty services, reduce retries, batch calls, cache responses.
+    </li>
+    <li>
+      Inter-region: reduce cross-region reads, use regional affinity, validate replication topology.
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Not splitting by destination (optimizations become guesswork).</li>
+    <li>Double-counting CDN edge bandwidth and origin egress.</li>
+    <li>Using one average response size and missing heavy endpoints.</li>
+    <li>Not modeling incident retry storms (peaks are not averages).</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate cross-zone and cross-region traffic from distributed systems (common hidden drivers).</li>
+    <li>Validate cross-zone and cross-region traffic (common hidden drivers).</li>
     <li>Validate compression and payload sizes for high-volume endpoints.</li>
     <li>Validate CDN origin egress separately from edge bandwidth and cache hit rate.</li>
   </ul>
@@ -73,5 +119,19 @@ const faqs = [
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/vpc/network-pricing" target="_blank" rel="nofollow noopener">
+        VPC network pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/vpc/docs" target="_blank" rel="nofollow noopener">
+        VPC documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

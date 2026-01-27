@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Private Service Connect costs: endpoint-hours and data processed (practical model)";
 const description =
-  "A practical private connectivity estimate: endpoint-hours plus data processed (GB). Includes validation steps to compare PSC vs NAT/internet egress and avoid paying for both paths.";
+  "A practical private connectivity estimate: endpoint-hours plus data processed (GB). Includes a worked template, pitfalls, and validation steps to compare PSC vs NAT/internet egress and avoid paying for both paths.";
 
 const faqs = [
   {
@@ -12,7 +12,11 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Count endpoints × hours per month, then estimate GB/month through those endpoints. Compare to NAT + public egress paths.",
+    a: "Count endpoints x hours per month, then estimate GB/month through those endpoints. Compare to NAT + public egress paths so you do not pay twice.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Paying for both paths: endpoints exist, but traffic still goes out via NAT/public egress due to DNS/routing fallbacks.",
   },
   {
     q: "How do I validate?",
@@ -24,48 +28,105 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-private-service-connect-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Private Service Connect-style networking often charges for <strong>time</strong> (endpoint-hours) and <strong>volume</strong>
-    (GB processed). Cost planning is straightforward once you split these into separate line items and validate routing.
+    Private Service Connect-style networking is easiest to estimate when you split it into two line items:{" "}
+    <strong>time</strong> (endpoint-hours) and <strong>volume</strong> (GB processed). Then validate that your traffic
+    actually uses the private path.
   </p>
 
-  <h2>1) Endpoint-hours</h2>
+  <h2>0) What to measure</h2>
+  <ul>
+    <li>
+      <strong>Endpoint-hours</strong>: endpoint count per environment and region, multiplied by hours/month.
+    </li>
+    <li>
+      <strong>GB processed</strong>: baseline + peak traffic through PSC endpoints.
+    </li>
+    <li>
+      <strong>Alternative path</strong>: what the traffic would cost via NAT/public egress.
+    </li>
+  </ul>
+
+  <h2>1) Endpoint-hours (baseline)</h2>
   <p>
-    Model: <strong>endpoint count × hours per month</strong>. Environment sprawl (multiple regions and environments) can make
-    endpoint-hours the dominant baseline.
+    Model: <strong>endpoints x hours per month</strong>. Environment sprawl (prod + staging + dev, multiple regions) often
+    makes endpoint-hours the dominant baseline.
   </p>
+  <ul>
+    <li>Count endpoints by environment and region; that is where growth hides.</li>
+    <li>Remove unused endpoints; idle endpoints still cost endpoint-hours.</li>
+  </ul>
 
   <h2>2) Data processed (GB/month)</h2>
   <p>
-    Estimate the traffic that uses PSC (storage, registries, databases). Treat “GB through PSC” as separate from internet
-    egress to avoid double-counting.
+    Estimate the traffic that uses PSC (artifact registries, storage, databases, APIs). Treat "GB through PSC" as separate
+    from internet egress to avoid double-counting.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Transfer (GB/month)</a>.
   </p>
+  <ul>
+    <li>Deployments can spike traffic (image pulls, artifact downloads). Model a peak month.</li>
+    <li>If services are cross-region, separate the cross-region component explicitly.</li>
+  </ul>
 
-  <h2>3) Compare against NAT/internet paths</h2>
+  <h2>3) Compare against NAT/internet egress (two scenarios)</h2>
   <p>
-    Model two scenarios: public egress via NAT and private egress via PSC. In many stacks, PSC reduces security risk but can
-    increase baseline costs via endpoint-hours.
+    Build two estimates: a private-path estimate (PSC) and a public-path estimate (NAT + internet egress). PSC often reduces
+    security risk, but it can increase baseline costs via endpoint-hours.
   </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Endpoint-hours</strong> = endpoints x hours/month (prod + non-prod)
+    </li>
+    <li>
+      <strong>GB processed</strong> = baseline + peak GB/month through PSC endpoints
+    </li>
+    <li>
+      <strong>Comparison</strong> = PSC scenario vs NAT/public egress scenario (avoid paying twice)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Endpoint sprawl across environments/regions (baseline grows quietly).</li>
+    <li>Traffic not actually using PSC due to DNS/routing (PSC + NAT costs at the same time).</li>
+    <li>Deployment spikes not modeled (container pulls and package downloads).</li>
+    <li>Blending GB processed and internet egress together, hiding optimization levers.</li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate routing/DNS so traffic actually uses PSC (avoid paying for endpoints you don’t use).</li>
+    <li>Validate routing/DNS so traffic actually uses PSC (avoid paying for endpoints you do not use).</li>
     <li>Validate endpoint count across environments (endpoint-hours scale with sprawl).</li>
-    <li>Validate GB/month during deployments (image pulls and package downloads can spike).</li>
+    <li>Validate GB/month during deployments and incident windows (peaks are not averages).</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Transfer</a>
-    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
     <a class="btn" href="/guides/gcp-cloud-nat-cost/">Cloud NAT cost</a>
+    <a class="btn" href="/guides/gcp-vpc-egress-costs/">VPC egress costs</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/vpc/docs/private-service-connect" target="_blank" rel="nofollow noopener">
+        Private Service Connect documentation
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/vpc/network-pricing" target="_blank" rel="nofollow noopener">
+        VPC network pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 
