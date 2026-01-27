@@ -1523,30 +1523,26 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure NAT Gateway cost: why bills spike and how to model them",
-    "description": "A practical NAT Gateway estimate: hourly baseline + GB processed (plus egress). Includes common failure patterns that multiply outbound traffic.",
+    "title": "Azure NAT Gateway cost: model hours, GB processed, and the real spike drivers",
+    "description": "A practical Azure NAT Gateway estimate: hourly baseline, GB processed, and the common multipliers (retries, image pulls, dependency storms). Includes a validation checklist and cost-reduction levers.",
     "canonicalPath": "/guides/azure-nat-gateway-cost",
     "category": "Azure",
     "slug": "azure-nat-gateway-cost",
     "topics": [
-      "egress",
       "requests"
     ]
   },
   {
-    "title": "Azure Private Link costs: model endpoint-hours and data processing",
-    "description": "A practical private networking cost model: endpoint-hours plus data processed (GB). Includes validation steps to decide when Private Link beats NAT/internet egress for cost and security.",
+    "title": "Azure Private Link costs: model endpoint-hours, data processed, and trade-offs vs NAT",
+    "description": "A practical Private Link estimate: endpoint-hours baseline plus data processed (GB). Includes a workflow to count endpoints, model traffic through them, and validate DNS/routing so you don't pay for both private and NAT paths.",
     "canonicalPath": "/guides/azure-private-link-costs",
     "category": "Azure",
     "slug": "azure-private-link-costs",
-    "topics": [
-      "egress",
-      "security"
-    ]
+    "topics": []
   },
   {
-    "title": "Azure Service Bus pricing: estimate messaging cost from deliveries and payload size",
-    "description": "A practical Service Bus estimate: message volume, deliveries/retries, and payload transfer. Includes validation steps for retries, dead-letter patterns, and fan-out.",
+    "title": "Azure Service Bus pricing: estimate messaging cost from operations, retries, and payload",
+    "description": "A practical Service Bus estimate: message volume, deliveries/retries, fan-out, and payload transfer. Includes a workflow to model baseline vs peak and validate the real multipliers (timeouts, DLQ replays, and subscription expansion).",
     "canonicalPath": "/guides/azure-service-bus-pricing",
     "category": "Azure",
     "slug": "azure-service-bus-pricing",
@@ -1556,8 +1552,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure SQL Database pricing: a practical way to estimate",
-    "description": "Model managed database cost without price tables: compute baseline, storage GB-month, backups/retention, and network/egress. Includes a validation checklist.",
+    "title": "Azure SQL Database pricing: a practical estimate (compute, storage, backups, transfer)",
+    "description": "Model Azure SQL Database cost without memorizing price tables: compute baseline (vCore/DTU), storage GB-month + growth, backup retention, and network transfer. Includes a validation checklist and common sizing traps.",
     "canonicalPath": "/guides/azure-sql-database-pricing",
     "category": "Azure",
     "slug": "azure-sql-database-pricing",
@@ -1582,8 +1578,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CDN request pricing: how to estimate $ per 10k / 1M requests",
-    "description": "Some CDNs charge request fees in addition to bandwidth. Learn what counts as a billable request, how to estimate monthly requests, and how to model per-10k vs per-1M pricing.",
+    "title": "CDN request pricing: estimate $ per 10k / 1M requests (and when it dominates)",
+    "description": "Some CDNs charge request fees in addition to bandwidth. Learn what counts as a billable request, how to estimate requests/month from RPS or analytics, and how to model per-10k vs per-1M pricing without unit mistakes.",
     "canonicalPath": "/guides/cdn-request-pricing",
     "category": "CDN",
     "slug": "cdn-request-pricing",
@@ -1594,13 +1590,14 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CloudFront vs Cloudflare CDN cost: what to compare (bandwidth, requests, origin egress)",
-    "description": "A practical comparison checklist for CloudFront vs Cloudflare pricing. Compare bandwidth ($/GB), request fees, regions, cache fill/origin egress, and add-ons like WAF and logs.",
+    "title": "CloudFront vs Cloudflare CDN cost: compare the right line items (bandwidth, requests, origin egress)",
+    "description": "A practical comparison checklist for CloudFront vs Cloudflare pricing. Compare bandwidth ($/GB), request fees, region mix, origin egress (cache fill), and add-ons like WAF, logs, and edge compute. Includes a modeling template and validation steps.",
     "canonicalPath": "/guides/cloudfront-vs-cloudflare-cdn-cost",
     "category": "CDN",
     "slug": "cloudfront-vs-cloudflare-cdn-cost",
     "topics": [
       "cdn",
+      "compute",
       "egress",
       "logging",
       "requests",
@@ -1608,8 +1605,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "How to estimate CDN bandwidth (GB/month) from analytics or Mbps",
-    "description": "A practical guide to estimating CDN bandwidth per month, including conversions from Mbps and common unit pitfalls (GB vs GiB).",
+    "title": "How to estimate CDN bandwidth (GB/month): analytics, RPS, or Mbps",
+    "description": "A practical guide to estimating CDN bandwidth per month. Includes methods from CDN analytics, from RPS × response size, and from throughput (Mbps), plus unit pitfalls (bits vs bytes, GB vs GiB) and a validation checklist.",
     "canonicalPath": "/guides/estimate-cdn-bandwidth-gb-per-month",
     "category": "CDN",
     "slug": "estimate-cdn-bandwidth-gb-per-month",
@@ -1882,8 +1879,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud cost estimation checklist (avoid thin estimates)",
-    "description": "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs, and network transfer. Includes validation steps and common pitfalls.",
+    "title": "Cloud cost estimation checklist: build a model Google (and finance) will trust",
+    "description": "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs/metrics, and network transfer. Includes a worksheet template, validation steps, and the most common double-counting traps.",
     "canonicalPath": "/guides/cloud-cost-estimation-checklist",
     "category": "General",
     "slug": "cloud-cost-estimation-checklist",
@@ -1891,6 +1888,7 @@ export const GUIDES: GuideLink[] = [
       "compute",
       "egress",
       "logging",
+      "metrics",
       "requests",
       "storage"
     ]
@@ -2027,8 +2025,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "EKS vs GKE vs AKS cost: a practical comparison checklist",
-    "description": "Compare managed Kubernetes costs across EKS, GKE, and AKS by modeling the same line items: nodes, control plane, load balancers, storage, observability, and egress.",
+    "title": "EKS vs GKE vs AKS cost: a practical comparison checklist (beyond node price)",
+    "description": "Compare managed Kubernetes costs across EKS, GKE, and AKS by modeling the same line items: nodes, control plane, load balancers, storage, observability, and egress. Includes a worksheet template and validation steps for baseline vs peak.",
     "canonicalPath": "/guides/eks-vs-gke-vs-aks-cost",
     "category": "Kubernetes",
     "slug": "eks-vs-gke-vs-aks-cost",
@@ -2105,8 +2103,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Estimate log ingestion volume (GB/day): quick methods",
-    "description": "How to estimate log ingestion volume in GB/day from bytes, events/sec, or throughput - plus common pitfalls like compression, sampling, and verbose debug logs.",
+    "title": "Estimate log ingestion volume (GB/day): fast methods + validation",
+    "description": "How to estimate log ingestion volume in GB/day from billing exports, from events/sec × bytes/event, or from throughput. Includes common pitfalls (duplicates, verbose debug logs, multiline events) and next steps to convert volume into dollars.",
     "canonicalPath": "/guides/estimate-log-ingestion-gb-per-day",
     "category": "Logging",
     "slug": "estimate-log-ingestion-gb-per-day",

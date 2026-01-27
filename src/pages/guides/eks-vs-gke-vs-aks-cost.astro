@@ -1,21 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "EKS vs GKE vs AKS cost: a practical comparison checklist";
+const title = "EKS vs GKE vs AKS cost: a practical comparison checklist (beyond node price)";
 const description =
-  "Compare managed Kubernetes costs across EKS, GKE, and AKS by modeling the same line items: nodes, control plane, load balancers, storage, observability, and egress.";
+  "Compare managed Kubernetes costs across EKS, GKE, and AKS by modeling the same line items: nodes, control plane, load balancers, storage, observability, and egress. Includes a worksheet template and validation steps for baseline vs peak.";
+
 const faqs = [
   {
     q: "Which is cheaper: EKS, GKE, or AKS?",
-    a: "There is no universal winner. Total cost depends on node pricing, control plane fees, traffic patterns (load balancers and egress), observability, and your discount/commitment model. Compare with a consistent set of line items.",
+    a: "There is no universal winner. Total cost depends on node pricing, control plane fees, load balancers/ingress, observability, storage, and egress. Compare with a consistent set of line items and your own workload shape.",
   },
   {
     q: "What data do I need to compare fairly?",
-    a: "At minimum: expected pod requests (to estimate node count), target instance types or $/hour, average vs peak utilization, and expected egress/logging volume. If you have regional traffic mix, include it.",
+    a: "At minimum: workload requests/limits (to estimate node count), a target node type or $/hour, average vs peak utilization, and expected egress/logging volume. If you have regional traffic mix, include it.",
   },
   {
-    q: "What's the biggest mistake in managed Kubernetes comparisons?",
-    a: "Comparing only node price. In real bills, load balancers, observability, storage, and egress can shift the winner depending on workload.",
+    q: "What is the biggest mistake in managed Kubernetes comparisons?",
+    a: "Comparing only node price. Real bills are often dominated by load balancers, NAT/egress, logs/metrics retention, and storage/snapshots.",
+  },
+  {
+    q: "How do I validate the estimate?",
+    a: "Validate node utilization and autoscaling behavior over a representative week, then validate the 'around the cluster' costs: load balancers, egress, and observability volume.",
   },
 ];
 ---
@@ -23,71 +28,152 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/eks-vs-gke-vs-aks-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    If you're deciding between managed Kubernetes platforms, the best way to compare cost is to model the same set of
-    line items for each provider. This avoids "apples vs oranges" (for example, comparing only node prices).
+    The best way to compare EKS vs GKE vs AKS cost is to normalize capacity first (node count) and then add the costs that
+    live "around the cluster": load balancers, egress/NAT, storage, and observability. This avoids apples-vs-oranges
+    comparisons like "node price only".
   </p>
 
-  <h2>Start with the same line items</h2>
+  <h2>0) Start with the same line items (for every provider)</h2>
   <ul>
-    <li><strong>Worker nodes</strong>: node count x $/hour x billable hours.</li>
-    <li><strong>Control plane</strong>: fixed hourly fees (where applicable) and multi-cluster strategy.</li>
-    <li><strong>Load balancers / ingress</strong>: hourly + data processing charges depending on product.</li>
-    <li><strong>Storage</strong>: persistent volumes, snapshots, object storage, and growth over time.</li>
-    <li><strong>Observability</strong>: logs ingestion/retention, metrics series, tracing.</li>
-    <li><strong>Egress</strong>: internet egress, NAT, and cross-zone/region transfer.</li>
+    <li>
+      <strong>Worker nodes</strong>: node count × $/hour × billable hours (baseline + peak).
+    </li>
+    <li>
+      <strong>Control plane</strong>: fixed fees, multi-cluster strategy, and management overhead.
+    </li>
+    <li>
+      <strong>Load balancers / ingress</strong>: hourly + data processing charges depending on product.
+    </li>
+    <li>
+      <strong>Storage</strong>: volumes, snapshots, object storage, and growth over time.
+    </li>
+    <li>
+      <strong>Observability</strong>: logs ingestion/retention, metrics series, and scan/query.
+    </li>
+    <li>
+      <strong>Egress</strong>: internet egress, NAT, and cross-zone/region transfer legs.
+    </li>
   </ul>
 
-  <h2>Step 1: Normalize capacity (node count)</h2>
+  <h2>1) Normalize capacity (node count) from workload requests</h2>
   <p>
-    Start from workload requests and a realistic allocatable headroom. Use{" "}
-    <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes Requests &amp; Limits Calculator</a> to get
-    a baseline node estimate.
+    Start from pod requests/limits and a realistic allocatable headroom. Do not size from "average CPU" alone; Kubernetes
+    is constrained by bin packing, headroom, and spikes.
   </p>
   <p class="muted">
-    Tip: compare multiple scenarios (average vs peak) instead of using peak 24/7.
+    Tools: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits</a>,{" "}
+    <a href="/calculators/kubernetes-node-cost-calculator/">Node cost</a>,{" "}
+    <a href="/calculators/kubernetes-cost-calculator/">Cluster cost</a>.
   </p>
+  <ul>
+    <li>
+      Build two scenarios: <strong>average month</strong> and <strong>peak month</strong>.
+    </li>
+    <li>
+      If you run autoscaling, model the fraction of time you are at peak (peaks are rarely 24/7).
+    </li>
+  </ul>
 
-  <h2>Step 2: Normalize node pricing</h2>
+  <h2>2) Normalize pricing (effective $/hour)</h2>
   <p>
-    Use an effective blended $/hour that matches your plan (on-demand, commitments, spot mix). Then price the node count
-    using <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost Calculator</a>.
+    Use an effective blended $/hour that matches your plan: on-demand, commitments, spot mix, and discounts. Early-stage
+    models should prioritize being directionally correct over being SKU-perfect.
   </p>
 
-  <h2>Step 3: Add the "around the cluster" costs</h2>
+  <h2>3) Add the "around the cluster" costs (where winners change)</h2>
+  <p>
+    Many teams discover that node price is not the deciding factor. These line items often dominate once traffic grows.
+  </p>
   <ul>
     <li>
-      <strong>Control plane</strong>: small for large clusters, but it matters for many small clusters (dev/test,
-      multi-tenant environments).
+      <strong>Load balancers</strong>: hourly + data processing; traffic-heavy services pay more here than expected.
     </li>
     <li>
-      <strong>Load balancers</strong>: traffic-heavy workloads can pay more here than expected.
+      <strong>NAT/egress</strong>: chatty microservices and cross-zone patterns create hidden transfer legs.
     </li>
     <li>
-      <strong>Observability</strong>: logs/metrics often scale with traffic and retention, not just pod count.
+      <strong>Observability</strong>: logs and metrics scale with traffic and retention, not with node count.
     </li>
     <li>
-      <strong>Egress</strong>: cross-zone/cross-region and NAT egress can dominate for chatty services.
+      <strong>Storage</strong>: persistent volumes, snapshots, and growth are long-lived multipliers.
+    </li>
+  </ul>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Egress</a>,{" "}
+    <a href="/calculators/log-cost-calculator/">Log cost</a>,{" "}
+    <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>,{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>.
+  </p>
+
+  <h2>4) Worksheet template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Nodes</strong> = baseline nodes + peak nodes (and % of time at peak)
+    </li>
+    <li>
+      <strong>Control plane</strong> = fixed monthly fee (multiply by number of clusters)
+    </li>
+    <li>
+      <strong>Load balancers</strong> = count × hours + data processed (if applicable)
+    </li>
+    <li>
+      <strong>Egress</strong> = GB/month by destination (internet, cross-region)
+    </li>
+    <li>
+      <strong>Logs</strong> = GB/day ingestion + retention days + scans
+    </li>
+    <li>
+      <strong>Metrics</strong> = active series × sample rate × retention
     </li>
   </ul>
 
-  <h2>Shortcuts that still work</h2>
+  <h2>Common pitfalls</h2>
   <ul>
-    <li>Use a single blended rate per node (or per vCPU/GB) for early planning.</li>
-    <li>Model "average month" and "peak month" separately, then bracket the cost.</li>
-    <li>Keep add-ons as explicit monthly line items until you have real metrics.</li>
+    <li>Comparing only node price and ignoring control plane + "around the cluster" costs.</li>
+    <li>Using peak node count 24/7 when autoscaling is bursty (overstates cost).</li>
+    <li>Ignoring egress and NAT: chatty services pay for transfer legs.</li>
+    <li>Letting observability grow unbounded (logs retention drift, high-cardinality metrics).</li>
+    <li>Not validating with a representative week (good-day data is not enough).</li>
   </ul>
 
-  <h2>Related resources</h2>
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate allocatable headroom and bin packing (do pods actually fit the way you think?).</li>
+    <li>Validate autoscaling patterns: how often are you at peak?</li>
+    <li>Validate egress by destination and identify the top talkers.</li>
+    <li>Validate log ingestion and retention; estimate scans from dashboard/alert frequency.</li>
+  </ul>
+
+  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/kubernetes-cost-calculator/">Kubernetes cost checklist</a>
-    <a class="btn" href="/guides/kubernetes-cost-model-beyond-nodes/">Cost model beyond nodes</a>
-    <a class="btn" href="/guides/kubernetes-requests-limits/">Requests &amp; limits sizing</a>
-    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
-    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost</a>
+    <a class="btn" href="/calculators/kubernetes-observability-cost-calculator/">K8s observability</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/eks/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon EKS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/kubernetes-engine/pricing" target="_blank" rel="nofollow noopener">
+        Google Kubernetes Engine pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/kubernetes-service/" target="_blank" rel="nofollow noopener">
+        Azure Kubernetes Service pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Service Bus pricing: estimate messaging cost from deliveries and payload size";
+const title = "Azure Service Bus pricing: estimate messaging cost from operations, retries, and payload";
 const description =
-  "A practical Service Bus estimate: message volume, deliveries/retries, and payload transfer. Includes validation steps for retries, dead-letter patterns, and fan-out.";
+  "A practical Service Bus estimate: message volume, deliveries/retries, fan-out, and payload transfer. Includes a workflow to model baseline vs peak and validate the real multipliers (timeouts, DLQ replays, and subscription expansion).";
 
 const faqs = [
   {
     q: "What usually drives messaging costs?",
-    a: "Message volume and retries are the most common drivers. Payload size matters when you move large messages frequently.",
+    a: "Operation volume (send/receive/deliveries) and retries are the most common drivers. Payload size matters when you move large messages frequently or when one publish fan-outs to many subscribers.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate messages/day, deliveries per message (including retries), and average payload size. Convert to monthly counts and GB/month transfer.",
+    a: "Estimate messages/day, average deliveries per message (including retries), and average payload size. Convert to monthly counts and estimate GB/month transfer for large payloads.",
+  },
+  {
+    q: "Why do messaging bills spike during incidents?",
+    a: "Incidents increase retries, DLQ volume, and replay behavior. One noisy producer or one failing consumer can multiply deliveries quickly.",
   },
   {
     q: "How do I validate?",
-    a: "Validate retry behavior and DLQ patterns; a single incident can multiply deliveries and inflate cost drivers.",
+    a: "Validate real message counts (incoming/outgoing), retry rates, DLQ reprocessing, and subscription counts (fan-out). Do not validate on a 'good day' only.",
   },
 ];
 ---
@@ -24,48 +28,155 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-service-bus-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Messaging cost estimation is “count the events”. The biggest mistakes are underestimating retries and ignoring fan-out
-    (one publish → multiple deliveries). Model volume and payload separately.
+    Messaging cost estimation is "count the events". The biggest mistakes are underestimating retries and ignoring fan-out
+    (one publish to a topic can become many deliveries). This guide gives you a simple model you can refine with real
+    telemetry.
   </p>
 
-  <h2>1) Message volume (per month)</h2>
+  <h2>0) Pick the right pricing model (what you actually pay for)</h2>
   <p>
-    Start from messages/second or messages/day and convert to monthly volume. If your system bursts (batch jobs, cron runs),
-    model peak windows separately.
+    Service Bus deployments are typically priced based on capacity/tier and usage. Even if your plan is not purely per-message,
+    the modeling workflow is the same: separate <strong>baseline</strong> (fixed capacity) from <strong>usage drivers</strong>
+    (operations, connections, throughput).
   </p>
-
-  <h2>2) Deliveries and retries</h2>
-  <p>
-    The true driver is often <strong>deliveries</strong>, not unique messages. If you retry 5× during an outage, you can 5×
-    your delivery volume. DLQ reprocessing can also create additional deliveries.
-  </p>
-
-  <h2>3) Payload size and transfer</h2>
-  <p>
-    If messages carry large payloads (or references that trigger downloads), estimate data transfer separately. Multiply
-    average payload size by delivery volume to get a GB/month ballpark.
-  </p>
-  <p>
-    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>,{" "}
-    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate retries and DLQ replay patterns (deliveries, not just messages).</li>
-    <li>Validate payload size distribution (don’t assume “small messages”).</li>
-    <li>Validate fan-out (subscriptions) for each topic/queue.</li>
+    <li>
+      <strong>Baseline</strong>: fixed cost for the tier/capacity and "always-on" resources.
+    </li>
+    <li>
+      <strong>Usage</strong>: message operations, deliveries, and throughput patterns.
+    </li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>1) Estimate message volume (per month)</h2>
+  <p>
+    Start from messages/second or messages/day and convert to monthly volume. If your system bursts (batch jobs, cron runs),
+    model peak windows separately instead of averaging them away.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">Rate to monthly volume</a>,{" "}
+    <a href="/calculators/api-request-cost-calculator/">Request math</a>.
+  </p>
+  <ul>
+    <li>
+      If you have multiple queues/topics, estimate each stream separately (one hot stream often dominates).
+    </li>
+    <li>
+      Keep <strong>baseline</strong> and <strong>peak</strong> message volumes as two explicit scenarios.
+    </li>
+  </ul>
+
+  <h2>2) Deliveries and retries (the hidden multiplier)</h2>
+  <p>
+    The true driver is often <strong>deliveries</strong>, not unique messages. Retries, redeliveries, and DLQ reprocessing
+    can multiply the effective operation count.
+  </p>
+  <ul>
+    <li>
+      <strong>Retry multiplier</strong>: if the average message is delivered 1.3× due to retries, your effective volume is 1.3×.
+    </li>
+    <li>
+      <strong>DLQ replay</strong>: a bad deploy can create a burst of replays (second spike).
+    </li>
+    <li>
+      <strong>Timeouts</strong>: slow consumers cause lock/visibility timeouts and extra deliveries.
+    </li>
+  </ul>
+
+  <h2>3) Fan-out (topics and subscriptions)</h2>
+  <p>
+    Fan-out is the most common reason teams underestimate cost. A single publish can become N deliveries if a topic has N
+    subscriptions. Model fan-out explicitly.
+  </p>
+  <ul>
+    <li>
+      <strong>Effective deliveries</strong> ~= publishes × subscriptions × deliveries per subscription (including retries)
+    </li>
+    <li>
+      Treat "broadcast" topics differently from point-to-point queues; their cost curves are different.
+    </li>
+  </ul>
+
+  <h2>4) Payload size (when bytes matter)</h2>
+  <p>
+    Message size matters in two ways: (1) big payloads increase throughput and may affect tiering/capacity needs, and (2) big
+    messages often imply downstream data transfer (e.g., consumers fetch an object from storage per message).
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>,{" "}
+    <a href="/calculators/unit-converter/">Units</a>.
+  </p>
+  <ul>
+    <li>
+      If payloads are large, consider sending references (object keys) and fetching from storage (but then model storage + egress).
+    </li>
+    <li>
+      Model <strong>peak payload</strong> behavior; one rare huge payload can dominate bytes.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Messages/month</strong> = baseline + peak
+    </li>
+    <li>
+      <strong>Fan-out factor</strong> = avg subscriptions per publish stream
+    </li>
+    <li>
+      <strong>Retry multiplier</strong> = 1 + retry_rate (apply to affected streams)
+    </li>
+    <li>
+      <strong>Effective deliveries/month</strong> ~= messages/month × fan-out × retry multiplier
+    </li>
+    <li>
+      <strong>GB/month (if relevant)</strong> ~= effective deliveries × avg payload bytes ÷ 1e9
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Modeling messages but forgetting retries/timeouts (deliveries are the bill driver).</li>
+    <li>Ignoring fan-out: one publish becomes many deliveries.</li>
+    <li>DLQ replay spikes after a bad deploy (second peak).</li>
+    <li>Assuming payloads are always small without sampling real messages.</li>
+    <li>Over-optimizing too early: first find the dominant stream and fix that one.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate incoming/outgoing message counts over a representative week (baseline + peak).</li>
+    <li>Validate retries and lock/timeout behavior during incident windows.</li>
+    <li>Validate subscription counts and topic fan-out per stream.</li>
+    <li>Sample payload sizes and estimate bytes; do not guess a single average across all streams.</li>
+  </ul>
+
+  <h2>Related tools</h2>
   <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Monthly volume</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request math</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/log-costs/">Log cost basics</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/service-bus/" target="_blank" rel="nofollow noopener">
+        Azure Service Bus pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/service-bus-messaging/" target="_blank" rel="nofollow noopener">
+        Azure Service Bus documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

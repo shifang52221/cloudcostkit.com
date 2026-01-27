@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Private Link costs: model endpoint-hours and data processing";
+const title = "Azure Private Link costs: model endpoint-hours, data processed, and trade-offs vs NAT";
 const description =
-  "A practical private networking cost model: endpoint-hours plus data processed (GB). Includes validation steps to decide when Private Link beats NAT/internet egress for cost and security.";
+  "A practical Private Link estimate: endpoint-hours baseline plus data processed (GB). Includes a workflow to count endpoints, model traffic through them, and validate DNS/routing so you don't pay for both private and NAT paths.";
 
 const faqs = [
   {
     q: "What usually drives Private Link costs?",
-    a: "Endpoint-hours are the baseline. Data processed (GB) becomes meaningful when you move a lot of data through private endpoints.",
+    a: "Endpoint-hours are the baseline. Data processed (GB) becomes meaningful when you move a lot of data through private endpoints (registries, storage, large downloads).",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Count endpoints × hours per month, then estimate GB/month through those endpoints. Compare that to NAT + egress paths.",
+    a: "Count private endpoints × hours per month, then estimate GB/month through those endpoints. Compare that to a NAT/public-endpoint path for the same traffic.",
   },
   {
     q: "How do I validate?",
-    a: "Validate traffic boundaries (what goes through the endpoint), validate cross-zone/region patterns, and validate whether you’re paying for both endpoint and NAT paths.",
+    a: "Validate DNS (private zones), routing, and which workloads actually use the private endpoint. A common failure is 'endpoint exists but traffic still uses public/NAT', which can lead to paying for both paths.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Endpoint sprawl: creating endpoints per environment, per region, per service without tracking count and utilization. Endpoint-hours can dominate even with modest traffic.",
   },
 ];
 ---
@@ -24,50 +28,138 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-private-link-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     Private Link-style networking typically charges for <strong>time</strong> (endpoint-hours) and <strong>volume</strong>
-    (GB processed). The decision is often a trade-off between security posture and cost, but you can model it with a simple
-    breakdown.
+    (data processed). The decision is often driven by security posture and architecture, but you can model it with a simple
+    breakdown and validate it with real traffic.
   </p>
 
-  <h2>1) Endpoint-hours</h2>
+  <h2>0) Count endpoints the right way (avoid sprawl)</h2>
   <p>
-    Start with: <strong>number of endpoints × hours per month</strong>. Environment sprawl (dev/stage/prod, multiple regions)
-    can make endpoint-hours the dominant line item.
+    Start with an inventory. Private endpoints tend to multiply as teams add environments and regions.
+  </p>
+  <ul>
+    <li>
+      <strong>Environments</strong>: prod, staging, dev (and any isolated tenants).
+    </li>
+    <li>
+      <strong>Regions</strong>: active-active or multi-region DR can double or triple endpoint count.
+    </li>
+    <li>
+      <strong>Services</strong>: storage, registries, key vaults, databases, messaging.
+    </li>
+  </ul>
+  <p class="muted">
+    Endpoint-hours scale with count, not with traffic. A low-traffic endpoint still costs hours.
+  </p>
+
+  <h2>1) Endpoint-hours (baseline)</h2>
+  <p>
+    The baseline is: <strong>number of endpoints × hours per month</strong>. If you have many small environments, endpoint
+    hours can dominate the bill even if data processed is low.
   </p>
 
   <h2>2) Data processed (GB/month)</h2>
   <p>
-    Estimate how much data flows through private endpoints. If you access storage, registries, or databases privately,
-    processed GB can be significant.
+    Estimate how much data flows through private endpoints. The common dominant flows are registry pulls, storage downloads,
+    and any large artifacts accessed privately.
   </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Transfer cost model (GB/month)</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/unit-converter/">Unit converter</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">Egress model (GB/month)</a>.
   </p>
-
-  <h2>3) Compare to NAT + internet egress</h2>
-  <p>
-    For cost comparisons, model two scenarios:
-    <strong>(A)</strong> internet egress via NAT and public endpoints, and <strong>(B)</strong> private endpoint traffic.
-    Then compare monthly baselines and how they scale with GB.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate what traffic actually uses Private Link vs public endpoints (routing/DNS matters).</li>
-    <li>Validate environment count and endpoint count (endpoint-hours scale with sprawl).</li>
-    <li>Validate GB/month and peak windows (deployments can spike registry pulls).</li>
+    <li>
+      <strong>Registry pulls</strong>: node churn and deploys create peaks; model baseline + peak.
+    </li>
+    <li>
+      <strong>Storage access</strong>: large downloads are often few endpoints but big bytes.
+    </li>
+    <li>
+      <strong>Database traffic</strong>: usually smaller bytes, but can be constant and high-frequency.
+    </li>
+  </ul>
+
+  <h2>3) Compare scenarios: Private Link vs NAT/public</h2>
+  <p>
+    For cost comparisons, model two scenarios for the <em>same traffic</em>:
+  </p>
+  <ul>
+    <li>
+      <strong>A) Public endpoint via NAT</strong>: NAT hours + NAT throughput + any internet egress charges.
+    </li>
+    <li>
+      <strong>B) Private endpoint</strong>: endpoint-hours + endpoint processed GB (plus any remaining egress for other traffic).
+    </li>
+  </ul>
+  <p class="muted">
+    Related: <a href="/guides/azure-nat-gateway-cost/">Azure NAT Gateway cost</a>.
+  </p>
+
+  <h2>4) Pitfalls that create double-paying</h2>
+  <ul>
+    <li>
+      <strong>DNS mismatch</strong>: endpoint exists but traffic resolves to the public hostname and still uses NAT.
+    </li>
+    <li>
+      <strong>Partial rollout</strong>: some workloads use private endpoints, others still use public endpoints.
+    </li>
+    <li>
+      <strong>Cross-region hairpins</strong>: traffic crosses regions unexpectedly; model those transfer legs separately.
+    </li>
+    <li>
+      <strong>Endpoint sprawl</strong>: endpoints created "just in case" across many VNets and environments.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Endpoints</strong> = count by env/region/service
+    </li>
+    <li>
+      <strong>Endpoint-hours</strong> = endpoints × hours/month
+    </li>
+    <li>
+      <strong>Processed GB/month</strong> = sum of private flows (baseline + peak)
+    </li>
+    <li>
+      <strong>Comparison</strong> = scenario A (NAT/public) vs scenario B (private endpoint)
+    </li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate DNS: private zones and actual resolution from workloads.</li>
+    <li>Validate routing: confirm which subnets reach the service via the private endpoint.</li>
+    <li>Measure bytes: find top private flows (registries, storage) and confirm baseline vs peak.</li>
+    <li>After changes, verify you reduced NAT/public traffic rather than adding an endpoint on top of it.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/data-egress-cost-calculator/">Transfer (GB/month)</a>
-    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
-    <a class="btn" href="/guides/azure-nat-gateway-cost/">Azure NAT cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>
+    <a class="btn" href="/calculators/unit-converter/">Units</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/private-link/" target="_blank" rel="nofollow noopener">
+        Azure Private Link pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/private-link/" target="_blank" rel="nofollow noopener">
+        Azure Private Link documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

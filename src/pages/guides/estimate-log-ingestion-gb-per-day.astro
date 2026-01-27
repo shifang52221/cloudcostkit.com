@@ -1,21 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate log ingestion volume (GB/day): quick methods";
+const title = "Estimate log ingestion volume (GB/day): fast methods + validation";
 const description =
-  "How to estimate log ingestion volume in GB/day from bytes, events/sec, or throughput - plus common pitfalls like compression, sampling, and verbose debug logs.";
+  "How to estimate log ingestion volume in GB/day from billing exports, from events/sec × bytes/event, or from throughput. Includes common pitfalls (duplicates, verbose debug logs, multiline events) and next steps to convert volume into dollars.";
+
 const faqs = [
   {
     q: "What's the fastest way to estimate GB/day?",
-    a: "Use your existing billing/usage export if you have one. If not, estimate from events/sec x average event size and validate with a short real sample.",
+    a: "Use your provider usage/billing export if you have it. If not, estimate from events/sec × average bytes/event and validate with a short real sample.",
   },
   {
     q: "Should I use uncompressed or compressed size?",
-    a: "Use the billable size for your provider. Some vendors bill on ingested bytes, some on stored bytes, and some on scanned bytes. If you're unsure, start with raw bytes as an upper bound and calibrate later.",
+    a: "Use the billable size for your provider. Some bill on ingested bytes, some on stored bytes, and some on scanned bytes. If you're unsure, start with raw bytes as an upper bound and calibrate later with real usage.",
   },
   {
     q: "Why is my estimate lower than the bill?",
-    a: "Common causes are verbose debug logs, duplicated logs (multiple shippers), high-cardinality logs, and unexpected sources like load balancers or VPC flow logs.",
+    a: "Common causes are verbose debug logs, duplicate shipping (multiple agents), unexpected high-volume sources (ingress, firewall, audit), and incident spikes with retries/errors.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Using one average and ignoring peaks. One incident week can produce more logs than three normal weeks combined.",
   },
 ];
 ---
@@ -23,59 +28,112 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/estimate-log-ingestion-gb-per-day"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Most log pricing models start with <strong>ingestion volume</strong>: how many GB of logs you send per day. This page
-    gives quick ways to estimate GB/day when you don't have a clean export yet.
+    Most log pricing models start with <strong>ingestion volume</strong>: how many GB of logs you send per day. If you do
+    not have a clean export yet, you can still estimate GB/day with a few practical methods and validate quickly once you
+    have real telemetry.
   </p>
 
-  <h2>Method 1: From your log provider usage (best)</h2>
+  <h2>Method 1: From your vendor usage export (best)</h2>
   <p>
-    If you already have a bill or a usage dashboard, take the average daily ingestion over a representative window (7 or
-    30 days). This is the most accurate planning input.
+    If you already have a bill or usage dashboard, take the average daily ingestion over a representative window (7 or 30
+    days). This is the most accurate planning input.
   </p>
+  <ul>
+    <li>Prefer a window that includes a normal day and a peak day.</li>
+    <li>If your workload is seasonal, keep separate baseline and peak months.</li>
+  </ul>
 
   <h2>Method 2: From events per second and average event size</h2>
   <p>
-    If you know roughly how many log events you emit and the average size per event:
+    If you can estimate event rate and average event size, you can estimate GB/day with this formula (decimal GB):
   </p>
   <ul>
     <li>
-      <strong>GB/day ≈ events/sec x avg bytes/event x 86,400 / 1,000,000,000</strong>
+      <strong>GB/day ~= events/sec × avg bytes/event × 86,400 ÷ 1,000,000,000</strong>
     </li>
   </ul>
-  <p>
-    Tips:
+  <p class="muted">
+    Tool: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost calculator</a> (includes event-rate conversion).
   </p>
   <ul>
-    <li>Use a sample of real logs to estimate bytes/event (not just a guessed number).</li>
-    <li>Split by source (app logs, load balancer logs, audit logs) and add them up.</li>
+    <li>Sample real logs to estimate bytes/event (do not guess a single number for everything).</li>
+    <li>Split by source: access/ingress, application logs, audit/security logs.</li>
+    <li>Keep a peak multiplier for incidents (errors and retries increase logs dramatically).</li>
   </ul>
 
   <h2>Method 3: From throughput (Mbps)</h2>
   <p>
-    If you have throughput charts (for example, log shipper network usage), you can convert Mbps to GB/day with the{" "}
-    <a href="/calculators/unit-converter/">Units Converter</a>. Use an average value over time, not the peak.
+    If you have throughput charts for your log shipper or exporter, convert average throughput into GB/day. Make sure you
+    distinguish Mbps (bits) from MB/s (bytes).
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/unit-converter/">Unit converter</a>.
   </p>
 
-  <h2>Common pitfalls</h2>
+  <h2>What to include (and what to separate)</h2>
   <ul>
-    <li><strong>Compression and parsing</strong>: providers may bill on different byte counts.</li>
-    <li><strong>Sampling</strong>: if you sample at source, event rates can change drastically in incidents.</li>
-    <li><strong>Duplicates</strong>: shipping the same logs twice inflates ingestion.</li>
-    <li><strong>Verbose debug logs</strong>: one noisy component can dominate total GB/day.</li>
+    <li>
+      Include: access logs, application logs, audit logs, infrastructure logs (kube, systemd), security logs (WAF/firewall).
+    </li>
+    <li>
+      Separate: one-time migrations, bulk debug dumps, and synthetic monitoring (model as special cases).
+    </li>
   </ul>
 
-  <h2>Next: translate GB/day into dollars</h2>
+  <h2>Common pitfalls (why estimates miss)</h2>
+  <ul>
+    <li>
+      <strong>Duplicate shipping</strong>: two agents ship the same logs (doubles ingestion).
+    </li>
+    <li>
+      <strong>Verbose debug logs</strong>: one noisy service dominates total volume.
+    </li>
+    <li>
+      <strong>Multiline events</strong>: stack traces can be much larger than normal log lines.
+    </li>
+    <li>
+      <strong>High-volume sources</strong>: ingress/firewall/audit logs are often bigger than application logs.
+    </li>
+    <li>
+      <strong>Incident spikes</strong>: retries and errors create a peak month that looks nothing like baseline.
+    </li>
+  </ul>
+
+  <h2>Next: translate GB/day into dollars (and retention)</h2>
   <p>
-    Once you have GB/day, estimate cost with:
+    Once you have GB/day, you typically need at least two more line items: retention storage and optional scan/search.
   </p>
   <div class="btn-row">
-    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost calculator</a>
-    <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>
-    <a class="btn" href="/guides/log-costs/">Log costs guide</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Ingestion cost</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>
+    <a class="btn" href="/calculators/log-storage-cost-calculator/">Tiered storage</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan/search</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Total log cost</a>
   </div>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Pick your top 3 log sources and measure their actual bytes/event (sample 100–1000 events).</li>
+    <li>Validate baseline and peak separately (incident week vs normal week).</li>
+    <li>After changes, verify ingestion GB/day moves in the expected direction and the bill follows.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" target="_blank" rel="nofollow noopener">
+        AWS CloudWatch pricing (logs)
+      </a>
+    </li>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/monitor/" target="_blank" rel="nofollow noopener">
+        Azure Monitor pricing (logs/metrics)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

@@ -1,21 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CloudFront vs Cloudflare CDN cost: what to compare (bandwidth, requests, origin egress)";
+const title = "CloudFront vs Cloudflare CDN cost: compare the right line items (bandwidth, requests, origin egress)";
 const description =
-  "A practical comparison checklist for CloudFront vs Cloudflare pricing. Compare bandwidth ($/GB), request fees, regions, cache fill/origin egress, and add-ons like WAF and logs.";
+  "A practical comparison checklist for CloudFront vs Cloudflare pricing. Compare bandwidth ($/GB), request fees, region mix, origin egress (cache fill), and add-ons like WAF, logs, and edge compute. Includes a modeling template and validation steps.";
+
 const faqs = [
   {
     q: "Which is cheaper: CloudFront or Cloudflare?",
-    a: "It depends on traffic mix (bandwidth vs requests), regions, cache hit rate (origin egress), and add-ons (WAF/logs). Use a simple model with your own assumptions rather than relying on a single benchmark.",
+    a: "There is no universal winner. Total cost depends on traffic mix (bandwidth vs requests), regions, cache hit rate (origin egress), and add-ons like WAF/logs/edge compute. Compare with the same line items and your own traffic inputs.",
   },
   {
-    q: "What data do I need to compare providers fairly?",
-    a: "At minimum: monthly GB delivered, monthly requests, and an estimate of cache hit rate (to approximate origin egress). If you have regional breakdown, use it.",
+    q: "What inputs do I need to compare providers fairly?",
+    a: "At minimum: monthly GB delivered to users, monthly requests, and an estimate of cache hit rate (to approximate origin egress). If you have regional traffic mix, use it.",
   },
   {
     q: "Do I need to include origin egress?",
-    a: "Often yes. If your origin provider charges egress, low cache hit rate can shift cost away from the CDN and into origin egress (cache fill).",
+    a: "Often yes. If your origin provider charges egress, low cache hit rate shifts cost away from the CDN and into origin egress (cache fill).",
+  },
+  {
+    q: "What is the most common comparison mistake?",
+    a: "Comparing only one line item (like $/GB) and ignoring request fees, origin egress, and add-ons. The winner often changes when you add WAF/logs or model bot spikes.",
   },
 ];
 ---
@@ -23,79 +28,131 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/cloudfront-vs-cloudflare-cdn-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    People often search for <em>CloudFront vs Cloudflare pricing</em> or <em>CloudFront vs Cloudflare cost</em>. The
-    easiest way to get a useful answer is to compare the bill as a set of line items, not as one number.
+    The easiest way to compare CloudFront vs Cloudflare cost is to treat the CDN bill as a set of line items, not a single
+    number. If you model the same line items for both providers, you can swap pricing assumptions and see which driver
+    actually dominates for <em>your</em> traffic.
   </p>
 
-  <h2>Start with the same 3 line items</h2>
+  <h2>0) Start with the same 3 core line items</h2>
   <ul>
-    <li><strong>Bandwidth</strong>: GB delivered from the edge to end users ($/GB).</li>
-    <li><strong>Requests</strong>: request fees (often $ per 10k or per 1M) if applicable.</li>
-    <li><strong>Origin egress (cache fill)</strong>: bytes pulled from origin to the CDN, billed by your origin provider.</li>
+    <li>
+      <strong>Bandwidth</strong>: GB delivered from edge to end users ($/GB).
+    </li>
+    <li>
+      <strong>Requests</strong>: request fees (often per 10k or per 1M) if applicable.
+    </li>
+    <li>
+      <strong>Origin egress (cache fill)</strong>: bytes pulled from origin to CDN on cache misses, billed by your origin provider.
+    </li>
   </ul>
-  <p>
-    If you model these three consistently, you can compare providers without being tripped up by marketing terms.
+  <p class="muted">
+    Bandwidth is not the same as origin egress. If you double-count those legs, your comparison will be wrong.
   </p>
 
-  <h2>Comparison checklist</h2>
+  <h2>1) Measure traffic inputs (baseline + peak)</h2>
+  <p>
+    Use a representative window (a normal week and an incident week if you have one). CDNs are often dominated by peak
+    events: bot traffic, marketing spikes, deploys that reduce cache hit rate, and incidents.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>,{" "}
+    <a href="/calculators/cdn-request-cost-calculator/">CDN request fees</a>,{" "}
+    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+  </p>
+
+  <h2>2) Model origin egress from hit rate (the cache fill leg)</h2>
+  <p>
+    A practical estimate is:
+    <strong> origin GB ~= edge GB * (1 - hit rate)</strong>. Purges, low TTLs, and deploys can temporarily crush hit rate and
+    spike origin traffic.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.
+  </p>
+
+  <h2>3) Add-ons that commonly flip the winner</h2>
+  <ul>
+    <li>
+      <strong>WAF / bot mitigation</strong>: security add-ons can dominate for attack-heavy traffic.
+    </li>
+    <li>
+      <strong>Logs</strong>: access logs at high request volume can be expensive (ingestion + retention + scans).
+    </li>
+    <li>
+      <strong>Edge compute</strong>: functions/worker usage can become its own cost center.
+    </li>
+    <li>
+      <strong>Image optimization</strong>: can reduce bandwidth but add compute/caching costs depending on plan.
+    </li>
+  </ul>
+  <p class="muted">
+    If you enable add-ons, model them as explicit line items instead of hiding them inside $/GB.
+  </p>
+
+  <h2>4) Comparison checklist (what to verify)</h2>
   <ol>
     <li>
-      <strong>Bandwidth unit and regions</strong>: pricing varies by geography. If you can, split your GB/month by the
-      main regions your users are in.
+      <strong>Region mix</strong>: split GB and requests by region if you can; pricing often differs by geography.
     </li>
     <li>
-      <strong>Request pricing and request classes</strong>: confirm whether requests are billed and in what units (per
-      10k vs per 1M). Read <a href="/guides/cdn-request-pricing/">CDN request pricing</a>.
+      <strong>Request units</strong>: per 10k vs per 1M (order-of-magnitude mistakes are common).
+      <span class="muted">
+        {" "}
+        Guide: <a href="/guides/cdn-request-pricing/">CDN request pricing</a>.
+      </span>
     </li>
     <li>
-      <strong>Cache hit rate and origin egress</strong>: if hit rate is low, origin egress can become a major cost.
-      Read <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+      <strong>Hit rate</strong>: validate hit rate by path; one large endpoint can dominate origin egress even if overall hit rate looks good.
     </li>
     <li>
-      <strong>Add-ons</strong>: WAF, bot management, logs, image optimization, and edge functions can dominate total cost
-      for some workloads.
+      <strong>Peaks</strong>: model bot spikes and incident windows separately.
     </li>
     <li>
-      <strong>Commitments and bundles</strong>: discounts can change the effective $/GB, but make sure to model usage
-      realistically.
+      <strong>Commitments</strong>: discounts change the effective rate; ensure you model realistic utilization.
     </li>
   </ol>
 
-  <h2>A simple way to compare costs</h2>
-  <p>
-    Use the same traffic inputs for both providers, then swap the pricing assumptions:
-  </p>
+  <h2>Worked template (copy/paste)</h2>
   <ul>
     <li>
-      Use <a href="/calculators/cdn-cost-calculator/">CDN Cost Calculator</a> for a vendor-neutral model.
+      <strong>Edge GB/month</strong> = baseline + peak
     </li>
     <li>
-      Use <a href="/calculators/cloudfront-cost-calculator/">CloudFront Cost Calculator</a> if you want CloudFront-style defaults and wording.
-    </li>
-  </ul>
-
-  <h2>When results are counterintuitive</h2>
-  <ul>
-    <li>
-      <strong>Requests dominate</strong>: API-heavy traffic can pay more in request fees than bandwidth.
+      <strong>Edge requests/month</strong> = baseline + peak (include bots/retries)
     </li>
     <li>
-      <strong>Origin egress dominates</strong>: low cache hit rate shifts spend to your origin provider.
+      <strong>Origin GB/month</strong> ~= edge GB/month * (1 - hit rate) (model purge/deploy separately)
     </li>
     <li>
-      <strong>WAF/logs dominate</strong>: security and observability add-ons can exceed delivery cost.
+      <strong>Add-ons</strong> = WAF + logs + edge compute (explicit line items)
     </li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN total cost</a>
+    <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">Request fees</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress</a>
     <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
-    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
-    <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="nofollow noopener">
+        AWS CloudFront pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://www.cloudflare.com/plans/" target="_blank" rel="nofollow noopener">
+        Cloudflare plans and pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

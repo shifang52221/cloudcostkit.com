@@ -1,21 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud cost estimation checklist (avoid thin estimates)";
+const title = "Cloud cost estimation checklist: build a model Google (and finance) will trust";
 const description =
-  "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs, and network transfer. Includes validation steps and common pitfalls.";
+  "A practical checklist to estimate cloud cost without missing major line items: requests, compute, storage, logs/metrics, and network transfer. Includes a worksheet template, validation steps, and the most common double-counting traps.";
+
 const faqs = [
   {
     q: "Why do cloud cost estimates miss by so much?",
-    a: "Most estimates only model one line item (like compute) and miss network transfer, logs/metrics, request fees, storage growth, and retry-driven spikes. A checklist prevents surprises.",
+    a: "Most estimates model one line item (compute) and miss network transfer, logs/metrics, request fees, storage growth, and retry-driven spikes. A checklist forces explicit drivers and a validation loop.",
   },
   {
     q: "What is the fastest way to get a rough monthly number?",
-    a: "Start with a small set of measurable drivers (requests/month, GB/month, instance-hours, GB-month stored). Use blended rates, then refine with tiering and region mix once you have a baseline.",
+    a: "Start with measurable drivers (requests/month, GB/month, instance-hours, GB-month stored) and blended effective rates. Build baseline + peak scenarios, then refine with region mix and tiering.",
   },
   {
     q: "How do I validate the estimate?",
-    a: "Compare directionality against real metrics/billing for a representative week. Validate units (GB vs GiB), request units (per 10k vs per 1M), and separate CDN bandwidth from origin egress.",
+    a: "Use a representative week of metrics/billing. Validate units (GB vs GiB), request units (per 10k vs per 1M), and avoid double-counting CDN bandwidth vs origin egress and ingestion vs storage vs scan.",
+  },
+  {
+    q: "What is the single best rule for a good estimate?",
+    a: "Every line item must have an explicit driver (count, hours, GB/day, requests/month) and a way to measure that driver later.",
   },
 ];
 ---
@@ -23,80 +28,183 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/cloud-cost-estimation-checklist"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    This is the checklist we use to keep cloud cost estimates from becoming "compute-only" spreadsheets. The goal is not
-    perfect precision on day 1. The goal is to include the big line items, validate units, and build a model you can
-    refine.
+  <p>
+    A good cloud estimate is not a perfect number on day 1. It's a model with explicit drivers, clear assumptions, and a
+    validation loop. This checklist helps you avoid "thin estimates" that ignore the parts of the bill that often dominate
+    at scale: <strong>requests</strong>, <strong>transfer</strong>, and <strong>observability</strong>.
   </p>
 
-  <h2>Step 1: Choose your primary drivers (measure first)</h2>
+  <h2>0) Output artifacts (what you should produce)</h2>
   <ul>
-    <li><strong>Requests/month</strong>: APIs, CDN, queue, database calls.</li>
-    <li><strong>GB/month</strong>: egress, CDN bandwidth, replication, backups.</li>
-    <li><strong>Instance-hours</strong>: VMs, managed node groups, workers.</li>
-    <li><strong>GB-month stored</strong>: object storage, block volumes, logs retained.</li>
+    <li>
+      <strong>Line-item table</strong>: each item has (driver, unit price, baseline, peak, notes).
+    </li>
+    <li>
+      <strong>Assumptions list</strong>: what you assumed and how to measure later.
+    </li>
+    <li>
+      <strong>Validation plan</strong>: which metrics/billing reports you will compare against after launch.
+    </li>
   </ul>
 
-  <h2>Step 2: Model the big five cost buckets</h2>
+  <h2>1) Choose primary drivers (measure first)</h2>
+  <p>
+    If you cannot name a driver, you cannot validate. Pick the smallest set of drivers that explain most of the cost.
+  </p>
+  <ul>
+    <li>
+      <strong>Requests/month</strong>: APIs, queues, databases, CDN requests.
+    </li>
+    <li>
+      <strong>GB/day or GB/month</strong>: egress, CDN bandwidth, replication, backups, scan volume.
+    </li>
+    <li>
+      <strong>Hours</strong>: instances, managed capacity, always-on gateways.
+    </li>
+    <li>
+      <strong>GB-month stored</strong>: storage, logs retained, snapshots/backups.
+    </li>
+    <li>
+      <strong>Time series / cardinality</strong>: metrics scale with series count and retention.
+    </li>
+  </ul>
+
+  <h2>2) Model the big five buckets (with calculators)</h2>
   <ol>
     <li>
-      <strong>Compute</strong>: instance-hours or vCPU/RAM hours (include headroom). Tool:{" "}
-      <a href="/calculators/compute-instance-cost-calculator/">compute instance cost</a>.
+      <strong>Compute</strong>: instance-hours or vCPU/RAM hours (include headroom).
+      <span class="muted">
+        {" "}
+        Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
+      </span>
     </li>
     <li>
-      <strong>Requests</strong>: request-based services add up. Tools:{" "}
-      <a href="/calculators/api-request-cost-calculator/">API request cost</a>,{" "}
-      <a href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>, and{" "}
-      <a href="/calculators/rps-to-monthly-requests-calculator/">RPS -&gt; monthly requests</a>.
+      <strong>Requests</strong>: request-based services add up (per 10k, per 1M, per 100k).
+      <span class="muted">
+        {" "}
+        Tools: <a href="/calculators/api-request-cost-calculator/">API request cost</a>,{" "}
+        <a href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>,{" "}
+        <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+      </span>
     </li>
     <li>
-      <strong>Network transfer</strong>: internet egress, cross-region, cross-AZ. Tools:{" "}
-      <a href="/calculators/data-egress-cost-calculator/">egress cost</a>,{" "}
-      <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>.
+      <strong>Network transfer</strong>: internet egress, cross-region, cross-zone.
+      <span class="muted">
+        {" "}
+        Tools: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>,{" "}
+        <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>.
+      </span>
     </li>
     <li>
-      <strong>Storage</strong>: base GB-month plus growth, replicas, and request fees. Tools:{" "}
-      <a href="/calculators/object-storage-cost-calculator/">object storage cost</a>,{" "}
-      <a href="/calculators/database-storage-growth-cost-calculator/">storage growth</a>.
+      <strong>Storage</strong>: base GB-month plus growth and replication.
+      <span class="muted">
+        {" "}
+        Tools: <a href="/calculators/object-storage-cost-calculator/">Object storage cost</a>,{" "}
+        <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>.
+      </span>
     </li>
     <li>
-      <strong>Observability</strong>: logs, metrics, traces (ingestion + retention + query/scan). Tools:{" "}
-      <a href="/calculators/log-ingestion-cost-calculator/">log ingestion</a>,{" "}
-      <a href="/calculators/log-search-scan-cost-calculator/">log scan</a>,{" "}
-      <a href="/calculators/metrics-timeseries-cost-calculator/">metrics timeseries</a>.
+      <strong>Observability</strong>: logs, metrics, traces (ingestion + retention + scan/search).
+      <span class="muted">
+        {" "}
+        Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+        <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>,{" "}
+        <a href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>,{" "}
+        <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series</a>.
+      </span>
     </li>
   </ol>
 
-  <h2>Step 3: Add the missing-but-common multipliers</h2>
+  <h2>3) Add the multipliers most teams forget</h2>
   <ul>
-    <li><strong>Retries/timeouts</strong>: multiply requests and transfer during incidents.</li>
-    <li><strong>Region mix</strong>: blended rate across regions is usually more accurate than a single $/GB.</li>
-    <li><strong>Cache hit rate</strong>: affects origin egress and origin requests behind a CDN.</li>
-    <li><strong>Growth</strong>: a "flat" storage estimate is almost always wrong over time.</li>
+    <li>
+      <strong>Baseline vs peak</strong>: peak windows (deploys, incidents) drive real spend and capacity decisions.
+    </li>
+    <li>
+      <strong>Retries/timeouts</strong>: multiply requests, transfer, and downstream dependency calls.
+    </li>
+    <li>
+      <strong>Cache hit rate</strong>: affects origin egress and origin request volume behind a CDN.
+    </li>
+    <li>
+      <strong>Region mix</strong>: a blended effective $/GB across regions is more accurate than one global number.
+    </li>
+    <li>
+      <strong>Growth</strong>: "flat storage" is usually wrong; model growth and average GB-month.
+    </li>
   </ul>
 
-  <h2>Step 4: Validate (the part most teams skip)</h2>
+  <h2>4) Avoid double counting (the most common trap)</h2>
+  <p>
+    Most estimate errors are not missing a line item. They are counting the same bytes or requests twice under different
+    names.
+  </p>
   <ul>
     <li>
-      Validate units: GB vs GiB, and request units (per 10k vs per 1M). Use{" "}
-      <a href="/calculators/unit-converter/">Units Converter</a>.
+      <strong>CDN bandwidth vs origin egress</strong>: edge GB delivered is not the same as origin GB on cache misses.
     </li>
     <li>
-      Separate <strong>CDN bandwidth</strong> from <strong>origin egress</strong> (cache fill). Guide:{" "}
-      <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+      <strong>Ingestion vs storage vs scan</strong>: logs can have three separate charges; do not treat them as one.
     </li>
-    <li>Recompute with a real week of metrics to make sure directionality matches.</li>
+    <li>
+      <strong>Request fees vs transfer fees</strong>: request-based pricing does not include GB unless the vendor says it does.
+    </li>
+    <li>
+      <strong>Replication transfer vs storage</strong>: replication can be both extra transfer and extra stored GB.
+    </li>
+    <li>
+      <strong>Backup retention vs primary storage</strong>: backup copies are not free by default; model retention explicitly.
+    </li>
   </ul>
+
+  <h2>5) Worksheet template (copy/paste)</h2>
+  <p class="muted">Use one row per line item. The important part is explicit drivers and explicit units.</p>
+  <ul>
+    <li>
+      <strong>Line item</strong>: name (e.g., "CDN requests", "Log ingestion", "Cross-region transfer")
+    </li>
+    <li>
+      <strong>Driver</strong>: requests/month OR GB/day OR hours/month OR GB-month OR series-month
+    </li>
+    <li>
+      <strong>Baseline</strong>: numeric value + explanation of where it comes from
+    </li>
+    <li>
+      <strong>Peak</strong>: numeric value + what causes it (deploy, incident, batch job)
+    </li>
+    <li>
+      <strong>Unit price</strong>: $ per unit (note the unit: per 10k, per 1M, per GB, per GB-month)
+    </li>
+    <li>
+      <strong>Owner</strong>: who will validate and own the lever (app team, infra, data)
+    </li>
+  </ul>
+
+  <h2>6) Validation loop (what to do after launch)</h2>
+  <ul>
+    <li>
+      <strong>Week 1</strong>: compare estimate drivers to real metrics (requests/day, GB/day, retained GB).
+    </li>
+    <li>
+      <strong>Week 2</strong>: compare estimate totals to billing exports; reconcile mismatches by line item.
+    </li>
+    <li>
+      <strong>Monthly</strong>: re-estimate with growth trends and update baseline/peak assumptions.
+    </li>
+  </ul>
+  <p class="muted">
+    Use <a href="/calculators/unit-converter/">Unit converter</a> to sanity-check GB vs GiB and Mbps vs MB/s conversions.
+  </p>
 
   <h2>Related reading</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/egress-costs/">Egress costs</a>
+    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/log-costs/">Log costs</a>
     <a class="btn" href="/guides/cdn-costs/">CDN costs</a>
-    <a class="btn" href="/guides/s3-pricing-explained/">Storage pricing explained</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
 </GuideLayout>
 

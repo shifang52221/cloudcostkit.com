@@ -1,21 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "How to estimate CDN bandwidth (GB/month) from analytics or Mbps";
+const title = "How to estimate CDN bandwidth (GB/month): analytics, RPS, or Mbps";
 const description =
-  "A practical guide to estimating CDN bandwidth per month, including conversions from Mbps and common unit pitfalls (GB vs GiB).";
+  "A practical guide to estimating CDN bandwidth per month. Includes methods from CDN analytics, from RPS × response size, and from throughput (Mbps), plus unit pitfalls (bits vs bytes, GB vs GiB) and a validation checklist.";
+
 const faqs = [
   {
     q: "What is a good rule of thumb to convert Mbps to GB/month?",
-    a: "A common approximation is 1 Mbps sustained over a month is about 324 GB/month (using decimal GB). Use the Units Converter for exact conversions and to avoid GB vs GiB confusion.",
+    a: "A common approximation is 1 Mbps sustained over a month is roughly 324 GB/month (decimal GB). Use the Units Converter for exact conversions and to avoid bits/bytes confusion.",
   },
   {
     q: "Should I use average or peak Mbps?",
-    a: "Use an average over time. Peak throughput usually overstates monthly GB significantly unless your traffic is flat at the peak (rare).",
+    a: "Use an average over time. Peak throughput usually overstates monthly GB unless traffic is flat at the peak (rare). Keep peaks as a separate scenario.",
   },
   {
     q: "Does a CDN always report 'GB transferred'?",
     a: "Providers label it differently (bytes served, data transferred, edge egress). Look for total bytes delivered to end users over a window.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Mixing bits and bytes (Mbps vs MB/s) or mixing GB and GiB. Those unit mistakes can swing the estimate by 8× or ~7%.",
   },
 ];
 ---
@@ -23,76 +28,125 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/estimate-cdn-bandwidth-gb-per-month"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Most CDN pricing is expressed as <strong>$ per GB</strong>. That means your first job is to estimate{" "}
-    <strong>GB per month</strong>. This guide walks through three practical ways to do it.
+    CDN pricing is often expressed as <strong>$ per GB</strong>. That means your first job is to estimate{" "}
+    <strong>GB per month</strong> delivered from edge to users. This guide gives three practical methods and a validation
+    checklist so your estimate is usable for budgeting.
   </p>
 
-  <h2>Option 1: Use CDN analytics directly</h2>
+  <h2>0) Decide what you are measuring (edge bandwidth)</h2>
   <p>
-    If you already have a CDN in front of traffic, your provider usually reports bytes transferred per time window. Use
-    that number and convert it to monthly GB.
+    For CDN bandwidth, the relevant number is bytes delivered from the CDN edge to end users. Do not confuse this with
+    origin egress (cache fill), which is a different leg.
+  </p>
+  <p class="muted">
+    Related: <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+  </p>
+
+  <h2>Method 1: Use CDN analytics (best)</h2>
+  <p>
+    If you already run a CDN, your provider usually reports bytes delivered per time window. Use a 30-day window if
+    available; otherwise multiply a representative day by ~30.4.
   </p>
   <ul>
-    <li>Look for a metric like "bytes served", "data transferred", or "egress".</li>
-    <li>Prefer a 30-day window if available; otherwise multiply a typical day by about 30.4.</li>
+    <li>Look for metrics like "bytes served", "data transferred", or "edge egress".</li>
+    <li>Prefer a representative window that includes normal days and a peak day.</li>
     <li>
-      Watch units (GB vs GiB). If you see GiB, convert with{" "}
-      <a href="/calculators/unit-converter/">Units Converter</a>.
+      If the UI shows GiB or TiB, convert carefully with{" "}
+      <a href="/calculators/unit-converter/">Unit converter</a>.
     </li>
   </ul>
 
-  <h2>Option 2: Convert from Mbps (throughput charts)</h2>
+  <h2>Method 2: From RPS and response size (early-stage planning)</h2>
   <p>
-    If you only have throughput (Mbps) from monitoring or dashboards, convert it into GB/month. The key is to use an
-    average throughput value over time, not the peak.
+    If you know request volume and typical response size, you can estimate bandwidth. This works well for API-like traffic,
+    but you must separate heavy-tail endpoints (downloads, large images) instead of blending everything.
   </p>
-  <p>
-    Use <a href="/calculators/unit-converter/">Units Converter</a> to convert Mbps to GB/month, or use this rule of
-    thumb:
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
   </p>
   <ul>
     <li>
-      <strong>1 Mbps sustained ≈ 324 GB/month</strong> (approximate; depends on units and month length)
+      <strong>GB/month</strong> ~= requests/month × avg response size (GB)
+    </li>
+    <li>
+      Split into at least two buckets: <strong>API-like</strong> (small payloads, high RPS) and <strong>download-like</strong>
+      (large payloads, lower RPS).
     </li>
   </ul>
-  <p>
-    Example: if your average throughput is 50 Mbps, that's roughly 50 x 324 ≈ 16,200 GB/month (about 16.2 TB/month).
-  </p>
 
-  <h2>Option 3: Estimate from page views and payload size</h2>
-  <p>For early-stage projects without traffic history, approximate bandwidth using content size and expected views:</p>
+  <h2>Method 3: Convert from throughput (Mbps)</h2>
+  <p>
+    If you only have throughput charts (monitoring dashboards, load balancer metrics), convert average Mbps into GB/month.
+    Use an average value over time, not peak throughput.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/unit-converter/">Unit converter</a>.
+  </p>
   <ul>
     <li>
-      <strong>GB/month ≈ views/month x average payload (MB) / 1024</strong>
+      Rule of thumb: <strong>1 Mbps sustained ~= 324 GB/month</strong> (decimal GB).
+    </li>
+    <li>
+      Example: 50 Mbps average ~= 50 × 324 ~= 16,200 GB/month (~16.2 TB/month).
     </li>
   </ul>
-  <p>
-    This is rough, but it helps create an initial budget. Once traffic starts, replace the estimate with analytics.
-  </p>
 
-  <h2>What to include (and what to ignore)</h2>
+  <h2>What to include (and what to model separately)</h2>
   <ul>
-    <li>Include: HTML, JS/CSS, images, downloads, video segments, API responses served from CDN.</li>
-    <li>Exclude: internal traffic and synthetic monitoring if it's not representative (or model separately).</li>
+    <li>
+      Include: HTML, JS/CSS, images, downloads, video segments, API responses served from CDN.
+    </li>
+    <li>
+      Model separately: synthetic monitoring, internal traffic, and large one-off migrations.
+    </li>
+    <li>
+      Remember: compression reduces bytes, but not request counts.
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>
+      <strong>Bits vs bytes</strong>: Mbps (bits) vs MB/s (bytes) is an 8× difference.
+    </li>
+    <li>
+      <strong>GB vs GiB</strong>: decimal vs binary units; convert consistently.
+    </li>
+    <li>
+      <strong>Heavy-tail endpoints</strong>: one download route can dominate bytes while most endpoints are tiny.
+    </li>
+    <li>
+      <strong>Peak windows</strong>: model baseline + peak; do not average peaks away.
+    </li>
   </ul>
 
   <h2>Next: turn GB/month into dollars</h2>
   <p>
-    After you have GB/month, price it with{" "}
-    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN Bandwidth Cost Calculator</a>, then add request fees with{" "}
-    <a href="/calculators/cdn-request-cost-calculator/">CDN Request Cost Calculator</a>. If you want a single page that
-    bundles both, use <a href="/calculators/cdn-cost-calculator/">CDN Cost Calculator</a>.
+    After you have GB/month, estimate cost with{" "}
+    <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost calculator</a>, then add request fees with{" "}
+    <a href="/calculators/cdn-request-cost-calculator/">CDN request cost calculator</a>. If you want a single page that
+    bundles both, use <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>.
   </p>
 
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate with a real 7–30 day analytics window once the CDN is live.</li>
+    <li>Validate top endpoints by bytes (not just by requests).</li>
+    <li>Validate unit conversions (Mbps vs MB/s, GB vs GiB) before trusting the number.</li>
+    <li>Validate that the estimate matches directionality when traffic changes (deploys, incidents, marketing spikes).</li>
+  </ul>
+
   <h2>Related tools</h2>
-  <p>
+  <div class="btn-row">
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
-    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
-    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
-  </p>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer estimator</a>
+    <a class="btn" href="/calculators/unit-converter/">Unit converter</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN total cost</a>
+  </div>
 </GuideLayout>
 

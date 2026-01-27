@@ -1,64 +1,175 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure NAT Gateway cost: why bills spike and how to model them";
+const title = "Azure NAT Gateway cost: model hours, GB processed, and the real spike drivers";
 const description =
-  "A practical NAT Gateway estimate: hourly baseline + GB processed (plus egress). Includes common failure patterns that multiply outbound traffic.";
+  "A practical Azure NAT Gateway estimate: hourly baseline, GB processed, and the common multipliers (retries, image pulls, dependency storms). Includes a validation checklist and cost-reduction levers.";
 
 const faqs = [
   {
     q: "Why do NAT bills spike?",
-    a: "Retry storms, large outbound downloads, container image pulls, and unbounded logging/telemetry can multiply GB processed quickly.",
+    a: "Retry storms, dependency timeouts, container image pulls during node churn, and large outbound downloads can multiply GB processed quickly. NAT sits on the hot path for outbound traffic, so incident windows are the peak scenario.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate baseline hours plus monthly GB outbound through NAT. Add a multiplier for retries/timeouts if the workload is not yet stable.",
+    a: "Count NAT gateways and hours per month, then estimate monthly outbound GB that routes through NAT. Add a separate peak line for deploy/incident windows and apply a retries multiplier.",
   },
   {
     q: "How do I validate?",
-    a: "Validate which subnets route through NAT and measure outbound GB from flow logs or a representative traffic window.",
+    a: "Validate which subnets route through NAT, then measure outbound GB from a representative window (flow logs, monitoring, or egress metrics). Verify that the biggest flows are the ones you think they are (registries, package downloads, APIs, telemetry).",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Modeling only the steady-state egress and ignoring deploy/scale-out behavior (node churn + cold caches) which can create short, expensive spikes.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/azure-nat-gateway-cost" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-nat-gateway-cost"
+  lastUpdated="2026-01-27"
+  faqs={faqs}
+>
   <p>
-    NAT gateways are deceptively simple: an hourly baseline plus a data processing driver. The real problem is that NAT sits
-    on the hot path for outbound traffic, so any retry storm or oversized download can amplify cost.
+    NAT Gateway pricing is simple on paper and tricky in production. The math is "hours + GB processed", but the bill is
+    driven by what traverses NAT during <strong>peak</strong> periods: deploys, scale-outs, incidents, and dependency
+    retries. This guide helps you build a model you can validate and improve.
   </p>
 
-  <h2>1) Baseline hours</h2>
-  <p>Model NAT gateway count × hours per month.</p>
-
-  <h2>2) GB processed</h2>
-  <p>
-    The practical way to estimate GB processed is to list the major outbound flows routed via NAT: container pulls, package
-    downloads, external API calls, telemetry, and backups. Then estimate monthly GB for each flow.
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
-  </p>
-
-  <h2>3) Common cost multipliers</h2>
+  <h2>0) Inventory what routes through NAT (the boundary)</h2>
+  <p>Before you estimate anything, list the outbound paths that actually use NAT.</p>
   <ul>
-    <li>Retries/timeouts to external APIs (each retry repeats full payload transfer).</li>
-    <li>Image pulls during node churn or frequent redeploys.</li>
-    <li>Uncached package downloads in CI or autoscaling environments.</li>
-    <li>High-volume telemetry/log shipping routed through NAT.</li>
+    <li>
+      <strong>Which subnets</strong> have default routes that egress through NAT?
+    </li>
+    <li>
+      <strong>Which workloads</strong> live in those subnets (AKS nodes, VMSS, build runners, jump boxes)?
+    </li>
+    <li>
+      <strong>Which destinations</strong> are hit at scale (container registries, package repos, external APIs, SaaS, telemetry)?
+    </li>
+  </ul>
+  <p class="muted">
+    If you cannot answer this, you will estimate the wrong thing. NAT costs are not "internet egress" in general; they are
+    "traffic that your routing sends through NAT".
+  </p>
+
+  <h2>1) Baseline hours (count NAT gateways)</h2>
+  <p>
+    The baseline is the number of NAT gateways times hours per month. If you have multiple environments or regions, model
+    each separately (prod/stage/dev). If your architecture is hub-and-spoke, be explicit about whether one NAT is shared or
+    whether each spoke has its own.
+  </p>
+
+  <h2>2) GB processed (the throughput driver)</h2>
+  <p>
+    The practical way to estimate GB processed is to list the big outbound flows and estimate each flow's monthly GB. Do not
+    guess with one blended number if you have a few dominant flows.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/unit-converter/">Unit converter</a>.
+  </p>
+  <ul>
+    <li>
+      <strong>Container image pulls</strong>: AKS/VMSS churn, new node pools, autoscaling.
+    </li>
+    <li>
+      <strong>Package downloads</strong>: OS updates, language deps, CI caches.
+    </li>
+    <li>
+      <strong>External APIs</strong>: request volume × response sizes (retries amplify).
+    </li>
+    <li>
+      <strong>Telemetry/log shipping</strong>: logs and metrics exporters often run "always on".
+    </li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>3) Model the peak month (retries + churn)</h2>
+  <p>
+    A realistic model has at least two scenarios: baseline and peak. Peak is where NAT costs surprise teams.
+  </p>
   <ul>
-    <li>Validate which subnets and workloads egress via NAT (routing tables matter).</li>
-    <li>Validate peak periods (deployments, incidents, scale-outs) where GB processed spikes.</li>
-    <li>Validate that large downloads are cached (registry mirrors, package proxies, CDN).</li>
+    <li>
+      <strong>Retries/timeouts</strong>: each retry repeats the full payload transfer; add a multiplier for incident windows.
+    </li>
+    <li>
+      <strong>Node churn</strong>: new nodes pull images and dependencies with cold caches.
+    </li>
+    <li>
+      <strong>Cold-start spikes</strong>: deployment rollouts can temporarily increase outbound dependency calls.
+    </li>
+  </ul>
+
+  <h2>4) Practical levers to reduce cost (without breaking security)</h2>
+  <ul>
+    <li>
+      <strong>Cache the big outbound flows</strong>: registry mirrors, package proxies, artifact caching.
+    </li>
+    <li>
+      <strong>Move large dependencies off the hot path</strong>: avoid downloading large artifacts at runtime.
+    </li>
+    <li>
+      <strong>Reduce retries</strong>: fix timeout budgets and backoff; retries are paid traffic.
+    </li>
+    <li>
+      <strong>Consider private access</strong> for high-volume Azure services (compare against Private Link).
+    </li>
+  </ul>
+  <p class="muted">
+    Related: <a href="/guides/azure-private-link-costs/">Azure Private Link costs</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>NAT gateways</strong> = count per env/region
+    </li>
+    <li>
+      <strong>Hours/month</strong> = 24 × days
+    </li>
+    <li>
+      <strong>Baseline GB/month</strong> = sum of big outbound flows routed via NAT
+    </li>
+    <li>
+      <strong>Peak add-on GB</strong> = deploy + incident windows (image pulls + retries)
+    </li>
+    <li>
+      <strong>Retry multiplier</strong> = 1 + retry_rate (apply to the affected flows)
+    </li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate routing: which subnets and workloads are actually using NAT.</li>
+    <li>Validate the top outbound destinations and their bytes in a representative week.</li>
+    <li>Validate deploy/scale-out periods: compare GB/hour during peak vs baseline.</li>
+    <li>After changes, re-measure outbound GB and confirm the model moves in the same direction as the bill.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
-    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/unit-converter/">Units</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/nat-gateway/" target="_blank" rel="nofollow noopener">
+        Azure NAT Gateway pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/virtual-network/nat-gateway/" target="_blank" rel="nofollow noopener">
+        Azure NAT Gateway documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

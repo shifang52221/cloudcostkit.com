@@ -1,21 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CDN request pricing: how to estimate $ per 10k / 1M requests";
+const title = "CDN request pricing: estimate $ per 10k / 1M requests (and when it dominates)";
 const description =
-  "Some CDNs charge request fees in addition to bandwidth. Learn what counts as a billable request, how to estimate monthly requests, and how to model per-10k vs per-1M pricing.";
+  "Some CDNs charge request fees in addition to bandwidth. Learn what counts as a billable request, how to estimate requests/month from RPS or analytics, and how to model per-10k vs per-1M pricing without unit mistakes.";
+
 const faqs = [
   {
     q: "Do all CDNs charge request fees?",
-    a: "No. Some plans bundle requests into bandwidth pricing, while others charge explicitly per request. Always check the pricing page for a requests line item.",
+    a: "No. Some plans bundle requests into bandwidth pricing, while others charge explicitly per request (often per 10k or per 1M). Always check your provider pricing page and the billable unit definition.",
   },
   {
     q: "How do I convert per-1M to per-10k pricing (or vice versa)?",
-    a: "Per-1M is 100x per-10k. For example, $0.75 per 1M requests equals $0.0075 per 10k requests.",
+    a: "Per 1M is 100× per 10k. Example: $0.75 per 1M requests equals $0.0075 per 10k requests.",
   },
   {
-    q: "Is every request billed the same?",
-    a: "Not always. Some providers have different prices for HTTP vs HTTPS, regional tiers, or request classes. Use the billable unit and class that matches your plan.",
+    q: "When do request fees dominate the bill?",
+    a: "Request fees dominate for API-like traffic: high RPS with small payloads, bot spikes, and highly cacheable sites where bandwidth drops but request volume stays high.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Using one blended monthly request count and forgetting retry/bot multipliers, or mixing units (per 10k vs per 1M) and being off by 100×.",
   },
 ];
 ---
@@ -23,61 +28,139 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/cdn-request-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    When people search for <em>CDN cost</em>, they focus on bandwidth ($/GB). But for many workloads,{" "}
-    <strong>request fees</strong> can be a real part of the bill (especially API-like traffic with small payloads).
+    When people search for "CDN cost", they focus on bandwidth ($/GB). But for many workloads, <strong>request fees</strong>{" "}
+    are a real line item. The key is to model request fees as a separate bill component and keep units explicit.
   </p>
 
-  <h2>What is a "billable request"?</h2>
+  <h2>0) Define "billable request" for your CDN</h2>
   <p>
-    Each CDN defines billable requests slightly differently. In general, it maps to HTTP/HTTPS requests handled at the
-    edge. Some providers separate request classes (for example, cache hits vs misses, dynamic vs static, or different
-    protocols).
+    Each CDN defines billable requests slightly differently (protocols, classes, regions). For planning, treat a billable
+    request as "an HTTP/HTTPS request handled at the edge", and then adjust if your provider splits classes.
   </p>
-  <p class="muted">
-    Use your provider definition as the source of truth. The goal of the model is planning accuracy, not guessing how a
-    specific vendor counts.
-  </p>
+  <ul>
+    <li>
+      Some providers price <strong>HTTPS</strong> differently from <strong>HTTP</strong>.
+    </li>
+    <li>
+      Some providers have <strong>regional tiers</strong> or different request classes.
+    </li>
+    <li>
+      Cache hit rate changes <strong>origin</strong> traffic, but request fees are usually counted at the edge.
+    </li>
+  </ul>
 
-  <h2>How to estimate requests/month</h2>
+  <h2>1) Estimate requests per month</h2>
+  <p>
+    Use the most direct source you have. If you already run a CDN, analytics is the best input.
+  </p>
   <ol>
     <li>
-      If you have CDN analytics, take the 30-day request count and use it as requests/month.
+      <strong>From CDN analytics</strong>: use the provider's 30-day request count (best).
     </li>
     <li>
-      If you have RPS, convert it with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
+      <strong>From RPS</strong>: convert request rate to requests/month, then model baseline + peak.
+      <span class="muted">
+        {" "}
+        Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+      </span>
     </li>
     <li>
-      If you only have log samples, extrapolate carefully and validate once you have real metrics.
+      <strong>From logs</strong>: sample access logs and extrapolate carefully, then replace with analytics once available.
     </li>
   </ol>
-
-  <h2>How to apply per-10k / per-1M pricing</h2>
-  <p>Two common formats:</p>
-  <ul>
-    <li><strong>Per 10k requests</strong>: request fees = (requests/month / 10,000) x $ per 10k</li>
-    <li><strong>Per 1M requests</strong>: request fees = (requests/month / 1,000,000) x $ per 1M</li>
-  </ul>
-  <p>
-    If your calculator expects per-10k and you have a per-1M price, divide by 100 (and multiply by 100 to go the other
-    direction).
+  <p class="muted">
+    Do not ignore bots, health checks, and retries. Those are often the "hidden request volume" that makes request fees
+    dominate.
   </p>
 
-  <h2>When request fees matter most</h2>
+  <h2>2) Apply per-10k vs per-1M pricing (keep units explicit)</h2>
+  <p>Two common formats:</p>
   <ul>
-    <li><strong>API traffic</strong>: many small responses and a high request rate.</li>
-    <li><strong>Highly cacheable sites</strong>: bandwidth drops, but request volume stays.</li>
-    <li><strong>Bot spikes</strong>: request volume can jump while bandwidth barely changes.</li>
+    <li>
+      <strong>Per 10k requests</strong>: request fees = (requests/month ÷ 10,000) × price per 10k
+    </li>
+    <li>
+      <strong>Per 1M requests</strong>: request fees = (requests/month ÷ 1,000,000) × price per 1M
+    </li>
+  </ul>
+  <p>
+    If you have a price per 1M and your calculator expects per 10k, divide the price by 100 (and multiply by 100 to go the
+    other direction).
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/cdn-request-cost-calculator/">CDN request cost calculator</a>.
+  </p>
+
+  <h2>3) When request fees matter most (traffic shapes)</h2>
+  <ul>
+    <li>
+      <strong>API traffic</strong>: high RPS, small payloads, lots of 200/304 responses.
+    </li>
+    <li>
+      <strong>Highly cacheable sites</strong>: bandwidth goes down, request count stays high.
+    </li>
+    <li>
+      <strong>Bot spikes</strong>: request volume jumps while bandwidth barely changes.
+    </li>
+    <li>
+      <strong>Many small assets</strong>: sites that serve many tiny objects per page view.
+    </li>
+  </ul>
+
+  <h2>4) Practical levers to reduce request fees</h2>
+  <ul>
+    <li>
+      <strong>Cache better</strong>: caching does not reduce edge request fees, but it can let you simplify APIs and reduce
+      origin traffic and retries.
+    </li>
+    <li>
+      <strong>Reduce background traffic</strong>: health checks, synthetic monitoring, and cron pings.
+    </li>
+    <li>
+      <strong>Bot mitigation</strong>: block or rate-limit obvious bot traffic (especially on expensive endpoints).
+    </li>
+    <li>
+      <strong>Batch and paginate</strong>: one request can replace many small ones for some API designs.
+    </li>
+  </ul>
+
+  <h2>Worked example (sanity check)</h2>
+  <ul>
+    <li>
+      <strong>100 RPS</strong> sustained is ~259M requests/month (100 × 86,400 × 30).
+    </li>
+    <li>
+      At <strong>$0.75 per 1M</strong>, request fees are ~259 × 0.75 = <strong>$194/month</strong>.
+    </li>
+    <li>
+      If a bot spike doubles RPS for 5 days, add that as a separate peak line item.
+    </li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost calculator</a>
-    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">Request fees</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests/month</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN total cost</a>
     <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
   </div>
+
+  <h2>Sources (examples of request-fee line items)</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="nofollow noopener">
+        AWS CloudFront pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/frontdoor/" target="_blank" rel="nofollow noopener">
+        Azure Front Door pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

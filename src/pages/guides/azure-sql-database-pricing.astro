@@ -1,73 +1,193 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure SQL Database pricing: a practical way to estimate";
+const title = "Azure SQL Database pricing: a practical estimate (compute, storage, backups, transfer)";
 const description =
-  "Model managed database cost without price tables: compute baseline, storage GB-month, backups/retention, and network/egress. Includes a validation checklist.";
+  "Model Azure SQL Database cost without memorizing price tables: compute baseline (vCore/DTU), storage GB-month + growth, backup retention, and network transfer. Includes a validation checklist and common sizing traps.";
 
 const faqs = [
   {
     q: "What usually drives managed database cost?",
-    a: "Compute capacity and storage are the primary drivers. Backups/retention and cross-zone/region data movement can be meaningful in production.",
+    a: "Compute capacity and storage are the primary drivers. Backup retention and data movement (cross-region access, exports) can be meaningful in production.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate a compute baseline, average storage GB, and backup retention. Add a separate line item for outbound data transfer if you have cross-region access patterns.",
+    a: "Pick a compute baseline, estimate average stored GB (and growth), and decide backup retention. Add a separate line item for outbound transfer if you have cross-region or internet access patterns.",
+  },
+  {
+    q: "What is the most common estimate mistake?",
+    a: "Sizing from averages only. The slow path (p95 latency, peak concurrency, IO bursts) is what drives the right tier and the right compute baseline.",
   },
   {
     q: "How do I validate?",
-    a: "Validate peak CPU/memory/IO usage, validate storage growth rate, and validate backup retention policies (including snapshots and PITR).",
+    a: "Validate peak CPU/IO usage, storage growth rate, and backup retention policies (PITR + any long-term retention). Validate network paths and billable transfer boundaries.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/azure-sql-database-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/azure-sql-database-pricing"
+  lastUpdated="2026-01-27"
+  faqs={faqs}
+>
   <p>
-    Managed database cost is usually “capacity + data”. The safest estimate breaks the database into compute, storage, and
-    backup/retention, and then validates IO and growth assumptions.
+    Managed database cost is usually "capacity + data". The safest estimate breaks the bill into clear line items you can
+    validate: <strong>compute</strong>, <strong>data storage</strong>, <strong>backup/retention</strong>, and{" "}
+    <strong>data transfer</strong>. This guide gives you a workflow that works even when you don't know the exact SKU yet.
   </p>
 
-  <h2>1) Compute baseline</h2>
+  <h2>0) Choose a purchase model (so you model the right unit)</h2>
   <p>
-    Pick an initial capacity based on expected concurrency and query patterns, then plan for headroom. If the workload is
-    spiky, model peak periods separately (peak hours drive the right sizing).
+    Azure SQL can be expressed in different purchase models (for example, vCore vs DTU) and deployment shapes (single
+    database vs pool). The estimate workflow is the same, but your "compute unit" differs.
+  </p>
+  <ul>
+    <li>
+      <strong>Single database</strong>: model one workload with one baseline.
+    </li>
+    <li>
+      <strong>Pool</strong>: model the sum of workloads and the peak overlap (pools are about smoothing peaks).
+    </li>
+    <li>
+      <strong>Serverless patterns</strong>: model baseline + peak separately (autoscale is not free if the peak is frequent).
+    </li>
+  </ul>
+
+  <h2>1) Compute baseline (capacity)</h2>
+  <p>
+    Pick an initial baseline based on expected concurrency and query complexity, then plan headroom. For spiky workloads,
+    keep a separate peak scenario rather than assuming peak 24/7.
+  </p>
+  <ul>
+    <li>
+      <strong>Baseline</strong>: typical business hours load and steady queries.
+    </li>
+    <li>
+      <strong>Peak</strong>: batch jobs, report generation, deploy windows, incident retries.
+    </li>
+    <li>
+      If you do not have data, bracket with two baselines (conservative vs aggressive) and validate once you have metrics.
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a> (use it as a generic monthly
+    capacity price model).
   </p>
 
-  <h2>2) Storage (GB-month)</h2>
+  <h2>2) Storage (GB-month) and growth</h2>
   <p>
-    Use average stored GB. If the dataset is growing, estimate monthly growth and compute average size across the month.
+    Storage estimation is about the average size across the month, not just today's size. If your dataset grows, average GB
+    is larger than the starting GB.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Database storage growth</a>.
   </p>
-
-  <h2>3) Backups and retention</h2>
-  <p>
-    Backup retention is often a quiet cost driver. Model backup storage separately from primary storage, and validate
-    retention windows (PITR, snapshots, long-term retention).
-  </p>
-
-  <h2>4) Networking</h2>
-  <p>
-    If clients access the database cross-zone/region or from the public internet, network transfer may be billed. Split
-    transfer by destination and validate boundaries.
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate peak CPU/memory/IO and plan headroom (avoid resizing churn).</li>
-    <li>Validate storage growth and retention policy for backups/snapshots.</li>
-    <li>Validate network paths (private access vs public/cross-region) and billable transfer.</li>
+    <li>
+      Separate <strong>data</strong> from <strong>logs/temp</strong> if your workload has heavy write churn.
+    </li>
+    <li>
+      Track growth drivers: retention tables, event logs, audit trails, large indexes.
+    </li>
+  </ul>
+
+  <h2>3) Backups and retention (often the quiet multiplier)</h2>
+  <p>
+    Backup storage is usually not the same as primary data storage. It scales with retention windows and with how quickly
+    data changes (churn). If you keep long-term retention, model it as its own line item.
+  </p>
+  <ul>
+    <li>
+      <strong>PITR retention</strong>: short/medium window for operational recovery.
+    </li>
+    <li>
+      <strong>Long-term retention</strong>: compliance-driven; keep volume controlled.
+    </li>
+    <li>
+      If your workload is append-heavy, backup growth can track data growth closely.
+    </li>
+  </ul>
+
+  <h2>4) Data transfer (validate boundaries)</h2>
+  <p>
+    Database traffic itself is often small bytes compared to web traffic, but data movement can matter when you do exports,
+    analytics, or cross-region access. Model transfer separately so you don't miss a high-volume ETL path.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Data egress</a>,{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>.
+  </p>
+
+  <h2>5) Observability (logs/metrics are separate bills)</h2>
+  <p>
+    Production databases often generate logs and metrics that are billed by ingestion, retention, and scan/query. Keep those
+    as explicit line items until you have real usage.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Log scan</a>,{" "}
+    <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Compute</strong> = baseline capacity + peak capacity scenario (if applicable)
+    </li>
+    <li>
+      <strong>Primary storage GB-month</strong> = average GB across the month (include growth)
+    </li>
+    <li>
+      <strong>Backup retention</strong> = PITR days + any long-term retention policy
+    </li>
+    <li>
+      <strong>Transfer GB/month</strong> = exports + cross-region access + other billed legs
+    </li>
+    <li>
+      <strong>Observability</strong> = logs ingestion + retention + scans + metrics series
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Sizing from averages only (peak concurrency and IO bursts decide the tier).</li>
+    <li>Modeling storage as "today's GB" and ignoring growth (GB-month is about average).</li>
+    <li>Forgetting backup retention and long-term retention policies.</li>
+    <li>Ignoring export/ETL traffic that creates real egress or cross-region transfer.</li>
+    <li>Letting observability grow unbounded (logs retention drift is common).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate peak CPU/IO usage and slow-path queries (p95 matters).</li>
+    <li>Validate storage growth drivers (tables, indexes, retention policies).</li>
+    <li>Validate backup retention windows and whether long-term retention is enabled.</li>
+    <li>Validate network paths (private vs public, cross-region) and which are billed.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
+    <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute</a>
     <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/azure-sql-database/" target="_blank" rel="nofollow noopener">
+        Azure SQL Database pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/azure-sql/database/" target="_blank" rel="nofollow noopener">
+        Azure SQL Database documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 
