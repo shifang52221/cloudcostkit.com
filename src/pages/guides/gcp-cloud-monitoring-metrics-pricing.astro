@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Monitoring metrics pricing: time series, sample rate, and retention";
+const title = "Cloud Monitoring metrics pricing (GCP): time series, sample rate, and retention";
 const description =
-  "A practical metrics cost model: time series cardinality, sample rate, retention, and dashboards/alerts. Includes validation steps to prevent high-cardinality explosions.";
+  "A practical metrics cost model: time series count (cardinality), sample rate, retention, and dashboard/alert query behavior. Includes validation steps to prevent high-cardinality explosions and excessive refresh patterns.";
 
 const faqs = [
   {
     q: "What usually drives metrics costs?",
-    a: "Cardinality (number of time series) is the biggest risk. Sample rate and long retention multiply volume, and dashboards/alerts can add repeated query load.",
+    a: "Cardinality (number of time series) is the biggest risk. Sample rate and retention multiply volume, and dashboards/alerts can create repeated query load.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate time series count × samples per minute × retention days. Validate with a representative environment and scale up.",
+    a: "Estimate time series count, samples per minute, and retention days. Then validate your top dimensions (labels) and cap any unbounded dimensions.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Adding an unbounded label like customerId, requestId, pod name, or path and accidentally creating a time series explosion.",
   },
   {
     q: "How do I validate?",
-    a: "Validate unbounded labels (dimensions), validate sample rates, and validate dashboard refresh intervals that trigger repeated queries.",
+    a: "Validate dimension cardinality, validate emit/scrape intervals, and audit dashboard refresh and alert evaluation frequency.",
   },
 ];
 ---
@@ -24,49 +28,120 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-monitoring-metrics-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Metrics systems are “time series × frequency × retention”. Costs spike when you accidentally create too many unique time
-    series (high cardinality) or when dashboards/alerts query wide time windows frequently.
+    Metrics systems are "time series × frequency × retention". Costs spike when you accidentally create too many unique time
+    series (high cardinality) or when dashboards/alerts query wide windows frequently. A good estimate makes cardinality
+    explicit instead of hoping it stays small.
   </p>
 
-  <h2>1) Cardinality (time series count)</h2>
+  <h2>0) Define what a time series is</h2>
   <p>
-    Cardinality is the primary risk. Labels like <strong>pod</strong>, <strong>path</strong>, or <strong>customerId</strong>
-    can create unbounded series counts. Model the number of unique label combinations explicitly.
+    A time series is a unique metric name plus a unique combination of dimension/label values. If you add dimensions like{" "}
+    <strong>pod</strong>, <strong>container</strong>, <strong>path</strong>, or <strong>customerId</strong>, the number of
+    unique combinations can explode.
   </p>
 
-  <h2>2) Sample rate</h2>
+  <h2>1) Estimate cardinality (time series count)</h2>
   <p>
-    Sample rate multiplies ingestion. A move from 60s to 10s increases samples ~6×. Model both normal and high-frequency
-    scenarios.
+    Model cardinality explicitly. A simple approximation is:
+    <strong> series ~= metrics * (dim1_values * dim2_values * ...)</strong>.
+  </p>
+  <ul>
+    <li>
+      Safe dimensions: environment, region, service (bounded sets).
+    </li>
+    <li>
+      Dangerous dimensions: requestId, userId, URL path, pod name (unbounded or high churn).
+    </li>
+    <li>
+      If you need per-entity detail, consider sampling or aggregating before emitting metrics.
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost calculator</a>.
+  </p>
+
+  <h2>2) Sample rate (frequency)</h2>
+  <p>
+    Sample rate multiplies ingestion volume. Going from 60s to 10s is a 6× increase. Model both a "normal" and a
+    "high-frequency" scenario and justify why you need high frequency.
   </p>
 
   <h2>3) Retention</h2>
   <p>
-    Long retention multiplies stored volume. Consider downsampling or reducing retention for high-resolution metrics.
+    Retention is a storage multiplier. Long retention can be expensive if you store high-resolution data for months. A
+    common pattern is: keep high-res for days, keep downsampled aggregates for weeks/months.
   </p>
 
-  <h2>4) Dashboards and alerts</h2>
+  <h2>4) Dashboards and alerts (repeated queries)</h2>
   <p>
-    Dashboards refreshing every minute and alerts scanning long windows can create repeated query load. Treat refresh rates
-    and time windows as explicit drivers.
+    Dashboards refreshing frequently and alerts scanning wide windows can create repeated query load. Treat refresh rates
+    and window sizes as explicit drivers.
   </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate cardinality drivers and cap unbounded labels/dimensions.</li>
-    <li>Validate sample rates (emit/scrape intervals) and ensure they match your needs.</li>
-    <li>Validate dashboard refresh and alert windows (avoid repeated wide scans).</li>
+    <li>
+      A dashboard refreshing every minute is 1,440 refreshes/day.
+    </li>
+    <li>
+      An alert evaluating every minute with a 24h window repeatedly re-scans the same historical data.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Time series</strong> = metrics × product(dim value counts)
+    </li>
+    <li>
+      <strong>Samples/month</strong> = time series × samples/minute × minutes/month
+    </li>
+    <li>
+      <strong>Retention</strong> = retention days (split high-res vs downsampled if applicable)
+    </li>
+    <li>
+      <strong>Query load</strong> = dashboards/day + alerts/day (include refresh cadence)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Unbounded or high-churn dimensions causing cardinality explosions.</li>
+    <li>Using high-frequency sampling everywhere instead of only where it adds value.</li>
+    <li>Keeping long retention for high-resolution data by default.</li>
+    <li>Dashboards/alerts querying wide windows with very frequent refresh.</li>
+    <li>Emitting per-request metrics instead of aggregating.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>List top dimensions and estimate unique value counts (bounded vs unbounded).</li>
+    <li>Validate emit/scrape intervals across environments (dev often differs from prod).</li>
+    <li>Audit dashboards: refresh intervals, time windows, number of panels (queries multiply).</li>
+    <li>Audit alerts: evaluation frequency and window sizes (avoid repeated wide scans).</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/monitoring/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Monitoring pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/monitoring/docs" target="_blank" rel="nofollow noopener">
+        Cloud Monitoring documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

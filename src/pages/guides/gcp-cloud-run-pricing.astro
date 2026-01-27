@@ -1,67 +1,144 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Run pricing: a practical model (requests, CPU/memory time, and egress)";
+const title = "Cloud Run pricing (GCP): requests, CPU/memory time, and egress (practical model)";
 const description =
-  "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, CPU/memory time, concurrency, outbound transfer, and logs.";
+  "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, duration, concurrency, outbound transfer, and logs. Includes a validation checklist for retries, cold starts, and heavy-tail response sizes.";
 
 const faqs = [
   {
     q: "What usually drives Cloud Run cost?",
-    a: "CPU/memory time is the core driver, but request volume and egress can dominate for high-traffic or large-response services.",
+    a: "CPU/memory time is the core driver, but request volume, egress, and log ingestion can dominate for high-traffic or large-response services.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly requests, average response size, and average request duration. Add separate line items for outbound transfer and logs.",
+    a: "Estimate monthly requests, request duration (p50/p95), and response size. Add separate line items for outbound transfer and logs/retention.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Sizing from one average duration and ignoring retries and the slow path. Incidents often increase both request volume and duration at the same time.",
   },
   {
     q: "How do I validate?",
-    a: "Validate p50/p95 latency and concurrency, and validate retry storms or cold-start periods that change average CPU time.",
+    a: "Validate p50/p95 latency, concurrency behavior, retries/timeouts, top endpoints by bytes, and log bytes per request.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-run-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-run-pricing"
+  lastUpdated="2026-01-27"
+  faqs={faqs}
+>
   <p>
-    Cloud Run-style platforms are predictable when you model the measurable drivers: requests, CPU/memory time, and outbound
-    transfer. The main risk is to ignore response size and logging.
+    Cloud Run-style platforms are predictable when you model measurable drivers: requests, CPU/memory time (duration), and
+    outbound transfer. The main mistakes are ignoring response size and logging, and ignoring peak periods where retries
+    multiply costs.
   </p>
 
-  <h2>1) Requests</h2>
-  <p>Convert traffic (RPS) to monthly requests and model peak vs average.</p>
+  <h2>0) Pick the right unit of analysis</h2>
+  <ul>
+    <li>
+      <strong>Requests/month</strong>: the driver for HTTP services.
+    </li>
+    <li>
+      <strong>Duration</strong>: the multiplier that turns requests into compute.
+    </li>
+    <li>
+      <strong>Concurrency</strong>: affects instance count and can change per-request CPU time under contention.
+    </li>
+    <li>
+      <strong>Egress</strong>: response bytes and external calls create transfer costs.
+    </li>
+    <li>
+      <strong>Logs</strong>: per-request bytes logged × request volume (often overlooked).
+    </li>
+  </ul>
+
+  <h2>1) Requests (monthly volume)</h2>
   <p>
-    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+    Convert request rate to monthly requests and keep baseline + peak separate. Peaks include bot spikes, marketing events,
+    and incident retry storms.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
   </p>
 
-  <h2>2) Duration and concurrency</h2>
+  <h2>2) Duration and concurrency (compute time)</h2>
   <p>
-    Use p50 and p95 request duration to model steady-state and spikes. Concurrency affects how many instances you run and
-    can change CPU time per request if the service is resource constrained.
+    Use percentiles (p50 and p95) instead of one average so you can model normal vs slow-path behavior. Slow paths often
+    come from upstream latency (DB/APIs), cold starts, and throttling.
   </p>
+  <ul>
+    <li>
+      If you increase concurrency, validate latency and CPU contention; concurrency is not free for CPU-bound handlers.
+    </li>
+    <li>
+      Track retries/timeouts: they multiply both request count and total compute time.
+    </li>
+  </ul>
 
   <h2>3) Response transfer and egress</h2>
   <p>
     If each request returns significant data, egress becomes a major driver. Estimate average response size and multiply by
-    monthly requests.
+    monthly requests, then split transfer by destination if needed.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
     <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
   </p>
-
-  <h2>4) Logs</h2>
-  <p>
-    Ingestion and retention can outweigh compute if you log too much per request. Estimate log bytes per request × request
-    volume.
-  </p>
-  <p>
-    Tool: <a href="/calculators/log-cost-calculator/">Log cost</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate p50/p95 latency and retry storms (incidents multiply request volume and CPU time).</li>
-    <li>Validate response size distribution (large payload endpoints should be modeled separately).</li>
-    <li>Validate log volume per request and retention settings.</li>
+    <li>
+      Model heavy-tail endpoints separately (downloads, exports) so they do not disappear into a blended average.
+    </li>
+    <li>
+      Include external dependency calls that return large payloads (they create egress too).
+    </li>
+  </ul>
+
+  <h2>4) Logs (often the second spike)</h2>
+  <p>
+    Logging can outweigh compute if you log too much per request. Estimate log bytes per request and multiply by request
+    volume, then model retention and scan/search if you query heavily.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Log scan</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>Duration</strong> = p50 + p95 scenario (seconds)
+    </li>
+    <li>
+      <strong>Egress GB/month</strong> = requests/month × avg response size (GB) (split heavy endpoints)
+    </li>
+    <li>
+      <strong>Log GB/month</strong> = requests/month × avg log bytes/request (baseline + peak)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using only average duration and ignoring p95 (slow path drives cost and capacity).</li>
+    <li>Ignoring retries/timeouts which multiply requests, duration, and downstream calls.</li>
+    <li>Not modeling response size (egress dominates for large payloads).</li>
+    <li>Verbose logs per request (ingestion dominates at scale).</li>
+    <li>Not separating baseline vs peak months (incidents change the cost shape).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate p50/p95 latency and cold start behavior.</li>
+    <li>Validate retries/timeouts and incident traffic windows.</li>
+    <li>Validate top endpoints by bytes (not just by request count).</li>
+    <li>Validate log bytes per request and retention settings.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -70,6 +147,21 @@ const faqs = [
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/run/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Run pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/run/docs" target="_blank" rel="nofollow noopener">
+        Cloud Run documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

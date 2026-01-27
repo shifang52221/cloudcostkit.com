@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Artifact Registry pricing: storage + pulls + egress (a practical estimate)";
+const title = "Artifact Registry pricing (GCP): storage + downloads + egress (practical estimate)";
 const description =
-  "Model Artifact Registry costs: storage (GB-month), download volume (pulls), and outbound transfer. Includes a workflow to estimate GB-month from retention.";
+  "A practical Artifact Registry cost model: stored GB-month baseline, download volume from CI/CD and cluster churn, and outbound transfer. Includes a workflow to estimate GB-month from retention and validate layer sharing and peak pull storms.";
 
 const faqs = [
   {
     q: "What usually drives Artifact Registry cost?",
-    a: "Storage (GB-month) is the baseline, but heavy CI/CD or large clusters can make downloads and egress meaningful.",
+    a: "Storage (GB-month) is the baseline, but heavy CI/CD and cluster churn can make downloads and egress meaningful. Peak pull storms during deploys and scale-outs are the common surprise.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate average artifact size, retention, and download volume. Treat cross-region downloads and internet egress separately.",
+    a: "Estimate stored GB-month from retention, then estimate download GB/month from pull volume and average artifact size. Split same-region vs cross-region/internet destinations for egress.",
   },
   {
     q: "How do I validate?",
-    a: "Validate real storage usage, validate retention policies, and sample download volumes during peak build/deploy windows.",
+    a: "Validate actual stored usage, validate retention policies, and sample download volume during peak build/deploy windows. Validate whether layer sharing reduces storage vs 'tags × size'.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Assuming storage equals tags × image size (layer sharing changes the math) and ignoring node churn and CI spikes that create short, expensive download peaks.",
   },
 ];
 ---
@@ -24,42 +28,111 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-artifact-registry-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Registries are “store bits, move bits”. A reliable estimate separates storage (GB-month) from download volume and egress.
+    Registries are "store bits, move bits". A reliable estimate separates three drivers: <strong>storage (GB-month)</strong>,{" "}
+    <strong>downloads (pull GB)</strong>, and <strong>egress</strong>. Most surprises come from retention drift and peak pull
+    storms (CI spikes, autoscaling, node churn).
   </p>
+
+  <h2>0) Define your scope (what you are counting)</h2>
+  <ul>
+    <li>
+      <strong>Artifact types</strong>: containers vs language packages vs build artifacts (sizes and churn differ).
+    </li>
+    <li>
+      <strong>Environments</strong>: prod/stage/dev repos (retention policies often drift by env).
+    </li>
+    <li>
+      <strong>Regions</strong>: multi-region clusters and cross-region runners change egress patterns.
+    </li>
+  </ul>
 
   <h2>1) Storage (GB-month)</h2>
   <p>
-    Estimate GB-month from retention: average artifact size × number retained. If artifacts share layers (container images),
-    storage is often less than “tags × size”, so validate with real usage stats when possible.
+    Build storage from retention. Start with "how much do we keep" rather than "how much do we push".
   </p>
-  <p>
-    Tool: <a href="/calculators/object-storage-cost-calculator/">Storage cost</a>.
+  <p class="muted">
+    Tool: <a href="/calculators/object-storage-cost-calculator/">Storage cost (GB-month)</a>.
   </p>
+  <ul>
+    <li>
+      Estimate <strong>average stored GB</strong> across the month, not just today's size.
+    </li>
+    <li>
+      For container images, layer sharing means storage is often less than "tags × size" (validate with actual usage).
+    </li>
+    <li>
+      Keep separate lines for <strong>base images</strong> vs <strong>app images</strong> (churn differs).
+    </li>
+  </ul>
 
   <h2>2) Downloads (pull volume)</h2>
   <p>
-    Downloads scale with CI/CD and autoscaling. Model the top drivers explicitly (build pipelines, node churn, deploy
-    frequency) rather than using one blended number.
+    Downloads scale with CI/CD and autoscaling. A good first model is:
+    <strong> deploys/day × pulls per deploy × avg artifact size</strong>, plus a peak line for incident windows and node churn.
   </p>
-
-  <h2>3) Egress</h2>
-  <p>
-    Split egress by destination and validate whether cross-region downloads are frequent (multi-region clusters often cause
-    this).
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate retention and garbage collection (old layers can keep storage high).</li>
-    <li>Validate download volume during peak build/deploy windows and cluster scale-outs.</li>
-    <li>Validate cross-region patterns (multi-region setups can multiply transfer).</li>
+    <li>
+      <strong>CI peaks</strong>: parallel builds and retries can create short pull storms.
+    </li>
+    <li>
+      <strong>Node churn</strong>: new nodes pull many images at once (worst during incidents).
+    </li>
+    <li>
+      <strong>Caching</strong>: node-local caching and image pre-pulling can reduce download volume dramatically.
+    </li>
+  </ul>
+
+  <h2>3) Egress (split by destination)</h2>
+  <p>
+    Treat transfer as its own line item. Split by destination because pricing and billing boundaries differ.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>,{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>.
+  </p>
+  <ul>
+    <li>
+      <strong>Same-region</strong>: often cheapest; keep clusters and registries co-located if possible.
+    </li>
+    <li>
+      <strong>Cross-region</strong>: multi-region clusters and remote runners can make this meaningful.
+    </li>
+    <li>
+      <strong>Internet</strong>: external users and third-party runners are the common egress driver.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Stored GB-month</strong> = average stored GB across month (validate with registry usage)
+    </li>
+    <li>
+      <strong>Download GB/month</strong> = pulls/month × avg artifact size (baseline + peak)
+    </li>
+    <li>
+      <strong>Egress GB/month</strong> = subset of downloads billed as outbound (cross-region/internet)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Retention drift: old tags and layers kept forever.</li>
+    <li>Assuming tags × size equals storage (layer sharing changes the math).</li>
+    <li>Ignoring CI and scale-out peaks (pull storms are the peak scenario).</li>
+    <li>Cross-region pulls hidden inside "it’s internal" assumptions.</li>
+    <li>Not validating caching behavior (warm vs cold nodes).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate actual stored usage and retention settings per repo.</li>
+    <li>Sample pull volume during peak build/deploy windows and scale-outs.</li>
+    <li>Validate which destinations are billed as outbound (same-region vs cross-region vs internet).</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -67,7 +140,21 @@ const faqs = [
     <a class="btn" href="/calculators/object-storage-cost-calculator/">GB-month</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
-    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+    <a class="btn" href="/guides/eks-vs-gke-vs-aks-cost/">Kubernetes platform costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/artifact-registry/pricing" target="_blank" rel="nofollow noopener">
+        Artifact Registry pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/artifact-registry/docs" target="_blank" rel="nofollow noopener">
+        Artifact Registry documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

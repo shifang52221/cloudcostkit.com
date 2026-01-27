@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Bigtable cost estimation: nodes, storage, and traffic (practical model)";
+const title = "Bigtable cost estimation: nodes, storage growth, and transfer (practical model)";
 const description =
-  "A driver-based Bigtable estimate: node-hours, stored GB, and network transfer. Includes validation steps for hotspots, compactions, and peak throughput.";
+  "A driver-based Bigtable estimate: provisioned capacity (node-hours), stored GB-month + growth, and network transfer. Includes validation steps for hotspots, compactions, and peak throughput that force over-provisioning.";
 
 const faqs = [
   {
     q: "What usually drives Bigtable cost?",
-    a: "Provisioned capacity (nodes) is usually the primary driver. Storage and network transfer become meaningful for large datasets or cross-region access patterns.",
+    a: "Provisioned capacity (nodes) is usually the primary driver. Storage and network transfer become meaningful for large datasets, long retention, or cross-region access patterns.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate node-hours (baseline + peak), then add stored GB and any cross-region egress. Validate with a representative workload window.",
+    a: "Estimate node-hours (baseline + peak), then add stored GB-month and any cross-region/internet egress. Validate with a representative workload window and hotspot risk.",
+  },
+  {
+    q: "What is the most common sizing mistake?",
+    a: "Sizing from average throughput and ignoring hotspots. One hot partition can force a much higher node count than the average suggests.",
   },
   {
     q: "How do I validate?",
-    a: "Validate peak throughput and hotspots (which force over-provisioning), and validate storage growth and compaction behavior.",
+    a: "Validate peak throughput and hotspot behavior, validate compaction/GC settings, and validate storage growth and retention assumptions.",
   },
 ];
 ---
@@ -24,52 +28,125 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-bigtable-cost-estimation"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Bigtable-like systems are capacity-planned: you pay for provisioned throughput capacity plus stored data. The main risk
-    is sizing from averages and ignoring peaks and hotspots.
+    Bigtable-like systems are capacity planned. Your bill is driven by provisioned throughput capacity plus stored data, and
+    it becomes expensive when you are forced to over-provision for peaks or hotspots. This guide gives a simple model you can
+    validate.
   </p>
 
-  <h2>1) Compute capacity (node-hours)</h2>
+  <h2>0) Identify the workload shape (what forces capacity)</h2>
+  <ul>
+    <li>
+      <strong>Read/write throughput</strong>: baseline vs peak (batch jobs and backfills are peak).
+    </li>
+    <li>
+      <strong>Hot keys / hotspots</strong>: uneven key distribution forces more capacity.
+    </li>
+    <li>
+      <strong>Latency targets</strong>: stricter tail latency often implies more headroom.
+    </li>
+  </ul>
+
+  <h2>1) Provisioned capacity (node-hours)</h2>
   <p>
-    Model baseline nodes and peak nodes separately. Peak demand and hotspot behavior can force higher node counts than
-    average throughput would suggest.
+    Model baseline nodes and peak nodes separately. If peak is rare, do not pay for it 24/7; if peak is frequent, you should
+    treat peak as the real baseline.
   </p>
-  <p>
-    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
+  <p class="muted">
+    Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute cost model</a> (generic monthly capacity pricing).
   </p>
+  <ul>
+    <li>
+      Keep <strong>baseline</strong> and <strong>peak</strong> node counts as two explicit scenarios.
+    </li>
+    <li>
+      If one job drives peak, model that job separately (duration per day/week).
+    </li>
+  </ul>
 
   <h2>2) Storage (GB-month) and growth</h2>
   <p>
-    Use average stored GB and model growth. If you keep multiple versions or long retention, growth can be faster than
-    expected.
+    Storage estimation is about average GB across the month, including growth. If you retain multiple versions or keep long
+    TTLs, storage grows faster than most teams expect.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/database-storage-growth-cost-calculator/">Storage growth model</a>.
   </p>
-
-  <h2>3) Network transfer</h2>
-  <p>
-    If clients are outside the region or you replicate across regions, include outbound transfer as a separate line.
-  </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate peak throughput and hotspot risk (hot partitions can force higher capacity).</li>
-    <li>Validate storage growth and retention/versioning assumptions.</li>
-    <li>Validate cross-region access patterns and billable transfer boundaries.</li>
+    <li>
+      Model data retention and any versioning explicitly (retention is a multiplier).
+    </li>
+    <li>
+      Validate compaction/GC behavior (retention settings and churn affect stored size).
+    </li>
+  </ul>
+
+  <h2>3) Network transfer (billable boundaries)</h2>
+  <p>
+    If clients are outside the region, or you replicate/serve across regions, include outbound transfer as a separate line.
+    Transfer often becomes meaningful when you add multi-region patterns.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/data-egress-cost-calculator/">Egress</a>,{" "}
+    <a href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Baseline node-hours</strong> = baseline nodes × hours/month
+    </li>
+    <li>
+      <strong>Peak node-hours</strong> = (peak nodes - baseline nodes) × peak hours/month
+    </li>
+    <li>
+      <strong>Stored GB-month</strong> = average stored GB across the month (include growth)
+    </li>
+    <li>
+      <strong>Transfer GB/month</strong> = cross-region/internet bytes (if applicable)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Ignoring hotspots (hot keys force capacity above average throughput).</li>
+    <li>Paying for peak capacity 24/7 even if peak is a short batch window.</li>
+    <li>Not modeling retention/versioning (stored GB grows quietly).</li>
+    <li>Missing cross-region transfer when adding DR or global clients.</li>
+    <li>Not validating with real workload traces (good-day averages hide tail risk).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate peak read/write throughput and identify peak drivers (batch jobs, backfills).</li>
+    <li>Validate hotspot risk (key distribution, top partitions) and fix the schema before scaling blindly.</li>
+    <li>Validate storage growth and retention (including churn and compaction behavior).</li>
+    <li>Validate where clients are (same-region vs cross-region) and which legs are billable.</li>
   </ul>
 
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/gcp-cloud-sql-pricing/">Cloud SQL estimate</a>
-    <a class="btn" href="/guides/gcp-cloud-storage-pricing/">Cloud Storage pricing</a>
+    <a class="btn" href="/guides/gcp-bigquery-cost-estimation/">BigQuery estimate</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/bigtable/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Bigtable pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/bigtable/docs" target="_blank" rel="nofollow noopener">
+        Cloud Bigtable documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

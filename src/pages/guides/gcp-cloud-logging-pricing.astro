@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Logging pricing: ingestion, retention, and query scans";
+const title = "Cloud Logging pricing (GCP): ingestion, retention, and query scans";
 const description =
-  "A practical model for Cloud Logging-style costs: GB ingested, retention GB-month, and query/scan. Includes a fast way to estimate GB/month from event rate and payload size.";
+  "A practical model for Cloud Logging costs: GB ingested, retention storage (GB-month), and query/scan behavior. Includes a fast method to estimate GB/day from events/sec × bytes/event and a checklist to find dominant sources.";
 
 const faqs = [
   {
     q: "What usually drives logging cost?",
-    a: "Ingestion volume (GB) is usually the primary driver. Retention becomes material when you keep logs for months, and query scans matter for heavy analytics.",
+    a: "Ingestion volume (GB) is usually the primary driver. Retention becomes material when you keep logs for months, and query scans matter for dashboard-heavy analytics.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate events per second and average payload size, convert to GB/day and GB/month, then multiply by retention days.",
+    a: "Estimate GB/day (from provider usage or from events/sec × bytes/event), then model retention days. Add scan/search if you run frequent queries or dashboards.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Using one blended event size and ignoring a single dominant source (ingress/firewall/audit). Another common miss is dashboard refresh frequency: repeated scans can add up quickly.",
   },
   {
     q: "How do I validate?",
-    a: "Sample real log payloads, validate high-volume sources, and validate dashboards/alerts that scan large windows repeatedly.",
+    a: "Sample real payload sizes for top sources, validate retention per source, and audit dashboards/alerts for wide windows and frequent refresh.",
   },
 ];
 ---
@@ -24,54 +28,137 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-logging-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     Logging costs are predictable when you treat logs like data: bytes in, bytes stored, bytes scanned. The biggest wins come
-    from controlling ingestion volume and retention.
+    from controlling ingestion volume and retention, and from preventing dashboards from scanning wide windows repeatedly.
   </p>
+
+  <h2>0) Inventory sources (do not blend)</h2>
+  <p>List the sources that can dominate volume and model them separately.</p>
+  <ul>
+    <li>
+      <strong>Ingress/access</strong>: very high volume, moderate size.
+    </li>
+    <li>
+      <strong>Firewall/WAF</strong>: can be high volume and high size (rule metadata).
+    </li>
+    <li>
+      <strong>Audit/security</strong>: lower volume but required retention.
+    </li>
+    <li>
+      <strong>Application logs</strong>: depends on log level and request volume.
+    </li>
+  </ul>
 
   <h2>1) Ingestion (GB)</h2>
   <p>
-    Estimate log bytes per event × events per second. Convert to GB/day and multiply by 30 for a monthly baseline. Model the
-    biggest sources separately (ingress, audit, firewall, application logs).
+    Ingestion is the core driver. If you have usage exports, use them. If not, estimate from event rate and payload size.
   </p>
-  <p>
-    Tool: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/guides/estimate-log-ingestion-gb-per-day/">Estimate GB/day guide</a>.
   </p>
+  <ul>
+    <li>
+      Model baseline + peak: incident traffic and verbose logging can create a peak month.
+    </li>
+    <li>
+      Sample bytes/event for the top sources instead of using one blended average.
+    </li>
+  </ul>
 
   <h2>2) Retention (GB-month)</h2>
   <p>
-    Retention is a GB-month problem. If you ingest 20 GB/day and retain 30 days, you store roughly 600 GB on average (before
-    compression and tiering assumptions).
+    Retention is a storage multiplier. In steady state, stored volume is roughly the last N days of logs, so retained GB is
+    approximately <strong>GB/day × retention days</strong>.
   </p>
-  <p>
-    Tool: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
+    <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>.
   </p>
-
-  <h2>3) Query and scan</h2>
-  <p>
-    Queries and dashboards often scan far more data than expected. Count how many queries run per day and estimate GB scanned
-    per query based on time window and filters.
-  </p>
-  <p>
-    Tool: <a href="/calculators/log-search-scan-cost-calculator/">Log scan</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the biggest sources and turn off or sample noisy logs first.</li>
-    <li>Validate retention windows and whether long-term retention is needed for all sources.</li>
-    <li>Validate dashboards/alerts for wide time windows that scan lots of data repeatedly.</li>
+    <li>
+      Keep a short hot window for troubleshooting and archive only what you must keep long-term.
+    </li>
+    <li>
+      Split retention by log class (access vs audit vs app logs) instead of one global retention setting.
+    </li>
+  </ul>
+
+  <h2>3) Query and scan (dashboards + alerts)</h2>
+  <p>
+    Query costs depend on how much data you scan and how often. Dashboards and alert rules can scan far more data than you
+    expect, especially with broad time windows and frequent refresh.
+  </p>
+  <p class="muted">
+    Tool: <a href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>.
+  </p>
+  <ul>
+    <li>
+      A dashboard refreshing every minute is 1,440 refreshes/day.
+    </li>
+    <li>
+      Prefer queries that filter early and use narrower time windows.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>GB/day ingested</strong> = sum over sources(events/day × bytes/event ÷ 1e9)
+    </li>
+    <li>
+      <strong>GB/month ingested</strong> = GB/day × 30.4 (baseline + peak)
+    </li>
+    <li>
+      <strong>Retained GB</strong> ~= GB/day × retention days (split by source)
+    </li>
+    <li>
+      <strong>GB scanned/month</strong> = scans/day × GB/scan × 30.4 (dashboards + alerts)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Turning on high-volume sources without measuring their payload sizes.</li>
+    <li>Using one blended event size that hides a dominant source (ingress/firewall).</li>
+    <li>Keeping long retention everywhere by default.</li>
+    <li>Dashboards/alerts scanning wide windows repeatedly (query cost explosion).</li>
+    <li>Verbose logging during incidents (peak ingestion dominates the month).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Sample payload sizes for top sources and compute bytes/event.</li>
+    <li>Validate which sources are enabled and disable/suppress the noisiest first.</li>
+    <li>Validate retention per log class and apply tiered storage if needed.</li>
+    <li>Audit dashboard refresh intervals and alert windows (reduce repeated wide scans).</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/log-cost-calculator/">All log tools</a>
     <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Ingestion</a>
-    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention</a>
+    <a class="btn" href="/calculators/log-storage-cost-calculator/">Tiered storage</a>
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/logging/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Logging pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/logging/docs" target="_blank" rel="nofollow noopener">
+        Cloud Logging documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

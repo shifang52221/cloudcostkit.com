@@ -1,22 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Functions pricing: invocations, duration, and log volume";
+const title = "Cloud Functions pricing (GCP): invocations, duration, egress, and log volume";
 const description =
-  "A practical Cloud Functions cost model: invocations, duration, networking/egress, and logs. Includes a validation checklist to avoid underestimating retries.";
+  "A practical Cloud Functions cost model: invocations, execution time, outbound transfer, and logs. Includes a workflow to estimate baseline + peak and validate retries, cold starts, and log bytes per invocation.";
 
 const faqs = [
   {
     q: "What usually drives Cloud Functions cost?",
-    a: "Invocations and duration are the core drivers, but log ingestion and outbound transfer can dominate for high-volume workloads.",
+    a: "Invocations and duration are the core drivers, but outbound transfer and log ingestion can dominate for high-volume or chatty workloads.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly invocations and average duration, then estimate response/outbound transfer and log bytes per invocation.",
+    a: "Estimate monthly invocations and duration, then add separate line items for response/outbound transfer and log bytes per invocation (plus retention).",
+  },
+  {
+    q: "Why do serverless bills spike during incidents?",
+    a: "Retries and timeouts multiply invocations and duration. Incident logging often becomes more verbose, creating a second spike from log ingestion.",
   },
   {
     q: "How do I validate?",
-    a: "Validate retries/timeouts, validate event trigger volume, and validate actual log payload sizes from a sample.",
+    a: "Validate trigger volume, retry rates, p95 duration, and average log payload size from real samples. Do not validate on a single good day.",
   },
 ];
 ---
@@ -24,55 +28,144 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-functions-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    The best Cloud Functions estimate is a “unit economics” model: per-invocation cost drivers multiplied by monthly volume.
-    Keep compute, transfer, and logs as separate lines.
+    The best Cloud Functions estimate is "unit economics": per-invocation drivers multiplied by monthly volume. Keep compute,
+    transfer, and logs as separate lines so you can see what actually dominates as traffic grows.
   </p>
 
-  <h2>1) Invocations</h2>
-  <p>
-    Convert your trigger source to monthly invocations (HTTP RPS, Pub/Sub messages, scheduler triggers). Model peak periods
-    separately if you have bursty traffic.
-  </p>
-  <p>
-    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+  <h2>0) Identify what triggers invocations (choose the right driver)</h2>
+  <ul>
+    <li>
+      <strong>HTTP</strong>: driver is requests/month.
+    </li>
+    <li>
+      <strong>Event-driven</strong>: driver is events/messages/month (Pub/Sub, storage events).
+    </li>
+    <li>
+      <strong>Scheduler</strong>: driver is runs/day (plus any fan-out).
+    </li>
+    <li>
+      <strong>Fan-out</strong>: one trigger may create N downstream invocations (hidden multiplier).
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a> (for rate-based drivers).
   </p>
 
-  <h2>2) Duration</h2>
-  <p>Use p50 and p95 duration to model steady-state and spikes. Spikes often come from upstream latency and retries.</p>
-
-  <h2>3) Transfer and egress</h2>
-  <p>Response size and outbound calls can make egress large. Estimate average response size and outbound GB separately.</p>
+  <h2>1) Invocations (per month)</h2>
   <p>
+    Convert your driver into monthly invocations. Keep baseline and peak periods separate (batch jobs, incidents, marketing
+    spikes).
+  </p>
+  <ul>
+    <li>
+      Include <strong>retries</strong>: a retry rate of 50% increases invocations by 1.5×.
+    </li>
+    <li>
+      Include <strong>background traffic</strong>: health checks, bots, cron pings.
+    </li>
+  </ul>
+
+  <h2>2) Duration (the compute multiplier)</h2>
+  <p>
+    Duration turns invocations into compute. Model at least two percentiles (p50 and p95) to capture slow-path behavior.
+    Slow paths are usually caused by upstream latency (DB/APIs), cold starts, and throttling.
+  </p>
+  <ul>
+    <li>
+      Track <strong>dependency time</strong>: external calls dominate duration for many functions.
+    </li>
+    <li>
+      Keep a peak scenario: incidents increase duration and retries at the same time.
+    </li>
+  </ul>
+
+  <h2>3) Outbound transfer (egress can dominate)</h2>
+  <p>
+    Outbound transfer becomes material when functions return large payloads or call external APIs. Estimate response size
+    separately from compute so you can see what is driving the bill.
+  </p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
     <a href="/calculators/data-egress-cost-calculator/">Egress</a>.
   </p>
-
-  <h2>4) Logs</h2>
-  <p>
-    Multiply bytes logged per invocation by invocation volume to estimate ingestion. Add retention and scan costs if you run
-    frequent queries.
-  </p>
-  <p>
-    Tool: <a href="/calculators/log-cost-calculator/">Log cost tools</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate retry behavior (each retry multiplies invocations and transfer).</li>
-    <li>Validate p95 duration and cold-start periods.</li>
-    <li>Validate log volume per invocation and retention policies.</li>
+    <li>
+      Split destinations: same-region vs cross-region vs internet have different billing behavior.
+    </li>
+    <li>
+      If one endpoint returns large payloads, model it separately (heavy tail).
+    </li>
+  </ul>
+
+  <h2>4) Logs (ingestion + retention + scan)</h2>
+  <p>
+    Logging scales with volume. If each invocation logs a few KB and you have millions of invocations, log ingestion can
+    exceed compute. Model ingestion and retention explicitly.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
+    <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>,{" "}
+    <a href="/calculators/log-search-scan-cost-calculator/">Scan/search</a>.
+  </p>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Invocations/month</strong> = baseline + peak (include retries and fan-out)
+    </li>
+    <li>
+      <strong>Duration</strong> = p50 + p95 scenario (seconds)
+    </li>
+    <li>
+      <strong>Egress GB/month</strong> = invocations/month × avg response size (GB) + external API egress
+    </li>
+    <li>
+      <strong>Log GB/month</strong> = invocations/month × avg log bytes/invocation (sample real payloads)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Ignoring retries/timeouts (multipliers on invocations, duration, and transfer).</li>
+    <li>Using one average duration instead of modeling the slow path (p95 matters).</li>
+    <li>Returning large payloads without modeling egress separately.</li>
+    <li>Verbose logs per invocation (log ingestion dominates at scale).</li>
+    <li>Not separating baseline vs peak months (incidents create a different cost profile).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Measure invocations and duration over a representative window (baseline + peak).</li>
+    <li>Validate retry rates and timeout behavior during incident windows.</li>
+    <li>Sample real log payload size and multiply by invocation volume.</li>
+    <li>Validate response sizes/top endpoints by bytes (avoid blended averages).</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests/month</a>
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/functions/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Functions pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/functions/docs" target="_blank" rel="nofollow noopener">
+        Cloud Functions documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

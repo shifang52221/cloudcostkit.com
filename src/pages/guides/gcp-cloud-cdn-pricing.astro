@@ -1,75 +1,150 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud CDN pricing: estimate bandwidth, requests, and origin egress";
+const title = "Cloud CDN pricing (GCP): bandwidth, requests, and origin egress (cache fill)";
 const description =
-  "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate, big endpoints, and purge events.";
+  "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate by path, heavy-tail endpoints, and purge/deploy events that reduce hit rate.";
 
 const faqs = [
   {
     q: "What usually drives CDN cost?",
-    a: "Bandwidth is usually the biggest driver. Requests matter for high-RPS APIs or lots of small objects.",
+    a: "Bandwidth is usually the biggest driver. Requests matter for API-like traffic and for sites with many small objects. Origin egress matters when hit rate is low or purges/deploys cause cold cache.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly edge GB and requests, then estimate origin GB from cache hit rate (misses drive cache fill).",
+    a: "Estimate monthly edge GB and edge requests, then estimate origin GB from cache hit rate (misses drive cache fill). Keep peak scenarios for bot spikes and cold cache events.",
   },
   {
     q: "How do I validate?",
-    a: "Validate cache hit rate and top endpoints by bytes/requests, and validate deploy/purge behavior that reduces hit rate.",
+    a: "Validate cache hit rate overall and by path, validate top endpoints by bytes, and validate purge/deploy behavior that temporarily increases cache misses.",
+  },
+  {
+    q: "What is the most common mistake?",
+    a: "Double-counting edge bandwidth and origin egress as the same GB, or using one blended response size when a few endpoints dominate bytes.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-cdn-pricing" lastUpdated="2026-01-22" faqs={faqs}>
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/gcp-cloud-cdn-pricing"
+  lastUpdated="2026-01-27"
+  faqs={faqs}
+>
   <p>
-    Cloud CDN pricing becomes predictable when you break it down into <strong>edge bandwidth</strong>, <strong>edge requests</strong>,
-    and <strong>origin egress</strong>. Most surprise bills are caused by cache misses and origin traffic (cache fill), not
-    steady-state cache hits.
+    Cloud CDN pricing becomes predictable when you break it into three drivers: <strong>edge bandwidth</strong>,{" "}
+    <strong>edge requests</strong>, and <strong>origin egress (cache fill)</strong>. Most surprise bills are caused by cache
+    misses and cold-cache events, not by steady-state hits.
   </p>
+
+  <h2>0) Define the boundary (edge vs origin)</h2>
+  <ul>
+    <li>
+      <strong>Edge bandwidth</strong>: bytes delivered from CDN to end users.
+    </li>
+    <li>
+      <strong>Origin egress</strong>: bytes pulled from origin to CDN on cache miss/fill.
+    </li>
+    <li>
+      <strong>Requests</strong>: request count at the edge; keep a separate count for origin if your origin pricing cares.
+    </li>
+  </ul>
 
   <h2>1) Edge bandwidth (GB/month)</h2>
   <p>
-    Use a representative traffic window. If you only know RPS, estimate average response size and multiply by monthly
-    requests. Model “big endpoints” separately to avoid blended-average errors.
+    Use a representative traffic window. If you only have RPS, estimate transfer from response size and request volume. If
+    you have a few very large endpoints (downloads, media), model them separately.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>,{" "}
-    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
+    <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
+    <a href="/calculators/unit-converter/">Unit converter</a>.
   </p>
 
   <h2>2) Requests (per month)</h2>
   <p>
-    Convert RPS to monthly requests and ensure you match pricing units (per 10k, per 1M). Requests are often small for large
-    objects but large for APIs and many-small-object workloads.
+    Convert RPS to monthly requests and keep units explicit (per 10k vs per 1M). Request fees often dominate for API-like
+    traffic with small payloads.
   </p>
-  <p>
-    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>,{" "}
-    <a href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
+    <a href="/calculators/cdn-request-cost-calculator/">CDN request fees</a>.
   </p>
+  <ul>
+    <li>
+      Keep a <strong>peak scenario</strong> for bot spikes and incident traffic.
+    </li>
+    <li>
+      If you have many small objects per page, request counts scale faster than bandwidth.
+    </li>
+  </ul>
 
   <h2>3) Origin egress (cache fill)</h2>
   <p>
-    Origin egress is driven by misses. A practical estimate is:
-    <strong>origin GB ≈ edge GB × (1 − hit rate)</strong>. Purges, low TTLs, and personalized responses reduce hit rate and
-    increase cache fill.
+    Origin egress is driven by cache misses. A practical estimate is:
+    <strong> origin GB ~= edge GB * (1 - hit rate)</strong>. Purges, deploys, and low TTLs reduce hit rate and increase cache
+    fill.
   </p>
-  <p>
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
+  <p class="muted">Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost</a>.</p>
   <ul>
-    <li>Validate cache hit rate and how it changes during deploys/purges.</li>
-    <li>Validate top endpoints by bytes and requests (avoid blended averages).</li>
-    <li>Validate origin egress separately from edge bandwidth to avoid double-counting.</li>
+    <li>
+      Model large objects separately: one download path can dominate origin GB even when overall hit rate looks healthy.
+    </li>
+    <li>
+      Track cold cache events: a purge plus a large deploy can temporarily turn most traffic into cache fill.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Edge requests/month</strong> = baseline + peak
+    </li>
+    <li>
+      <strong>Edge GB/month</strong> = requests/month * avg response size (GB) (split big endpoints)
+    </li>
+    <li>
+      <strong>Origin GB/month</strong> ~= edge GB/month * (1 - hit rate)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Double-counting edge bandwidth and origin egress.</li>
+    <li>Using one blended response size when a few endpoints dominate bytes.</li>
+    <li>Ignoring purge/deploy behavior and cold-cache events.</li>
+    <li>Mixing request pricing units (per 10k vs per 1M).</li>
+    <li>Assuming hit rate is stable; it varies by path, TTL, and cache key configuration.</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Validate cache hit rate overall and by path, and measure changes during deploys/purges.</li>
+    <li>Validate top endpoints by bytes and request volume (avoid blended averages).</li>
+    <li>Validate peak windows where retries or bot traffic increase requests and bandwidth.</li>
   </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost</a>
-    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN requests</a>
-    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN total cost</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">Bandwidth</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">Requests</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/cdn/pricing" target="_blank" rel="nofollow noopener">
+        Cloud CDN pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/cdn/docs" target="_blank" rel="nofollow noopener">
+        Cloud CDN documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

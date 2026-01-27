@@ -1627,8 +1627,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Artifact Registry pricing: storage + pulls + egress (a practical estimate)",
-    "description": "Model Artifact Registry costs: storage (GB-month), download volume (pulls), and outbound transfer. Includes a workflow to estimate GB-month from retention.",
+    "title": "Artifact Registry pricing (GCP): storage + downloads + egress (practical estimate)",
+    "description": "A practical Artifact Registry cost model: stored GB-month baseline, download volume from CI/CD and cluster churn, and outbound transfer. Includes a workflow to estimate GB-month from retention and validate layer sharing and peak pull storms.",
     "canonicalPath": "/guides/gcp-artifact-registry-pricing",
     "category": "GCP",
     "slug": "gcp-artifact-registry-pricing",
@@ -1639,19 +1639,18 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "BigQuery cost estimation: storage, scans, and streaming (practical model)",
-    "description": "Estimate BigQuery-style analytics costs with drivers you can measure: stored data (GB-month), scanned bytes, streaming ingestion, and partitioning/retention choices.",
+    "title": "BigQuery cost estimation: storage, bytes scanned, and the dashboard trap",
+    "description": "Estimate BigQuery-style analytics costs with measurable drivers: stored data (GB-month), bytes scanned (per query), and streaming/exports. Includes a workflow to model baseline vs peak and validate partition pruning and dashboard refresh behavior.",
     "canonicalPath": "/guides/gcp-bigquery-cost-estimation",
     "category": "GCP",
     "slug": "gcp-bigquery-cost-estimation",
     "topics": [
-      "backup",
       "storage"
     ]
   },
   {
-    "title": "Bigtable cost estimation: nodes, storage, and traffic (practical model)",
-    "description": "A driver-based Bigtable estimate: node-hours, stored GB, and network transfer. Includes validation steps for hotspots, compactions, and peak throughput.",
+    "title": "Bigtable cost estimation: nodes, storage growth, and transfer (practical model)",
+    "description": "A driver-based Bigtable estimate: provisioned capacity (node-hours), stored GB-month + growth, and network transfer. Includes validation steps for hotspots, compactions, and peak throughput that force over-provisioning.",
     "canonicalPath": "/guides/gcp-bigtable-cost-estimation",
     "category": "GCP",
     "slug": "gcp-bigtable-cost-estimation",
@@ -1662,8 +1661,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud Armor pricing: model request volume and attack spikes",
-    "description": "A practical WAF cost model: baseline traffic plus attack spikes. Includes validation steps for request surges, rule sets, and logging/analytics.",
+    "title": "Cloud Armor pricing (GCP): model baseline traffic, attack spikes, and logging",
+    "description": "A practical Cloud Armor estimate: baseline request volume plus an attack scenario (peak RPS × duration). Includes validation steps for spikes, rule footprint, and the secondary cost driver most teams miss: logs and analytics during incidents.",
     "canonicalPath": "/guides/gcp-cloud-armor-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-armor-pricing",
@@ -1674,8 +1673,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud CDN pricing: estimate bandwidth, requests, and origin egress",
-    "description": "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate, big endpoints, and purge events.",
+    "title": "Cloud CDN pricing (GCP): bandwidth, requests, and origin egress (cache fill)",
+    "description": "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate by path, heavy-tail endpoints, and purge/deploy events that reduce hit rate.",
     "canonicalPath": "/guides/gcp-cloud-cdn-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-cdn-pricing",
@@ -1686,8 +1685,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud Functions pricing: invocations, duration, and log volume",
-    "description": "A practical Cloud Functions cost model: invocations, duration, networking/egress, and logs. Includes a validation checklist to avoid underestimating retries.",
+    "title": "Cloud Functions pricing (GCP): invocations, duration, egress, and log volume",
+    "description": "A practical Cloud Functions cost model: invocations, execution time, outbound transfer, and logs. Includes a workflow to estimate baseline + peak and validate retries, cold starts, and log bytes per invocation.",
     "canonicalPath": "/guides/gcp-cloud-functions-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-functions-pricing",
@@ -1698,41 +1697,39 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud Logging pricing: ingestion, retention, and query scans",
-    "description": "A practical model for Cloud Logging-style costs: GB ingested, retention GB-month, and query/scan. Includes a fast way to estimate GB/month from event rate and payload size.",
+    "title": "Cloud Logging pricing (GCP): ingestion, retention, and query scans",
+    "description": "A practical model for Cloud Logging costs: GB ingested, retention storage (GB-month), and query/scan behavior. Includes a fast method to estimate GB/day from events/sec × bytes/event and a checklist to find dominant sources.",
     "canonicalPath": "/guides/gcp-cloud-logging-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-logging-pricing",
     "topics": [
       "backup",
-      "logging"
+      "logging",
+      "storage"
     ]
   },
   {
-    "title": "Cloud Monitoring metrics pricing: time series, sample rate, and retention",
-    "description": "A practical metrics cost model: time series cardinality, sample rate, retention, and dashboards/alerts. Includes validation steps to prevent high-cardinality explosions.",
+    "title": "Cloud Monitoring metrics pricing (GCP): time series, sample rate, and retention",
+    "description": "A practical metrics cost model: time series count (cardinality), sample rate, retention, and dashboard/alert query behavior. Includes validation steps to prevent high-cardinality explosions and excessive refresh patterns.",
     "canonicalPath": "/guides/gcp-cloud-monitoring-metrics-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-monitoring-metrics-pricing",
     "topics": [
       "backup",
-      "database",
       "metrics"
     ]
   },
   {
-    "title": "Cloud NAT cost: why it spikes and how to model outbound traffic",
-    "description": "A practical Cloud NAT estimate: hourly baseline + data processed (plus egress). Includes common patterns that multiply outbound GB during incidents and deployments.",
+    "title": "Cloud NAT cost (GCP): why it spikes and how to model outbound traffic",
+    "description": "A practical Cloud NAT estimate: baseline configuration + outbound GB processed through NAT, with a peak scenario for retries, node churn, and dependency storms. Includes a validation checklist and cost-reduction levers.",
     "canonicalPath": "/guides/gcp-cloud-nat-cost",
     "category": "GCP",
     "slug": "gcp-cloud-nat-cost",
-    "topics": [
-      "egress"
-    ]
+    "topics": []
   },
   {
-    "title": "Cloud Run pricing: a practical model (requests, CPU/memory time, and egress)",
-    "description": "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, CPU/memory time, concurrency, outbound transfer, and logs.",
+    "title": "Cloud Run pricing (GCP): requests, CPU/memory time, and egress (practical model)",
+    "description": "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, duration, concurrency, outbound transfer, and logs. Includes a validation checklist for retries, cold starts, and heavy-tail response sizes.",
     "canonicalPath": "/guides/gcp-cloud-run-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-run-pricing",
