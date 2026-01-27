@@ -1,96 +1,67 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
+import { LogStorageTieredCostCalculator } from "../../components/calculators/LogStorageTiered";
 
-const title = "Log Storage Cost Calculator";
+const title = "Tiered Log Storage Cost Calculator (Hot + Archive)";
 const description =
-  "Estimate log storage cost from GB/day ingested, retention days, and $/GB-month pricing. Educational use only.";
+  "Estimate tiered log storage costs with a hot window plus an optional cold/archive tier. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/log-storage-cost-calculator"
-  intro="If you're searching for log storage costs, retention is usually the driver. This calculator estimates the steady-state retained log storage and its monthly cost from GB/day, retention days, and a $/GB-month pricing assumption."
+  intro="Many teams keep a short hot window for fast search, then move older logs to a cheaper cold/archive tier. This calculator estimates steady-state storage cost for a 2-tier model (hot + optional cold), including archive fraction and a compression factor if your vendor bills on stored size."
   examples={[
-    "50 GB/day retained for 30 days -> ~1,500 GB retained steady-state; apply $/GB-month to estimate storage cost.",
-    "High retention (90-365 days) often dominates storage cost even when daily ingest is flat.",
+    "Hot: 14 days at $0.03/GB-month + Cold: 90 additional days at $0.01/GB-month (archive 100%).",
+    "Archive only audit logs (e.g., 20% of volume) instead of archiving everything.",
   ]}
   includes={[
-    "Retained log storage estimate from GB/day and retention days.",
-    "Monthly storage cost estimate from retained GB and $/GB-month pricing.",
+    "Hot retention storage cost (GB/day × hot days × $/GB-month).",
+    "Optional cold/archive storage cost for additional days.",
+    "Optional archive fraction and compression ratio.",
   ]}
   excludes={[
-    "Ingestion charges (model separately if billed).",
-    "Search/scan charges and indexing add-ons (model separately).",
+    "Ingestion charges (use Log Ingestion calculator).",
+    "Scan/search charges (use Log Search Scan calculator).",
+    "Provider-specific minimums and retrieval charges for cold tiers.",
   ]}
   how={[
-    "Retained GB (steady-state) ~ GB/day x retention days.",
-    "Monthly storage cost = retained GB x $/GB-month.",
-    "If retention varies by log type, model each type separately and sum."
+    "Hot stored GB ≈ GB/day × hot retention days.",
+    "Cold stored GB ≈ GB/day × archive fraction × cold days × compression ratio.",
+    "Monthly storage cost = (hot stored GB × hot $/GB-month) + (cold stored GB × cold $/GB-month).",
   ]}
   faqs={[
     {
-      q: "Why is retention the main driver?",
-      a: "Storage is billed over time (GB-month). Longer retention multiplies steady-state stored GB even when ingest is constant.",
+      q: "What does 'cold additional days' mean?",
+      a: "Cold retention is modeled as extra days beyond the hot window (e.g., 14 hot + 90 cold = 104 total days retained).",
     },
     {
-      q: "What if I use multiple retention tiers?",
-      a: "Split your logs into tiers (e.g., 7 days hot + 90 days archive), estimate each tier separately with different $/GB-month rates, and add them up.",
+      q: "What is archive fraction?",
+      a: "Some teams archive only specific classes of logs (audit/security) instead of everything. Use a fraction to model that subset.",
     },
     {
-      q: "Does compression reduce billed GB?",
-      a: "It depends on the vendor. Some bill based on compressed stored size; others bill based on ingested volume. Check your provider's billing definition.",
+      q: "What is compression ratio?",
+      a: "If your vendor bills cold storage on compressed stored size, set a ratio under 1. If billing is based on ingested size, use 1.",
     },
   ]}
   lastUpdated="2026-01-27"
   related={[
+    { href: "/calculators/log-retention-storage-cost-calculator", label: "Single-tier retention storage" },
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
-    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
-    { href: "/guides/log-costs", label: "Guide: log costs" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan/search cost" },
+    { href: "/calculators/log-cost-calculator", label: "Log cost (all line items)" },
     { href: "/guides/log-retention-storage-cost", label: "Guide: retention storage cost" },
   ]}
 >
-  <LogRetentionStorageCostCalculator client:load />
+  <LogStorageTieredCostCalculator client:load />
+
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Retention tiers (hot vs cold) — a practical model</h2>
-    <p class="muted" style="margin-top:8px">
-      If you keep “hot” logs for fast search and “cold” logs for compliance, model them as separate tiers with different
-      retention days and different $/GB-month rates.
-    </p>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Hot tier: 7–14 days for troubleshooting and dashboards.</li>
-      <li>Cold tier: 90–365 days for audits and investigations (often cheaper storage).</li>
-      <li>Only index what you search; indexing everything is a common hidden multiplier.</li>
-    </ul>
-  </div>
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">How to use this in a real estimate</h2>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
+      <li>Split logs into classes (access/app/audit) and decide what you actually need to retain long-term.</li>
+      <li>Keep a small hot window for troubleshooting and dashboards; archive only what you must.</li>
+      <li>Validate what the vendor bills for cold tiers (stored bytes vs ingested bytes, plus retrieval charges).</li>
     </ul>
-
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
-    </ul>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
-    </ul>
-
-    <h2>Next steps</h2>
-    <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
-      <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
-      <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan cost</a>
-      <a class="btn" href="/guides/log-costs/">Guide: log costs</a>
-      <a class="btn" href="/guides/log-retention-storage-cost/">Guide: retention storage cost</a>
-    </div>
   </div>
 </CalculatorLayout>
+

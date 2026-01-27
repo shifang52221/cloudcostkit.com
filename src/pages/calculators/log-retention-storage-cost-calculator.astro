@@ -4,87 +4,82 @@ import { LogRetentionStorageCostCalculator as LogRetentionStorageCostCalculatorC
 
 const title = "Log Retention Storage Cost Calculator";
 const description =
-  "Estimate retained log storage cost from GB/day, retention days, and $/GB-month pricing. Educational use only.";
+  "Estimate retained log storage cost from GB/day, retention days, and $/GB-month pricing (steady-state). Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/log-retention-storage-cost-calculator"
-  intro="Long retention policies can create big storage bills. This calculator estimates steady-state retained volume and storage cost."
+  intro="Retention turns a daily log stream into a steady-state stored dataset. This calculator estimates retained GB and monthly storage cost using a simple model: retained GB ≈ GB/day × retention days."
   examples={[
-    "50 GB/day logs with 30-day retention → ~1,500 GB retained steady state (before compression).",
+    "50 GB/day with 30-day retention → ~1,500 GB retained steady-state (before vendor-specific compression rules).",
+    "If you retain 90–365 days, storage often becomes the dominant log line item.",
   ]}
   includes={[
-    "Steady-state retained volume estimate (GB/day x retention days).",
-    "Monthly storage estimate from retained GB and $/GB-month pricing.",
+    "Steady-state retained volume estimate (GB/day × retention days).",
+    "Monthly storage estimate from retained GB and $/GB-month.",
   ]}
   excludes={[
-    "Ingestion charges (use Log Ingestion Cost Calculator).",
-    "Indexing/query scan charges (use Log Search Scan Cost Calculator).",
+    "Ingestion charges (use Log Ingestion calculator).",
+    "Scan/search charges (use Log Search Scan calculator).",
+    "Tiered hot/cold storage modeling (use Tiered Log Storage calculator).",
   ]}
   how={[
-    "Retained volume (steady state) ~ GB/day x retention days.",
-    "Monthly storage cost = retained GB x storage price per GB-month.",
-    "This is a simplified model; provider billing may differ by compression, indexing, and tiers.",
+    "Retained volume (steady state) ≈ GB/day × retention days.",
+    "Monthly storage cost = retained GB × $/GB-month.",
+    "If retention differs by log type, model each log type separately and sum.",
   ]}
   faqs={[
     {
-      q: "Why steady state?",
-      a: "After you've been logging for longer than your retention window, the dataset size is roughly constant: the last N days.",
+      q: "When does steady-state not apply?",
+      a: "During ramp-up (before you've logged for retention days) and when ingestion is highly seasonal. In those cases, model separate months/scenarios.",
     },
     {
-      q: "What if I have multiple log types?",
-      a: "Model each log stream separately (app logs, access logs, audit logs), then sum the results.",
+      q: "How should I choose retention?",
+      a: "Keep a small hot window for troubleshooting (days to weeks), and keep long retention only for high-value audit/security logs.",
+    },
+    {
+      q: "What if my provider has multiple tables with different retention?",
+      a: "Treat each table/source as its own stream (GB/day + retention days), then add the results.",
     },
   ]}
   lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
-    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
-    { href: "/guides/log-costs", label: "Guide: log costs" },
+    { href: "/calculators/log-storage-cost-calculator", label: "Tiered log storage (hot + archive)" },
+    { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan/search cost" },
     { href: "/guides/log-retention-storage-cost", label: "Guide: retention storage cost" },
+    { href: "/guides/log-costs", label: "Guide: log costs" },
   ]}
 >
   <LogRetentionStorageCostCalculatorComponent client:load />
+
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Retention defaults that keep costs predictable</h2>
+    <h2 style="margin-top:0">A practical retention policy (by log class)</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Prod: 7–14 days hot retention, longer only for critical/audit logs.</li>
-      <li>Staging: 3–7 days (enough for debugging, not enough to create surprise bills).</li>
-      <li>Dev: 1–3 days (noisy logs are common; short retention prevents drift).</li>
+      <li>
+        <strong>Access/ingress logs</strong>: 7–14 days hot retention (high volume, mostly operational value).
+      </li>
+      <li>
+        <strong>Application logs</strong>: 14–30 days (enough for incident timelines).
+      </li>
+      <li>
+        <strong>Audit/security logs</strong>: 90–365 days (compliance-driven; keep volume controlled).
+      </li>
     </ul>
     <p class="muted" style="margin-top:10px">
-      If you must keep logs long-term, archive to cheaper storage and keep only a small hot window indexed.
+      If you need long-term retention, consider moving cold logs to cheaper storage and keeping only a small hot window
+      indexed/searchable.
     </p>
   </div>
+
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">How to validate</h2>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
+      <li>Validate measured ingestion (GB/day) for your top sources, not a blended average.</li>
+      <li>Validate retention settings per table/source (defaults often drift).</li>
+      <li>Validate what the vendor bills as “stored GB” (compressed size vs ingested size differs by provider).</li>
     </ul>
-
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
-    </ul>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
-    </ul>
-
-    <h2>Next steps</h2>
-    <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
-      <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
-      <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan cost</a>
-      <a class="btn" href="/guides/log-costs/">Guide: log costs</a>
-      <a class="btn" href="/guides/log-retention-storage-cost/">Guide: retention storage cost</a>
-    </div>
   </div>
 </CalculatorLayout>
+

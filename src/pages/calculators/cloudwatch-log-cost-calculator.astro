@@ -1,104 +1,82 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { LogIngestionCostCalculator } from "../../components/calculators/LogIngestionCost";
-import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
+import { CloudwatchLogsCostCalculator } from "../../components/calculators/CloudwatchLogsCost";
 
 const title = "CloudWatch Logs Cost Calculator";
 const description =
-  "Estimate CloudWatch Logs-style costs from ingestion volume and retention storage assumptions. Educational use only.";
+  "Estimate CloudWatch Logs-style costs from ingestion, retention storage, and optional Logs Insights scans. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/cloudwatch-log-cost-calculator"
-  intro="CloudWatch Logs-style pricing is commonly driven by ingestion volume and retention. This page helps you estimate a practical monthly total by combining ingestion and retention storage line items using your own assumptions."
+  intro="CloudWatch Logs cost usually comes from three drivers: ingestion (GB), retention storage (GB-month), and Logs Insights scans (GB scanned). This calculator groups those line items into one model so you can estimate a realistic monthly total."
   examples={[
-    "Estimate ingestion from GB/day and a $/GB rate, then estimate retained storage from retention days and $/GB-month.",
-    "Retention can dominate total cost when you keep high-volume logs for 90+ days.",
+    "Model baseline ingestion + retention first, then optionally add Logs Insights scans if you query heavily.",
+    "Retention can dominate when you keep high-volume logs for 90+ days; scans can dominate when dashboards query broad windows.",
   ]}
   includes={[
-    "Ingestion estimate from GB/day and $/GB assumptions.",
-    "Retention storage estimate from GB/day, retention days, and $/GB-month assumptions.",
+    "Ingestion estimate from GB/day and $/GB.",
+    "Retention storage estimate from GB/day, retention days, and $/GB-month.",
+    "Optional Logs Insights scan estimate from scanned GB/day and $/GB scanned.",
   ]}
   excludes={[
-    "Query/scan charges and premium features (model separately if billed).",
-    "Region-tiered pricing unless you use blended rates or separate scenarios.",
+    "Exports/subscription filters to other systems (which may have their own ingestion charges).",
+    "Vendor-specific minimums and advanced features (anomaly detection, premium analytics).",
   ]}
   how={[
-    "Ingestion cost = GB/day x days/month x $/GB.",
-    "Retained storage (steady state) ~ GB/day x retention days; apply $/GB-month.",
-    "Sum the two line items for a monthly estimate.",
+    "Ingestion cost = (GB/day × billing days) × $/GB.",
+    "Retention storage (steady state) ≈ (GB/day × retention days) × $/GB-month.",
+    "Optional: Logs Insights scan cost = (GB scanned/day × billing days) × $/GB scanned.",
+    "Sum the line items for a monthly estimate.",
   ]}
   faqs={[
     {
-      q: "Why does retention matter so much?",
-      a: "Storage is billed per GB-month. Longer retention multiplies the amount of stored data even if ingestion stays flat.",
+      q: "Why do CloudWatch Logs bills spike during incidents?",
+      a: "Incidents create retries/timeouts and verbose logs, which multiply ingestion. Incident dashboards often scan broader windows more frequently, multiplying Insights scans.",
     },
     {
-      q: "How do I reduce costs quickly?",
-      a: "Reduce noisy logs at source, shorten retention for low-value logs, and avoid retaining high-volume debug logs in hot storage.",
+      q: "What is the most common modeling mistake?",
+      a: "Using one blended GB/day and forgetting that retention and scans are independent multipliers (retention days and query frequency).",
+    },
+    {
+      q: "How can I reduce costs quickly?",
+      a: "Drop noisy logs at source, shorten retention for low-value logs, and reduce broad Insights queries (narrow time windows and filter early).",
     },
   ]}
   lastUpdated="2026-01-27"
   related={[
+    { href: "/calculators/cloudwatch-logs-insights-cost-calculator", label: "CloudWatch Logs Insights scan cost" },
     { href: "/calculators/log-cost-calculator", label: "Log cost calculator (generic)" },
-    { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost calculator" },
-    { href: "/calculators/cloudwatch-logs-insights-cost-calculator", label: "Logs Insights scan cost" },
-    { href: "/guides/aws-cloudwatch-logs-pricing", label: "Guide: CloudWatch Logs pricing" },
-    { href: "/guides/estimate-log-ingestion-gb-per-day", label: "Guide: estimate log ingestion (GB/day)" },
-    { href: "/guides/log-retention-storage-cost", label: "Guide: log retention storage cost" },
+    { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
+    { href: "/calculators/log-storage-cost-calculator", label: "Tiered log storage (hot + archive)" },
     { href: "/guides/log-costs", label: "Guide: log costs" },
   ]}
 >
-  <div class="prose">
-    <h2 style="margin-top:0">1) Ingestion</h2>
-  </div>
-  <LogIngestionCostCalculator client:load />
+  <CloudwatchLogsCostCalculator client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2>2) Retention storage</h2>
-  </div>
-  <LogRetentionStorageCostCalculator client:load />
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">CloudWatch-specific gotchas to model separately</h2>
+    <h2 style="margin-top:0">CloudWatch-specific gotchas</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Query/scan</strong>: if you use Logs Insights heavily, scan volume can be a separate line item.</li>
-      <li><strong>Subscription filters</strong>: forwarding logs can move data into another system that also charges ingestion.</li>
-      <li><strong>High-cardinality fields</strong>: can increase downstream costs when you index/aggregate.</li>
+      <li>
+        <strong>Subscription filters / exports</strong>: forwarding logs to another system can create a second ingestion bill.
+      </li>
+      <li>
+        <strong>Dashboards and alerts</strong>: frequent refresh + wide windows can multiply Insights scan volume.
+      </li>
+      <li>
+        <strong>Retention drift</strong>: log groups often default to “never expire” unless explicitly set.
+      </li>
     </ul>
-    <p class="muted" style="margin-top:10px">
-      Use this page for the “baseline” ingestion + retention model, then add scan/exports as separate scenarios.
-    </p>
   </div>
+
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Validate after changes</h2>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
+      <li>Validate ingestion GB/day for your largest log groups (ingress, API, audit).</li>
+      <li>Validate retention days per log group and ensure defaults are not “forever”.</li>
+      <li>Validate Insights scanned bytes for dashboards/alerts (query frequency matters as much as window size).</li>
     </ul>
-
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
-    </ul>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
-    </ul>
-
-    <h2>Next steps</h2>
-    <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
-      <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator (generic)</a>
-      <a class="btn" href="/calculators/log-storage-cost-calculator/">Log storage cost calculator</a>
-      <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights scan cost</a>
-      <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">Guide: CloudWatch Logs pricing</a>
-    </div>
   </div>
 </CalculatorLayout>
+

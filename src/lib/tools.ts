@@ -209,7 +209,7 @@ export const TOOLS: Tool[] = [
   {
     slug: "log-ingestion-cost-calculator",
     title: "Log Ingestion Cost Calculator",
-    description: "Estimate monthly log ingestion and retention cost from GB/day and retention days.",
+    description: "Estimate monthly log ingestion cost from GB/day or from event rate and $/GB pricing.",
     category: "Logging",
   },
   {
@@ -220,14 +220,14 @@ export const TOOLS: Tool[] = [
   },
   {
     slug: "log-storage-cost-calculator",
-    title: "Log Storage Cost Calculator",
-    description: "Estimate log storage cost from retention days and $/GB-month pricing.",
+    title: "Tiered Log Storage Cost Calculator (Hot + Archive)",
+    description: "Estimate log storage cost using a hot window plus an optional cold/archive tier.",
     category: "Logging",
   },
   {
     slug: "cloudwatch-log-cost-calculator",
     title: "CloudWatch Logs Cost Calculator",
-    description: "Estimate CloudWatch-style log ingestion + retention costs.",
+    description: "Estimate CloudWatch-style log costs: ingestion, retention storage, and optional Insights scans.",
     category: "Logging",
   },
   {
