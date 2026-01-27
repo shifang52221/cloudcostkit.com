@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-pricing-explained"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -79,6 +79,18 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>Storage classes: treat retrieval as a separate scenario</h2>
+  <p>
+    Colder storage classes often look cheap on GB-month, but they can add retrieval and minimum duration costs. The safest
+    budgeting approach is to model a "retrieval month" separately (audits, backfills, restores) instead of smearing it
+    across the whole year.
+  </p>
+  <ul>
+    <li>Storage: GB-month by class (hot vs cold vs archive).</li>
+    <li>Transitions: lifecycle moves can create extra requests and sometimes fees.</li>
+    <li>Retrieval: restore GB and restore requests when you access archived objects.</li>
+  </ul>
+
   <h2>Recommended modeling approach</h2>
   <ol>
     <li>Estimate average stored GB.</li>
@@ -97,5 +109,18 @@ const faqs = [
     <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
     <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
   </p>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/s3/storage-classes/" target="_blank" rel="nofollow noopener">
+        Amazon S3 storage classes
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

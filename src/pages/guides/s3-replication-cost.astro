@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-replication-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -39,6 +39,10 @@ const faqs = [
   </p>
   <p>
     Guide: <a href="/guides/estimate-replication-gb-per-month-from-writes/">estimate replication GB/month</a>.
+  </p>
+  <p>
+    Exception: if you do a one-time migration/backfill (copying the whole bucket), model that as a separate one-time month:
+    total copied GB plus any request/listing work needed to enumerate objects.
   </p>
 
   <h2>Replication cost components</h2>
@@ -79,6 +83,14 @@ const faqs = [
     <li><strong>Request fees</strong>: many small objects can create high request volume.</li>
   </ul>
 
+  <h2>How to validate (avoid billing surprises)</h2>
+  <ul>
+    <li>Validate replication GB/month from source write volume and churn (not from bucket size).</li>
+    <li>Validate directionality: which side is billed for transfer/feature fees depends on provider rules.</li>
+    <li>Validate object count and listing behavior for large buckets (LIST can be a real cost in migrations).</li>
+    <li>Validate that destination storage class matches your intent (defaulting to hot tier is common).</li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/s3-replication-cost-calculator/">S3 replication cost</a>
@@ -91,5 +103,18 @@ const faqs = [
     Educational use only. S3 and compatible services have provider-specific rules (directionality, request classes,
     minimums, and regional pricing). Use this as a planning framework and confirm details in official docs.
   </p>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html" target="_blank" rel="nofollow noopener">
+        Amazon S3 replication documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

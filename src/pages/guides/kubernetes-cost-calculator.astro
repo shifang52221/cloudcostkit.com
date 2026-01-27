@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-cost-calculator"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -84,6 +84,36 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Nodes</strong> = node-hours/month by pool (baseline + peak)
+    </li>
+    <li>
+      <strong>Overhead</strong> = (1 - allocatable%) + daemonsets + max pods/node constraints
+    </li>
+    <li>
+      <strong>Storage</strong> = PV GB-month + snapshots GB-month (retention)
+    </li>
+    <li>
+      <strong>Load balancers</strong> = LB count x hours/month + data processed (if applicable)
+    </li>
+    <li>
+      <strong>Egress</strong> = internet + cross-zone + cross-region GB/month (split by destination)
+    </li>
+    <li>
+      <strong>Observability</strong> = log ingestion + retention + metrics series (separate line items)
+    </li>
+  </ul>
+
+  <h2>Validation checklist (before you trust the number)</h2>
+  <ul>
+    <li>Validate requests/limits and daemonset overhead from a representative cluster window.</li>
+    <li>Validate max pods per node and topology constraints (they can increase node count beyond "math minimum").</li>
+    <li>Validate outbound GB/month and whether traffic is internet vs cross-zone/cross-region.</li>
+    <li>Validate log bytes per request and retention policy defaults (avoid silent retention drift).</li>
+  </ul>
+
   <h2>Compare managed services</h2>
   <p>
     If you're choosing between managed Kubernetes offerings, use a consistent set of line items and the same traffic
@@ -104,4 +134,3 @@ const faqs = [
     as a planning baseline and validate with real usage after deployment.
   </p>
 </GuideLayout>
-

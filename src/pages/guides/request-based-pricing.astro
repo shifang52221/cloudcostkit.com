@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/request-based-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -46,7 +46,18 @@ const faqs = [
     100x.
   </p>
 
-  <h2>3) Estimate request cost</h2>
+  <h2>3) Split by request class (when providers have tiers)</h2>
+  <p>
+    Many services have more than one request class (for example: cached vs uncached, read vs write, standard vs advanced).
+    Do not blend them if prices differ materially.
+  </p>
+  <ul>
+    <li>API: reads vs writes, auth-heavy endpoints, and retry-prone endpoints.</li>
+    <li>CDN: cached hits vs origin requests (cache miss rate changes origin cost).</li>
+    <li>Messaging: publishes vs deliveries (fan-out and retries multiply deliveries).</li>
+  </ul>
+
+  <h2>4) Estimate request cost</h2>
   <ul>
     <li>
       API requests: <a href="/calculators/api-request-cost-calculator/">API request cost calculator</a>
@@ -59,7 +70,23 @@ const faqs = [
     </li>
   </ul>
 
-  <h2>4) Validate (avoid surprise multipliers)</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>Price unit</strong> = per 10k / 100k / 1M (write it down explicitly)
+    </li>
+    <li>
+      <strong>Class split</strong> = cached vs uncached (or read vs write) if pricing differs
+    </li>
+    <li>
+      <strong>Cost</strong> = sum(class_requests / unit x price_per_unit)
+    </li>
+  </ul>
+
+  <h2>5) Validate (avoid surprise multipliers)</h2>
   <ul>
     <li>
       Identify retry loops and timeouts. These can multiply API request volume and add transfer.
@@ -72,6 +99,28 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using a single monthly average and ignoring peak windows (marketing events and incidents).</li>
+    <li>Not splitting endpoints: a heavy endpoint can dominate requests and transfer.</li>
+    <li>Forgetting internal traffic: service-to-service calls can be larger than user traffic.</li>
+    <li>Assuming retries are rare (they often become "normal" under throttling or dependency issues).</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://cloud.google.com/run/pricing" target="_blank" rel="nofollow noopener">
+        Example: request-based components in Cloud Run pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank" rel="nofollow noopener">
+        Example: API Gateway request pricing
+      </a>
+    </li>
+  </ul>
+
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/cdn-costs/">CDN costs</a>
@@ -80,4 +129,3 @@ const faqs = [
     <a class="btn" href="/guides/egress-costs/">Egress costs</a>
   </div>
 </GuideLayout>
-

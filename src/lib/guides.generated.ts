@@ -2078,7 +2078,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Kubernetes requests & limits: practical sizing (and cost impact)",
-    "description": "How to size clusters from requests, choose allocatable headroom, and use limits to reason about burst risk - with a calculator and common pitfalls.",
+    "description": "How to size clusters from requests, choose allocatable headroom, and use limits to reason about burst risk - with a calculator, a worked template, and common pitfalls.",
     "canonicalPath": "/guides/kubernetes-requests-limits",
     "category": "Kubernetes",
     "slug": "kubernetes-requests-limits",
@@ -2088,8 +2088,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Kubernetes requests vs limits: why requests drive node count",
-    "description": "A practical explanation of Kubernetes requests vs limits for capacity planning and cost estimation, with common mistakes and quick sizing guidance.",
+    "title": "Kubernetes requests vs limits: why requests drive node count (and cost)",
+    "description": "A practical explanation of Kubernetes requests vs limits for capacity planning and cost estimation, with common mistakes, a worked sizing workflow, and links to calculators.",
     "canonicalPath": "/guides/kubernetes-requests-vs-limits-for-sizing",
     "category": "Kubernetes",
     "slug": "kubernetes-requests-vs-limits-for-sizing",

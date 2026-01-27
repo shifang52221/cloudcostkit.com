@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-crr-vs-srr-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -85,11 +85,58 @@ const faqs = [
     <a href="/calculators/object-storage-cost-calculator/">Object storage cost calculator</a>.
   </p>
 
+  <h2>Validation checklist (before you choose CRR vs SRR)</h2>
+  <ul>
+    <li>Validate your goal: DR/multi-region reads (CRR) vs durability inside a region (SRR).</li>
+    <li>Validate replicated GB/month from write volume and churn (do not use bucket size).</li>
+    <li>Validate destination storage class and lifecycle policies (replica defaults matter).</li>
+    <li>Validate whether replication is billed as a feature fee, transfer, or both in your provider/region.</li>
+  </ul>
+
+  <h2>Worked comparison template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Replicated GB/month</strong> = changed data per month (baseline + peak)
+    </li>
+    <li>
+      <strong>CRR per-GB fee</strong> = replication/transfer line item (if applicable)
+    </li>
+    <li>
+      <strong>SRR per-GB fee</strong> = replication line item (usually lower transfer component)
+    </li>
+    <li>
+      <strong>Replica storage</strong> = destination GB-month (by storage class)
+    </li>
+    <li>
+      <strong>Requests</strong> = extra PUT/GET/LIST/HEAD per month (many small objects scenario)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Comparing CRR vs SRR based on total bucket size instead of changed data per month.</li>
+    <li>Forgetting destination storage class (replica defaults to hot tier unless configured).</li>
+    <li>Ignoring peak replication windows (deployments/backfills can spike changed data).</li>
+  </ul>
+
   <h2>Related guides</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/s3-replication-cost/">S3 replication cost</a>
     <a class="btn" href="/guides/copy-storage-pricing/">Copy storage pricing</a>
     <a class="btn" href="/guides/s3-pricing-explained/">S3 pricing explained</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon S3 pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html" target="_blank" rel="nofollow noopener">
+        Amazon S3 replication documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/network-transfer-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -67,6 +67,22 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>Where to get the data (fastest sources)</h2>
+  <ul>
+    <li>
+      <strong>Billing exports</strong>: best for validating real GB and directionality (what is actually billed).
+    </li>
+    <li>
+      <strong>CDN analytics</strong>: edge bandwidth, request volume, cache hit rate (needed to split origin vs edge).
+    </li>
+    <li>
+      <strong>Load balancer metrics</strong>: data processed and request volume (good for separating heavy endpoints).
+    </li>
+    <li>
+      <strong>Flow logs / VPC metrics</strong>: inter-zone and inter-region traffic (often invisible in app metrics).
+    </li>
+  </ul>
+
   <h2>4) Validate (avoid double counting)</h2>
   <ul>
     <li>
@@ -79,6 +95,49 @@ const faqs = [
     <li>Check incident windows: retries/timeouts can multiply transfer.</li>
   </ul>
 
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Internet egress GB/month</strong> = requests/month x avg response size (split heavy endpoints)
+    </li>
+    <li>
+      <strong>CDN bandwidth GB/month</strong> = edge-to-user delivery (from CDN analytics)
+    </li>
+    <li>
+      <strong>Origin egress GB/month</strong> = cache fill traffic (depends on cache hit rate)
+    </li>
+    <li>
+      <strong>Cross-AZ GB/month</strong> = top east-west flows (LB, service mesh, database calls)
+    </li>
+    <li>
+      <strong>Cross-region GB/month</strong> = replication + DR + multi-region reads
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Blending all transfer into one average number (you lose the optimization lever).</li>
+    <li>Double-counting CDN bandwidth and origin egress (cache fill is the origin driver).</li>
+    <li>Ignoring cross-AZ traffic in multi-zone services (steady background cost in microservices).</li>
+    <li>Ignoring incident retries/timeouts (same payload transferred multiple times).</li>
+  </ul>
+
+  <h2>Optimization levers (match the lever to the bucket)</h2>
+  <ul>
+    <li>
+      Internet egress: compress payloads, reduce response size, put heavy endpoints behind CDN or signed downloads.
+    </li>
+    <li>
+      Origin egress: improve cache hit rate, avoid cache-busting deploy patterns, separate long-tail endpoints.
+    </li>
+    <li>
+      Cross-AZ: co-locate chatty services, reduce retries, batch calls, and avoid accidental cross-zone database access.
+    </li>
+    <li>
+      Cross-region: reduce cross-region reads, use regional affinity, and validate replication topology.
+    </li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
@@ -86,5 +145,18 @@ const faqs = [
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region</a>
     <a class="btn" href="/guides/egress-costs/">Egress guide</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="nofollow noopener">
+        AWS pricing (region/transfer pricing varies; validate per provider)
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/vpc/network-pricing" target="_blank" rel="nofollow noopener">
+        GCP VPC network pricing
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

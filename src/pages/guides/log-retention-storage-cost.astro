@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/log-retention-storage-cost"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -53,6 +53,35 @@ const faqs = [
     <li><strong>Cold</strong>: 30-180 days archived or stored cheaply (slower retrieval)</li>
   </ul>
 
+  <h2>Worked example (sanity-check your model)</h2>
+  <p>
+    Suppose you ingest <strong>10 GB/day</strong> and retain logs for <strong>30 days</strong>. Once you reach steady state,
+    stored logs are roughly <strong>300 GB</strong>. If storage is priced per GB-month, you can estimate monthly storage cost
+    as 300 GB x ($/GB-month), then add ingestion and any query/scan costs separately.
+  </p>
+  <ul>
+    <li>If you increase retention from 30 days to 90 days at the same ingest rate, stored GB roughly triples.</li>
+    <li>If you reduce ingest (sampling, filtering, structured logs), retention cost falls linearly too.</li>
+  </ul>
+
+  <h2>Do not forget query/scan behavior</h2>
+  <p>
+    Storage is only one part of "retention cost". If your team frequently searches or scans logs (especially during
+    incidents), scan/search can become a second spike. Keep scan volume and search frequency as explicit inputs.
+  </p>
+  <p class="muted">
+    Tools: <a href="/calculators/log-search-scan-cost-calculator/">Log scan/search cost</a>,{" "}
+    <a href="/calculators/log-cost-calculator/">Log cost overview</a>.
+  </p>
+
+  <h2>Fast levers (reduce cost without losing signal)</h2>
+  <ul>
+    <li>Shorten retention for low-value debug logs; keep longer retention for sparse high-value security/audit logs.</li>
+    <li>Sample noisy logs and reduce per-request log bytes (structured fields, fewer stack traces).</li>
+    <li>Move cold retention to cheaper tiers/object storage if your provider supports it.</li>
+    <li>Set defaults in IaC to prevent retention drift across new log groups/services.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li><strong>Retention drift</strong>: default policies slowly expand across more log groups.</li>
@@ -66,4 +95,18 @@ const faqs = [
     <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion calculator</a>
     <a class="btn" href="/guides/log-costs/">Log costs guide</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" target="_blank" rel="nofollow noopener">
+        CloudWatch pricing (example of ingestion + storage billing model)
+      </a>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/logging/pricing" target="_blank" rel="nofollow noopener">
+        Cloud Logging pricing (example of logging pricing model)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
