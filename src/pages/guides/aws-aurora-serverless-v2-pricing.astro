@@ -7,15 +7,15 @@ const description =
 const faqs = [
   {
     q: "What is the #1 mistake in Serverless v2 estimates?",
-    a: "Using a single average ACU and ignoring peak periods. Costs usually track ACU-hours, so short peaks can matter when they happen frequently.",
+    a: "Using a single average ACU and ignoring peak periods. Costs track ACU-hours over time, so frequent short peaks can add up.",
   },
   {
     q: "Should I model min and max capacity?",
-    a: "Yes. Use min capacity to estimate baseline, then model a peak scenario that reflects traffic spikes, batch jobs, or incident load.",
+    a: "Yes. Min capacity acts like a baseline you pay most of the time. Max capacity helps you bound the peak scenario and understand worst-case spend.",
   },
   {
     q: "What else do I need besides ACUs?",
-    a: "Storage (GB-month) and backups/retention. These can dominate long-term costs even when compute is right-sized.",
+    a: "Storage GB-month and backup GB-month (retention + churn). These can become long-term baselines even when compute is right-sized.",
   },
 ];
 ---
@@ -23,56 +23,114 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-aurora-serverless-v2-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Aurora Serverless v2 estimates should be built as scenarios: a baseline (typical ACUs) and at least one peak case.
-    If you model only an average, you will usually under-budget for spiky workloads.
+    Aurora Serverless v2 is priced primarily by <strong>ACU-hours</strong>, so you should estimate it like a time-series
+    bill: a baseline most hours, plus peaks that happen during batch jobs, traffic spikes, or incidents. If you budget
+    from a single average ACU, you usually under-estimate.
   </p>
 
-  <h2>Step 1: Build a baseline ACU-hours estimate</h2>
-  <ul>
-    <li>Estimate your typical ACUs during steady operation.</li>
-    <li>Convert to monthly usage: ACU-hours = avg ACU x hours/month.</li>
-    <li>Price with your effective $/ACU-hour for the region.</li>
-  </ul>
-
-  <h2>Step 2: Add a peak scenario (the part that protects the budget)</h2>
-  <p class="muted">
-    Peak model: peak ACU x peak hours per month (for example, 8 ACU for 2 hours/day).
-  </p>
-  <ul>
-    <li>Traffic spikes, launches, and incident response</li>
-    <li>Batch jobs, ETL, and large backfills</li>
-    <li>Retry storms from upstream timeouts</li>
-  </ul>
-
-  <h2>Step 3: Add storage and backups</h2>
+  <h2>Step 1: pick baseline and peak scenarios (don’t start with one number)</h2>
   <p>
-    Compute is only one part of the bill. Add storage GB-month and backup GB-month (retention + churn) as separate line
-    items.
+    Write down two scenarios you can defend:
+  </p>
+  <ul>
+    <li>
+      <strong>Baseline</strong>: typical ACUs during steady operation (most hours).
+    </li>
+    <li>
+      <strong>Peak</strong>: ACUs during known heavy windows (backfills, reports, spikes, deploy storms).
+    </li>
+  </ul>
+  <p class="muted">
+    If you know your configured min/max, baseline is often close to min, and peak should be bounded by max (or your
+    expected upper range).
   </p>
 
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-aurora-pricing/">Aurora pricing (what to include)</a>
-    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
-    <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
-  </div>
-
-  <h2>Validation checklist</h2>
+  <h2>Step 2: estimate ACU-hours</h2>
+  <p>
+    ACU-hours is just “capacity × time”. For a planning model:
+  </p>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <strong>Baseline ACU-hours</strong> = baseline ACU × baseline hours/month
+    </li>
+    <li>
+      <strong>Peak ACU-hours</strong> = peak ACU × peak hours/month
+    </li>
+    <li>
+      <strong>Total</strong> = baseline ACU-hours + peak ACU-hours
+    </li>
+  </ul>
+  <p class="muted">
+    Worked example: baseline 2 ACU always-on → 2 × 730 = 1,460 ACU-hours. Peak 8 ACU for 2 hours/day → 8 × 60 = 480
+    ACU-hours. Total ≈ 1,940 ACU-hours/month.
+  </p>
+
+  <h2>Step 3: add storage and backup retention as stable baselines</h2>
+  <ul>
+    <li>
+      <strong>Storage</strong>: average GB-month (and forecast if the database is growing).
+    </li>
+    <li>
+      <strong>Backups</strong>: backup GB-month driven by retention and churn.
+    </li>
+  </ul>
+  <p class="muted">
+    Tools and follow-ups:{" "}
+    <a href="/calculators/database-storage-growth-cost-calculator/">storage growth</a> and{" "}
+    <a href="/guides/aws-rds-backup-storage-gb-month-estimate/">estimate backup GB-month</a>.
+  </p>
+
+  <h2>Step 4: stress-test your budget (the “what if it happens weekly?” test)</h2>
+  <p>
+    The best guardrail is to ask: what if the peak window happens every day or every week? If your estimate can’t absorb
+    that, you’ll get surprised by routine operational events (deploys, backfills, retries).
+  </p>
+  <ul>
+    <li>Backfills and migrations (data reshaping or index builds)</li>
+    <li>Report generation and analytics queries</li>
+    <li>Upstream incidents that cause retries and timeouts</li>
+    <li>Seasonal traffic spikes and product launches</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Assuming serverless means “auto-pauses to zero” (v2 is not the same as older models).</li>
+    <li>Using a short load test and extrapolating to a month without modeling peaks.</li>
+    <li>Ignoring retention: backups can become a steady cost even if compute is perfect.</li>
+    <li>Budgeting from max capacity only (overestimates) or average only (underestimates) instead of scenarios.</li>
+    <li>Missing “around the DB” costs: logs, metrics, and transfer when apps aren’t co-located.</li>
+  </ul>
+
+  <h2>How to validate after you go live</h2>
+  <ul>
+    <li>In CUR / Cost Explorer, identify the ACU-hours usage line and compare baseline vs peak months.</li>
+    <li>Compare the time shape in metrics to billing: do peaks happen daily, weekly, or only during incidents?</li>
+    <li>After tuning min/max, re-check that latency and failover behavior still meet requirements.</li>
+  </ul>
+
+  <h2>Related guides and calculators</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-aurora-pricing/">Aurora pricing checklist</a>
+    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora</a>
+    <a class="btn" href="/calculators/aws-rds-cost-calculator/">RDS cost calculator</a>
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/rds/aurora/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon Aurora pricing (includes Serverless v2)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html" target="_blank" rel="nofollow noopener">
+        Aurora Serverless v2 documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

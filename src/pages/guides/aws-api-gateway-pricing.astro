@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What are the two biggest cost drivers for many APIs?",
@@ -24,6 +24,25 @@ const description =
   <p>
     API Gateway pricing is usually dominated by <strong>request charges</strong> plus <strong>data transfer</strong>.
     Depending on API type and features, you may also see add-ons that matter for production workloads.
+  </p>
+
+  <h2>Where to get the inputs</h2>
+  <ul>
+    <li>
+      <strong>Requests</strong>: API logs, gateway metrics, or analytics. Use a representative week and model peak
+      separately if traffic is bursty.
+    </li>
+    <li>
+      <strong>Payload sizes</strong>: average response size from logs or tracing. Use compressed sizes if compression is
+      enabled.
+    </li>
+    <li>
+      <strong>Transfer boundary</strong>: which path is billed (internet egress vs internal vs cross-region).
+    </li>
+  </ul>
+  <p class="muted">
+    If you only have RPS and average payload size, convert it to GB/month with{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">response size transfer</a>.
   </p>
 
   <h2>What to include in an estimate</h2>
@@ -48,6 +67,17 @@ const description =
     transfer estimate. Then add any feature-specific line items you rely on.
   </p>
 
+  <h2>When transfer dominates</h2>
+  <ul>
+    <li>Large list endpoints, exports, file downloads, and “fat JSON” responses can dominate spend.</li>
+    <li>Retry storms multiply both requests and transfer, even when success traffic is unchanged.</li>
+    <li>CDN caching in front of the gateway can reduce origin requests and origin transfer for cacheable traffic.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN</a>
+  </div>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Underestimating transfer by using uncompressed payload sizes.</li>
@@ -70,9 +100,9 @@ const description =
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate requests/month from logs or analytics; do not rely on a single peak RPS snapshot.</li>
-    <li>Validate payload sizes (response KB/MB) because transfer can dominate for large payload APIs.</li>
-    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+    <li>Validate the primary driver with measured usage from a representative window.</li>
+    <li>Confirm units (GB vs GiB) and request pricing units (per 10k vs per 1M).</li>
+    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -82,5 +112,16 @@ const description =
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      AWS pricing overview:{" "}
+      <a href="https://aws.amazon.com/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/pricing
+      </a>
+    </li>
+    <li>Use official API Gateway pricing for your region and API type to set effective $/request and $/GB assumptions.</li>
+  </ul>
 
 </GuideLayout>

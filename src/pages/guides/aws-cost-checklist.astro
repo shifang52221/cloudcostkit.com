@@ -1,105 +1,119 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS cost checklist: a simple budgeting framework";
+const title = "AWS cost checklist: model the drivers that actually move the bill";
 const description =
-  "A practical AWS cost checklist to build a realistic monthly budget: compute, storage, data transfer, observability, and CDN - plus validation steps to avoid surprises.";
-const faqs = [
-  {
-    q: "Why do AWS budgets miss?",
-    a: "They model only compute. The biggest misses are transfer (egress/cross-AZ), logs/metrics, and request-priced services that scale with traffic.",
-  },
-  {
-    q: "What is the fastest way to get a baseline number?",
-    a: "Use a blended rate approach: estimate the monthly drivers (hours, GB-month, requests, GB/month transfer), multiply by effective unit prices, then refine for tiering and region mix later.",
-  },
-  {
-    q: "How should I validate the checklist estimate?",
-    a: "Compare directionality against a real week of metrics or billing exports. Validate units (GB vs GiB) and separate CDN bandwidth from origin egress.",
-  },
-];
+  "A practical AWS cost checklist for planning and reviews: define scope, identify top cost drivers (requests, GB, GB-month, hours), and avoid the common blind spots (data transfer, logs, and cross-AZ).";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cost-checklist"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What are the most common AWS cost blind spots?",
+      a: "Data transfer, logging/metrics, and request-based charges. They often scale with traffic and can grow faster than compute.",
+    },
+    {
+      q: "What's the fastest way to build a cost model?",
+      a: "Identify the top 1–3 drivers per system (hours, requests, GB transferred, GB-month stored), then estimate them from measured telemetry and validate against a real week.",
+    },
+  ]}
 >
-  <p class="muted">
-    Use this checklist when you want a "good enough" AWS budget quickly. The goal is to avoid missing the line items
-    that most often surprise teams.
+  <p>
+    If your AWS bill feels “mysterious”, it usually means you are missing a driver. Most costs scale with a small set of
+    units: <strong>hours</strong>, <strong>requests</strong>, <strong>GB transferred</strong>, and <strong>GB-month stored</strong>.
+    This checklist helps you capture the drivers that actually move spend.
   </p>
 
-  <h2>1) Compute</h2>
+  <h2>1) Define scope (avoid mixing worlds)</h2>
   <ul>
-    <li>
-      <a href="/calculators/ec2-cost-calculator/">EC2 cost</a> (instances x $/hour x hours/month x uptime)
-    </li>
-    <li>
-      <a href="/calculators/eks-cost-calculator/">EKS cost</a> (nodes + control plane) and{" "}
-      <a href="/guides/aws-eks-control-plane-cost/">control plane guide</a>
-    </li>
+    <li>Accounts and regions included</li>
+    <li>Environments (prod vs staging vs dev)</li>
+    <li>Time window and seasonality (baseline vs busy month)</li>
   </ul>
 
-  <h2>2) Storage</h2>
+  <h2>2) Identify the top 5 line items first</h2>
   <ul>
-    <li>
-      <a href="/calculators/s3-cost-calculator/">S3 cost</a> (storage + requests + egress)
-    </li>
-    <li>
-      <a href="/calculators/s3-request-cost-calculator/">S3 request cost</a> and{" "}
-      <a href="/guides/aws-s3-request-costs/">request cost guide</a>
-    </li>
-    <li>
-      <a href="/calculators/s3-replication-cost-calculator/">S3 replication</a> (if you replicate/copy data)
-    </li>
-    <li>
-      Storage classes and archive: <a href="/guides/aws-s3-storage-classes/">storage classes</a> and{" "}
-      <a href="/calculators/aws-s3-glacier-cost-calculator/">archive cost calculator</a>
-    </li>
+    <li>Use billing/Cost Explorer to find the top services by spend.</li>
+    <li>For each service, write down the primary driver unit (hours, requests, GB, GB-month).</li>
+    <li>Do not optimize everything at once; fix the top drivers first.</li>
   </ul>
 
-  <h2>3) Data transfer (usually the biggest surprise)</h2>
+  <h2>3) Data transfer: the most common hidden bill</h2>
   <ul>
-    <li><a href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer</a></li>
-    <li><a href="/calculators/data-egress-cost-calculator/">Internet egress</a></li>
-    <li>
-      Guide: <a href="/guides/network-transfer-costs/">network transfer costs explained</a>
-    </li>
+    <li>Internet egress (bytes leaving AWS)</li>
+    <li>Cross-AZ traffic (often accidental)</li>
+    <li>Cross-region traffic and replication</li>
+    <li>NAT gateways and load balancers can change where transfer shows up</li>
   </ul>
-
-  <h2>4) Observability</h2>
-  <ul>
-    <li><a href="/calculators/log-cost-calculator/">Log cost</a></li>
-    <li><a href="/calculators/log-search-scan-cost-calculator/">Log search/scan</a></li>
-    <li><a href="/calculators/metrics-timeseries-cost-calculator/">Metrics series cost</a></li>
-    <li>
-      Guide: <a href="/guides/aws-logging-cost-reduction/">reduce logging costs</a>
-    </li>
-  </ul>
-
-  <h2>5) CDN</h2>
-  <ul>
-    <li><a href="/calculators/cloudfront-cost-calculator/">CloudFront cost</a></li>
-    <li>
-      Guide: <a href="/guides/cdn-costs/">CDN costs explained</a>
-    </li>
-  </ul>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Validate units: GB vs GiB and request units (per 10k vs per 1M).</li>
-    <li>Separate CDN bandwidth (edge-to-user) from origin egress (cache fill).</li>
-    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
-  </ul>
-
-  <h2>Related reading</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Full cost estimation checklist</a>
-    <a class="btn" href="/guides/aws-ec2-cost-estimation/">EC2 estimation</a>
-    <a class="btn" href="/guides/aws-s3-data-transfer/">S3 transfer</a>
-    <a class="btn" href="/guides/aws-logging-cost-reduction/">Reduce logging costs</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ cost guide</a>
   </div>
-</GuideLayout>
 
+  <h2>4) Logs and metrics: ingestion + retention + scans</h2>
+  <ul>
+    <li>Log ingestion (GB/day) and retention (GB-month)</li>
+    <li>Query scan costs (Insights/Athena/SIEM)</li>
+    <li>Custom metric cardinality and dashboard polling</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cloudwatch-log-cost-calculator/">CloudWatch Logs cost</a>
+    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a>
+  </div>
+
+  <h2>5) Request-based services: count requests before pricing</h2>
+  <ul>
+    <li>CDN requests and bandwidth (origin vs edge)</li>
+    <li>API requests and response size (requests + transfer)</li>
+    <li>Database requests (read/write units, query scans)</li>
+  </ul>
+  <p class="muted">
+    If you only know RPS, convert it to monthly requests and then model cost drivers.
+  </p>
+
+  <h2>6) Storage: GB-month + requests + snapshots</h2>
+  <ul>
+    <li>Object storage: GB-month and request volume</li>
+    <li>Block storage: volume GB-month, provisioned IOPS/throughput, snapshots</li>
+    <li>Replication: storage copies and transfer</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshots</a>
+  </div>
+
+  <h2>7) Reliability incidents are also cost incidents</h2>
+  <ul>
+    <li>Retry storms multiply requests, logs, and transfer.</li>
+    <li>Incidents increase query scans (people search logs repeatedly).</li>
+    <li>Capacity spikes (autoscaling) increase hours and cross-AZ patterns.</li>
+  </ul>
+
+  <h2>8) Validation checklist (so the model is trusted)</h2>
+  <ul>
+    <li>Validate each primary driver from measured telemetry (logs/metrics/billing) for a representative week.</li>
+    <li>Use two scenarios: baseline and busy month.</li>
+    <li>Confirm unit consistency (GB vs GiB, requests units, per-hour vs per-second).</li>
+    <li>After changes, compare against the next week of real billing and adjust assumptions.</li>
+  </ul>
+
+  <h2>9) Make the model operational</h2>
+  <ul>
+    <li>Write down assumptions and owners (who updates request volume, who updates storage growth).</li>
+    <li>Link each driver to the place you measure it (metrics, logs, billing report).</li>
+    <li>Update monthly: keep a small set of calculators and checklists close to the team.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      AWS pricing overview:{" "}
+      <a href="https://aws.amazon.com/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/pricing
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

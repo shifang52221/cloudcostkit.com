@@ -3,72 +3,136 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "CloudTrail cost optimization (reduce high-volume drivers)";
 const description =
-  "A practical playbook to reduce CloudTrail costs: control data event scope, reduce automated churn, and avoid downstream storage/query waste. Includes validation steps and related tools.";
-const faqs = [
-  {
-    q: "What's the biggest lever for CloudTrail cost?",
-    a: "Data event scope. Data events can be very high volume, so enabling them broadly can dominate your bill.",
-  },
-  {
-    q: "Can downstream analysis cost more than the logs themselves?",
-    a: "Yes. Storage, queries, and SIEM ingestion can exceed event charges if you retain a lot of data or run frequent queries.",
-  },
-  {
-    q: "Why do CloudTrail costs spike during incidents?",
-    a: "Retry storms and automated tooling can multiply API calls. Those retries become real events and also increase downstream ingestion and query volume.",
-  },
-  {
-    q: "What should I measure first?",
-    a: "Events/month split by management vs data events, and downstream scan/query volume (GB scanned). Those usually explain most of the bill.",
-  },
-];
+  "A practical playbook to reduce CloudTrail costs: measure event volume, control data event scope with selectors, reduce automated churn, and avoid downstream storage/query waste.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudtrail-cost-optimization"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What's the biggest lever for CloudTrail cost?",
+      a: "Data event scope. Data events can be very high volume, so enabling them broadly is the fastest way to create a large bill.",
+    },
+    {
+      q: "Can downstream analysis cost more than CloudTrail itself?",
+      a: "Yes. Storage, queries, and SIEM ingestion can exceed event charges if you retain a lot of data or run frequent broad scans.",
+    },
+    {
+      q: "Why do CloudTrail costs spike during incidents?",
+      a: "Retry storms and automated tooling multiply API calls. Those retries become events and also increase downstream ingestion and query volume.",
+    },
+  ]}
 >
-  <p class="muted">
-    CloudTrail costs are typically driven by event volume plus downstream storage and analysis. Most savings come from
-    narrowing the highest-volume event streams and preventing expensive downstream analysis sprawl.
+  <p>
+    CloudTrail costs are typically driven by <strong>event volume</strong> plus downstream storage and analysis. Most
+    savings come from narrowing the highest-volume event streams (usually data events) and keeping downstream analysis
+    efficient.
   </p>
 
-  <h2>1) Control data event scope</h2>
+  <h2>Step 1: measure before you optimize</h2>
   <ul>
-    <li>Enable data events only for the resources that truly need audit visibility.</li>
-    <li>Start with a short measurement window to quantify volume before scaling up.</li>
-    <li>Prefer targeted prefixes/buckets rather than enabling everything by default.</li>
+    <li>Count events/day for at least 7 days and split management vs data vs insight.</li>
+    <li>Identify the top event sources (which services and resources generate most volume).</li>
+    <li>Model a "busy week" scenario for deploy spikes and incident retries.</li>
+  </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-cloudtrail-estimate-events/">estimate CloudTrail events/month</a>.
+  </p>
+
+  <h2>Step 2: control data event scope (highest leverage)</h2>
+  <p>
+    Data events can be orders of magnitude higher than management events. Treat data event enablement as a scoped audit
+    decision, not a default checkbox.
+  </p>
+  <ul>
+    <li>
+      <strong>Be selective</strong>: enable data events only for resources that require audit visibility.
+    </li>
+    <li>
+      <strong>Start narrow</strong>: begin with a subset (critical buckets/prefixes/functions) and expand with measurement.
+    </li>
+    <li>
+      <strong>Use selectors intentionally</strong>: avoid "everything by default"; scope by resource and, where possible, by event type.
+    </li>
   </ul>
 
-  <h2>2) Reduce automated churn</h2>
+  <h2>Common high-volume sources to watch</h2>
   <ul>
-    <li>Fix retry storms and timeouts that amplify API calls.</li>
-    <li>Reduce noisy scheduled jobs and overly chatty automation where possible.</li>
-    <li>Timebox experiments that generate large API call volume.</li>
+    <li>Object-level operations on high-throughput storage (reads/writes at scale).</li>
+    <li>Function and automation-heavy workflows that invoke many API calls per request.</li>
+    <li>Scheduled jobs and scanners that touch many resources on a cadence.</li>
+  </ul>
+  <p class="muted">
+    The goal is not to disable audit coverage blindly, but to scope it to what you truly need and can afford to analyze.
+  </p>
+
+  <h2>Step 3: reduce automated churn and retries</h2>
+  <ul>
+    <li>
+      <strong>Fix retry storms</strong>: timeouts and transient failures multiply API calls and therefore audit events.
+    </li>
+    <li>
+      <strong>Quiet noisy automation</strong>: chatty IaC loops, frequent reconciles, and scanning jobs can dominate management volume.
+    </li>
+    <li>
+      <strong>Separate environments</strong>: test/staging can generate production-like volume if not isolated.
+    </li>
   </ul>
 
-  <h2>3) Reduce downstream waste</h2>
+  <h2>Step 4: reduce downstream waste (often overlooked)</h2>
   <ul>
-    <li>Set retention intentionally; avoid keeping everything forever by default.</li>
-    <li>Query efficiently and avoid repeated broad scans.</li>
-    <li>Filter/route logs so expensive tooling ingests only what it needs.</li>
+    <li>
+      <strong>Retention tiers</strong>: keep raw logs short; retain aggregated/security signals longer.
+    </li>
+    <li>
+      <strong>Partition and filter</strong>: store by date and prefix so investigations scan days, not months.
+    </li>
+    <li>
+      <strong>Route selectively</strong>: forward only what you need into expensive SIEM or log platforms.
+    </li>
+    <li>
+      <strong>Reduce scan size</strong>: avoid repeated broad queries; build targeted dashboards that do not scan "all time".
+    </li>
   </ul>
+  <div class="btn-row">
+    <a class="btn" href="/guides/log-retention-storage-cost/">Retention cost</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Query scan cost</a>
+  </div>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Measure events/day by type (management vs data) for a representative week.</li>
-    <li>Measure downstream scan/query GB and identify the top query patterns.</li>
-    <li>After changes, confirm reduced event volume and reduced downstream ingestion/query cost.</li>
+    <li>After selector changes, re-measure data event volume to confirm the expected drop.</li>
+    <li>Compare downstream scan GB for your top dashboards/queries before vs after.</li>
+    <li>Confirm you did not remove required audit coverage for regulated resources.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Related links</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-cloudtrail-cost-calculator/">CloudTrail cost</a>
+    <a class="btn" href="/calculators/aws-cloudtrail-cost-calculator/">CloudTrail cost calculator</a>
     <a class="btn" href="/guides/aws-cloudtrail-pricing/">CloudTrail pricing</a>
-    <a class="btn" href="/guides/aws-cloudtrail-estimate-events/">Estimate events/month</a>
-    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/log-costs/">Log costs (overview)</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudTrail pricing:{" "}
+      <a href="https://aws.amazon.com/cloudtrail/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudtrail/pricing
+      </a>
+    </li>
+    <li>
+      CloudTrail event selectors:{" "}
+      <a
+        href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

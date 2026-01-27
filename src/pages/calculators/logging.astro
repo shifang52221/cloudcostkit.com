@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Logging calculators | ${SITE.name}`;
+const description =
+  "Logging and observability cost calculators for ingestion, retention storage, query/scan, metrics series, and CloudWatch-style line items.";
+const slots = SITE.adsenseSlots;
+
+const tools = TOOLS.filter((t) => t.category === "Logging");
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/logging">
+  <section class="card hero">
+    <h1>Logging calculators</h1>
+    <p>Model ingestion + retention first, then add query/scan and metrics cardinality where it matters.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/log-costs/">Guide: log costs</a>
+      <a class="btn" href="/guides/metrics-costs/">Guide: metrics costs</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A practical model</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Estimate GB/day ingested and retention days.</li>
+        <li>Convert to GB-month stored and apply $/GB-month.</li>
+        <li>Add scan/query cost if you run frequent or wide queries.</li>
+        <li>For metrics, model active series (cardinality) and retention.</li>
+      </ol>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">What spikes bills</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>High-cardinality labels (metrics) and noisy debug logs.</li>
+        <li>Wide queries that scan large time ranges or many log streams.</li>
+        <li>Incident retries that multiply log volume without increasing useful signal.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} logging tools</div>
+    <div class="grid">
+      {tools.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}/`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+</BaseLayout>
+

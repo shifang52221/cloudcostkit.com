@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `FinOps calculators | ${SITE.name}`;
+const description =
+  "FinOps calculators for compute cost, break-even analysis, request-based pricing, and common managed-service line items.";
+const slots = SITE.adsenseSlots;
+
+const tools = TOOLS.filter((t) => t.category === "FinOps");
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/finops">
+  <section class="card hero">
+    <h1>FinOps calculators</h1>
+    <p>Estimate core managed-service line items and compare pricing options with explicit assumptions.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/requests-costs/">Guide: request-based pricing</a>
+      <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A practical estimate</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start with effective rates and real drivers (requests, GB, hours) before optimizing pricing tiers.</li>
+        <li>Keep baseline and peak scenarios so budgets survive incidents.</li>
+        <li>Separate “compute-only” comparisons from full-stack costs (logs, transfer, storage, retries).</li>
+      </ul>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Common pitfalls</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Unit errors (per 10k vs per 1M, GB vs GiB) causing 10× mistakes.</li>
+        <li>Retry storms and fan-out multiplying request volume.</li>
+        <li>Ignoring storage growth and retention in “compute-only” models.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} FinOps tools</div>
+    <div class="grid">
+      {tools.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}/`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+</BaseLayout>
+

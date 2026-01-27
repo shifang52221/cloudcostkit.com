@@ -1,82 +1,117 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CloudWatch dashboards pricing: estimate dashboard-month costs";
+const title = "CloudWatch dashboards pricing: what to include (dashboard-month + API)";
 const description =
-  "A practical checklist for CloudWatch dashboards pricing: how to count dashboards, what a dashboard-month represents, and the common sources of dashboard sprawl.";
-const faqs = [
-  {
-    q: "What is a dashboard-month?",
-    a: "A dashboard-month is the unit used to bill dashboards over time. The exact definition can depend on the provider, but the practical model is: how many dashboards exist for the month.",
-  },
-  {
-    q: "What usually drives dashboard costs up?",
-    a: "Dashboard sprawl: many near-duplicate dashboards across environments, teams, tenants, or services, plus frequent refresh patterns that can add API request costs.",
-  },
-  {
-    q: "Do dashboards and metrics API calls interact?",
-    a: "Often yes. If dashboards refresh frequently or query many widgets, the metric API request line item can increase alongside dashboards.",
-  },
-];
+  "A practical guide to CloudWatch dashboard costs: dashboard-month charges plus the hidden drivers (metrics API requests, alarms, and high-cardinality metrics).";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-dashboards-pricing"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Do dashboards cost money by themselves?",
+      a: "Often yes (dashboard-month), but the bigger driver can be what dashboards cause: metrics API requests and the custom metrics you ingest to make dashboards useful.",
+    },
+    {
+      q: "Why do dashboard-heavy orgs see higher API request charges?",
+      a: "Dashboards refresh frequently and query multiple metrics each time. Multiply refresh rate × widgets × metrics per widget and it adds up quickly.",
+    },
+  ]}
 >
-  <p class="muted">
-    CloudWatch-style dashboards are usually billed as a simple baseline (dashboard-month). The surprise is often not the
-    dashboard line itself, but the way dashboards contribute to sprawl and API polling.
-  </p>
-
-  <h2>What to count</h2>
-  <ul>
-    <li><strong>Dashboards</strong>: total dashboards that exist in the account (or per environment).</li>
-    <li><strong>Environments</strong>: prod + staging + dev often multiply dashboard count.</li>
-    <li><strong>Tenants/teams</strong>: per-tenant or per-team dashboards can balloon quickly.</li>
-    <li><strong>Refresh patterns</strong>: frequent refresh can increase metrics API requests.</li>
-  </ul>
-
-  <h2>A fast estimate</h2>
   <p>
-    Start by counting dashboards per environment, then add the obvious multipliers (teams, tenants). If you expect rapid
-    growth, model a "future state" dashboard count rather than today's number.
+    CloudWatch dashboards are usually modeled as <strong>dashboard-month</strong>, but the “real” costs often live next
+    door: <strong>metrics API requests</strong>, <strong>custom metrics</strong>, and <strong>alarms</strong> created to
+    support dashboards and alerting.
   </p>
 
-  <h2>Cost-control tips</h2>
+  <h2>What to model</h2>
   <ul>
-    <li>Consolidate dashboards (service-level) instead of per-entity dashboards.</li>
-    <li>Delete old dashboards from experiments and migrations.</li>
-    <li>Prefer templated dashboards or tags over duplicating dashboards per team.</li>
+    <li>
+      <strong>Dashboards</strong>: dashboard-month count (how many dashboards exist and are billed)
+    </li>
+    <li>
+      <strong>Metrics API requests</strong>: GetMetricData / GetMetricStatistics called by dashboards and tools
+    </li>
+    <li>
+      <strong>Custom metrics volume</strong>: metrics you publish to support visualizations and SLOs
+    </li>
+    <li>
+      <strong>Alarm-months</strong>: alarms created as “dashboard companions”
+    </li>
   </ul>
-
-  <h2>Quantify with a calculator</h2>
-  <p>
-    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to model
-    dashboards plus the related line items (custom metrics, alarms, and API requests).
-  </p>
-
-  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-pricing/">CloudWatch metrics pricing</a>
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics cost optimization</a>
+    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a>
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarms cost</a>
   </div>
+
+  <h2>A fast estimation workflow</h2>
+  <ol>
+    <li>Count dashboards (prod vs non-prod).</li>
+    <li>Estimate dashboard refresh traffic: users × views × refreshes.</li>
+    <li>Estimate API requests: refreshes × widgets × metrics per widget.</li>
+    <li>Apply dashboard-month and API request rates from your region pricing.</li>
+  </ol>
+
+  <h2>Worked example (order-of-magnitude)</h2>
+  <p class="muted">
+    Suppose 25 engineers open a dashboard 10 times/day, each view refreshes 5 times, and the dashboard has 20 widgets:
+  </p>
+  <ul>
+    <li>Dashboard refreshes/day ~= 25 * 10 * 5 = 1,250</li>
+    <li>If each widget queries ~3 metrics, metric queries/day ~= 1,250 * 20 * 3 = 75,000</li>
+  </ul>
+  <p class="muted">
+    This is why “dashboard sprawl” can create surprisingly large API request volume, even with normal usage patterns.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>
+      <strong>Dashboard duplication</strong>: each team clones a dashboard pack instead of sharing a standard set.
+    </li>
+    <li>
+      <strong>High-cardinality metrics</strong>: dashboards require per-dimension metrics that explode metric count.
+    </li>
+    <li>
+      <strong>Always-on refresh</strong>: wallboard TVs and NOC screens refresh continuously and drive constant queries.
+    </li>
+    <li>
+      <strong>Tool overlap</strong>: multiple observability tools poll the same CloudWatch metrics in parallel.
+    </li>
+    <li>
+      <strong>Cross-account views</strong>: shared dashboards across accounts can increase polling if multiple teams keep them open.
+    </li>
+  </ul>
+
+  <h2>Cost control levers (without losing visibility)</h2>
+  <ul>
+    <li>Reduce duplication: maintain a shared “golden dashboard” per service.</li>
+    <li>Reduce refresh: avoid 10-second refresh for slow-moving metrics.</li>
+    <li>Reduce metrics per widget: aggregate where possible and avoid per-instance views by default.</li>
+    <li>Move heavy exploration to logs/traces for investigations and keep dashboards for operational monitoring.</li>
+  </ul>
+  <p class="muted">
+    If you need fast detection, prefer alarms for paging and keep dashboards optimized for triage rather than continuous
+    high-frequency polling.
+  </p>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Count dashboards by environment and by ownership/team.</li>
+    <li>Identify “always-on” dashboards (TVs, wallboards) and measure their refresh rate.</li>
+    <li>Measure metrics API request volume from a real week and validate the estimate.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -17,10 +17,16 @@ const slots = SITE.adsenseSlots;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/calculators">
   <section class="card hero">
-    <span class="pill">Fast • Free • No signup</span>
+    <span class="pill">Fast / Free / No signup</span>
     <h1>Cloud cost & capacity tools</h1>
     <p>Estimate spend and sizing with transparent assumptions. Use results for planning and comparisons.</p>
     <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/networking/">Networking</a>
+      <a class="btn" href="/calculators/logging/">Logging</a>
+      <a class="btn" href="/calculators/storage/">Storage</a>
+      <a class="btn" href="/calculators/kubernetes/">Kubernetes</a>
+      <a class="btn" href="/calculators/finops/">FinOps</a>
+      <a class="btn" href="/calculators/units/">Units</a>
       <a class="btn" href="/calculators/aws/">AWS calculators</a>
       <a class="btn" href="/calculators/azure/">Azure calculators</a>
       <a class="btn" href="/calculators/gcp/">GCP calculators</a>
@@ -28,6 +34,38 @@ const slots = SITE.adsenseSlots;
       <a class="btn" href="/guides/azure/">Azure cost guides</a>
       <a class="btn" href="/guides/gcp/">GCP cost guides</a>
     </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Start with a driver (not a price table)</h2>
+      <p class="muted" style="margin:10px 0 0">
+        Most cloud bills are dominated by a few measurable drivers: requests/month, GB transferred, GB-month stored, and
+        instance-hours. Start with drivers and an effective rate, then refine with tiering and region mix once the model
+        is directionally correct.
+      </p>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+        <a class="btn" href="/methodology/">Methodology</a>
+        <a class="btn" href="/calculators/unit-converter/">Units converter</a>
+      </div>
+    </section>
+
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A simple workflow</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Estimate requests/month and GB/month.</li>
+        <li>Estimate compute (instance-hours or vCPU/RAM hours).</li>
+        <li>Add storage and retention (GB-month) and replication/copies.</li>
+        <li>Validate against a real week of billing/metrics and adjust.</li>
+      </ol>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>
+        <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+        <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+        <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
+      </div>
+    </section>
   </section>
 
   <section class="card section" style="margin-top:18px" id="tools-filter">

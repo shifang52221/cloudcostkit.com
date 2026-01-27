@@ -44,6 +44,45 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
     </div>
   </section>
 
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">How to use these guides</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start with a measurable driver (requests/month, GB/month, hours, GB-month).</li>
+        <li>Use a calculator for the first estimate, then return to the guide for pitfalls and validation.</li>
+        <li>Validate with a real week of billing/metrics before “optimizing” pricing tiers.</li>
+      </ol>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+        <a class="btn" href="/methodology/">Methodology</a>
+        <a class="btn" href="/calculators/">Tools</a>
+      </div>
+    </section>
+
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Suggested starting points</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>
+          <a href="/guides/egress-costs/">Egress costs</a>: separate CDN bandwidth from origin egress.
+        </li>
+        <li>
+          <a href="/guides/log-costs/">Log costs</a>: ingestion + retention first, then scan/query.
+        </li>
+        <li>
+          <a href="/guides/storage-costs/">Storage costs</a>: GB-month + requests + replication/copies + egress.
+        </li>
+        <li>
+          <a href="/guides/kubernetes-costs/">Kubernetes costs</a>: nodes plus the non-node line items.
+        </li>
+      </ul>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/calculators/networking/">Networking calculators</a>
+        <a class="btn" href="/calculators/logging/">Logging calculators</a>
+        <a class="btn" href="/calculators/storage/">Storage calculators</a>
+      </div>
+    </section>
+  </section>
+
   <section class="card section" style="margin-top:18px" id="guides-filter">
     <div class="form" style="align-items:end">
       <div class="field field-3">

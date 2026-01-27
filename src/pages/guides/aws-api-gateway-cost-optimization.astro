@@ -1,77 +1,149 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "API Gateway cost optimization (high-leverage levers)";
+const title = "API Gateway cost optimization: reduce requests, bytes, and log spend";
 const description =
-  "A short playbook to reduce API Gateway spend: cut requests, cut payload sizes, and avoid retry-driven cost spikes.";
-const faqs = [
-  {
-    q: "What's the fastest lever to reduce API Gateway cost?",
-    a: "Reduce request volume (cache, batch, avoid polling) and reduce average response size (compression, pagination).",
-  },
-  {
-    q: "Can retries make API Gateway expensive?",
-    a: "Yes. Timeouts and transient errors can cause client retries and amplify request volume. Treat elevated retries as both a reliability and cost incident.",
-  },
-];
+  "A practical playbook to reduce API Gateway spend: identify the dominant driver (requests, transfer, or logs), then apply high-leverage fixes with a validation checklist.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-cost-optimization"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What's the fastest lever to reduce API Gateway cost?",
+      a: "Reduce request volume and reduce bytes transferred. For many APIs, transfer and retries can dominate more than the per-request fee.",
+    },
+    {
+      q: "Can retries make API Gateway expensive?",
+      a: "Yes. Timeouts and transient errors trigger client retries and amplify both request volume and transferred bytes. Treat elevated retries as a reliability and cost incident.",
+    },
+    {
+      q: "Do access logs matter for cost?",
+      a: "They can. At high volume, log ingestion and retention (and query scans) can become a meaningful part of the bill.",
+    },
+  ]}
 >
   <p>
-    API Gateway bills scale with <strong>requests</strong> and often <strong>bytes transferred</strong>. Most savings
-    come from cutting one (or both) of those drivers, and from preventing retry storms.
+    API Gateway bills scale with <strong>requests</strong> and often <strong>bytes transferred</strong>. The fastest
+    savings come from identifying the dominant driver, then applying targeted fixes that reduce one (or both) without
+    breaking correctness.
   </p>
 
-  <h2>1) Reduce request volume</h2>
+  <h2>Step 0: identify the dominant driver</h2>
   <ul>
-    <li>Cache hot reads (edge caching or application caching).</li>
-    <li>Batch small calls and avoid chatty client patterns.</li>
-    <li>Avoid aggressive polling; use events/streams when possible.</li>
+    <li>
+      <strong>Requests</strong>: total requests/month (including retries, health checks, and background jobs).
+    </li>
+    <li>
+      <strong>Transfer</strong>: average response size over the wire (compressed) multiplied by request volume.
+    </li>
+    <li>
+      <strong>Logs</strong>: access log ingestion (GB/day) + retention + query scans.
+    </li>
+  </ul>
+  <p class="muted">
+    If you don’t know which dominates, model all three with a quick estimate, then validate against a real week of
+    measured usage.
+  </p>
+
+  <h2>1) Reduce request volume (without losing functionality)</h2>
+  <ul>
+    <li>
+      <strong>Cache hot reads</strong>: edge caching (CloudFront) for cacheable GETs, or application caching for
+      authenticated reads.
+    </li>
+    <li>
+      <strong>Batch calls</strong>: collapse chatty flows (N sequential calls) into fewer endpoints.
+    </li>
+    <li>
+      <strong>Avoid aggressive polling</strong>: switch to events/streams (SSE/WebSockets) where it fits.
+    </li>
+    <li>
+      <strong>Control automated traffic</strong>: health checks, bots, integrations, and cron jobs are often a large %
+      of total requests.
+    </li>
   </ul>
 
-  <h2>2) Reduce response size</h2>
+  <h2>2) Reduce bytes transferred (often larger than request fees)</h2>
   <ul>
-    <li>Enable compression where appropriate.</li>
-    <li>Paginate list endpoints; avoid huge default payloads.</li>
-    <li>Move large downloads behind object storage/CDN instead of returning big payloads via the API.</li>
+    <li>
+      <strong>Enable compression</strong> where safe; model using compressed payload sizes, not raw JSON sizes.
+    </li>
+    <li>
+      <strong>Paginate large endpoints</strong> and avoid huge default payloads.
+    </li>
+    <li>
+      <strong>Move large downloads</strong> behind object storage + CDN instead of returning big payloads via the API.
+    </li>
+    <li>
+      <strong>Use cache-friendly shapes</strong>: stable URLs and query parameters improve CDN efficiency.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response size to transfer</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+  </div>
+
+  <h2>3) Stop retry-driven cost spikes</h2>
+  <ul>
+    <li>
+      <strong>Measure retries</strong>: track 4xx/5xx rates, timeouts, and client retry counts by endpoint.
+    </li>
+    <li>
+      <strong>Fix upstream bottlenecks</strong>: slow dependencies cause timeouts and retries (databases, Lambda cold
+      starts, downstream APIs).
+    </li>
+    <li>
+      <strong>Use backoff + idempotency</strong>: prevents duplicated work and thundering herd patterns.
+    </li>
   </ul>
 
-  <h2>3) Prevent retry-driven spikes</h2>
+  <h2>4) Keep access logs useful (and affordable)</h2>
   <ul>
-    <li>Instrument timeouts, 5xx rates, and client retry counts.</li>
-    <li>Fix slow upstream dependencies that trigger retries (databases, Lambda cold starts).</li>
-    <li>Use backoff and circuit breakers to avoid thundering-herd patterns.</li>
+    <li>Log only the fields you use; large headers and verbose formats inflate GB/day.</li>
+    <li>Keep a slim “always-on” format; enable verbose logging only during investigations.</li>
+    <li>Set retention intentionally; avoid keeping success logs forever by default.</li>
   </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-api-gateway-access-logs-cost/">API Gateway access logs cost</a>.
+  </p>
 
   <h2>Validate with a cost model</h2>
-  <p>
+  <p class="muted">
     Use <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost calculator</a> to quantify savings from
     reduced requests or smaller payload sizes.
   </p>
 
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>,{" "}
-    <a href="/guides/aws-api-gateway-vs-alb-vs-cloudfront-cost/">API Gateway vs ALB vs CloudFront cost</a>.
-  </p>
-
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate requests/month from logs or analytics; do not rely on a single peak RPS snapshot.</li>
-    <li>Validate payload sizes (response KB/MB) because transfer can dominate for large payload APIs.</li>
-    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+    <li>Validate requests/month from logs or metrics; include retries and automated traffic.</li>
+    <li>Validate payload size using compressed “over the wire” sizes (not raw JSON).</li>
+    <li>Validate cache hit rate (if using a CDN) and confirm origin request reduction.</li>
+    <li>Compare a real week of cost/usage before and after changes (same traffic seasonality).</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
-    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
-    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      API Gateway pricing:{" "}
+      <a href="https://aws.amazon.com/api-gateway/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/api-gateway/pricing
+      </a>
+    </li>
+    <li>
+      CloudWatch Logs pricing (access logs often land here):{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+    <li>
+      CloudFront pricing (for caching/transfer tradeoffs):{" "}
+      <a href="https://aws.amazon.com/cloudfront/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudfront/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

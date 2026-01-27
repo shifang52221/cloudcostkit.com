@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS SQS cost optimization (high-leverage fixes)";
 const description =
-  "A practical playbook to reduce SQS costs: reduce requests per message, batch operations, avoid retry storms, and handle poison messages. Includes validation steps and related tools.";
+  "A practical playbook to reduce SQS costs: reduce requests per successful message with batching and long polling, prevent retry storms and poison loops, and validate savings with sent/received/deleted metrics.";
 const faqs = [
   {
     q: "What's the fastest way to reduce SQS cost?",
-    a: "Reduce total requests: batch operations, reduce retries, and avoid excess Receive calls from aggressive polling patterns.",
+    a: "Reduce total requests: batch operations, reduce retries, and reduce empty Receive calls from aggressive polling patterns.",
   },
   {
     q: "Why do poison messages cause bill spikes?",
-    a: "They can loop through retries and DLQ workflows, creating many billable receives/deletes and extra downstream work.",
+    a: "They loop through repeated receives and processing attempts (often with visibility changes) until they’re handled or sent to a DLQ, creating many billable requests.",
   },
   {
     q: "How do I estimate request volume?",
-    a: "Start from messages/month, then multiply by requests/message (Send + Receive + Delete plus retries). Validate with CloudWatch sent/received/deleted metrics.",
+    a: "Start from messages/month, then multiply by requests/message (Send + Receive + Delete plus multipliers). Validate with CloudWatch sent/received/deleted metrics for a representative week.",
   },
   {
     q: "What typically increases requests per message?",
-    a: "Retries, visibility timeout extensions, consumer failures, and designs where a single logical message triggers multiple API calls.",
+    a: "Retries, visibility timeout extensions, empty receives from polling, consumer failures, and designs where one logical message triggers multiple API calls.",
   },
 ];
 ---
@@ -27,49 +27,109 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-sqs-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p>
+    SQS spend is usually request-driven. The highest-leverage strategy is to reduce <strong>requests per successful
+    message</strong> and prevent the multipliers: retries, empty receives, and poison loops. This playbook focuses on
+    changes that are measurable and safe.
+  </p>
+
+  <h2>Step 0: baseline “requests per message”</h2>
+  <ul>
+    <li>Messages sent/received/deleted per day (representative week)</li>
+    <li>Retry rate / redrives (how often messages are processed more than once)</li>
+    <li>Empty receives (polling tax)</li>
+    <li>Visibility timeout extensions (ChangeMessageVisibility calls)</li>
+  </ul>
   <p class="muted">
-    SQS spend scales with request volume. Most cost wins come from reducing how many API calls you make per successful
-    message.
+    Estimation workflow: <a href="/guides/aws-sqs-estimate-requests/">estimate SQS requests</a>
   </p>
 
-  <h2>1) Batch whenever possible</h2>
-  <p>
-    If your architecture supports it, batch sends/receives/deletes to reduce per-message request overhead.
-  </p>
-
-  <h2>2) Fix retries and poison message loops</h2>
+  <h2>1) Batch operations (reduces requests per message immediately)</h2>
   <ul>
-    <li>Use backoff and jitter on retries.</li>
-    <li>Detect poison messages early and route them to a DLQ.</li>
-    <li>Improve timeouts so messages don't get reprocessed repeatedly.</li>
+    <li>Use batch send/receive/delete where your client supports it.</li>
+    <li>Choose a batch size that matches your processing latency goals.</li>
+    <li>Validate end-to-end: batching reduces requests but can change how quickly you drain bursts.</li>
   </ul>
 
-  <h2>3) Reduce unnecessary Receive traffic</h2>
+  <h2>2) Reduce empty receives (polling tax)</h2>
   <p>
-    Aggressive polling and short visibility settings can increase billable receive calls. Tune polling behavior and
-    visibility timeouts to reduce excess receives.
+    Empty receives are pure waste: they are billable requests without useful work. Common fixes:
   </p>
-
-  <h2>4) Validate changes with a calculator</h2>
   <ul>
-    <li>
-      Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS Cost Calculator</a> to model requests per message and
-      see how cost changes.
-    </li>
-    <li>
-      Validate with metrics: NumberOfMessagesSent/Received/Deleted, and a representative week of volume.
-    </li>
+    <li>Enable long polling to reduce empty responses when the queue is quiet.</li>
+    <li>Don’t over-provision consumers; scale consumers to backlog/lag, not to peak guesswork.</li>
+    <li>For scheduled workloads, don’t poll continuously.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>3) Fix retries and poison message loops</h2>
+  <ul>
+    <li><strong>Idempotency</strong>: make processing safe to retry without side effects.</li>
+    <li><strong>DLQ policy</strong>: set maxReceiveCount so poison messages don’t loop forever.</li>
+    <li><strong>Timeout tuning</strong>: set visibility timeout to cover normal processing time; avoid repeated timeouts.</li>
+    <li><strong>Backoff</strong>: if you retry, use jitter and a clear stop condition.</li>
+  </ul>
+
+  <h2>4) Reduce “extra” API calls</h2>
+  <ul>
+    <li>Minimize ChangeMessageVisibility calls by aligning visibility timeout with real processing time.</li>
+    <li>Avoid designs where one logical message triggers multiple queue operations unnecessarily.</li>
+    <li>Watch for consumer restarts that re-receive in-flight messages.</li>
+  </ul>
+
+  <h2>Quantify savings before/after</h2>
+  <ul>
+    <li>Requests/message before vs after (sent/received/deleted metrics)</li>
+    <li>Empty receives/day before vs after</li>
+    <li>Retry rate and DLQ redrives (poison loop reduction)</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a>
+  </p>
+
+  <h2>Quick triage: what’s driving requests?</h2>
+  <ul>
+    <li><strong>If received ≫ sent</strong>: retries/poison loops are likely dominating.</li>
+    <li><strong>If received is high while backlog is near zero</strong>: empty receives (polling) are likely dominating.</li>
+    <li><strong>If visibility changes are frequent</strong>: processing time vs visibility timeout mismatch.</li>
+    <li><strong>If DLQ is growing</strong>: fix the poison message class; it’s creating repeated requests.</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Batching without monitoring backlog (latency may change).</li>
+    <li>Scaling consumers aggressively and creating huge empty receive volume.</li>
+    <li>Not using DLQs, so poison messages loop indefinitely.</li>
+    <li>Visibility timeout too short, causing repeated receives and duplicate work.</li>
+    <li>Optimizing SQS requests but ignoring downstream retries (which can recreate the problem).</li>
+  </ul>
+
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/aws-sqs-estimate-requests/">Estimate SQS requests</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/calculators/aws-sqs-cost-calculator/">SQS cost calculator</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
+    <a class="btn" href="/guides/aws-sqs-pricing/">SQS pricing</a>
+    <a class="btn" href="/guides/aws-sqs-estimate-requests/">Estimate requests</a>
+    <a class="btn" href="/guides/aws-sns-cost-optimization/">SNS cost optimization</a>
+    <a class="btn" href="/guides/messaging-costs/">Messaging cost hub</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/sqs/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SQS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-batch-api-actions.html" target="_blank" rel="nofollow noopener">
+        SQS batch API actions
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html" target="_blank" rel="nofollow noopener">
+        SQS dead-letter queues
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

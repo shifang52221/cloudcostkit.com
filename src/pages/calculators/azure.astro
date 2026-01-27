@@ -18,7 +18,39 @@ const slots = SITE.adsenseSlots;
     <div class="btn-row" style="margin-top:12px">
       <a class="btn" href="/guides/azure/">Azure cost guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/methodology/">Methodology</a>
     </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A practical Azure estimate</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start with drivers: requests/month, GB/month transfer, GB-month stored, and uptime hours.</li>
+        <li>Use an effective rate first (blended) to get directionality.</li>
+        <li>Add boundaries: internet egress vs intra-region vs cross-region.</li>
+        <li>Validate against a real week of billing exports and adjust.</li>
+      </ol>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/calculators/networking/">Networking</a>
+        <a class="btn" href="/calculators/logging/">Logging</a>
+        <a class="btn" href="/calculators/storage/">Storage</a>
+        <a class="btn" href="/calculators/finops/">FinOps</a>
+      </div>
+    </section>
+
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Common pitfalls</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Mixing regions and applying a single $/GB to multiple transfer paths.</li>
+        <li>Underestimating retries and fan-out patterns that multiply request volume during incidents.</li>
+        <li>Letting logs/metrics grow without retention and query guardrails.</li>
+        <li>Using end-of-month storage size instead of average GB-month.</li>
+      </ul>
+      <p class="muted" style="margin:12px 0 0">
+        If you need a checklist-style workflow, start with <a href="/guides/cloud-cost-estimation-checklist/">cloud cost estimation checklist</a>.
+      </p>
+    </section>
   </section>
 
   <section class="card section">
@@ -69,4 +101,3 @@ const slots = SITE.adsenseSlots;
     </p>
   </section>
 </BaseLayout>
-

@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Load balancer cost optimization (high-leverage fixes)";
 const description =
-  "A practical playbook to reduce load balancer costs: reduce LB-hours, reduce LCU/NLCU drivers, and avoid traffic amplification patterns. Includes validation steps and related calculators.";
+  "A practical playbook to reduce load balancer costs: cut LB-hours, reduce LCU/NLCU drivers (connections/bytes/requests), and prevent incident traffic amplification with a measurable validation plan.";
 const faqs = [
   {
     q: "What's the fastest lever for load balancer cost?",
-    a: "Reduce the number of load balancers (LB-hours). In Kubernetes, one load balancer per service patterns can create many always-on load balancers.",
+    a: "Reduce LB-hours by reducing the number of load balancers. In Kubernetes, one load balancer per service patterns create many always-on LBs.",
   },
   {
     q: "How do I reduce LCU/NLCU charges?",
-    a: "Reduce the drivers: requests, connections, bytes processed, and TLS overhead. Also fix retry storms and chatty clients that multiply traffic.",
+    a: "Reduce the drivers: connection churn, active connections, bytes processed, and rule evaluation overhead. Fix retry storms and chatty clients that multiply traffic.",
+  },
+  {
+    q: "Should I optimize LB-hours or LCUs first?",
+    a: "If you have many LBs, start with LB-hours. If you have a few high-traffic LBs, focus on LCU/NLCU and the traffic drivers.",
   },
   {
     q: "Why do load balancer bills spike during incidents?",
-    a: "Retries/timeouts can multiply requests and bytes. If clients retry aggressively, the load balancer sees higher request and connection volume even if success traffic is unchanged.",
-  },
-  {
-    q: "Should I optimize for LB-hours or LCUs first?",
-    a: "If you have many load balancers, start with LB-hours. If you have a few high-traffic load balancers, focus on LCUs/NLCUs and the traffic drivers.",
+    a: "Retries and timeouts can multiply requests and connections. Bot traffic and thundering herds can inflate bytes processed even when success traffic is flat.",
   },
 ];
 ---
@@ -27,42 +27,105 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-load-balancer-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    Load balancer bills usually scale with always-on hours and usage. Most savings come from reducing LB count and
-    reducing capacity-unit drivers (LCU/NLCU).
+  <p>
+    Load balancer optimization is usually about two levers: <strong>how many LBs you run</strong> (LB-hours) and{" "}
+    <strong>how busy each LB is</strong> (LCU/NLCU). The best results come from reducing always-on LB count and removing
+    traffic amplification patterns that inflate connections and bytes.
   </p>
 
-  <h2>1) Reduce the number of load balancers (LB-hours)</h2>
+  <h2>Step 1: reduce the number of load balancers (LB-hours)</h2>
   <ul>
-    <li>Consolidate services behind shared ingress where feasible.</li>
-    <li>Avoid one load balancer per microservice unless it is required.</li>
-    <li>Remove unused load balancers left behind by experiments and migrations.</li>
+    <li>
+      Consolidate services behind shared ingress where feasible (especially in Kubernetes).
+    </li>
+    <li>
+      Delete abandoned LBs from migrations and experiments (they often remain “quietly expensive”).
+    </li>
+    <li>
+      Standardize patterns: “one public LB per environment” is usually cheaper than “one per microservice”.
+    </li>
+  </ul>
+  <p class="muted">
+    Start by listing all LBs and tagging ownership; cost reduction is often “delete what nobody owns”.
+  </p>
+
+  <h2>Step 2: reduce LCU/NLCU drivers (requests, connections, bytes)</h2>
+  <ul>
+    <li>
+      <strong>Reduce connection churn</strong>: keep-alive and fewer short timeouts reduce new connections.
+    </li>
+    <li>
+      <strong>Reduce bytes processed</strong>: compress payloads, avoid routing large downloads through the LB, offload to CDN/object storage.
+    </li>
+    <li>
+      <strong>Reduce request amplification</strong>: cache hot responses and avoid “polling every second” patterns.
+    </li>
+    <li>
+      <strong>Simplify routing rules</strong>: avoid unnecessary rule complexity that adds evaluation overhead.
+    </li>
+  </ul>
+  <p class="muted">
+    If you can’t tell which driver dominates, run the LCU estimator from metrics and look at which dimension is highest:
+    <a href="/guides/aws-load-balancer-estimate-lcu/"> estimate LCU/NLCU</a>.
+  </p>
+
+  <h2>Step 3: remove incident multipliers (the most common “spike” root cause)</h2>
+  <ul>
+    <li>
+      Fix retry storms: set sane timeouts, jittered backoff, and circuit breakers for downstream outages.
+    </li>
+    <li>
+      Rate-limit abusive clients and bot traffic (a small amount of unwanted traffic can dominate LCU).
+    </li>
+    <li>
+      Watch for deploy storms: rolling deploys can temporarily multiply connections and error retries.
+    </li>
   </ul>
 
-  <h2>2) Reduce unit usage (LCU / NLCU)</h2>
+  <h2>Step 4: quantify savings before changing architecture</h2>
+  <p>
+    Optimization gets easier when you model the before/after in the same terms:
+  </p>
   <ul>
-    <li>Fix retry storms and timeouts that multiply requests.</li>
-    <li>Reduce chatty patterns and excessive short-lived connections.</li>
-    <li>Reduce payload sizes (compression, avoid large downloads through the load balancer where possible).</li>
-    <li>Use caching (CDN) for static assets so fewer bytes go through the load balancer.</li>
+    <li>
+      LB-hours saved = LBs removed × 730 hours/month (or your scheduled hours)
+    </li>
+    <li>
+      Usage saved = (avg LCU/NLCU before − after) × hours/month
+    </li>
   </ul>
-
-  <h2>3) Validate the estimate (before/after)</h2>
-  <ul>
-    <li>Track LB count and hours (how many load balancers are always on).</li>
-    <li>Track request rate, connection rate, and bytes processed (the capacity-unit drivers).</li>
-    <li>Re-check incident windows: spikes often come from retries and bot traffic.</li>
-  </ul>
-
-  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
-    <a class="btn" href="/calculators/aws-load-balancer-estimate-lcu/">Estimate LCU/NLCU</a>
-    <a class="btn" href="/guides/aws-load-balancer-lcu-explained/">LCU explained</a>
-    <a class="btn" href="/guides/aws-alb-vs-nlb-cost/">ALB vs NLB</a>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost calculator</a>
+    <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">LCU/NLCU calculator</a>
+    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
   </div>
-</GuideLayout>
 
+  <h2>Validation plan (what to measure for a week)</h2>
+  <ul>
+    <li>LB count and hours (did LB-hours actually drop?)</li>
+    <li>LCU/NLCU drivers (connections, bytes, rule evals) for avg and p95</li>
+    <li>Incident windows: did retries and errors drop after fixes?</li>
+    <li>Related side effects: cross-AZ transfer and NAT/egress if routing changed</li>
+  </ul>
+  <p class="muted">
+    Related cost domains: <a href="/guides/aws-nat-gateway-cost/">NAT gateway costs</a> and{" "}
+    <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
+  </p>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/elasticloadbalancing/pricing/" target="_blank" rel="nofollow noopener">
+        Elastic Load Balancing pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html" target="_blank" rel="nofollow noopener">
+        ALB CloudWatch metrics
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

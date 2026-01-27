@@ -3,11 +3,11 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS Lambda pricing (what to include)";
 const description =
-  "A practical checklist for estimating AWS Lambda-style costs: requests, duration x memory, logs, and common hidden line items.";
+  "A practical checklist for estimating AWS Lambda-style costs: requests, duration × memory (GB-seconds), provisioned concurrency when used, logs, and common hidden line items.";
 const faqs = [
   {
     q: "What are the two core Lambda pricing inputs?",
-    a: "Invocations (request count) and compute usage in GB-seconds (duration x memory).",
+    a: "Invocations (request count) and compute usage in GB-seconds (duration × memory).",
   },
   {
     q: "Do logs and metrics come with Lambda?",
@@ -19,75 +19,97 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-lambda-pricing"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
->
-  <p class="muted">
-    Lambda pricing can look simple, but budgets get surprised by the surrounding line items: logging, data transfer, and
-    downstream services (databases, queues, storage).
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-lambda-pricing" lastUpdated="2026-01-27" faqs={faqs}>
+  <p>
+    Lambda pricing looks simple on paper, but budgets get surprised by the surrounding line items: logs, data transfer,
+    retries, and downstream services. Use this checklist to build a realistic estimate and validate it after you deploy.
   </p>
 
   <h2>1) Start with the two core line items</h2>
   <ul>
-    <li><strong>Requests</strong>: billed per invocation (often quoted per 1M requests).</li>
-    <li><strong>Compute</strong>: billed as <strong>GB-seconds</strong> (duration x memory).</li>
+    <li><strong>Requests</strong>: billed per invocation (often priced per 1M requests).</li>
+    <li><strong>Compute</strong>: billed as <strong>GB-seconds</strong> (duration × configured memory).</li>
   </ul>
-  <p>
-    Use the <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda cost calculator</a> to model both with your own
-    pricing assumptions.
+  <p class="muted">
+    Tool: <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda cost calculator</a>
   </p>
 
-  <h2>2) Model duration with a range, not a single number</h2>
+  <h2>2) Model duration as a range (not a single number)</h2>
   <p>
-    Duration usually has a long tail. For planning, model <strong>p50</strong> and <strong>p95</strong> (or "typical" and
-    "busy hour") to understand sensitivity.
+    Duration usually has a long tail. For planning, keep at least two scenarios:
   </p>
-
-  <h2>3) Don't forget memory and over-allocation</h2>
-  <p>
-    Lambda compute scales with configured memory, even if your function rarely uses it. If you over-allocate memory,
-    GB-seconds (and cost) increase directly.
-  </p>
-
-  <h2>4) Common hidden Lambda-adjacent costs</h2>
   <ul>
-    <li><strong>Logging</strong>: ingestion + retention storage; large JSON logs add up quickly.</li>
-    <li><strong>Data transfer</strong>: internet egress and VPC/NAT patterns depending on architecture.</li>
-    <li><strong>Downstream services</strong>: DynamoDB/RDS/S3/SQS/SNS can dominate total cost in real workloads.</li>
+    <li><strong>Typical</strong>: a representative median or steady period.</li>
+    <li><strong>Busy/incident</strong>: p95-ish or “known heavy window” where retries, cold starts, or downstream latency increases duration.</li>
   </ul>
-  <p class="muted" style="margin-top:10px">
-    If Lambda triggers DynamoDB heavily, model it separately using{" "}
-    <a href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost calculator</a>.
-  </p>
 
-  <h2>5) Sanity-check with unit economics</h2>
+  <h2>3) Memory settings directly change compute cost</h2>
   <p>
-    Convert to "cost per 1M requests" (or "cost per request") for your expected duration and memory. This makes it easier
-    to compare serverless vs containers/VMs and spot regressions quickly.
+    Lambda compute cost scales with configured memory, even if your function rarely uses it. Over-allocating memory
+    increases GB-seconds linearly. Under-allocating can increase duration and still raise cost.
   </p>
-
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>,{" "}
-    <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate cost</a>,{" "}
-    <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Right-size memory using measured duration vs memory experiments.</li>
+    <li>Watch for “downstream bound” functions: adding memory might not reduce duration if the bottleneck is a database/API.</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>4) Add provisioned concurrency if you use it</h2>
+  <p>
+    Provisioned concurrency can improve cold-start behavior, but it adds a baseline cost. Treat it like “always-on
+    capacity” and model it separately from on-demand invocations.
+  </p>
+  <p class="muted">
+    Guide: <a href="/guides/aws-lambda-concurrency-and-cold-starts/">concurrency and cold starts</a>
+  </p>
+
+  <h2>5) Common Lambda-adjacent costs</h2>
+  <ul>
+    <li><strong>Logging</strong>: ingestion + retention; large JSON logs add up quickly.</li>
+    <li><strong>Networking</strong>: NAT/egress and cross-AZ transfer patterns depending on architecture.</li>
+    <li><strong>Downstream services</strong>: databases, queues, storage; they often dominate total spend in real systems.</li>
+  </ul>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Transfer cost</a>
+    <a class="btn" href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost</a>
   </div>
 
+  <h2>6) Sanity-check with unit economics</h2>
+  <p>
+    Convert your estimate into “cost per 1M requests” for a typical duration/memory combination. It makes regressions
+    obvious and helps compare to always-on compute.
+  </p>
+  <p class="muted">
+    Related: <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate cost</a>
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Budgeting from a single duration number and ignoring long-tail behavior.</li>
+    <li>Over-allocating memory “just in case” without measuring the duration trade-off.</li>
+    <li>Retry storms inflating invocation count and total duration during incidents.</li>
+    <li>Ignoring log volume and retention until it becomes a top driver.</li>
+    <li>Forgetting data transfer and NAT patterns when functions run in a VPC.</li>
+  </ul>
+
+  <h2>How to validate after you deploy</h2>
+  <ul>
+    <li>Confirm billed request count and billed duration match your model for a representative week.</li>
+    <li>Check p50/p95 duration and error/retry rates; duration inflation often explains spend spikes.</li>
+    <li>Measure log ingestion GB/day and confirm retention settings match your policy.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Lambda pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html" target="_blank" rel="nofollow noopener">
+        Provisioned concurrency documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -22,7 +22,36 @@ const gcpGuides = GUIDES.filter((g) => g.category === "GCP")
       <a class="btn" href="/guides/">All guides</a>
       <a class="btn" href="/calculators/">Calculators</a>
       <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+      <a class="btn" href="/methodology/">Methodology</a>
     </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A simple GCP estimate</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start with requests/month and GB/month (egress + inter-zone).</li>
+        <li>Add storage (GB-month) and lifecycle/retention rules.</li>
+        <li>Add logs/metrics ingestion + retention + scan/query.</li>
+        <li>Validate boundaries (internet vs internal) and unit conversions.</li>
+      </ol>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/calculators/networking/">Networking calculators</a>
+        <a class="btn" href="/calculators/logging/">Logging calculators</a>
+        <a class="btn" href="/calculators/storage/">Storage calculators</a>
+      </div>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Common traps</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Under-modeling inter-zone and cross-region transfer.</li>
+        <li>High-cardinality metrics labels creating “quietly growing” bills.</li>
+        <li>Confusing CDN bandwidth with origin egress (cache fill).</li>
+      </ul>
+      <p class="muted" style="margin:12px 0 0">
+        Use a baseline + peak scenario and validate against a real week before making commitments.
+      </p>
+    </section>
   </section>
 
   <section class="card section">

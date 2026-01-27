@@ -1,71 +1,134 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CloudWatch alarms cost optimization (reduce alarm sprawl)";
+const title = "CloudWatch alarms cost optimization: reduce alarm-month waste";
 const description =
-  "A practical playbook to reduce CloudWatch alarms costs: remove duplicates, avoid per-entity alarms, and right-size high-resolution usage. Includes validation steps and related tools.";
-const faqs = [
-  {
-    q: "What's the biggest lever to reduce alarm charges?",
-    a: "Reduce the number of alarms you maintain: remove duplicates, consolidate per-service alarms, and avoid per-tenant/per-pod alarms where a higher-level SLO alarm is sufficient.",
-  },
-  {
-    q: "When do high-resolution alarms make sense?",
-    a: "Use them sparingly for the few signals that truly require fast detection. For most metrics, a 1-minute period is enough and cheaper.",
-  },
-  {
-    q: "Why do alarm counts grow unexpectedly?",
-    a: "Alarm sprawl: teams duplicate alarms across environments, create per-entity alarms, and forget to delete alarms when services are retired.",
-  },
-  {
-    q: "How do I validate alarm reductions are safe?",
-    a: "Track alert outcomes (missed incidents vs noise), keep core SLO alarms, and validate coverage for critical user journeys and dependencies.",
-  },
-];
+  "A practical playbook to reduce CloudWatch alarm costs: find unused alarms, avoid per-resource duplication, choose resolution intentionally, and validate changes safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-cost-optimization"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What usually drives CloudWatch alarm cost?",
+      a: "Alarm-month count and alarm type. The fastest savings are usually deleting unused alarms and avoiding duplicate alarms across environments and tools.",
+    },
+    {
+      q: "Do high-resolution alarms cost more?",
+      a: "They can, because they evaluate more frequently and are typically priced differently. Use high resolution only where the faster detection materially changes outcomes.",
+    },
+    {
+      q: "How do I reduce alarm cost without losing safety?",
+      a: "Keep outcome-based alarms (availability, error rate, latency SLO), remove noisy resource-by-resource alarms, and validate changes with an incident-oriented checklist.",
+    },
+  ]}
 >
-  <p class="muted">
-    Alarm charges are usually linear in alarm count. The best savings come from controlling alarm sprawl, especially
-    across environments and auto-scaled resources.
+  <p>
+    CloudWatch alarm costs scale with <strong>alarm-month</strong> and alarm type. Most orgs overspend because alarms
+    accumulate over time: experiments, old environments, and duplicated alarms per resource. The goal is not “fewer
+    alarms”, it’s <strong>fewer low-value alarms</strong>.
   </p>
 
-  <h2>1) Reduce duplicates and dead alarms</h2>
+  <h2>Step 0: identify your top cost drivers</h2>
   <ul>
-    <li>Delete alarms for retired services and old environments.</li>
-    <li>Remove duplicate alarms across regions/accounts unless they add value.</li>
+    <li>
+      <strong>Total alarm count</strong> by type: standard vs high-resolution vs composite.
+    </li>
+    <li>
+      <strong>Orphaned alarms</strong>: alarms referencing deleted resources or old environments.
+    </li>
+    <li>
+      <strong>Duplicate intent</strong>: multiple alarms trying to detect the same incident in different ways.
+    </li>
   </ul>
-
-  <h2>2) Avoid per-entity alarms</h2>
-  <ul>
-    <li>Prefer SLO-based alarms over per-pod/per-tenant alarms where possible.</li>
-    <li>Aggregate metrics before alarming (for example, fleet-level error rate).</li>
-  </ul>
-
-  <h2>3) Right-size high-resolution usage</h2>
-  <ul>
-    <li>Downgrade high-resolution alarms that don't need fast evaluation.</li>
-    <li>Use composite alarms to reduce alert noise (and model their cost).</li>
-  </ul>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Inventory alarm count by environment and type (standard vs high-resolution vs composite).</li>
-    <li>Remove duplicates, then validate incident coverage against core SLOs.</li>
-    <li>Track noise: alert frequency and false positives should go down after consolidation.</li>
-  </ul>
-
-  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarms cost</a>
-    <a class="btn" href="/guides/aws-cloudwatch-alarms-estimate-alarm-count/">Estimate alarm count</a>
-    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics optimization</a>
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarm cost calculator</a>
+    <a class="btn" href="/guides/aws-cloudwatch-alarms-pricing/">Alarm pricing</a>
   </div>
+
+  <h2>High-leverage savings levers</h2>
+  <ul>
+    <li>
+      <strong>Delete unused alarms</strong>: remove alarms for retired services, test stacks, and one-off experiments.
+    </li>
+    <li>
+      <strong>Prefer outcome-based alarms</strong>: keep a small set of service-level alarms (availability, error rate,
+      latency) instead of hundreds of per-instance alarms.
+    </li>
+    <li>
+      <strong>Reduce per-resource duplication</strong>: alert on a fleet aggregate or percent-bad instead of one alarm
+      per instance/container.
+    </li>
+    <li>
+      <strong>Right-size resolution</strong>: high-resolution evaluation is useful for “fast failure” paths, but wasteful
+      for slow-moving signals.
+    </li>
+    <li>
+      <strong>Consolidate composite alarms</strong>: use composites to reduce pager noise, but avoid “composite on top of
+      composite” sprawl.
+    </li>
+  </ul>
+
+  <h2>Common patterns that create runaway alarm counts</h2>
+  <ul>
+    <li>
+      <strong>Autoscaling</strong>: instance-per-alarm patterns scale linearly with fleet size.
+    </li>
+    <li>
+      <strong>Multi-tenant dimensions</strong>: alarms per customer/tenant/cardinality dimension explode quickly.
+    </li>
+    <li>
+      <strong>Copy-paste dashboards/alarms</strong>: each team copies an alarm set instead of sharing a standard pack.
+    </li>
+  </ul>
+  <p class="muted">
+    If alarm count grows with fleet size or customer count, you need aggregation, not more per-resource alarms.
+  </p>
+
+  <h2>Safer alternatives to “one alarm per thing”</h2>
+  <ul>
+    <li>
+      <strong>Rate-based alarms</strong>: error rate and latency percentiles at the service boundary (API / gateway).
+    </li>
+    <li>
+      <strong>Percent unhealthy</strong>: alert when unhealthy instances exceed a threshold (e.g., &gt; 5%).
+    </li>
+    <li>
+      <strong>Burn-rate style</strong>: align alerts to SLO impact rather than single metric spikes.
+    </li>
+    <li>
+      <strong>Event-based alerting</strong>: use a single alarm for “deployment failed” instead of many symptoms.
+    </li>
+  </ul>
+
+  <h2>Validation checklist (do not break your on-call)</h2>
+  <ul>
+    <li>For every alarm removed, name the incident it would have detected and what replaces it.</li>
+    <li>Validate you still cover: availability, high error rate, elevated latency, and saturation signals.</li>
+    <li>Run a “game day” query: can you detect and triage top 3 historical incidents without the deleted alarms?</li>
+    <li>After changes, monitor paging volume and time-to-detect for 1–2 release cycles.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+    <li>
+      CloudWatch alarms concepts:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

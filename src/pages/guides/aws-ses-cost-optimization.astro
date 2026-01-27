@@ -3,11 +3,11 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "SES cost optimization (reduce volume, retries, and payload)";
 const description =
-  "A practical playbook to reduce AWS SES costs: prevent duplicate sends, reduce retries, keep payloads small, and control alert storms. Includes validation steps and related tools.";
+  "A practical playbook to reduce AWS SES costs: prevent duplicate sends, control retries and alert storms, reduce non-prod waste, and keep payloads small when they matter — with validation steps to protect deliverability.";
 const faqs = [
   {
     q: "What's the biggest lever to reduce SES cost?",
-    a: "Reduce send volume and prevent duplicates. Most SES spend is linear in email count, so avoiding unnecessary sends and retries is the highest impact.",
+    a: "Reduce send volume and prevent duplicates. Most SES spend is linear in email count, so avoiding unnecessary sends and retries is highest impact.",
   },
   {
     q: "How do I prevent incident-driven cost spikes?",
@@ -15,11 +15,11 @@ const faqs = [
   },
   {
     q: "Do payload size and attachments matter?",
-    a: "They can. If you send large templates or attachments, include payload size in your model and prefer links over attachments when possible.",
+    a: "They can. If you send large templates or attachments, prefer links to downloads and reduce template bloat. Include payload size in the model only when it’s a meaningful driver.",
   },
   {
-    q: "How do I validate improvements?",
-    a: "Track emails sent, bounce/complaint rate, and retry volume before/after. Validate deliverability while reducing volume and retries.",
+    q: "How do I validate improvements safely?",
+    a: "Track sends/day, retry rate, bounce/complaint rates, and deliverability before/after. Validate that volume reductions don’t remove critical notifications.",
   },
 ];
 ---
@@ -27,46 +27,92 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-ses-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    SES costs usually scale with emails sent. The best savings come from preventing duplicate sends, controlling retries,
-    and reducing payload size when you include large templates or attachments.
+  <p>
+    SES costs usually scale with emails sent. The best savings come from preventing unnecessary sends and controlling the
+    multipliers: <strong>duplicates</strong>, <strong>retries</strong>, and <strong>alert storms</strong>. This playbook
+    focuses on high-leverage changes that cut spend while protecting deliverability.
   </p>
 
-  <h2>1) Reduce volume and duplicates</h2>
+  <h2>Step 0: baseline what you’re sending</h2>
   <ul>
-    <li>Send fewer notifications by batching or digesting where appropriate.</li>
-    <li>Dedupe message IDs so retries don't generate duplicate emails.</li>
-    <li>Disable noisy non-prod email sending or route it to a sink.</li>
+    <li>Emails/day by type: transactional vs marketing vs notifications</li>
+    <li>Duplicate/resend rate (how many sends are “not new information”)</li>
+    <li>Incident spikes: identify the top 1–2 events that trigger alert storms</li>
+    <li>Non-prod volume (dev/stage often produces surprising sends)</li>
+  </ul>
+  <p class="muted">
+    If you don’t have a baseline yet: <a href="/guides/aws-ses-estimate-email-volume/">estimate email volume</a>
+  </p>
+
+  <h2>1) Reduce volume by design (batch, digest, and preference controls)</h2>
+  <ul>
+    <li><strong>Digest notifications</strong>: daily/weekly summaries instead of per-event blasts.</li>
+    <li><strong>Preference center</strong>: let users opt out of low-value notifications.</li>
+    <li><strong>Batch admin alerts</strong>: group events by incident window, not per event.</li>
+    <li><strong>Suppress redundant events</strong>: avoid “state changed” loops that email repeatedly.</li>
   </ul>
 
-  <h2>2) Control retries</h2>
+  <h2>2) Prevent duplicates (idempotency is a cost control)</h2>
   <ul>
-    <li>Use exponential backoff and stop retrying after a sensible limit.</li>
-    <li>Fix failure sources (timeouts, upstream dependencies) that trigger resend loops.</li>
+    <li>Use an idempotency key per logical email (user + template + event id).</li>
+    <li>Store send state (sent/pending) to prevent races from creating duplicates.</li>
+    <li>Deduplicate at the queue/job level so retries don’t become extra sends.</li>
   </ul>
 
-  <h2>3) Reduce payload size</h2>
+  <h2>3) Control retries (retry storms are both reliability and cost incidents)</h2>
   <ul>
-    <li>Keep templates lean; avoid embedding large images.</li>
-    <li>Prefer links to downloads instead of large attachments when possible.</li>
+    <li>Use exponential backoff with jitter and a clear max retry limit.</li>
+    <li>Stop retrying when the root cause is persistent (circuit breaker / fail-fast).</li>
+    <li>Separate “send” failures from “template rendering” failures; fix the latter first.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>4) Reduce non-prod waste</h2>
   <ul>
-    <li>Track sends/day and retry volume for a representative week, then compare after changes.</li>
-    <li>Validate deliverability (bounce/complaints) after changing templates and volume.</li>
-    <li>Confirm incident controls: rate limits and dedupe prevent alert storms.</li>
+    <li>Route dev/stage emails to a sink mailbox or disable external sends entirely.</li>
+    <li>Use smaller test recipient sets and avoid marketing-scale campaigns in staging.</li>
+    <li>Schedule test workloads so they don’t run 730 hours/month.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>5) Reduce payload when it matters</h2>
+  <ul>
+    <li>Prefer links to downloads instead of attachments.</li>
+    <li>Keep templates lean; avoid embedding large images inline.</li>
+    <li>Remove duplicated JSON blobs and debug metadata from templates.</li>
+  </ul>
+  <p class="muted">
+    Helper: <a href="/calculators/unit-converter/">units converter</a> (for size modeling)
+  </p>
+
+  <h2>Validate improvements (protect deliverability)</h2>
+  <ul>
+    <li>Sends/day and sends/user (did volume actually drop?)</li>
+    <li>Duplicate/resend rate (did idempotency stop duplicates?)</li>
+    <li>Bounce and complaint rates (deliverability must remain healthy)</li>
+    <li>Incident behavior: do alert storms stay bounded now?</li>
+  </ul>
+
+  <h2>Tools and next steps</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ses-cost-calculator/">SES cost</a>
+    <a class="btn" href="/calculators/aws-ses-cost-calculator/">SES cost calculator</a>
     <a class="btn" href="/guides/aws-ses-pricing/">SES pricing</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-logging-cost-reduction/">Reduce logging costs</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/ses/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SES pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/ses/latest/dg/send-email-concepts.html" target="_blank" rel="nofollow noopener">
+        SES sending concepts
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

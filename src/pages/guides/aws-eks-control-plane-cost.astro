@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "EKS control plane cost: how to model it and when it matters";
 const description =
-  "A practical guide to modeling EKS-style control plane costs: fixed hourly fees, multi-cluster strategy, and how to keep dev/test clusters from inflating spend.";
+  "A practical guide to modeling EKS control plane costs: fixed hourly fees, multi-cluster strategy, and how to keep dev/test clusters from inflating spend.";
 const faqs = [
   {
     q: "What is the EKS control plane charge?",
-    a: "A fixed hourly fee per cluster (control plane). It's usually small for large production clusters, but it can dominate the bill if you run many small clusters.",
+    a: "A fixed hourly fee per cluster (control plane). It’s usually small for large production clusters, but it can dominate the bill if you run many small clusters.",
   },
   {
     q: "When does it matter most?",
-    a: "When you have many environments (dev/test/stage), per-team clusters, or multi-region duplication. Control plane fees add linearly with cluster count.",
+    a: "When you have many environments (dev/test/stage), per-team clusters, or multi-region duplication. Control plane fees scale linearly with cluster count.",
   },
   {
     q: "How do I reduce control plane cost safely?",
-    a: "Consolidate non-prod into fewer shared clusters, schedule dev/test clusters to turn off, and use namespaces/policy for isolation when you don't need full cluster-level isolation.",
+    a: "Consolidate non-prod into fewer shared clusters, use namespaces/policy for isolation, and prefer ephemeral clusters for short-lived testing instead of always-on clusters.",
   },
   {
     q: "Should I use one big cluster or many small clusters?",
-    a: "It's a trade-off: many clusters improve isolation and autonomy but increase fixed fees and operational overhead. For non-prod, fewer clusters is usually cheaper and simpler.",
+    a: "It’s a trade-off: many clusters improve isolation and autonomy but increase fixed fees and operational overhead. For non-prod, fewer shared clusters is usually cheaper and simpler.",
   },
 ];
 ---
@@ -27,48 +27,100 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-eks-control-plane-cost"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Managed Kubernetes control plane fees are often a fixed hourly line item. They are small for large production
-    clusters, but they can dominate costs for small dev/test clusters - especially if you run many clusters.
+    Managed Kubernetes control plane fees are a fixed “per cluster” line item. They’re often small for a single
+    production cluster, but they become meaningful when cluster count explodes (teams × environments × regions). This
+    guide shows how to model the cost and when it’s worth paying for more clusters.
   </p>
 
   <h2>Quick estimation formula</h2>
   <ul>
     <li>
-      <strong>Control plane cost/month ~ clusters x $/hour x 730</strong>
+      <strong>Control plane cost/month ≈ clusters × $/hour × 730</strong>
     </li>
-    <li>Then add node and add-on costs separately (nodes, storage, logs, load balancers, egress).</li>
+    <li>
+      Then add nodes and add-ons separately (nodes, storage, logs, load balancers, egress).
+    </li>
+  </ul>
+  <p class="muted">
+    Tooling: <a href="/calculators/eks-cost-calculator/">EKS cost calculator</a> (control plane + nodes + common add-ons).
+  </p>
+
+  <h2>Why it sneaks up on teams</h2>
+  <p>
+    Cluster sprawl usually isn’t intentional. It happens through reasonable decisions that multiply:
+  </p>
+  <ul>
+    <li>Every team wants isolation (one cluster per team).</li>
+    <li>Every team wants environments (dev + stage + prod).</li>
+    <li>Then regions get duplicated (us-east + eu-west).</li>
+  </ul>
+  <p class="muted">
+    A quick mental model: 5 teams × 3 env × 2 regions = 30 clusters. Fixed fees add up even if nodes are tiny.
+  </p>
+
+  <h2>When paying for more clusters is worth it</h2>
+  <ul>
+    <li>
+      <strong>Hard isolation requirements</strong>: compliance boundaries, noisy-neighbor risk, or strict blast radius.
+    </li>
+    <li>
+      <strong>Operational autonomy</strong>: teams ship independently and need different Kubernetes versions or add-ons.
+    </li>
+    <li>
+      <strong>Multi-region HA</strong>: duplicated clusters are a deliberate cost for resilience.
+    </li>
   </ul>
 
-  <h2>When it matters</h2>
+  <h2>How to keep control plane spend under control</h2>
   <ul>
-    <li>Many small clusters (per-team or per-environment)</li>
-    <li>Always-on dev/test environments</li>
-    <li>Multi-region clusters with duplicated control planes</li>
-  </ul>
-
-  <h2>How to keep it under control</h2>
-  <ul>
-    <li>Turn off idle dev/test clusters (or schedule uptime)</li>
-    <li>Consolidate non-prod workloads into fewer shared clusters</li>
-    <li>Use namespaces and policy to isolate teams when appropriate</li>
+    <li>
+      <strong>Consolidate non-prod</strong>: use a shared dev/test cluster with namespaces, quotas, and policy.
+    </li>
+    <li>
+      <strong>Prefer ephemeral clusters</strong>: create clusters for CI/perf testing and delete them after the run.
+    </li>
+    <li>
+      <strong>Make “new cluster” a budgeted decision</strong>: require a short justification (why not namespace isolation?).
+    </li>
+    <li>
+      <strong>Reduce add-on duplication</strong>: every cluster tends to pull in the same ingress, logging, and monitoring stack.
+    </li>
   </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
-    <li>Counting only nodes: the fixed fee still exists even with tiny node groups.</li>
-    <li>Ignoring add-ons: logs, metrics, and load balancers can exceed the control plane fee.</li>
-    <li>Multi-region duplication: cluster count grows quickly with region x environment.</li>
+    <li>Counting only node-hours and forgetting the per-cluster fee.</li>
+    <li>Always-on dev/test clusters that could be shared or ephemeral.</li>
+    <li>Duplicating clusters across regions for “maybe someday” HA without a real requirement.</li>
+    <li>Underestimating add-on overhead (logging/metrics/ingress) that scales with cluster count.</li>
+    <li>Creating clusters to solve tenancy problems better handled with policy, quotas, and namespaces.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>How to validate (and find sprawl)</h2>
+  <ul>
+    <li>In Cost Explorer/CUR, filter to EKS and group by usage type to confirm the fixed hourly component.</li>
+    <li>List all clusters by environment and region; compare to what’s actually receiving traffic.</li>
+    <li>For each non-prod cluster, ask: could this be a namespace in a shared cluster?</li>
+  </ul>
+
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
-    <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing guide</a>
-    <a class="btn" href="/guides/kubernetes-cost-calculator/">Kubernetes cost checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing checklist</a>
+    <a class="btn" href="/guides/aws-eks-node-sizing/">EKS node sizing</a>
+    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
+    <a class="btn" href="/guides/aws-ecs-vs-eks-cost/">ECS vs EKS</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/eks/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon EKS pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

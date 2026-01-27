@@ -1,67 +1,118 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "EBS gp3 IOPS and throughput (how to budget)";
+const title = "gp3 IOPS and throughput: how to size (EBS)";
 const description =
-  "How to budget gp3 performance vs cost: baseline, provisioned IOPS, provisioned throughput, and common mistakes in estimates. Includes validation steps and related tools.";
-const faqs = [
-  {
-    q: "Should I always provision high IOPS/throughput?",
-    a: "No. Provision only what you need. Over-provisioned performance is one of the most common sources of unnecessary EBS spend.",
-  },
-  {
-    q: "What should I do if I don't know my IOPS needs?",
-    a: "Start with a baseline (typical + peak), then measure IOPS and throughput in production. Use the measured peak window to adjust your budget and provisioning.",
-  },
-  {
-    q: "Why do gp3 estimates go wrong?",
-    a: "Because teams provision peak performance 24/7. Peaks are often rare (backups, batch jobs, migrations). Budget with separate scenarios and validate with real metrics.",
-  },
-  {
-    q: "How do I validate gp3 performance settings?",
-    a: "Compare provisioned IOPS/throughput to actual utilization and latency. If utilization is consistently low, you can usually reduce provisioned values safely.",
-  },
-];
+  "A practical guide to sizing EBS gp3 performance: choose IOPS and throughput from measured utilization, avoid over-provisioning, and validate latency under realistic load.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-gp3-iops-throughput"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What is the common gp3 cost mistake?",
+      a: "Provisioning IOPS and throughput far above what the workload uses. Always start from measured utilization and size for p95, not worst-case peaks.",
+    },
+    {
+      q: "Should I size for peak or average?",
+      a: "For performance, size for p95/p99 and validate during busy windows. For cost, avoid using a single worst-case spike as a baseline unless it happens regularly.",
+    },
+  ]}
 >
-  <p class="muted">
-    gp3 makes it easy to pay for performance you don't use. Budgeting is simpler if you treat performance as a separate
-    knob from storage, and validate with measured IOPS/throughput once the workload runs.
+  <p>
+    With gp3, you can often choose performance more explicitly. That is great for cost control, but it also means you can
+    accidentally over-provision IOPS and throughput. The safest sizing workflow starts from measured utilization and
+    validates performance under realistic load.
   </p>
 
-  <h2>1) Separate storage from performance</h2>
+  <h2>Step 1: measure your baseline</h2>
   <ul>
-    <li><strong>Storage</strong>: GB-month baseline cost.</li>
-    <li><strong>IOPS</strong>: provisioned IOPS-month cost (if billed).</li>
-    <li><strong>Throughput</strong>: provisioned MB/s-month cost (if billed).</li>
+    <li>IOPS utilization (average and p95) during a representative week</li>
+    <li>Throughput utilization (MB/s) during the same window</li>
+    <li>Latency and tail latency during busy periods</li>
   </ul>
+  <p class="muted">If you only measure averages, you will under-size; if you size for worst spikes, you will overpay.</p>
 
-  <h2>2) Budget with two scenarios</h2>
+  <h2>Step 2: choose targets (planning rules)</h2>
   <ul>
-    <li><strong>Typical</strong>: steady-state throughput and IOPS.</li>
-    <li><strong>Peak</strong>: batch jobs, backups, migrations, reindexing, or high-traffic events.</li>
-    <li>Do not pay peak 24/7 unless the workload is truly always at peak.</li>
+    <li>
+      <strong>IOPS target</strong>: start near p95 and add a small buffer for growth and burst.
+    </li>
+    <li>
+      <strong>Throughput target</strong>: start near p95 MB/s; throughput matters most for large sequential reads/writes.
+    </li>
+    <li>
+      <strong>Capacity</strong>: size GB for data + growth, not to “buy performance”.
+    </li>
   </ul>
-
-  <h2>3) Validate with metrics (the part that prevents waste)</h2>
-  <ul>
-    <li>Compare actual IOPS and throughput against provisioned values.</li>
-    <li>Track latency and queue depth for the workload's peak window.</li>
-    <li>If utilization stays low, reduce provisioned performance and re-check latency.</li>
-  </ul>
-
-  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
-    <a class="btn" href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3</a>
-    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
-    <a class="btn" href="/guides/aws-ebs-cost-optimization/">EBS cost optimization</a>
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
+    <a class="btn" href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>
   </div>
-</GuideLayout>
 
+  <h2>Workload patterns (why IOPS vs throughput matters)</h2>
+  <ul>
+    <li>
+      <strong>Small random IO</strong>: IOPS bound (databases, metadata-heavy workloads).
+    </li>
+    <li>
+      <strong>Large sequential IO</strong>: throughput bound (backups, large file operations).
+    </li>
+    <li>
+      <strong>Mixed workloads</strong>: size both and validate under real traffic.
+    </li>
+  </ul>
+
+  <h2>Rule of thumb: throughput is IOPS times IO size</h2>
+  <p class="muted">
+    Rough relationship: throughput (MB/s) ~= IOPS * IO size (MB). If your IO size is small, you can be IOPS-bound even if
+    throughput looks low.
+  </p>
+
+  <h2>Worked example (planning)</h2>
+  <ul>
+    <li>Workload p95: 3,000 IOPS with ~16 KB IO size (~0.016 MB)</li>
+    <li>Throughput ~= 3,000 * 0.016 ~= 48 MB/s</li>
+    <li>If you move to 128 KB IO size (~0.125 MB), throughput at 3,000 IOPS would be ~375 MB/s</li>
+  </ul>
+  <p class="muted">
+    This is why workload behavior (random vs sequential, IO size) matters more than a single "IOPS" number.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Setting IOPS and throughput from a single peak event (over-provisioning).</li>
+    <li>Ignoring snapshots and restore patterns that create temporary throughput bursts.</li>
+    <li>Changing settings without a canary and without tracking latency regressions.</li>
+    <li>Overlooking application bottlenecks (CPU, network) and blaming the volume.</li>
+  </ul>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate performance under a busy window (deploy or batch job) after changes.</li>
+    <li>Track latency distribution (p50/p95/p99) for the workload, not just IOPS.</li>
+    <li>Re-check after 1–2 weeks to ensure growth does not remove safety buffer.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      EBS pricing:{" "}
+      <a href="https://aws.amazon.com/ebs/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ebs/pricing
+      </a>
+    </li>
+    <li>
+      EBS volume types:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

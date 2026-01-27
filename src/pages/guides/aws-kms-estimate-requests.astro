@@ -3,23 +3,19 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate KMS requests per month (where they come from)";
 const description =
-  "How to estimate AWS KMS request volume for cost models: measure and scale, then break down by top callers and operations. Includes validation tips and common pitfalls.";
+  "A practical workflow to estimate AWS KMS request volume: identify call sources, translate workload volume into KMS API calls, and validate with billing/CloudTrail so you can budget and optimize safely.";
 const faqs = [
   {
-    q: "Why is KMS request estimation tricky?",
-    a: "Because many services generate KMS requests indirectly. Your app may not call KMS directly, but encrypted storage, databases, or secrets access can still generate significant KMS traffic.",
+    q: "Why are KMS request estimates hard?",
+    a: "Because KMS calls can be triggered by many services and by application patterns (decrypting secrets frequently, generating data keys too often). It’s easy to miss request volume until billing shows it.",
   },
   {
-    q: "What's the fastest path to a number?",
-    a: "Measure total KMS requests over a representative window and scale to monthly. Then break it down by top callers and operations.",
+    q: "What’s a good unit to estimate from?",
+    a: "Use the unit that drives crypto work: app requests, secret fetches, objects uploaded/downloaded, or messages processed. Then estimate KMS calls per unit and multiply.",
   },
   {
-    q: "What are common spike drivers?",
-    a: "Retries/timeouts, cold starts, pod churn, and per-request Decrypt patterns. High-QPS services can generate large request volume quickly.",
-  },
-  {
-    q: "How do I validate the estimate?",
-    a: "Compare the estimated requests/month against billing/metrics for a real week, and confirm the top callers and operations match your architecture.",
+    q: "How do I validate my estimate quickly?",
+    a: "Use Cost Explorer/CUR to see request-driven KMS charges, then use CloudTrail event history to identify the top KMS API callers and operations for a representative week.",
   },
 ];
 ---
@@ -27,46 +23,113 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-kms-estimate-requests"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    The biggest driver of KMS cost is usually request volume. Start with a measured total, then identify the biggest
-    call sites so you know where optimization actually matters.
-  </p>
-
-  <h2>Method 1: Measure and scale (best)</h2>
-  <ul>
-    <li>Measure total KMS requests over 7 or 30 days and scale to monthly.</li>
-    <li>Separate by account/region if you have multiple deployments.</li>
-    <li>Prefer a representative window (avoid incident spikes).</li>
-  </ul>
-
-  <h2>Method 2: Break down by caller</h2>
-  <ul>
-    <li>Identify top callers (applications, services, roles) and their request rates.</li>
-    <li>Look for hot paths: per-request crypto, secrets fetched on every request, or frequent re-encryption operations.</li>
-  </ul>
-
-  <h2>Method 3: Sanity checks</h2>
-  <ul>
-    <li>Retry loops and timeouts can multiply KMS calls.</li>
-    <li>High-QPS services calling Decrypt frequently can dominate total requests.</li>
-    <li>Per-object or per-record encryption in tight loops creates large request volume.</li>
-  </ul>
-
-  <h2>Turn requests into cost</h2>
   <p>
-    Use <a href="/calculators/aws-kms-cost-calculator/">AWS KMS Cost Calculator</a> with your measured requests/month and
-    effective $ per 10k requests.
+    KMS request charges are the part that surprises budgets. The good news is you can estimate them with a simple
+    workflow: identify what triggers KMS calls, translate workload volume into “KMS calls per unit”, then validate using
+    billing and CloudTrail.
   </p>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-kms-pricing/">KMS pricing</a>
-    <a class="btn" href="/guides/aws-kms-cost-optimization/">KMS optimization</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
-  </div>
-</GuideLayout>
+  <h2>Step 1: list your KMS call sources (don’t start from pricing)</h2>
+  <p>Write down every place encryption happens in your architecture:</p>
+  <ul>
+    <li>
+      <strong>Application crypto</strong>: envelope encryption patterns (GenerateDataKey + Decrypt).
+    </li>
+    <li>
+      <strong>Secrets access</strong>: apps fetching encrypted secrets/config at runtime.
+    </li>
+    <li>
+      <strong>Storage pipelines</strong>: services encrypting objects or snapshots as part of ingestion.
+    </li>
+    <li>
+      <strong>Background jobs</strong>: cron/ETL jobs that run frequently and perform crypto work.
+    </li>
+  </ul>
 
+  <h2>Step 2: pick the workload unit for each source</h2>
+  <ul>
+    <li><strong>Web/API</strong>: app requests per month</li>
+    <li><strong>Secrets</strong>: secret reads per month (per service × per instance/task × frequency)</li>
+    <li><strong>Objects</strong>: objects encrypted/decrypted per month</li>
+    <li><strong>Jobs</strong>: job runs per month × crypto operations per run</li>
+  </ul>
+  <p class="muted">
+    Helper: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>
+  </p>
+
+  <h2>Step 3: estimate “KMS calls per unit” (this is where design choices matter)</h2>
+  <p>
+    Two systems with the same traffic can have wildly different KMS request volume depending on caching and batching.
+    Your goal is to write down a defensible ratio.
+  </p>
+  <ul>
+    <li>
+      <strong>Best-case</strong>: generate a data key once per session/batch/object and cache decrypted materials where safe.
+    </li>
+    <li>
+      <strong>Worst-case</strong>: decrypt on every request, generate data keys too frequently, and retry on errors.
+    </li>
+  </ul>
+  <p class="muted">
+    If you don’t know the ratio, assume a conservative “calls per unit”, then validate and correct after you measure.
+  </p>
+
+  <h2>Step 4: compute monthly requests (simple math)</h2>
+  <ul>
+    <li>
+      <strong>KMS requests/month</strong> = Σ(unit volume/month × KMS calls per unit)
+    </li>
+    <li>
+      Keep two scenarios: baseline and incident/peak (retries can multiply calls).
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-kms-cost-calculator/">KMS cost calculator</a> (convert keys + requests into an estimate)
+  </p>
+
+  <h2>Step 5: validate and attribute (so you can optimize safely)</h2>
+  <ul>
+    <li>
+      <strong>Billing/CUR</strong>: confirm that request-driven KMS charges exist and see whether requests dominate keys.
+    </li>
+    <li>
+      <strong>CloudTrail</strong>: identify the top KMS API callers and operations (Decrypt, Encrypt, GenerateDataKey).
+    </li>
+    <li>
+      <strong>Service metrics</strong>: correlate spikes with deployments and incidents; retries often explain “mystery” jumps.
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Estimating from key count only and treating requests as negligible.</li>
+    <li>Decrypting secrets/config on every request instead of caching (when appropriate).</li>
+    <li>Generating data keys per record/message when a batch/session key would work.</li>
+    <li>Ignoring retries/timeouts that multiply KMS calls during incident windows.</li>
+    <li>Missing non-prod traffic and always-on dev/test as request drivers.</li>
+  </ul>
+
+  <h2>Next steps</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/aws-kms-pricing/">KMS pricing checklist</a>
+    <a class="btn" href="/guides/aws-kms-cost-optimization/">KMS cost optimization</a>
+    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+  </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html" target="_blank" rel="nofollow noopener">
+        AWS KMS Developer Guide (concepts)
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/kms/pricing/" target="_blank" rel="nofollow noopener">
+        AWS KMS pricing
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

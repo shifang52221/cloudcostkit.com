@@ -7,15 +7,15 @@ const description =
 const faqs = [
   {
     q: "Is Aurora always cheaper than RDS?",
-    a: "Not always. Aurora can be a great fit, but costs depend on workload shape (I/O, read scaling, storage growth), region pricing, and whether you use provisioned vs serverless.",
+    a: "Not always. Aurora can be a great fit, but costs depend on workload shape (I/O patterns, read scaling, storage growth), region pricing, and whether you use provisioned vs serverless.",
   },
   {
     q: "What do I need for a first-pass estimate?",
-    a: "Start with compute hours, average storage (GB-month), and an estimate for backups/retention. If you expect I/O-heavy patterns or frequent failovers, model a high-usage scenario too.",
+    a: "Compute hours (instances or ACUs), average storage (GB-month), and backup retention (GB-month). Then add a high-usage scenario for I/O or bursty traffic so your budget survives reality.",
   },
   {
-    q: "What is the biggest hidden cost driver?",
-    a: "Workload-driven usage that isn't captured by 'DB size' alone: heavy I/O patterns, rapid storage growth, and long retention can quietly dominate long-term spend.",
+    q: "What typically causes surprise bills?",
+    a: "Workload-driven usage that isn’t captured by DB size alone: heavy I/O, rapid storage growth, long retention, and the surrounding infrastructure (load balancers, logs, transfer).",
   },
 ];
 ---
@@ -23,64 +23,147 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-aurora-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p>
+    Aurora estimates go wrong when teams model only compute. A realistic model includes at least four lines: compute,
+    storage, backups/retention, and a “high-usage” scenario for I/O-heavy or bursty workloads. This page is a practical
+    checklist you can use for a budget, a migration plan, or a “why did our bill spike?” review.
+  </p>
+
+  <h2>1) Choose the compute model (provisioned vs serverless)</h2>
+  <ul>
+    <li>
+      <strong>Provisioned</strong>: estimate monthly instance-hours (including writer + readers).
+    </li>
+    <li>
+      <strong>Serverless</strong>: estimate ACU-hours as a baseline plus a peak scenario.
+    </li>
+  </ul>
   <p class="muted">
-    Aurora cost estimates often go wrong when teams model only compute. A complete model includes storage and retention,
-    and often benefits from a second "high-usage" scenario for I/O-heavy workloads.
+    If you use serverless, treat capacity as time-series usage, not a single average. See{" "}
+    <a href="/guides/aws-aurora-serverless-v2-pricing/">Aurora Serverless v2 pricing</a>.
   </p>
 
-  <h2>1) Model compute (instance-hours or ACUs)</h2>
+  <h2>2) Add storage GB-month (and model growth)</h2>
   <p>
-    Start from how many instances you run and for how many hours per month. If you use serverless, model your average
-    capacity and add a peak scenario.
+    Storage is usually a steady cost that grows over time. For a first pass, estimate an average GB-month for the month
+    you care about. For planning, build a simple forecast:
+  </p>
+  <ul>
+    <li>Current size (GB)</li>
+    <li>Growth per day/week (GB)</li>
+    <li>Retention window (how far back you keep data, if applicable)</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth calculator</a>
   </p>
 
-  <h2>2) Model database storage (GB-month) and growth</h2>
+  <h2>3) Model backups and retention separately</h2>
   <p>
-    Use your expected average storage (GB-month). If storage grows over time, build a multi-month forecast using{" "}
-    <a href="/calculators/database-storage-growth-cost-calculator/">DB storage growth</a>.
-  </p>
-
-  <h2>3) Model backups and retention as a separate line item</h2>
-  <p>
-    Backup storage can become a steady monthly cost with long retention and high churn. Treat it as separate from
-    primary storage.
+    Backups can become a “quiet baseline” cost, especially with long retention and high churn (frequent updates and
+    large write volumes). Treat backup storage as its own GB-month line item and validate how retention is configured.
   </p>
   <p class="muted">
-    Next: <a href="/guides/aws-rds-backup-storage-gb-month-estimate/">estimate backup GB-month</a>.
+    Next: <a href="/guides/aws-rds-backup-storage-gb-month-estimate/">estimate backup GB-month</a> and{" "}
+    <a href="/guides/aws-rds-backups-and-snapshots/">backups and snapshots checklist</a>.
   </p>
 
   <h2>4) Add a high-usage scenario for workload-driven costs</h2>
-  <ul>
-    <li>Batch jobs that rewrite large tables</li>
-    <li>Hot partitions / high write amplification</li>
-    <li>Workloads with frequent retries and timeouts</li>
-  </ul>
   <p>
-    Even if you cannot price every detail up front, a "high-usage" scenario prevents under-budgeting.
+    Even when you can’t price every internal detail up front, a second scenario prevents under-budgeting. Use it when
+    you expect one or more of the patterns below.
+  </p>
+  <ul>
+    <li>Batch jobs that rewrite large tables or run heavy analytical queries</li>
+    <li>Hot partitions or skewed keys that cause bursts</li>
+    <li>Retry storms from upstream timeouts (incidents multiply usage)</li>
+    <li>Large backfills, migrations, or index rebuilds</li>
+  </ul>
+
+  <h2>5) Don’t forget the “around the database” line items</h2>
+  <ul>
+    <li>
+      <strong>Read scaling</strong>: reader instances (provisioned) or reader capacity (serverless) increases compute.
+    </li>
+    <li>
+      <strong>Data transfer</strong>: cross-AZ traffic and internet egress can show up when apps aren’t co-located.
+    </li>
+    <li>
+      <strong>Logging/metrics</strong>: verbose SQL/audit logs and high-cardinality metrics can be a separate bill.
+    </li>
+  </ul>
+  <p class="muted">
+    Helpful context: <a href="/guides/network-transfer-costs/">network transfer costs</a> and{" "}
+    <a href="/guides/aws-logging-cost-reduction/">reduce logging costs</a>.
   </p>
 
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-aurora-serverless-v2-pricing/">Aurora Serverless v2 pricing</a>
-    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a>
-    <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
-  </div>
-
-  <h2>Validation checklist</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <strong>Compute</strong> = (writer instances × hours) + (reader instances × hours) or ACU-hours scenarios
+    </li>
+    <li>
+      <strong>Storage</strong> = average GB-month (include forecast if storage is growing)
+    </li>
+    <li>
+      <strong>Backups</strong> = backup GB-month (retention + churn)
+    </li>
+    <li>
+      <strong>High-usage scenario</strong> = peak compute/capacity hours + any known usage multipliers
+    </li>
+  </ul>
+  <p class="muted">
+    If you want a single “close enough” number, keep compute as the variable and treat storage/backups as stable baselines.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Modeling only “DB size” and ignoring retention (backup GB-month).</li>
+    <li>Using one average for serverless and missing frequent short peaks.</li>
+    <li>Assuming storage won’t grow (or forgetting growth from indexes and history tables).</li>
+    <li>Ignoring incident windows where retries multiply query volume.</li>
+    <li>Missing the “surrounding” bills: load balancers, NAT/egress, logs, and metrics.</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>
+      In Cost Explorer / CUR, group by usage type and confirm your compute, storage, and backup lines exist as separate
+      drivers.
+    </li>
+    <li>Compare your “high-usage” scenario to real peak windows (deploys, batch jobs, incidents).</li>
+    <li>
+      If you’re migrating, run a short parallel period and compare the shape of usage (steady baseline vs peaks), not
+      only a single month total.
+    </li>
+  </ul>
+
+  <h2>Related guides and calculators</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/aws-rds-cost-calculator/">RDS cost calculator</a>
+    <a class="btn" href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora</a>
+    <a class="btn" href="/guides/aws-aurora-serverless-v2-pricing/">Serverless v2 pricing</a>
+    <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/rds/aurora/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon Aurora pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html" target="_blank" rel="nofollow noopener">
+        Amazon Aurora User Guide
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html" target="_blank" rel="nofollow noopener">
+        RDS automated backups (retention concepts)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

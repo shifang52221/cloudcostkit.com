@@ -3,19 +3,19 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate ALB LCU (and NLB NLCU) from metrics: quick methods";
 const description =
-  "A practical guide to estimate ALB LCU and NLB NLCU from load balancer metrics: new connections, active connections, bytes processed, and rule evaluations. Includes a calculator workflow.";
+  "A practical guide to estimate ALB LCU and NLB NLCU from load balancer metrics: new connections, active connections, bytes processed, and rule evaluations — with a repeatable workflow and validation steps.";
 const faqs = [
   {
     q: "What do I need to estimate LCU/NLCU?",
-    a: "You need average new connections/sec, average active connections, and bytes processed per hour. For ALB, rule evaluations can be an extra driver.",
+    a: "Average new connections/sec, average active connections, and bytes processed per hour. For ALB, rule evaluations can be an additional driver depending on configuration.",
   },
   {
     q: "Should I use average or peak metrics?",
-    a: "Use averages for budgeting and add a peak scenario for safety. Many bills are driven by a small number of peak hours.",
+    a: "Use averages for a monthly budget and add a peak scenario for busy/incident hours. Many bills are driven by a small number of repeatable peak periods.",
   },
   {
     q: "What’s the fastest workflow?",
-    a: "Extract the metrics, estimate capacity units (LCU/NLCU) with a calculator, then plug units/hour into the load balancer cost calculator with your pricing.",
+    a: "Extract driver metrics for a representative window, compute average units/hour with a calculator, then price units/hour plus the fixed LB hourly fee. Validate after a week and refine the peak scenario.",
   },
 ];
 ---
@@ -23,62 +23,107 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-load-balancer-estimate-lcu"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    LCU/NLCU bills are hard to predict if you don’t translate metrics into <strong>capacity units per hour</strong>.
-    This guide shows a simple workflow to estimate average units/hour (and a peak scenario) for budgeting.
+    LCU/NLCU bills are hard to predict until you translate metrics into <strong>capacity units per hour</strong>. The
+    most reliable approach is: pull the driver metrics, compute average + p95, then estimate units/hour (LCU/NLCU) and
+    price them. This guide focuses on getting to a defensible estimate quickly.
   </p>
 
-  <h2>Step 1: collect the key metrics</h2>
+  <h2>Step 1: choose a representative window (and define peak hours)</h2>
   <ul>
-    <li><strong>New connections per second</strong> (average)</li>
+    <li><strong>Budget baseline</strong>: pick a “normal week” and compute averages.</li>
+    <li><strong>Peak scenario</strong>: define what peak means for you (p95 hour, busiest day, or incident window).</li>
+    <li><strong>Separate non-prod</strong>: dev/test often has very different patterns (and can be scheduled).</li>
+  </ul>
+
+  <h2>Step 2: collect the driver metrics</h2>
+  <p class="muted">
+    You can estimate from the provider’s “LCU-like” metric if available, but a portable approach is to collect the driver
+    inputs and let a calculator map them to units.
+  </p>
+  <ul>
+    <li><strong>New connections</strong> (per second average)</li>
     <li><strong>Active connections</strong> (average concurrent)</li>
-    <li><strong>Bytes processed per hour</strong> (convert to GB/hour)</li>
-    <li><strong>Rule evaluations per second</strong> (ALB only, if applicable)</li>
+    <li><strong>Bytes processed</strong> (convert to GB/hour)</li>
+    <li><strong>Rule evaluations</strong> (ALB-focused driver when you have complex routing)</li>
+  </ul>
+
+  <h2>Step 3: turn CloudWatch sums into per-second / per-hour numbers</h2>
+  <p>
+    CloudWatch often provides metrics as a <strong>Sum over a period</strong>. To convert:
+  </p>
+  <ul>
+    <li>
+      <strong>Per-second average</strong> = sum over period / seconds in period
+    </li>
+    <li>
+      <strong>Per-hour GB</strong> = bytes over hour / 1e9 (or use your provider’s convention consistently)
+    </li>
   </ul>
   <p class="muted">
-    If you only have bytes/day or bytes/month, convert to GB/hour with <a href="/calculators/unit-converter/">Units converter</a>.
+    If you only have Mbps charts, convert to GB/month first using <a href="/calculators/unit-converter/">Units converter</a>,
+    then back into GB/hour for unit estimates.
   </p>
 
-  <h2>Step 2: estimate capacity units (LCU/NLCU)</h2>
+  <h2>Step 4: estimate units/hour (LCU/NLCU)</h2>
   <p>
-    Use an estimator to compute each driver’s units and take the maximum.
+    Capacity unit billing typically takes the <strong>maximum</strong> across the dimensions (connections, bytes, rules).
+    The easiest way to avoid mistakes is to use a calculator that implements the provider’s mapping.
   </p>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">ALB LCU / NLB NLCU calculator</a>
     <a class="btn" href="/guides/aws-load-balancer-lcu-explained/">LCU/NLCU explained</a>
   </div>
 
-  <h2>Step 3: convert units/hour into dollars</h2>
-  <p>
-    Plug your average units/hour into the cost calculator along with the fixed hourly LB fee and your $/unit-hour.
-  </p>
+  <h2>Step 5: price units/hour + the fixed LB hourly fee</h2>
+  <ul>
+    <li>
+      Monthly usage cost ≈ avg units/hour × hours/month × $/unit-hour
+    </li>
+    <li>
+      Monthly fixed cost ≈ LB count × hours/month × $/LB-hour
+    </li>
+  </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a>
     <a class="btn" href="/guides/aws-load-balancer-cost/">Load balancer cost guide</a>
   </div>
 
-  <h2>Step 4: add a peak scenario</h2>
+  <h2>Step 6: add a peak scenario (the part that prevents under-budgeting)</h2>
   <ul>
-    <li>Use p95/p99 or “top hour of the day” metrics to estimate peak units/hour.</li>
-    <li>Validate whether peak hours are frequent (daily) or rare (incidents/batch jobs).</li>
-    <li>Many budgets fail because the peak is ignored.</li>
+    <li>Compute p95 (or busiest hour) units/hour and multiply by peak hours/month.</li>
+    <li>Decide if peak happens daily (baseline) or only during incidents (rare).</li>
+    <li>Include retries/timeouts: incident traffic often multiplies connections and bytes.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>Common mistakes</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Using peak-only metrics for the whole month (overestimates baseline).</li>
+    <li>Ignoring peak scenarios entirely (underestimates budgets).</li>
+    <li>Mixing units (GB vs GiB, bytes vs bits) and getting a silent 1.07× or 8× error.</li>
+    <li>Estimating from request rate only and forgetting payload size and connection churn.</li>
+    <li>Not validating after changes (routing tweaks and retries can shift the dominant driver).</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/elasticloadbalancing/pricing/" target="_blank" rel="nofollow noopener">
+        Elastic Load Balancing pricing (LCU/NLCU pricing context)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html" target="_blank" rel="nofollow noopener">
+        ALB CloudWatch metrics
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html" target="_blank" rel="nofollow noopener">
+        NLB CloudWatch metrics
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -3,97 +3,119 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Fargate vs EC2 cost: how to compare compute, overhead, and hidden line items";
 const description =
-  "A practical guide to compare Fargate vs EC2 cost: normalize workload shape, model compute, account for idle capacity, and include the line items that often dominate (load balancers, logs, NAT/egress).";
+  "A practical Fargate vs EC2 cost comparison: normalize workload assumptions, compare unit economics (vCPU/memory-hours vs instance-hours), and include the line items that change the answer (idle capacity, load balancers, logs, transfer).";
 const faqs = [
   {
-    q: "When is Fargate cheaper than EC2?",
-    a: "Fargate can be cheaper when EC2 would be underutilized, when workloads are spiky, or when the cost of idle capacity dominates. Paying per task-hour can beat paying for always-on instances.",
+    q: "When does Fargate tend to be cheaper than EC2?",
+    a: "When workloads are bursty or have low average utilization, because you avoid paying for idle instances. It also helps when you can keep average running tasks low through autoscaling and scheduling.",
   },
   {
-    q: "When is EC2 cheaper than Fargate?",
-    a: "EC2 often wins at steady high utilization when you pack workloads efficiently, use commitments (Savings Plans/Reserved), and amortize overhead across many services.",
+    q: "When does EC2 tend to be cheaper than Fargate?",
+    a: "When workloads are steady and you can pack tasks efficiently on instances (high utilization). EC2 also gives more levers for committed discounts and instance selection.",
   },
   {
-    q: "What’s the fastest way to compare them?",
-    a: "Model compute-only first with the same average capacity assumptions, then add the big line items (load balancers, logs, egress/NAT). The winner often changes once non-compute costs are included.",
+    q: "What should I include beyond compute?",
+    a: "Load balancers, logs, and networking (NAT/egress/cross-AZ). Those often dominate once compute is right-sized.",
   },
 ];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-fargate-vs-ec2-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-fargate-vs-ec2-cost" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    “Fargate vs EC2 cost” is usually a question about <strong>idle capacity</strong> and <strong>operational overhead</strong>.
-    Compute list prices are rarely the whole story. Use the checklist below to compare apples-to-apples.
+    Fargate vs EC2 cost is mostly a question of <strong>idle capacity</strong> and <strong>packing efficiency</strong>.
+    Fargate bills the resources of running tasks; EC2 bills the whole instance whether tasks use it or not. Use this
+    checklist to compare with consistent assumptions.
   </p>
 
-  <h2>Step 1: normalize workload shape</h2>
+  <h2>Step 0: normalize assumptions (otherwise you compare apples to oranges)</h2>
   <ul>
-    <li><strong>Average capacity</strong>: average running tasks/instances over the month (not peak).</li>
-    <li><strong>Traffic shape</strong>: steady, bursty, or scheduled down.</li>
-    <li><strong>Constraints</strong>: latency, cold starts, and scaling behavior.</li>
+    <li><strong>Average demand</strong>: typical vCPU and memory actually used (not peak-only).</li>
+    <li><strong>Burstiness</strong>: how often you hit peak and how quickly you scale up/down.</li>
+    <li><strong>Scheduling</strong>: always-on vs business-hours vs batch windows.</li>
+    <li><strong>Non-compute</strong>: load balancers, logs, and data transfer baseline.</li>
   </ul>
-
-  <h2>Step 2: compare compute-only cost</h2>
-  <p>
-    Start with compute-only to get a baseline, then iterate.
+  <p class="muted">
+    If you only know traffic, start with <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a> and validate later with metrics.
   </p>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 cost calculator</a>
-    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
-    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
-  </div>
 
-  <h2>Step 3: add line items that often dominate</h2>
+  <h2>Step 1: model Fargate as task resources × hours</h2>
+  <ul>
+    <li><strong>vCPU-hours</strong> = avg running tasks × vCPU per task × hours/month</li>
+    <li><strong>GB-hours</strong> = avg running tasks × memory (GB) per task × hours/month</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 calculator</a>
+  </p>
+
+  <h2>Step 2: model EC2 as instances × hours (then adjust for utilization)</h2>
+  <p>
+    EC2 cost depends on how well you pack tasks. If you run large instances at 20% utilization, EC2 “loses” even if the
+    per-vCPU rate is cheaper.
+  </p>
+  <ul>
+    <li><strong>Instance-hours</strong> = instance count × hours/month</li>
+    <li><strong>Effective utilization</strong>: subtract overhead and fragmentation; don’t assume 100% packing.</li>
+    <li><strong>Attached storage</strong>: EBS volumes and snapshots are separate line items.</li>
+  </ul>
+
+  <h2>What usually decides the winner</h2>
   <ul>
     <li>
-      <strong>Load balancers</strong>: multiple services behind ALBs/NLBs can drive a large baseline.
+      <strong>Idle</strong>: if your average demand is far below peak, Fargate often wins by not paying for idle instances.
     </li>
     <li>
-      <strong>Logs</strong>: ingestion + retention (and scan/search) can exceed compute for noisy services.
+      <strong>Packing</strong>: if you can keep instances hot (high utilization), EC2 often wins.
     </li>
     <li>
-      <strong>Networking</strong>: NAT gateway processed traffic, internet egress, and cross-AZ transfer.
-    </li>
-    <li>
-      <strong>Storage</strong>: EBS volumes, snapshots, and I/O can matter for stateful workloads.
+      <strong>Ops overhead</strong>: EC2 requires capacity management (AMIs, scaling groups, patching); if that causes overprovisioning, cost rises.
     </li>
   </ul>
+
+  <h2>Don’t ignore the non-compute bills</h2>
+  <ul>
+    <li><strong>Load balancers</strong>: always-on hourly baseline plus capacity units.</li>
+    <li><strong>Logs</strong>: ingestion GB/day + retention (often bigger than expected).</li>
+    <li><strong>Networking</strong>: NAT processed GB and cross-AZ transfer from chatty services.</li>
+  </ul>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
-    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Transfer cost</a>
   </div>
 
-  <h2>Practical guidance</h2>
+  <h2>Common pitfalls</h2>
   <ul>
-    <li>Pick Fargate when you want speed, fewer ops concerns, and smaller or uncertain steady-state usage.</li>
-    <li>Pick EC2 when you can keep utilization high, apply commitments, and manage platform overhead efficiently.</li>
-    <li>Revisit after measuring average utilization and traffic; don’t decide from list prices alone.</li>
+    <li>Comparing peak capacity instead of average (budgets follow average).</li>
+    <li>Assuming perfect EC2 packing and ignoring fragmentation and headroom.</li>
+    <li>Ignoring EBS and snapshot costs for EC2-backed clusters.</li>
+    <li>Optimizing compute and then discovering logs/transfer are the top drivers.</li>
+    <li>Leaving non-prod always-on and attributing the waste to “service pricing”.</li>
   </ul>
 
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-fargate-pricing/">Fargate pricing</a>,{" "}
-    <a href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS cost</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
+  <h2>How to validate after you choose</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Measure average running tasks vs planned (Fargate) or average instance utilization (EC2).</li>
+    <li>In billing, confirm compute is not being dwarfed by LB/log/transfer lines.</li>
+    <li>After deploys/incidents, check whether you scale down quickly (or pay for long tail idle).</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-fargate-pricing/">Fargate pricing</a>
+    <a class="btn" href="/guides/aws-fargate-cost-optimization/">Fargate cost optimization</a>
+    <a class="btn" href="/guides/aws-ecs-task-sizing/">Task sizing</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/fargate/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Fargate pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="nofollow noopener">
+        Amazon EC2 On-Demand pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

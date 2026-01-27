@@ -1,70 +1,133 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate CloudWatch alarm count (avoid alarm sprawl)";
+const title = "Estimate CloudWatch alarm count (standard, high-res, composite)";
 const description =
-  "How to estimate CloudWatch alarm count for cost models: inventory by environment, team, and service, and watch out for per-tenant/per-pod patterns.";
-const faqs = [
-  {
-    q: "Why do alarm counts grow unexpectedly?",
-    a: "Alarm sprawl: teams duplicate alarms across environments, create per-service or per-tenant alarms, and forget to delete alarms when services are retired.",
-  },
-  {
-    q: "Should I model peak alarms or average alarms?",
-    a: "Model alarm-months: the number of alarms that exist in the month. If alarms are created/destroyed automatically, use a representative average but validate the peak count.",
-  },
-  {
-    q: "What patterns create explosive alarm counts?",
-    a: "Per-pod/per-node alarms in Kubernetes, per-tenant alarms in multi-tenant systems, and one alarm per resource for auto-provisioned fleets.",
-  },
-  {
-    q: "How do I validate the estimate?",
-    a: "Sample a few accounts/regions, count alarms by type, then extrapolate. Validate against the actual inventory once you have it.",
-  },
-];
+  "How to estimate CloudWatch alarm-month charges: count alarms by type (standard, high-resolution, composite), include ephemeral environments, and validate with inventory methods.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-estimate-alarm-count"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What is the right unit for alarm cost models?",
+      a: "Alarm-month. If you create alarms for only part of a month (for example, ephemeral environments), pro-rate by time.",
+    },
+    {
+      q: "What usually makes alarm count estimates wrong?",
+      a: "Forgetting ephemeral stacks (PR envs), duplicating alarms across tools, and treating per-instance alarms as a constant instead of scaling with fleet size.",
+    },
+  ]}
 >
-  <p class="muted">
-    Alarm pricing is usually per-alarm-month, so you mainly need one number: how many alarms exist by type. The goal is
-    not precision to the last alarm, but to avoid missing multiplicative patterns.
-  </p>
-
-  <h2>Step 1: Inventory by environment</h2>
-  <ul>
-    <li>Prod vs staging vs dev often multiplies alarm count.</li>
-    <li>Count alarms per region/account if you have multi-account structure.</li>
-  </ul>
-
-  <h2>Step 2: Look for multiplicative patterns</h2>
-  <ul>
-    <li>Per-pod or per-node alarms in Kubernetes.</li>
-    <li>Per-tenant or per-customer alarms in multi-tenant systems.</li>
-    <li>One alarm per queue/topic/table with auto-provisioned resources.</li>
-  </ul>
-
-  <h2>Step 3: Separate by alarm type</h2>
-  <ul>
-    <li>Standard vs high-resolution vs composite (pricing differs).</li>
-    <li>Flag any high-resolution alarms that can be downgraded.</li>
-  </ul>
-
-  <h2>Turn counts into cost</h2>
   <p>
-    Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">AWS CloudWatch Alarms Cost Calculator</a> to translate
-    counts into a monthly estimate using your $/alarm-month prices.
+    To estimate CloudWatch alarm cost, you need one input per alarm type: <strong>alarm-month count</strong>. The tricky
+    part is that alarm counts are rarely stable: autoscaling, ephemeral environments, and copy-paste monitoring packs can
+    change the number by 2–10× over time.
   </p>
 
-  <h2>Related reading</h2>
+  <h2>Step 1: count current alarms by type (baseline)</h2>
+  <ul>
+    <li>
+      <strong>Standard alarms</strong>: default evaluation.
+    </li>
+    <li>
+      <strong>High-resolution alarms</strong>: faster detection; priced separately.
+    </li>
+    <li>
+      <strong>Composite alarms</strong>: rollups of multiple alarms.
+    </li>
+  </ul>
   <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudwatch-alarms-cost-optimization/">Reduce alarm costs</a>
+    <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarm cost calculator</a>
     <a class="btn" href="/guides/aws-cloudwatch-alarms-pricing/">Alarm pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
-</GuideLayout>
 
+  <h2>Step 2: include environments and time fraction</h2>
+  <p>
+    Alarm-month is proportional to time. If a PR environment exists 3 days and creates 60 alarms, the alarm-month
+    contribution is roughly:
+  </p>
+  <ul>
+    <li>60 alarms * (3 / 30.4) ~= 5.9 alarm-months</li>
+  </ul>
+  <p class="muted">
+    This is why short-lived environments with “full production alarm packs” can quietly become expensive.
+  </p>
+
+  <h2>Three practical inventory methods (pick one)</h2>
+  <ul>
+    <li>
+      <strong>CloudWatch inventory</strong>: list existing alarms and group by alarm type and environment tag or name
+      prefix.
+    </li>
+    <li>
+      <strong>IaC source-of-truth</strong>: count alarms defined in Terraform/CloudFormation and multiply by the number
+      of stacks/environments.
+    </li>
+    <li>
+      <strong>Monitoring templates</strong>: if you generate alarms from templates, count template expansion rules (per
+      service, per instance, per queue, etc.).
+    </li>
+  </ul>
+
+  <h2>Spot the scaling multipliers (what makes it explode)</h2>
+  <ul>
+    <li>
+      <strong>Per-instance alarms</strong>: alarm count scales with fleet size (N instances -> N alarms).
+    </li>
+    <li>
+      <strong>Per-dimension alarms</strong>: per tenant/customer/region dimensions multiply the base set.
+    </li>
+    <li>
+      <strong>Per-team duplication</strong>: teams copy the same alarms for shared components.
+    </li>
+    <li>
+      <strong>Ephemeral stacks</strong>: PR environments, sandboxes, and test deployments add time-weighted alarm-months.
+    </li>
+  </ul>
+
+  <h2>Model growth scenarios (so you don't re-estimate every month)</h2>
+  <ul>
+    <li>
+      <strong>Fleet growth</strong>: if you use per-instance alarms, model alarm count as proportional to instance count.
+    </li>
+    <li>
+      <strong>Team growth</strong>: if each new service includes a full alarm pack, model alarms as “alarms per service”.
+    </li>
+    <li>
+      <strong>Ephemeral usage</strong>: if PR environments are common, model “environments active per day” as a driver.
+    </li>
+  </ul>
+  <p class="muted">
+    Even a simple scenario (baseline month vs busy month) is better than a single point estimate for planning.
+  </p>
+
+  <h2>Cross-check: does the number make operational sense?</h2>
+  <ul>
+    <li>How many alarms fired in the last 30 days vs total alarm count?</li>
+    <li>How many alarms have never fired (or always OK) in the last 90 days?</li>
+    <li>Can on-call engineers name what the top 20 alarms are for?</li>
+  </ul>
+  <p class="muted">
+    If most alarms never fire and nobody can explain their purpose, you likely have a high “alarm-month waste” rate.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Count by type (standard/high-res/composite) and by environment (prod/staging/dev).</li>
+    <li>Pro-rate ephemeral environments by days active per month.</li>
+    <li>Identify scaling multipliers (fleet size, tenants, regions) and model growth scenarios.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

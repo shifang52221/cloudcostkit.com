@@ -1,0 +1,115 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Kubernetes calculators | ${SITE.name}`;
+const description =
+  "Kubernetes cost calculators for requests/limits sizing, node sizing, cluster baseline cost, and observability overhead.";
+const slots = SITE.adsenseSlots;
+
+const tools = TOOLS.filter((t) => t.category === "Kubernetes");
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/kubernetes">
+  <section class="card hero">
+    <h1>Kubernetes calculators</h1>
+    <p>
+      Size from requests, turn that into nodes, then add the non-node costs (load balancers, egress, logs, and metrics).
+    </p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/kubernetes-costs/">Guide: Kubernetes costs</a>
+      <a class="btn" href="/guides/kubernetes-requests-limits/">Guide: requests vs limits</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A sizing workflow that survives reality</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start from per-pod requests (CPU/memory) and replicas, not limits.</li>
+        <li>Reserve headroom for deploys and imperfect packing (don’t target 100%).</li>
+        <li>Convert to nodes using allocatable resources and max-pods limits.</li>
+        <li>Add DaemonSet overhead, storage, and load balancers.</li>
+        <li>Validate against a representative week of scheduling and billing data.</li>
+      </ol>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">What teams miss (cost model beyond nodes)</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li><strong>Load balancers</strong>: one-per-service patterns create always-on hourly cost plus capacity units.</li>
+        <li><strong>Cross-AZ traffic</strong>: service-to-service chatter and load balancer hops can add transfer cost.</li>
+        <li><strong>NAT & egress</strong>: container image pulls and external calls often route through expensive paths.</li>
+        <li><strong>Logs & metrics</strong>: high-cardinality labels and verbose logs can dominate the bill.</li>
+        <li><strong>Storage</strong>: PVs, snapshots, and retention are often priced separately from compute.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>
+        <strong>Requests/limits</strong>: from manifests/Helm values; confirm real usage with metrics (p50/p95).
+      </li>
+      <li>
+        <strong>Replica counts</strong>: HPA min/max and typical steady-state (average tasks/pods matters for cost).
+      </li>
+      <li>
+        <strong>DaemonSets</strong>: list per-node overhead (logging agent, monitoring, CNI helpers).
+      </li>
+      <li>
+        <strong>Max pods per node</strong>: density is often capped by IP/ENI limits before CPU is full.
+      </li>
+    </ul>
+    <p class="muted" style="margin-top:10px">
+      If you need a quick sanity check, start with the{" "}
+      <a href="/calculators/kubernetes-requests-limits-calculator/">requests/limits calculator</a>, then validate node
+      count with{" "}
+      <a href="/calculators/kubernetes-node-cost-calculator/">node cost</a>.
+    </p>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validate after you change sizing</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Node-hours: did node count drop, or did fragmentation keep nodes flat?</li>
+      <li>Load balancers: did service exposure patterns change (count and capacity units)?</li>
+      <li>Transfer: did cross-AZ and NAT processed GB move after traffic routing changes?</li>
+      <li>Observability: did log ingestion GB/day and metrics series grow or shrink?</li>
+    </ul>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} Kubernetes tools</div>
+    <div class="grid">
+      {tools.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}/`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next steps</h2>
+    <ul>
+      <li>
+        Learn the full cost checklist: <a href="/guides/kubernetes-costs/">Kubernetes costs</a>
+      </li>
+      <li>
+        Avoid sizing from limits: <a href="/guides/kubernetes-requests-vs-limits-for-sizing/">requests vs limits for sizing</a>
+      </li>
+      <li>
+        Compare platforms: <a href="/guides/aws-ecs-vs-eks-cost/">ECS vs EKS cost</a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+</BaseLayout>

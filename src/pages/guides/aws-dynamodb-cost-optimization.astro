@@ -1,74 +1,145 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS DynamoDB cost optimization (high-leverage fixes)";
+const title = "DynamoDB cost optimization: reduce read/write and storage drivers";
 const description =
-  "A short playbook to reduce DynamoDB spend: reduce request volume, right-size items, avoid hot partitions, and keep storage and retention under control.";
+  "A practical playbook to reduce DynamoDB spend: fix access patterns, reduce item size, avoid scan-heavy queries, control index amplification, and validate changes safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-dynamodb-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
-      q: "What’s the easiest way to reduce DynamoDB cost?",
-      a: "Reduce read/write request volume (cache, batch, avoid retries) and reduce item size. These usually dominate spend at scale.",
+      q: "What's the fastest lever to reduce DynamoDB cost?",
+      a: "Reduce read/write units by fixing access patterns and item sizes. Avoid scans, control retries, and reduce index amplification.",
     },
     {
-      q: "Can retries increase DynamoDB cost?",
-      a: "Yes. Throttling/timeouts can multiply requests. Fix hot partitions and backoff behavior to avoid bill spikes.",
+      q: "Why do GSIs often increase cost more than expected?",
+      a: "They can add both storage and write amplification. Writes may need to update multiple indexes, and indexes store extra copies of data.",
     },
   ]}
 >
-  <p class="muted">
-    DynamoDB costs are usually controllable. The key is to focus on the levers that move the bill: request volume, item
-    size, and storage growth.
+  <p>
+    DynamoDB costs typically scale with <strong>reads</strong>, <strong>writes</strong>, and <strong>stored bytes</strong>.
+    The highest leverage savings come from reducing wasted reads/writes (especially scans) and controlling data and index
+    amplification.
   </p>
 
-  <h2>1) Reduce request volume (especially reads)</h2>
+  <h2>Step 0: identify your dominant driver</h2>
   <ul>
-    <li>Cache hot reads where correctness allows.</li>
-    <li>Batch reads/writes when you can.</li>
-    <li>Fix retry loops (timeouts and throttling) that multiply requests.</li>
+    <li>
+      <strong>Reads dominate</strong>: high read request volume, scan-heavy workloads, or strong consistency requirements.
+    </li>
+    <li>
+      <strong>Writes dominate</strong>: high write volume or many secondary indexes.
+    </li>
+    <li>
+      <strong>Storage dominates</strong>: large items, many projected attributes, or long-lived data without TTL.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost calculator</a>
+    <a class="btn" href="/guides/aws-dynamodb-pricing/">DynamoDB pricing</a>
+  </div>
+
+  <h2>1) Reduce read cost (avoid scans and oversized reads)</h2>
+  <ul>
+    <li>
+      <strong>Avoid scans</strong>: prefer query patterns that target a partition key and narrow sort key ranges.
+    </li>
+    <li>
+      <strong>Use projection</strong>: return only needed attributes to reduce read bytes and item size amplification.
+    </li>
+    <li>
+      <strong>Cache hot reads</strong>: app-level caching or edge caching reduces repeated reads.
+    </li>
+    <li>
+      <strong>Control retries</strong>: timeouts and retries multiply read units during incidents.
+    </li>
   </ul>
 
-  <h2>2) Reduce item size and payloads</h2>
-  <p>
-    Large items increase read/write work and increase storage. Review item schemas and avoid storing duplicated large
-    blobs inside table items.
-  </p>
+  <h2>2) Reduce write cost (control amplification)</h2>
+  <ul>
+    <li>
+      <strong>Minimize index count</strong>: each GSI can increase write work and stored bytes.
+    </li>
+    <li>
+      <strong>Write smaller items</strong>: item size affects effective write units.
+    </li>
+    <li>
+      <strong>Batch writes</strong>: reduce overhead and smooth spikes where possible.
+    </li>
+  </ul>
 
-  <h2>3) Avoid hot partitions</h2>
-  <p>
-    Uneven access patterns cause throttling which can trigger retries and inflate costs. If you see throttles, treat it
-    as both a performance and cost bug.
-  </p>
+  <h2>Index and data model hygiene (often the real cost lever)</h2>
+  <ul>
+    <li>
+      <strong>Every GSI is a multiplier</strong>: treat new GSIs like new tables from a cost perspective.
+    </li>
+    <li>
+      <strong>Project only what you need</strong>: avoid projecting large attributes into indexes by default.
+    </li>
+    <li>
+      <strong>Avoid "scan to find"</strong>: redesign access patterns so your hot paths are key-based queries.
+    </li>
+    <li>
+      <strong>Separate analytics</strong>: move heavy exploratory workloads to a system designed for scans, not DynamoDB.
+    </li>
+  </ul>
 
-  <h2>4) Control storage and retention</h2>
-  <p>
-    If the dataset grows steadily, forecast cost with{" "}
-    <a href="/calculators/database-storage-growth-cost-calculator/">Database Storage Growth Calculator</a>.
-  </p>
+  <h2>3) Reduce storage cost (data shape and retention)</h2>
+  <ul>
+    <li>
+      <strong>Use TTL intentionally</strong>: expire data that does not need to be retained indefinitely.
+    </li>
+    <li>
+      <strong>Store references</strong>: keep large blobs in object storage and store only pointers in DynamoDB.
+    </li>
+    <li>
+      <strong>Control projection</strong>: indexes that project many attributes can multiply storage.
+    </li>
+  </ul>
 
-  <h2>5) Sanity-check with a simple calculator</h2>
-  <p>
-    Use <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a> to see whether reads, writes,
-    or storage is your dominant driver, then optimize the right lever.
-  </p>
+  <h2>4) Choose the right capacity mode (and validate)</h2>
+  <ul>
+    <li>
+      <strong>Spiky workloads</strong>: on-demand can be simpler, but still needs request volume validation.
+    </li>
+    <li>
+      <strong>Predictable workloads</strong>: provisioned + autoscaling can reduce cost when you can forecast.
+    </li>
+    <li>
+      <strong>Busy month modeling</strong>: include deploy/incident spikes so you don’t under-provision and trigger retries.
+    </li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Validate top queries: what percent are scans vs targeted queries?</li>
+    <li>Validate item size distribution (average and p95) before and after changes.</li>
+    <li>Validate GSI count and projections; quantify write amplification from indexes.</li>
+    <li>After changes, compare a real week of usage and confirm incidents do not regress.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      DynamoDB pricing:{" "}
+      <a href="https://aws.amazon.com/dynamodb/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/dynamodb/pricing
+      </a>
+    </li>
+    <li>
+      Best practices and design patterns:{" "}
+      <a
+        href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

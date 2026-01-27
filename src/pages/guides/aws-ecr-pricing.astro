@@ -3,60 +3,133 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "ECR pricing: what to model (storage + transfer)";
 const description =
-  "A practical AWS ECR pricing checklist: stored GB-month, data transfer paths, and the operational patterns that create cost spikes.";
+  "A practical AWS ECR pricing checklist: storage (GB-month), image pull transfer across network boundaries, and the operational patterns that create cost spikes (retention, CI rebuilds, multi-arch).";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecr-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What typically drives ECR cost?",
-      a: "Stored data (GB-month) plus data transfer out depending on where your workloads pull images. Storage growth from many tags is the most common driver.",
+      a: "Stored data (GB-month) plus data transfer depending on where workloads pull images. Storage growth from many tags is the most common driver.",
     },
     {
       q: "Is image pull traffic always billable egress?",
-      a: "No. It depends on the network path (same region/VPC, cross-region, or internet). Use your effective $/GB for the traffic path that applies.",
+      a: "No. It depends on the traffic path (same region/VPC, cross-region, or internet). Model the effective $/GB for the path you actually use.",
     },
   ]}
 >
   <p>
-    ECR costs are easiest to estimate with a two-part model: <strong>storage (GB-month)</strong> plus <strong>data
-    transfer</strong>. The right answer depends heavily on your retention policy and where your workloads run.
+    ECR costs are easiest to estimate with a two-part model: <strong>storage (GB-month)</strong> plus{" "}
+    <strong>transfer</strong>. The right answer depends heavily on your retention policy and where your workloads run
+    (same region vs cross-region vs internet).
   </p>
 
-  <h2>What to model</h2>
+  <h2>1) Storage (GB-month): how many images you keep</h2>
   <ul>
     <li>
-      <strong>Stored GB-month</strong>: average stored image size over the month
+      Storage grows with tags retained and average image size, not with how often you deploy.
     </li>
     <li>
-      <strong>Egress GB/month</strong>: bytes pulled across billable network paths
+      CI pipelines that push many tags/day create fast growth without retention policies.
     </li>
     <li>
-      <strong>Operational drivers</strong>: rebuild frequency, tag retention, and multi-arch duplication
+      Multi-arch images can duplicate stored bytes if you keep separate variants per architecture.
+    </li>
+  </ul>
+  <p class="muted">
+    Guide: <a href="/guides/aws-ecr-estimate-storage-gb-month/">estimate ECR storage (GB-month)</a>.
+  </p>
+
+  <h2>2) Transfer: where pulls happen matters</h2>
+  <ul>
+    <li>
+      Pulls in the <strong>same region</strong> are usually cheaper than cross-region pulls.
+    </li>
+    <li>
+      Cross-region replication can reduce pull transfer but increases storage (you store multiple copies).
+    </li>
+    <li>
+      Internet paths and NAT gateways can add additional cost layers in real architectures.
+    </li>
+  </ul>
+  <p class="muted">
+    If you use private subnets, include NAT gateway processed GB as a separate line item.
+  </p>
+
+  <h2>A fast estimation workflow</h2>
+  <ol>
+    <li>Estimate storage: average image size × retained images (by repo class).</li>
+    <li>Estimate pull volume: pulls/day × average image size (and cache hit behavior).</li>
+    <li>Apply your effective $/GB-month and $/GB transfer for the actual traffic path.</li>
+    <li>Validate with a real week of pull patterns (CI + cluster autoscaling days).</li>
+  </ol>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost calculator</a>
+    <a class="btn" href="/guides/aws-ecr-cost-optimization/">ECR cost optimization</a>
+  </div>
+
+  <h2>Common spike drivers</h2>
+  <ul>
+    <li>
+      <strong>No retention</strong>: old tags accumulate forever.
+    </li>
+    <li>
+      <strong>Frequent rebuilds</strong>: pushing many images/day grows storage quickly.
+    </li>
+    <li>
+      <strong>Cluster scaling</strong>: new nodes pull images repeatedly (cold cache).
+    </li>
+    <li>
+      <strong>Cross-region pulls</strong>: replication and multi-region clusters change transfer costs.
     </li>
   </ul>
 
-  <h2>A fast estimate</h2>
+  <h2>How to estimate pull transfer (fast model)</h2>
+  <ul>
+    <li>
+      Pull GB/day ~= (pulls/day) × (avg image size GB) × (1 - cache hit rate)
+    </li>
+    <li>
+      If nodes re-pull on every deploy, your effective cache hit rate can be near zero during busy windows.
+    </li>
+    <li>
+      Include CI separately: CI often pulls more frequently than production.
+    </li>
+  </ul>
   <p class="muted">
-    Use <a href="/calculators/aws-ecr-cost-calculator/">AWS ECR Cost Calculator</a> for a simple storage + transfer model.
-    Then refine egress based on where your clusters run and whether you replicate images across regions.
+    Transfer is a boundary problem. If your pulls go through NAT or cross-region, model those paths explicitly.
   </p>
+
+  <h2>Retention policy vs rollback needs (practical)</h2>
+  <ul>
+    <li>CI tags: keep a short window (days) and rely on rebuildability.</li>
+    <li>Release tags: keep a longer window (weeks/months) for rollbacks.</li>
+    <li>Base images: pin carefully; a few large images can dominate storage.</li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate storage with a few representative repos (average image size and retention window).</li>
+    <li>Validate storage with a few representative repos (image size and retention window).</li>
     <li>Validate transfer boundary: same region vs cross-region vs internet makes a huge difference.</li>
-    <li>Watch for spike drivers: CI rebuild frequency and multi-arch duplication.</li>
+    <li>Validate pull behavior during autoscaling and CI bursts (not just steady state).</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost</a>
-    <a class="btn" href="/guides/aws-ecr-estimate-storage-gb-month/">Estimate storage GB-month</a>
-    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-  </div>
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      ECR pricing:{" "}
+      <a href="https://aws.amazon.com/ecr/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ecr/pricing
+      </a>
+    </li>
+    <li>
+      ECR documentation:{" "}
+      <a href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html" rel="nofollow noopener" target="_blank">
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

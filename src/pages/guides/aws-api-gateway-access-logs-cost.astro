@@ -3,49 +3,68 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "API Gateway access logs cost: how to estimate ingestion and retention";
 const description =
-  "A practical guide to estimate API Gateway access logs cost: how to estimate average log bytes per request, convert to GB/day, model retention (GB-month), and reduce log spend safely.";
-const faqs = [
-  {
-    q: "What drives API Gateway access log cost?",
-    a: "Access log cost is driven by ingestion volume (GB/day) and retention (GB-month). The biggest driver is usually how verbose your log format is and your request volume.",
-  },
-  {
-    q: "How do I estimate average log size?",
-    a: "Sample 100–1000 log lines from production and compute average bytes per line. Include headers/fields you actually log because they can change size materially.",
-  },
-  {
-    q: "What’s the fastest way to estimate monthly cost?",
-    a: "Convert requests/month x bytes/log into GB/day, then price ingestion and retention. Use a calculator to avoid mistakes with units and retention math.",
-  },
-];
+  "A practical guide to estimate API Gateway access logs cost: estimate average bytes per request, convert to GB/day, model retention (GB-month), and reduce log spend safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-access-logs-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What drives API Gateway access log cost?",
+      a: "Access log cost is driven by ingestion volume (GB/day) and retention (GB-month). The two biggest inputs are request volume and how verbose your log format is.",
+    },
+    {
+      q: "How do I estimate average log size?",
+      a: "Sample a few thousand log lines and compute average bytes per line. Include the exact fields you log because headers and user agents can change size materially.",
+    },
+    {
+      q: "What's the fastest way to estimate monthly cost?",
+      a: "Convert requests/day x bytes/log into GB/day, then model ingestion and retention separately. Add query/scan costs if you run frequent searches.",
+    },
+  ]}
 >
   <p>
-    API Gateway access logs are often treated as “just a logging setting”, but at high request volume they can become a
-    real line item. The key is estimating two numbers: <strong>GB ingested per day</strong> and{" "}
-    <strong>retained GB-month</strong>.
+    API Gateway access logging is easy to enable, but at high request volume it can become a real bill line item. A good
+    estimate needs three parts: <strong>ingestion (GB/day)</strong>, <strong>retention (GB-month)</strong>, and{" "}
+    <strong>queries</strong> (if you run searches/analytics over the logs).
+  </p>
+
+  <h2>Where the cost shows up</h2>
+  <ul>
+    <li>
+      <strong>Ingestion</strong>: GB ingested into your logging destination (often CloudWatch Logs).
+    </li>
+    <li>
+      <strong>Storage</strong>: retained GB-month (retention policy creates the steady-state storage baseline).
+    </li>
+    <li>
+      <strong>Queries/scans</strong>: log searches and dashboards (often the surprise during incidents).
+    </li>
+  </ul>
+  <p class="muted">
+    If you already have a log pipeline, use measured ingestion and query scan volumes instead of estimating from first
+    principles.
   </p>
 
   <h2>Step 1: estimate average bytes per log line</h2>
   <ul>
-    <li>Export a sample of access logs (100–1000 lines).</li>
-    <li>Compute average bytes per line (or median + p95 if you have big variance).</li>
-    <li>Be careful: logging headers, JWT claims, and long user agents can inflate size.</li>
+    <li>Pick a representative window (normal traffic + a small slice of peak).</li>
+    <li>Sample a few thousand log lines and compute average bytes/line (and p95 if sizes vary a lot).</li>
+    <li>Watch the big fields: long headers, JWT claims, user agents, and referrers.</li>
   </ul>
 
-  <h2>Step 2: convert requests/month into GB/day</h2>
+  <h2>Step 2: convert requests into GB/day</h2>
   <p>
-    Approximation: <strong>GB/day ≈ (requests/month ÷ 30.4) x bytes/log ÷ 1e9</strong>.
+    Approximation: <strong>GB/day ~= requests/day x bytes/log / 1e9</strong>.
+  </p>
+  <p class="muted">
+    If you only have requests/month, use: <strong>requests/day ~= requests/month / 30.4</strong>.
   </p>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-api-gateway-access-log-cost-calculator/">Access log cost calculator</a>
-    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to requests</a>
   </div>
 
   <h2>Step 3: model retention (GB-month)</h2>
@@ -53,38 +72,71 @@ const faqs = [
     Retention creates a steady storage baseline. If you ingest 10 GB/day and retain 30 days, steady-state stored volume
     is roughly 300 GB.
   </p>
+  <p class="muted">Model retention separately from ingestion: they are different rate cards in many tools.</p>
+
+  <h2>Step 4: add query/scan costs (often the surprise)</h2>
+  <ul>
+    <li>Incident response: repeated broad searches can scan huge volumes.</li>
+    <li>Dashboards: scheduled queries add predictable recurring scans.</li>
+    <li>Bad filters: scanning unpartitioned data is expensive.</li>
+  </ul>
   <p class="muted">
-    If you run queries (scan/search), model query scan costs separately.
+    Tool: <a href="/calculators/log-search-scan-cost-calculator/">Log search/scan cost calculator</a>.
   </p>
 
-  <h2>How to reduce access log cost</h2>
+  <h2>How to reduce access log cost (without losing signal)</h2>
   <ul>
-    <li>Log fewer fields (drop large headers and unnecessary payload details).</li>
-    <li>Sample logs for high-volume endpoints (keep full logs for errors/security signals).</li>
-    <li>Reduce retention for noisy logs; keep long retention only where required.</li>
-    <li>Fix retries/timeouts that multiply request volume and log volume.</li>
+    <li>
+      <strong>Make the log format intentional</strong>: drop large headers; log stable identifiers; avoid duplicating
+      payload fields.
+    </li>
+    <li>
+      <strong>Separate “always-on” vs “debug”</strong>: keep a slim always-on format and enable verbose logging only
+      during investigations.
+    </li>
+    <li>
+      <strong>Retention by value</strong>: short retention for noisy success logs, longer retention for security signals
+      where required.
+    </li>
+    <li>
+      <strong>Prevent retry storms</strong>: timeouts and retries multiply both requests and log volume.
+    </li>
   </ul>
-
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
-    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion cost</a>
-    <a class="btn" href="/guides/log-costs/">Log cost guide</a>
-  </div>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate requests/month from logs or analytics; do not rely on a single peak RPS snapshot.</li>
-    <li>Validate payload sizes (response KB/MB) because transfer can dominate for large payload APIs.</li>
-    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+    <li>Validate requests/day from a representative window (include weekday/weekend patterns).</li>
+    <li>Validate bytes/log using a real sample after finalizing the log format.</li>
+    <li>Confirm retention policy (days) and whether logs are replicated/forwarded elsewhere.</li>
+    <li>Estimate query frequency and scan size for dashboards and incident workflows.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Related links</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
-    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
-    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
+    <a class="btn" href="/guides/log-costs/">Log costs (overview)</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      API Gateway logging:{" "}
+      <a
+        href="https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+    <li>
+      CloudWatch Logs pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

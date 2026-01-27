@@ -3,82 +3,115 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate CloudWatch metrics API requests (dashboards and polling)";
 const description =
-  "How to estimate CloudWatch-style metrics API requests: dashboards, GetMetricData polling, exporters, and automation. Use this to avoid surprise 'API requests' line items.";
-const faqs = [
-  {
-    q: "Which actions usually create metrics API requests?",
-    a: "Dashboards, automation, exporters, and scripts that call metric APIs like GetMetricData/GetMetricStatistics. At scale, frequent polling can become a meaningful cost line item.",
-  },
-  {
-    q: "What's the simplest way to estimate API requests?",
-    a: "Start from dashboards: widgets queried per refresh x refreshes per month, then add any exporters/automation polling loops you run.",
-  },
-  {
-    q: "How do I reduce API request cost safely?",
-    a: "Increase refresh intervals, batch requests, reduce widget count, and remove unused dashboards and automation.",
-  },
-];
+  "How to estimate CloudWatch metrics API request volume for cost models: derive requests from dashboards and tooling polling, include refresh rates, and validate with measured usage.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-metrics-estimate-api-requests"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What usually drives metrics API request volume?",
+      a: "Dashboards and tooling polling. Refresh frequency and the number of metrics queried per refresh dominate.",
+    },
+    {
+      q: "Why do request estimates miss by a lot?",
+      a: "Because the estimate forgets wallboards (always-on), multiple tools polling the same data, and bursty incident behavior.",
+    },
+  ]}
 >
   <p>
-    CloudWatch Metrics-style pricing can include an <strong>API requests</strong> line item. It tends to show up when you
-    have many dashboards, frequent refresh, and heavy polling from automation/exporters.
+    Metrics API request costs (GetMetricData and similar calls) can become meaningful when dashboards and tools poll
+    frequently. A good estimate is based on <strong>refresh behavior</strong>, not on guesswork.
   </p>
 
-  <h2>Step 1: Estimate dashboard-driven requests</h2>
+  <h2>Step 1: inventory the callers</h2>
+  <ul>
+    <li>
+      <strong>CloudWatch dashboards</strong>: human views + wallboards + auto-refresh.
+    </li>
+    <li>
+      <strong>Third-party tools</strong>: Grafana, NOC tooling, custom scripts polling metrics.
+    </li>
+    <li>
+      <strong>Automations</strong>: scheduled jobs that pull metrics for reports and capacity planning.
+    </li>
+  </ul>
+
+  <h2>Step 2: estimate requests from dashboards (fast model)</h2>
   <p class="muted">
-    Practical model: <strong>widgets queried per refresh x refreshes per month</strong>.
+    Rough model: API requests/day ~= views/day × refreshes/view × widgets/dashboard × queries/widget
   </p>
   <ul>
-    <li>Count your dashboards and estimate widgets per dashboard.</li>
-    <li>Estimate refresh interval (for example, every 60 seconds vs every 5 minutes).</li>
-    <li>Model peak usage (incident war rooms, NOC screens) separately if it is frequent.</li>
+    <li>
+      <strong>Views/day</strong>: how often dashboards are opened (include wallboards as continuous views).
+    </li>
+    <li>
+      <strong>Refreshes/view</strong>: depends on refresh interval and typical session duration.
+    </li>
+    <li>
+      <strong>Widgets</strong>: number of widgets per dashboard.
+    </li>
+    <li>
+      <strong>Queries/widget</strong>: many widgets query multiple metrics (dimensions, percentiles, multiple series).
+    </li>
   </ul>
 
-  <h2>Step 2: Add exporters and automation polling</h2>
+  <h2>Step 3: include tools polling (often the hidden driver)</h2>
   <ul>
-    <li>Metric scrapers/exporters (periodic GetMetricData loops)</li>
-    <li>Autoscaling and scheduled jobs that query metrics</li>
-    <li>Third-party tooling that pulls metrics across many accounts</li>
+    <li>List each tool and its refresh interval (e.g., every 10s, 30s, 60s).</li>
+    <li>Estimate metrics queried per refresh (dashboards, panels, and alert evaluations).</li>
+    <li>Multiply by number of users or number of running instances (for distributed polling setups).</li>
   </ul>
 
-  <h2>Step 3: Budget a high-usage scenario</h2>
+  <h2>Add an incident multiplier</h2>
   <p>
-    If you are unsure, build two estimates: a low-usage baseline and a high-usage scenario (more dashboards, faster
-    refresh, more services). This avoids missing the line item in forecasts.
+    During incidents, engineers open multiple dashboards and run many ad-hoc investigations. For planning, include a
+    “busy day” factor (for example, 5–10× normal dashboard views).
   </p>
 
-  <h2>Turn requests into dollars</h2>
-  <p>
-    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> and set the API
-    request pricing input to your effective $ per 1k requests.
+  <h2>Worked example (order-of-magnitude)</h2>
+  <ul>
+    <li>Dashboards: 40 views/day</li>
+    <li>Refreshes per view: 6 (10-minute session with ~2-minute refresh)</li>
+    <li>Widgets: 24 per dashboard</li>
+    <li>Queries per widget: 2 (two series or two dimensions)</li>
+    <li>API requests/day ~= 40 * 6 * 24 * 2 ~= 11,520</li>
+  </ul>
+  <p class="muted">
+    This is just the dashboard component. Add third-party tooling polling and wallboards to complete the picture.
   </p>
 
-  <h2>Related guides</h2>
+  <h2>How to reduce requests (without breaking monitoring)</h2>
+  <ul>
+    <li>Increase refresh interval for slow-moving metrics.</li>
+    <li>Reduce widgets and series per widget; aggregate at the service level.</li>
+    <li>Consolidate overlapping dashboards and remove unused ones.</li>
+    <li>Ensure only one tool polls CloudWatch as the source-of-truth (avoid duplicated polling).</li>
+  </ul>
+
+  <h2>Turn it into cost</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudwatch-dashboards-pricing/">CloudWatch dashboards pricing</a>
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-custom-metrics/">Estimate custom metrics</a>
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-cost-optimization/">Metrics cost optimization</a>
+    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a>
+    <a class="btn" href="/guides/aws-cloudwatch-dashboards-pricing/">Dashboard pricing</a>
   </div>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Measure a real week of metrics API request counts and compare to the model.</li>
+    <li>Identify “always-on” polling (wallboards and NOC screens) and quantify their refresh intervals.</li>
+    <li>Confirm whether multiple tools poll the same metrics in parallel.</li>
+    <li>After changes, validate dashboards still load and alerting still works.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

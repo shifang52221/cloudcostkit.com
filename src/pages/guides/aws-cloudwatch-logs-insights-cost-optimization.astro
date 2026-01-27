@@ -1,75 +1,133 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Logs Insights cost optimization (high-leverage fixes)";
+const title = "CloudWatch Logs Insights cost optimization (reduce GB scanned)";
 const description =
-  "A short playbook to reduce Logs Insights scan costs: narrow queries, reduce refresh frequency, cut noisy logs, and avoid incident query loops.";
-const faqs = [
-  {
-    q: "What's the fastest way to cut Logs Insights cost?",
-    a: "Reduce scanned GB by narrowing time ranges, filtering early, and reducing dashboard refresh frequency.",
-  },
-  {
-    q: "Can incidents increase scan costs?",
-    a: "Yes. Re-running broad queries repeatedly during incidents can dramatically increase scanned GB/day.",
-  },
-];
+  "A practical playbook to reduce CloudWatch Logs Insights costs: measure GB scanned, fix query patterns, time-bound dashboards, and avoid repeated incident scans.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-cost-optimization"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What drives Logs Insights cost?",
+      a: "GB scanned by queries. Frequent broad queries over long time ranges are the fastest way to create a large bill.",
+    },
+    {
+      q: "How do I reduce GB scanned without losing debug ability?",
+      a: "Make queries time-bounded, filter early, split noisy logs into separate groups, and avoid dashboards that re-scan large ranges continuously.",
+    },
+  ]}
 >
-  <p class="muted">
-    Logs Insights spend scales with scanned bytes. Most cost wins come from reducing how much data your queries scan and
-    how often you run those queries.
-  </p>
-
-  <h2>1) Reduce time ranges</h2>
   <p>
-    Broad "last 7 days" queries are expensive. Default dashboards to shorter windows (15m/1h/6h) and use longer windows
-    only when investigating.
+    Logs Insights pricing is usually a function of <strong>GB scanned</strong>. To reduce cost, you reduce how many bytes
+    your queries scan. The highest leverage fixes are almost always about <strong>query shape</strong> and
+    <strong>log organization</strong>, not about deleting logs blindly.
   </p>
 
-  <h2>2) Filter early and narrow scope</h2>
+  <h2>Step 0: measure before optimizing</h2>
   <ul>
-    <li>Filter on service/env first before heavy parsing or aggregation.</li>
-    <li>Avoid querying across all log groups by default.</li>
-    <li>Prefer targeted queries for high-volume log groups.</li>
+    <li>Identify the top 10 queries by GB scanned (dashboards + ad-hoc investigations).</li>
+    <li>Measure scanned GB/day for a representative week, including incident days.</li>
+    <li>Identify which log groups drive scanning (noisy vs high-signal).</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights cost</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-insights-pricing/">Logs Insights pricing</a>
+  </div>
+
+  <h2>High-leverage levers</h2>
+  <ul>
+    <li>
+      <strong>Time-bound every query</strong>: avoid “last 30 days” defaults; start with 15–60 minutes and expand only
+      if needed.
+    </li>
+    <li>
+      <strong>Filter early</strong>: restrict by service, path, status code, or request id before expensive parsing and sorting.
+    </li>
+    <li>
+      <strong>Split noisy logs</strong>: keep debug/verbose logs separate so you don’t scan them during normal operations.
+    </li>
+    <li>
+      <strong>Reduce repeated scans</strong>: dashboards should query small windows; incident playbooks should avoid scanning “all time” repeatedly.
+    </li>
+    <li>
+      <strong>Make queries reusable</strong>: save “golden queries” that are scoped and time-bounded to avoid ad-hoc broad scans.
+    </li>
   </ul>
 
-  <h2>3) Tune dashboards and automation</h2>
-  <p>
-    Dashboard refresh frequency can drive many repeated queries. Increase refresh intervals and batch queries where
-    possible.
-  </p>
+  <h2>Query patterns that usually scan less</h2>
+  <ul>
+    <li>
+      <strong>Start narrow</strong>: 15 minutes, one log group, one service, then widen if the signal is missing.
+    </li>
+    <li>
+      <strong>Filter before parsing</strong>: restrict by a simple substring or status code early, then parse JSON fields.
+    </li>
+    <li>
+      <strong>Split debug logs</strong>: keep verbose logs in separate groups so normal queries don’t scan them.
+    </li>
+    <li>
+      <strong>Use “top N” sparingly</strong>: sorting large ranges can encourage bigger scans; scope first.
+    </li>
+  </ul>
+  <p class="muted">Example query shape (pseudocode):</p>
+  <pre><code>{`fields @timestamp, @message
+| filter @message like /ERROR/
+| filter service = "payments"
+| sort @timestamp desc
+| limit 50`}</code></pre>
 
-  <h2>4) Reduce noisy logs at source</h2>
-  <p>
-    Less log volume means fewer bytes to scan. Remove verbose debug logs in steady state and set retention intentionally.
-  </p>
+  <h2>Operational guardrails</h2>
+  <ul>
+    <li>Dashboards: default to short windows (15m/1h) and avoid auto-refresh on long ranges.</li>
+    <li>Incident playbooks: prefer “narrow then widen” steps instead of repeated “search everything”.</li>
+    <li>Ownership: track who owns the top scanning dashboards and review them quarterly.</li>
+  </ul>
 
-  <h2>5) Validate with a calculator</h2>
-  <p>
-    Use <a href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights Cost Calculator</a> to see how reducing
-    scanned GB/day changes monthly cost.
-  </p>
+  <h2>Common cost traps</h2>
+  <ul>
+    <li>
+      <strong>Wide time ranges</strong>: scanning 7 days vs 1 hour can be a 168× jump in scanned GB.
+    </li>
+    <li>
+      <strong>Dashboards as scanners</strong>: auto-refresh dashboards can re-scan the same large dataset all day.
+    </li>
+    <li>
+      <strong>Unbounded search patterns</strong>: “find error anywhere” across all groups becomes expensive at scale.
+    </li>
+    <li>
+      <strong>Noisy log groups</strong>: high-volume success logs dominate scan volume for simple questions.
+    </li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate scanned GB/day from query metrics for a representative week.</li>
-    <li>Reduce time ranges and add filters early to prevent broad scans.</li>
-    <li>Watch for recurring dashboards that run heavy queries frequently.</li>
+    <li>For every “optimized query”, compare scanned GB before vs after.</li>
+    <li>Confirm dashboards are time-bounded and do not scan long ranges on auto-refresh.</li>
+    <li>Confirm noisy logs are separated or sampled so routine queries scan high-signal data.</li>
+    <li>After changes, validate incident workflows still work (debug ability preserved).</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights cost</a>
-    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan cost</a>
-    <a class="btn" href="/guides/log-costs/">Log costs</a>
-    <a class="btn" href="/guides/aws-cloudwatch-logs-insights-cost-optimization/">Reduce scan cost</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+    <li>
+      Logs Insights query syntax:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -3,23 +3,19 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "KMS cost optimization (reduce request volume safely)";
 const description =
-  "A practical playbook to reduce AWS KMS costs: reduce request volume in hot paths, fix retry loops, and keep crypto patterns safe. Includes validation steps and related tools.";
+  "A practical AWS KMS cost optimization checklist focused on the real driver: request volume. Learn where KMS calls come from, how to reduce them safely with caching and batching, and how to validate savings.";
 const faqs = [
   {
-    q: "What's the biggest lever to reduce KMS cost?",
-    a: "Reduce request volume. Key-month charges are usually stable; request charges scale with how often you call KMS operations like Encrypt/Decrypt/GenerateDataKey.",
+    q: "What is the biggest lever for KMS cost?",
+    a: "Reducing request volume (Decrypt/Encrypt/GenerateDataKey calls). Key-month charges are usually small compared to request charges in high-frequency systems.",
   },
   {
-    q: "How do I reduce KMS calls without weakening security?",
-    a: "Use envelope encryption appropriately, cache decrypted values briefly where safe, and avoid decrypting secrets on every request. Validate with your security and rotation requirements.",
+    q: "Is it safe to cache decrypted materials?",
+    a: "Often yes, if you do it carefully: cache for a short TTL, scope by key/tenant, and invalidate on rotation/credential changes. The right approach depends on your threat model and compliance requirements.",
   },
   {
-    q: "What creates KMS request spikes?",
-    a: "Retries/timeouts, cold starts, and per-request decrypt patterns. Treat big KMS request spikes as both cost and reliability signals.",
-  },
-  {
-    q: "How do I validate the optimization?",
-    a: "Measure requests/day before/after and confirm security behavior: rotation, key usage policies, and failure handling remain correct.",
+    q: "How do I find what is generating KMS calls?",
+    a: "Use CloudTrail to identify top callers and operations, then correlate with workload volume (requests, jobs, secret fetches). Billing confirms whether requests dominate your spend.",
   },
 ];
 ---
@@ -27,46 +23,89 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-kms-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    Most KMS savings come from reducing requests without breaking security guarantees. Treat large KMS request spikes as
-    both a cost issue and a reliability signal.
+  <p>
+    KMS cost optimization is usually not about reducing keys; it’s about reducing <strong>request volume</strong>. If you
+    have a hot-path decrypt, a “fetch secret per request” pattern, or too-frequent data key generation, request charges
+    can scale linearly with traffic. This checklist focuses on the high-leverage fixes that keep security intact.
   </p>
 
-  <h2>1) Reduce KMS calls in hot paths</h2>
+  <h2>Step 1: verify what’s driving spend (keys vs requests)</h2>
   <ul>
-    <li>Avoid decrypting secrets on every request; prefer short-lived caching where safe.</li>
-    <li>Use envelope encryption so bulk data encryption happens locally after a data key is generated.</li>
-    <li>Do not rotate/re-encrypt more frequently than required.</li>
+    <li>In Cost Explorer/CUR, confirm whether requests dominate keys.</li>
+    <li>Identify the top usage types and the months/weeks where spend spikes.</li>
+  </ul>
+  <p class="muted">
+    Start with: <a href="/guides/aws-kms-pricing/">KMS pricing checklist</a>
+  </p>
+
+  <h2>Step 2: reduce KMS calls in hot paths (the common “surprise bill” pattern)</h2>
+  <ul>
+    <li>
+      <strong>Avoid per-request decrypt</strong>: don’t decrypt secrets/config on every request if a short TTL cache works.
+    </li>
+    <li>
+      <strong>Cache results safely</strong>: scope caches by environment/tenant and use a conservative TTL.
+    </li>
+    <li>
+      <strong>Fix retry storms</strong>: timeouts and retries can multiply decrypt calls during incidents.
+    </li>
   </ul>
 
-  <h2>2) Fix retry loops</h2>
+  <h2>Step 3: use envelope encryption efficiently (batch, don’t spam GenerateDataKey)</h2>
+  <p>
+    Many systems should generate data keys far less frequently than they do. The core idea is “one data key for a unit of
+    work” rather than “one key per record”.
+  </p>
   <ul>
-    <li>Timeouts and transient errors can cause retry storms and multiply KMS calls.</li>
-    <li>Add backoff and circuit breakers to protect both cost and reliability.</li>
+    <li>Generate data keys per session/batch/object, not per small message.</li>
+    <li>Reuse within a controlled window when it matches your policy.</li>
+    <li>Separate baseline traffic from peak/incident behavior (peaks often dominate request totals).</li>
   </ul>
 
-  <h2>3) Reduce key sprawl</h2>
+  <h2>Step 4: reduce non-prod request volume</h2>
   <ul>
-    <li>Use fewer keys when separate keys do not add meaningful isolation.</li>
-    <li>Retire unused keys from old environments and test accounts.</li>
+    <li>Schedule dev/test workloads so they don’t run 730 hours/month.</li>
+    <li>Use lower-frequency jobs and smaller test datasets where possible.</li>
+    <li>Check that staging isn’t doing production-level traffic or retries.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>Step 5: validate changes with measurement (don’t guess)</h2>
   <ul>
-    <li>Measure requests/day for a representative week (avoid incident spikes).</li>
-    <li>Confirm which callers generate requests (apps, secrets, storage, databases).</li>
-    <li>After changes, validate rotation and access policies still meet security requirements.</li>
+    <li>Use CloudTrail to confirm the top caller’s KMS operations dropped after caching/batching.</li>
+    <li>In billing, confirm request-driven KMS charges decreased (not just moved between accounts/regions).</li>
+    <li>Track “KMS calls per 1M app requests” as a unit metric for regressions.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Reducing security controls to cut cost instead of reducing request volume safely.</li>
+    <li>Caching without TTL/invalidation (risk) or not caching at all (cost).</li>
+    <li>Ignoring incident windows where retries multiply calls and dominate monthly totals.</li>
+    <li>Optimizing prod but leaving non-prod always-on with the same high-frequency patterns.</li>
+    <li>Not attributing top callers, so you can’t tell whether the change worked.</li>
+  </ul>
+
+  <h2>Related tools and guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-kms-cost-calculator/">KMS cost</a>
+    <a class="btn" href="/calculators/aws-kms-cost-calculator/">KMS cost calculator</a>
     <a class="btn" href="/guides/aws-kms-estimate-requests/">Estimate requests</a>
-    <a class="btn" href="/guides/aws-kms-pricing/">KMS pricing</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/kms/pricing/" target="_blank" rel="nofollow noopener">
+        AWS KMS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/kms/latest/developerguide/services.html" target="_blank" rel="nofollow noopener">
+        AWS services that integrate with KMS (background context)
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

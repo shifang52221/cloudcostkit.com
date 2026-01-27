@@ -3,15 +3,19 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS Lambda cost optimization (high-leverage fixes)";
 const description =
-  "A short playbook for reducing Lambda-style spend: reduce duration, right-size memory, cut logs, and avoid transfer surprises.";
+  "A practical Lambda cost optimization checklist: reduce GB-seconds (duration × memory), control retries, right-size concurrency, and avoid hidden logging and networking costs.";
 const faqs = [
   {
-    q: "What's the #1 driver of Lambda compute cost?",
-    a: "GB-seconds: invocations x duration x configured memory. Reduce any of the three to reduce compute cost.",
+    q: "What’s the biggest lever for Lambda cost?",
+    a: "Reducing GB-seconds: lower duration and right-size memory. For many systems, eliminating retries and controlling log volume can save more than micro-optimizing code.",
   },
   {
-    q: "Can logging dominate Lambda costs?",
-    a: "Yes. High-volume structured logs can create large ingestion + retention bills even when function compute is modest.",
+    q: "Does lowering memory always save money?",
+    a: "Not always. Lower memory can increase duration. The right approach is to test a few memory sizes and pick the best cost/performance point for your function.",
+  },
+  {
+    q: "What causes Lambda cost spikes?",
+    a: "Retry storms, downstream latency, sudden increases in invocation count, and verbose logs. Cold-start mitigation choices (like provisioned concurrency) can also add baseline spend.",
   },
 ];
 ---
@@ -19,67 +23,93 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-lambda-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p>
+    Lambda cost optimization is mostly about reducing <strong>GB-seconds</strong> (duration × memory) and preventing
+    accidental multipliers (retries, verbose logs, and expensive networking paths). Use this checklist to find the biggest
+    wins first, then validate savings with billing.
+  </p>
+
+  <h2>1) Reduce duration (fix the slow parts first)</h2>
+  <ul>
+    <li>Remove cold-start bloat: smaller bundles, fewer dependencies, faster initialization.</li>
+    <li>Reduce downstream latency: cache hot reads and avoid chatty per-request calls.</li>
+    <li>Batch work where possible (especially for stream/queue processing).</li>
+  </ul>
+
+  <h2>2) Right-size memory by testing (duration vs memory curve)</h2>
+  <p>
+    Memory affects both cost and performance. Try a few memory sizes and compare total cost per 1M requests (or per job
+    run), not just duration.
+  </p>
+  <ul>
+    <li>Measure p50 and p95 duration at each memory size.</li>
+    <li>Pick the best “cost per unit of work” point, not the smallest memory number.</li>
+  </ul>
+
+  <h2>3) Eliminate retries and wasted invocations (the common spike driver)</h2>
+  <ul>
+    <li>Set timeouts and retry policies intentionally; don’t let defaults amplify incidents.</li>
+    <li>Use idempotency where retries are unavoidable.</li>
+    <li>Watch for upstream retry storms: one incident can multiply invocations and duration.</li>
+  </ul>
+
+  <h2>4) Be deliberate about concurrency and cold starts</h2>
+  <ul>
+    <li>Cold starts often increase duration; frequent cold starts can raise GB-seconds.</li>
+    <li>Provisioned concurrency can reduce cold starts but adds baseline cost.</li>
+    <li>Separate “SLA paths” from background jobs; they need different concurrency choices.</li>
+  </ul>
   <p class="muted">
-    Lambda costs usually scale with usage, but a few changes can dramatically reduce spend without changing product
-    behavior.
+    Guide: <a href="/guides/aws-lambda-concurrency-and-cold-starts/">concurrency and cold starts</a>
   </p>
 
-  <h2>1) Reduce duration first</h2>
+  <h2>5) Reduce logging and networking bills</h2>
   <ul>
-    <li>Use connection reuse for HTTP clients and databases.</li>
-    <li>Move expensive initialization outside the handler when safe.</li>
-    <li>Cache heavy lookups when correctness allows.</li>
+    <li><strong>Logs</strong>: reduce verbosity, sample high-volume logs, and set retention deliberately.</li>
+    <li><strong>Networking</strong>: avoid routing through NAT by accident; model egress and transfer explicitly.</li>
   </ul>
-
-  <h2>2) Right-size memory (and measure)</h2>
-  <p>
-    Memory affects both CPU allocation and GB-seconds. Benchmark a few memory sizes; sometimes a higher memory setting
-    reduces duration enough to reduce total cost.
-  </p>
-
-  <h2>3) Treat logging as a billable product feature</h2>
-  <ul>
-    <li>Log fewer bytes (avoid huge JSON blobs and repeated fields).</li>
-    <li>Lower log level in steady state; sample noisy endpoints.</li>
-    <li>Set retention intentionally (often 7-30 days, not forever).</li>
-  </ul>
-  <p>
-    Use <a href="/calculators/log-cost-calculator/">log cost calculator</a> to estimate ingestion + retention impact.
-  </p>
-
-  <h2>4) Avoid transfer and NAT surprises</h2>
-  <p>
-    If your function runs in a VPC, outbound traffic patterns can create extra line items (for example, NAT gateway).
-    Model transfer early using <a href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a> and{" "}
-    <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.
-  </p>
-
-  <h2>5) Always validate with a per-1M requests number</h2>
-  <p>
-    Convert your estimate into a unit cost to compare architectures and spot regressions quickly:{" "}
-    <a href="/calculators/aws-lambda-cost-calculator/">Lambda cost calculator</a>.
-  </p>
-
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-lambda-pricing/">Lambda pricing</a>,{" "}
-    <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate cost</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
-  </ul>
-
-  <h2>Related reading</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Transfer cost</a>
   </div>
 
+  <h2>6) Validate savings (don’t guess)</h2>
+  <ul>
+    <li>Compare billed GB-seconds and request count before/after changes.</li>
+    <li>Check duration distribution (p50/p95) and error/retry rate; spikes usually correlate with these.</li>
+    <li>Verify log ingestion GB/day and retention dropped if that was a target.</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Reducing memory without measuring duration (can increase GB-seconds).</li>
+    <li>Optimizing code but leaving retries/timeouts to multiply invocations.</li>
+    <li>Using provisioned concurrency broadly instead of only for latency-sensitive paths.</li>
+    <li>Ignoring logs and transfer until they become top line items.</li>
+    <li>Not re-checking after traffic growth (optimization needs a feedback loop).</li>
+  </ul>
+
+  <h2>Related tools and guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost calculator</a>
+    <a class="btn" href="/guides/aws-lambda-pricing/">Lambda pricing</a>
+    <a class="btn" href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate</a>
+  </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Lambda pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html" target="_blank" rel="nofollow noopener">
+        AWS Lambda best practices
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

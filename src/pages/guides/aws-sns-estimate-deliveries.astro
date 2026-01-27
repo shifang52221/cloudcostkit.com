@@ -3,68 +3,120 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate SNS deliveries per month (messages x subscribers)";
 const description =
-  "How to estimate SNS delivery volume for cost models: from message counts, subscriber fan-out, filter policies, and retries.";
+  "A practical workflow to estimate SNS delivery volume: start from publishes, model matched fan-out (after filter policies), add a retry multiplier for failures, and validate with metrics so budgets survive incidents.";
+const faqs = [
+  {
+    q: "What’s the fastest way to estimate deliveries?",
+    a: "Deliveries/month ~ publishes/month x matched subscribers per publish. If filters drop most messages, use the match rate to reduce effective fan-out.",
+  },
+  {
+    q: "How do retries affect deliveries?",
+    a: "Retries increase delivery attempts. If endpoints are slow or failing, the same message may be attempted multiple times, increasing effective deliveries and total cost.",
+  },
+  {
+    q: "How do I validate the estimate quickly?",
+    a: "Use a representative week of SNS metrics to get publishes/deliveries and failure rate, then scale to monthly. Compare to your fan-out model by topic.",
+  },
+];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-sns-estimate-deliveries"
-  lastUpdated="2026-01-22"
-  faqs={[
-    {
-      q: "What’s the fastest way to estimate deliveries?",
-      a: "Deliveries/month ≈ publishes/month x average subscribers per message. Reduce the subscriber count by filter-policy match rate if only some messages deliver to each subscription.",
-    },
-    {
-      q: "How do retries affect deliveries?",
-      a: "Retries increase delivery attempts. If endpoints are slow or erroring, the same message can be attempted multiple times, increasing effective deliveries and downstream costs.",
-    },
-  ]}
+  lastUpdated="2026-01-27"
+  faqs={faqs}
 >
   <p>
-    For SNS pricing, <strong>deliveries</strong> (messages delivered to endpoints) are usually the main driver. A simple
-    fan-out model gets you close quickly.
+    SNS costs are usually delivery-driven, so you need a good delivery estimate. The easiest model is fan-out:
+    <strong>publishes x matched subscribers</strong>. The mistake is to use subscriber count without accounting for filter
+    policies and retries. This guide shows a workflow that gets you close quickly and stays valid when incidents happen.
   </p>
 
-  <h2>Method 1: From publishes and fan-out</h2>
+  <h2>Step 1: estimate publishes per month</h2>
+  <ul>
+    <li>Split by topic (a few topics usually dominate).</li>
+    <li>Separate prod vs non-prod (test topics can create noise).</li>
+    <li>Keep a peak scenario if alerts are a major use case.</li>
+  </ul>
+
+  <h2>Step 2: estimate matched fan-out (subscriptions that actually receive messages)</h2>
+  <p>
+    Use matched subscribers per publish, not “total subscriptions”. If filter policies exist, only some subscriptions
+    match each message.
+  </p>
+  <ul>
+    <li><strong>Matched fan-out</strong> = total subscriptions x match rate</li>
+    <li>
+      Example: 100 subscriptions with a 20% match rate → 20 matched deliveries per publish
+    </li>
+  </ul>
+
+  <h2>Step 3: compute baseline deliveries</h2>
   <ul>
     <li>
-      <strong>Deliveries/month ≈ publishes/month x avg subscribers per message</strong>
+      <strong>Deliveries/month ~ publishes/month x matched fan-out</strong>
     </li>
-    <li>Adjust fan-out by filter match rate (if filters drop most messages).</li>
-    <li>Segment by topic: a few large topics often dominate total deliveries.</li>
+    <li>Do it per topic first; then sum across topics.</li>
   </ul>
 
-  <h2>Method 2: From metrics and logs</h2>
-  <ul>
-    <li>Use SNS delivery metrics per topic/subscription if available.</li>
-    <li>Track failure rate; high failure increases retries and cost.</li>
-  </ul>
-
-  <h2>Method 3: From downstream consumers</h2>
-  <ul>
-    <li>For SQS subscriptions, queue message ingress can approximate deliveries.</li>
-    <li>For HTTP endpoints, request logs can approximate deliveries (plus retries).</li>
-  </ul>
-
-  <h2>Turn volume into cost</h2>
+  <h2>Step 4: add retry multiplier for failures (the hidden cost driver)</h2>
   <p>
-    Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS Cost Calculator</a> with publishes/month, deliveries/month,
-    and your effective per-1M pricing inputs.
+    Delivery failures and slow endpoints can cause repeated attempts. The easiest way to model this is a multiplier:
+  </p>
+  <ul>
+    <li><strong>Effective deliveries ~ baseline deliveries x (1 + retry factor)</strong></li>
+    <li>Retry factor depends on endpoint reliability and your retry behavior.</li>
+    <li>Keep an “incident week” scenario; it can dominate monthly variance.</li>
+  </ul>
+
+  <h2>Step 5: sanity-check with downstream signals</h2>
+  <ul>
+    <li><strong>SQS subscriptions</strong>: queue ingress volume can approximate deliveries.</li>
+    <li><strong>HTTP/S endpoints</strong>: request logs show delivery attempts (including retries).</li>
+    <li><strong>Email/SMS</strong>: treat as separate because operational behavior differs (deliverability and retries).</li>
+  </ul>
+
+  <h2>Worked example (structure)</h2>
+  <ul>
+    <li>Publishes/month: 10M</li>
+    <li>Subscriptions: 50</li>
+    <li>Filter match rate: 40% → matched fan-out = 20</li>
+    <li>Baseline deliveries/month ~ 10M x 20 = 200M</li>
+    <li>Incident retry factor: +10% → 220M effective deliveries</li>
+  </ul>
+
+  <h2>Turn deliveries into cost</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS cost calculator</a> with publishes/month, deliveries/month,
+    and your effective per-1M pricing assumptions.
   </p>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Validate publishes and deliveries from a representative week (and keep a separate incident sample).</li>
+    <li>Confirm filter policies are actually reducing matched fan-out as intended.</li>
+    <li>Track failure rate; if it’s non-trivial, include retries in the model.</li>
+    <li>Re-check after architecture changes (topic splits, new subscribers, new endpoints).</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-sns-pricing/">SNS pricing checklist</a>
+    <a class="btn" href="/guides/aws-sns-cost-optimization/">SNS cost optimization</a>
+    <a class="btn" href="/guides/aws-sqs-vs-sns-cost/">SQS vs SNS</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/sns/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SNS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-cloudwatch.html" target="_blank" rel="nofollow noopener">
+        SNS monitoring with CloudWatch (metrics for validation)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudfront-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,20 @@ const faqs = [
     This guide explains how to estimate both in a way that stays stable as pricing changes: you bring your own $/GB and
     $ per 10k (or per 1M) assumptions.
   </p>
+
+  <h2>Where to get the numbers</h2>
+  <ul>
+    <li>
+      <strong>Bandwidth</strong>: CDN analytics and billing reports typically expose bytes delivered. Convert to GB/month
+      for the traffic path you care about.
+    </li>
+    <li>
+      <strong>Requests</strong>: request count from CDN analytics, logs, or RPS converted to monthly requests.
+    </li>
+    <li>
+      <strong>Cache hit rate</strong>: use it to estimate origin egress (cache fill) separately from edge bandwidth.
+    </li>
+  </ul>
 
   <h2>1) Estimate bandwidth (GB/month)</h2>
   <p>
@@ -63,6 +77,19 @@ const faqs = [
     keep the traffic math.
   </p>
 
+  <h2>4) A fast “bandwidth vs requests” sanity check</h2>
+  <p class="muted">
+    If you’re not sure which line item matters, compare the two quickly:
+  </p>
+  <ul>
+    <li><strong>Bandwidth cost</strong> = GB/month × $/GB</li>
+    <li><strong>Request cost</strong> = (requests/month ÷ 10,000) × $ per 10k</li>
+  </ul>
+  <p class="muted">
+    Workloads with many small objects (thumbnails, JS/CSS chunks, APIs cached at the edge) can have request fees that are
+    non-trivial even when bandwidth looks modest.
+  </p>
+
   <h2>4) Common pitfalls</h2>
   <ul>
     <li><strong>GB vs GiB</strong>: dashboards and pricing pages may use different units.</li>
@@ -73,6 +100,21 @@ const faqs = [
     For the origin-traffic nuance, read{" "}
     <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
   </p>
+
+  <h2>Include origin costs (when it matters)</h2>
+  <ul>
+    <li>
+      If the CDN pulls from object storage or a load balancer, you may pay <strong>origin egress</strong> and sometimes
+      <strong>origin requests</strong>.
+    </li>
+    <li>
+      Model origin egress as a separate line item (cache fill) and validate with measured cache hit rate.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+    <a class="btn" href="/guides/aws-cloudfront-cache-hit-rate/">Cache hit rate guide</a>
+  </div>
 
   <h2>Related calculators</h2>
   <p>
@@ -93,6 +135,17 @@ const faqs = [
     <li>Validate the primary driver with measured usage from a representative window.</li>
     <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
     <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      AWS pricing overview:{" "}
+      <a href="https://aws.amazon.com/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/pricing
+      </a>
+    </li>
+    <li>Use official CloudFront pricing for your regions and request classes, then plug those values into the calculators.</li>
   </ul>
 
   <h2>Related reading</h2>

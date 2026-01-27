@@ -21,6 +21,58 @@ const [emailUser, emailDomain] = SITE.email.split("@");
       <li>Privacy-friendly: calculators run in your browser.</li>
     </ul>
 
+    <h2 style="margin:18px 0 10px">What this site is for</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Budgeting</strong>: get a directional monthly estimate quickly.</li>
+      <li><strong>Comparisons</strong>: compare workload shapes, tiers, and architecture options.</li>
+      <li><strong>Right-sizing</strong>: turn requirements (RPS, payload, retention, requests/limits) into billable units.</li>
+      <li><strong>Validation</strong>: build an estimate you can reconcile against billing exports and metrics.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">How to get accurate estimates</h2>
+    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Start with measurable drivers (requests/month, GB/month, hours, GB-month stored).</li>
+      <li>Use an effective rate first (blended $/GB or $/1M) to get directionality.</li>
+      <li>Add boundaries and multipliers (retries, fan-out, cache hit rate).</li>
+      <li>Validate against a real week of data and adjust assumptions.</li>
+    </ol>
+    <p class="muted" style="margin:12px 0 0">
+      See <a href="/methodology/">Methodology</a> and the <a href="/guides/cloud-cost-estimation-checklist/">estimation checklist</a>.
+    </p>
+
+    <h2 style="margin:18px 0 10px">Data and pricing sources</h2>
+    <p class="muted" style="margin:0">
+      Most calculators accept your own pricing inputs because provider prices vary by region, tiering, discounts, and
+      product options. For official sources, start with provider pricing pages and then validate against billing exports.
+    </p>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>
+        AWS:{" "}
+        <a href="https://aws.amazon.com/pricing/" rel="nofollow noopener" target="_blank">
+          aws.amazon.com/pricing
+        </a>
+      </li>
+      <li>
+        Azure:{" "}
+        <a href="https://azure.microsoft.com/pricing/" rel="nofollow noopener" target="_blank">
+          azure.microsoft.com/pricing
+        </a>
+      </li>
+      <li>
+        Google Cloud:{" "}
+        <a href="https://cloud.google.com/pricing" rel="nofollow noopener" target="_blank">
+          cloud.google.com/pricing
+        </a>
+      </li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Limitations</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Tools are simplified planning models; bills can differ due to tiering, rounding, and product-specific rules.</li>
+      <li>Incidents often change drivers (retries/timeouts, bot traffic, backfills), which can dominate monthly totals.</li>
+      <li>Provider documentation is the source of truth. Use these tools to build and validate your model, not to replace docs.</li>
+    </ul>
+
     <h2 style="margin:18px 0 10px">Contact</h2>
     <p class="muted" style="margin:0">
       Feedback and suggestions:{" "}

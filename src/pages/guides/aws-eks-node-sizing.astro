@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "EKS node sizing: requests, overhead, and why packing is never perfect";
 const description =
-  "A practical EKS node sizing guide: size from requests, reserve headroom, account for daemonsets and pod limits, and understand why real scheduling can require more nodes than the math minimum.";
+  "A practical EKS node sizing guide: size from requests, reserve headroom, account for DaemonSets and max-pods limits, and understand why real scheduling often needs more nodes than the math minimum.";
 const faqs = [
   {
     q: "Should I size from requests or limits?",
-    a: "Size from requests. Requests drive scheduling and node count. Limits are safety caps and can be bursty; sizing from limits usually overestimates.",
+    a: "Size from requests. Requests drive scheduling and node count. Limits are safety caps; sizing from limits usually overestimates.",
   },
   {
     q: "Why does the real node count exceed the spreadsheet?",
-    a: "Because packing is imperfect: pod limits, topology spread, affinities, mixed instance types, and fragmentation all reduce utilization vs the theoretical max.",
+    a: "Because packing is imperfect: DaemonSet overhead, max-pods limits, topology constraints, affinities, and fragmentation reduce utilization vs the theoretical max.",
   },
   {
     q: "How much headroom should I reserve?",
-    a: "A common starting point is to target ~70-85% utilization of allocatable resources, then adjust based on workload variability and autoscaling behavior.",
+    a: "A common starting point is to target 70–85% utilization of allocatable resources, then adjust based on workload variability and autoscaling behavior.",
   },
   {
-    q: "What are the common hidden costs around EKS nodes?",
-    a: "Cross-AZ traffic, load balancers, NAT gateways, and logging/metrics can add meaningful costs beyond node compute.",
+    q: "What are the hidden costs around nodes?",
+    a: "Load balancers, NAT/egress, cross-AZ traffic, and logging/metrics can add meaningful costs beyond node compute.",
   },
 ];
 ---
@@ -27,54 +27,137 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-eks-node-sizing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    For EKS (and Kubernetes in general), node sizing is best done from <strong>requests</strong>. Then you adjust for
-    overhead and accept the reality that scheduling is not perfect.
+  <p>
+    Node sizing in EKS (and Kubernetes in general) is best done from <strong>requests</strong>. Then you subtract
+    overhead, reserve headroom, and accept that scheduling is not a perfect bin-packing problem. This page gives you a
+    workflow that produces a defendable node count for budgeting and capacity planning.
   </p>
 
-  <h2>Step 1: requests drive capacity</h2>
+  <h2>Step 0: collect the inputs you actually need</h2>
   <ul>
-    <li>Use representative pod requests (not peaks) for CPU and memory.</li>
-    <li>Sum requests across pods to get total requested CPU/memory.</li>
-    <li>Divide by node allocatable resources to get a baseline node count.</li>
+    <li>
+      <strong>Per-pod requests</strong> (CPU and memory) for each workload at steady state.
+    </li>
+    <li>
+      <strong>Replica counts</strong> (typical, not just max), plus deploy surge if you do rolling updates.
+    </li>
+    <li>
+      <strong>DaemonSets</strong> that run on every node (logging agent, metrics agent, CNI helpers).
+    </li>
+    <li>
+      <strong>Topology constraints</strong> (multi-AZ spread, anti-affinity) that reduce packing.
+    </li>
   </ul>
   <p class="muted">
-    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests and Limits Calculator</a>
+    Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">requests & limits calculator</a>
   </p>
 
-  <h2>Step 2: reserve overhead and headroom</h2>
+  <h2>Step 1: compute total requested CPU and memory</h2>
   <ul>
-    <li><strong>System overhead</strong>: kube-system pods, daemonsets, and networking.</li>
-    <li><strong>Operational headroom</strong>: room for rolling deploys, spikes, and rescheduling during failures.</li>
     <li>
-      A practical starting point is to plan for <strong>70-85%</strong> utilization of allocatable resources.
+      <strong>Total CPU requested</strong> = Σ(pod CPU request × replicas)
+    </li>
+    <li>
+      <strong>Total memory requested</strong> = Σ(pod memory request × replicas)
+    </li>
+  </ul>
+  <p class="muted">
+    Include the “deploy surge” case if you run extra replicas during rollouts (that surge is real capacity).
+  </p>
+
+  <h2>Step 2: convert node specs into allocatable capacity</h2>
+  <p>
+    Don’t size from marketing vCPU/RAM numbers. Size from <strong>allocatable</strong> (after system reservations). If
+    you don’t have real nodes yet, use a conservative haircut (for example, reserve a slice for the OS and kubelet).
+  </p>
+  <ul>
+    <li>Allocatable CPU per node (vCPU) and allocatable memory per node (GiB)</li>
+    <li>System overhead: kube-system pods and node agents</li>
+  </ul>
+
+  <h2>Step 3: account for per-node overhead (DaemonSets)</h2>
+  <p>
+    DaemonSets are “tax per node”. If a DaemonSet requests 200m CPU and 200Mi memory, that cost scales with node count,
+    not pod count. Add the sum of DaemonSet requests to every node in your model.
+  </p>
+
+  <h2>Step 4: check max pods per node (density caps)</h2>
+  <p>
+    Many clusters hit a pod-density limit before CPU is full. Max pods depends on networking/IP/ENI constraints. If you
+    ignore it, you’ll under-estimate node count for many small pods.
+  </p>
+  <ul>
+    <li>
+      <strong>Pod cap check</strong>: nodes needed ≥ ceil(total pods / max pods per node)
+    </li>
+    <li>
+      Use the larger of CPU-driven, memory-driven, and pod-cap-driven node counts.
     </li>
   </ul>
 
-  <h2>Step 3: account for pod limits and imperfect packing</h2>
+  <h2>Step 5: reserve headroom for reality</h2>
+  <p>
+    The theoretical minimum assumes perfect packing and zero operational slack. Real clusters need headroom for rolling
+    deploys, rescheduling during node drains, traffic spikes, and fragmentation.
+  </p>
   <ul>
-    <li>Max pods per node (ENI/IP limits) can cap density even when CPU/memory is available.</li>
-    <li>Topology spread constraints can force extra nodes across AZs.</li>
-    <li>Affinities/anti-affinities and taints fragment capacity.</li>
-    <li>Mixed instance types increase fragmentation (some pods only fit certain shapes).</li>
+    <li>Start with a utilization target like 70–85% of allocatable resources.</li>
+    <li>Increase headroom if workloads are bursty or autoscaling is slow/noisy.</li>
+    <li>Increase headroom if you enforce strict topology spread or anti-affinity.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>Worked example (structure, not provider-specific pricing)</h2>
   <ul>
-    <li>Check real allocatable resources (not vCPU/RAM marketing numbers).</li>
-    <li>Validate daemonset overhead per node and max pods per node.</li>
-    <li>Run a week of real scheduling metrics and compare requested vs allocatable utilization.</li>
+    <li>Total steady requests: 48 vCPU and 160 GiB memory</li>
+    <li>Candidate node allocatable: 7.5 vCPU and 28 GiB (after reservations)</li>
+    <li>Baseline: max(ceil(48/7.5), ceil(160/28)) = max(7, 6) = 7 nodes</li>
+    <li>Apply 20% headroom → 9 nodes (round up)</li>
+    <li>Then verify pod density and topology constraints; adjust upward if required</li>
+  </ul>
+  <p class="muted">
+    Cost follow-up: once you have node count, estimate spend with{" "}
+    <a href="/calculators/kubernetes-node-cost-calculator/">node cost</a>.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Sizing from limits instead of requests (inflates nodes and cost).</li>
+    <li>Ignoring DaemonSet requests that consume resources on every node.</li>
+    <li>Assuming perfect packing despite topology spread and anti-affinity constraints.</li>
+    <li>Forgetting pod-density caps (max pods per node) for many small workloads.</li>
+    <li>Targeting 95–100% utilization and then being surprised by deploy and failure events.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>How to validate against a real cluster</h2>
+  <ul>
+    <li>Compare requested vs allocatable utilization over a representative week.</li>
+    <li>Measure DaemonSet overhead per node and confirm it matches your model.</li>
+    <li>Check scheduling failures and pending pods: they often reveal pod caps or fragmentation.</li>
+    <li>After changes, validate that node-hours dropped and that reliability didn’t regress.</li>
+  </ul>
+
+  <h2>Related guides and calculators</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost calculator</a>
+    <a class="btn" href="/guides/aws-eks-pricing/">EKS pricing checklist</a>
+    <a class="btn" href="/guides/aws-eks-control-plane-cost/">Control plane cost</a>
+    <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests & limits</a>
     <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Node cost</a>
-    <a class="btn" href="/guides/kubernetes-requests-vs-limits-for-sizing/">Requests vs limits</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank" rel="nofollow noopener">
+        Kubernetes: resource requests and limits
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html" target="_blank" rel="nofollow noopener">
+        Amazon EKS: choosing an instance type (capacity planning context)
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

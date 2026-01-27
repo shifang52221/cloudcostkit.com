@@ -22,7 +22,36 @@ const azureGuides = GUIDES.filter((g) => g.category === "Azure")
       <a class="btn" href="/guides/">All guides</a>
       <a class="btn" href="/calculators/">Calculators</a>
       <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+      <a class="btn" href="/methodology/">Methodology</a>
     </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A simple Azure estimate</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start with requests/month and GB/month.</li>
+        <li>Add storage (GB-month) and retention policies.</li>
+        <li>Add egress boundaries (internet vs region vs zone).</li>
+        <li>Validate units (GB vs GiB) and request pricing units.</li>
+      </ol>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/calculators/networking/">Networking calculators</a>
+        <a class="btn" href="/calculators/logging/">Logging calculators</a>
+        <a class="btn" href="/calculators/storage/">Storage calculators</a>
+      </div>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Common traps</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Underestimating egress by mixing destinations and tiers.</li>
+        <li>Ignoring retries/timeouts and fan-out patterns (requests explode during incidents).</li>
+        <li>Letting logs and metrics grow without retention and query guardrails.</li>
+      </ul>
+      <p class="muted" style="margin:12px 0 0">
+        Start with effective rates and validate against billing exports before optimizing tiers.
+      </p>
+    </section>
   </section>
 
   <section class="card section">

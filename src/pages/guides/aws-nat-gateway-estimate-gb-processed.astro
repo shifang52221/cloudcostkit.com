@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate NAT Gateway GB processed (quick methods)";
 const description =
-  "Practical ways to estimate NAT Gateway GB processed per month: from metrics/flow logs, from Mbps charts, and from common traffic sources. Includes validation tips.";
+  "Practical ways to estimate NAT Gateway GB processed per month: from NAT metrics, from VPC Flow Logs, from Mbps charts, and from common traffic sources — with validation tips so your budget holds up.";
 const faqs = [
   {
     q: "What's the easiest way to estimate GB processed?",
-    a: "Use NAT Gateway metrics or VPC Flow Logs to sum bytes through the NAT gateway over a representative time window, then scale to monthly.",
+    a: "Use NAT Gateway metrics to sum bytes for a representative window (7–30 days) and scale to monthly. It measures what the bill is based on.",
   },
   {
     q: "Can I estimate from Mbps charts?",
-    a: "Yes. Convert average Mbps to GB/month using a units converter and then validate with metrics as soon as you can.",
+    a: "Yes. Convert average Mbps to GB/month using a units converter, then validate with metrics as soon as you can.",
   },
   {
     q: "What usually dominates GB processed?",
-    a: "Container image pulls, package updates, external API calls, and log shipping. Autoscaling and incidents can amplify all of these.",
+    a: "Container image pulls, OS/package updates, external API calls, and log shipping. Autoscaling and incidents amplify all of these.",
   },
   {
     q: "How do I validate the estimate?",
-    a: "Compare your estimated GB/month against the actual processed-bytes metrics for a representative week and refine your top traffic sources.",
+    a: "Compare your estimated GB/month against the processed-bytes metrics for a representative week and confirm the top traffic sources using flow logs or egress summaries.",
   },
 ];
 ---
@@ -27,44 +27,98 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-nat-gateway-estimate-gb-processed"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    NAT Gateway costs scale with GB processed, so your budget depends on getting this number roughly right. Use one of the
-    methods below depending on what data you have.
+  <p>
+    NAT Gateway processing charges scale with <strong>GB processed</strong>, so your budget depends on getting this number
+    roughly right. The goal isn’t perfection — it’s a defensible baseline plus a peak/incident scenario. Use the method
+    that matches the data you have today, then validate with metrics later.
   </p>
 
-  <h2>1) From NAT metrics (best)</h2>
+  <h2>Method 1) From NAT metrics (best)</h2>
+  <ol>
+    <li>Pick a representative window (7–30 days) and sum bytes processed.</li>
+    <li>Convert bytes → GB using the same convention you use for pricing (and keep it consistent).</li>
+    <li>Scale to monthly: GB/month ≈ GB/window × (30 / days in window).</li>
+  </ol>
   <p class="muted">
-    Aggregate total bytes processed over 7-30 days and convert to GB. This is the most reliable approach because it
-    measures exactly what is billed as processed traffic.
+    Use this whenever possible because it directly measures the billed driver.
   </p>
 
-  <h2>2) From VPC Flow Logs</h2>
+  <h2>Method 2) From VPC Flow Logs (good for attribution)</h2>
+  <p>
+    Flow logs are useful when you need to answer “what produced the GB?”. A practical workflow:
+  </p>
+  <ol>
+    <li>Filter flow logs to traffic that traverses NAT gateway ENIs.</li>
+    <li>Group by destination (top domains/IPs) and source (top subnets/workloads).</li>
+    <li>Sum bytes and convert to GB/month.</li>
+  </ol>
   <p class="muted">
-    Filter flow logs for traffic that traverses the NAT gateway ENIs and sum bytes. Convert to GB/month.
+    This method is slower but helps you find the 2–3 sources that actually matter (images, updates, external APIs).
   </p>
 
-  <h2>3) From throughput (Mbps) charts</h2>
+  <h2>Method 3) From throughput charts (Mbps) (fast first pass)</h2>
+  <p>
+    If you only have an “average Mbps” chart, you can estimate monthly GB with a units converter. Steps:
+  </p>
+  <ol>
+    <li>Start from average Mbps (not peak).</li>
+    <li>Apply utilization: if the chart is peak, multiply by an average factor you can defend.</li>
+    <li>Convert Mbps → GB/month with consistent units.</li>
+  </ol>
   <p class="muted">
-    If you only have average throughput (Mbps), convert it to GB/month. Use{" "}
-    <a href="/calculators/unit-converter/">Units Converter</a> to avoid mixing GB and GiB.
+    Tool: <a href="/calculators/unit-converter/">Units converter</a>
   </p>
 
-  <h2>4) Sanity-check common sources</h2>
+  <h2>Method 4) Sanity-check from common sources (useful when data is missing)</h2>
+  <p>
+    If you have no metrics yet, estimate the big buckets and add them:
+  </p>
   <ul>
-    <li>OS/package updates behind NAT</li>
-    <li>Container image pulls (CI/CD and scaling events)</li>
-    <li>External APIs and SaaS traffic</li>
-    <li>Log shipping to external destinations</li>
+    <li><strong>Image pulls</strong>: image size × pulls/month × fleet size</li>
+    <li><strong>Updates</strong>: update GB/week × nodes × weeks/month</li>
+    <li><strong>External APIs</strong>: requests/month × avg payload size (GB)</li>
+    <li><strong>Log shipping</strong>: log export GB/day × days/month</li>
+  </ul>
+  <p class="muted">
+    This is crude but helps you avoid pretending it’s zero.
+  </p>
+
+  <h2>Worked example (structure, not provider-specific rates)</h2>
+  <ul>
+    <li>Representative week metrics: 1.2 TB processed in 7 days</li>
+    <li>Scale to month: (1.2 TB / 7) × 30 ≈ 5.1 TB/month</li>
+    <li>Price: 5.1 TB × $/GB + gateway-hours × $/hour</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT optimization</a>
-    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
-  </div>
-</GuideLayout>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Compare estimate vs real processed-bytes metrics for a week after deployment.</li>
+    <li>Identify the top 3 sources (images, updates, APIs) and verify they match expectations.</li>
+    <li>Include an incident scenario: retries often dominate monthly peaks.</li>
+    <li>After changes, confirm GB processed dropped (not just moved to transfer/egress elsewhere).</li>
+  </ul>
 
+  <h2>Next steps</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT optimization</a>
+    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs endpoints</a>
+  </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/vpc/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon VPC pricing (NAT Gateway pricing)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html" target="_blank" rel="nofollow noopener">
+        VPC Flow Logs documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

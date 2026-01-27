@@ -1,76 +1,113 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate Logs Insights scanned GB (quick methods)";
+const title = "Estimate Logs Insights scanned GB (from query habits)";
 const description =
-  "Practical ways to estimate Logs Insights scan volume: from query metrics, from typical query patterns, and from dataset size and time ranges. Includes validation tips and common pitfalls.";
-const faqs = [
-  {
-    q: "What's the best way to estimate scanned GB?",
-    a: "Use query metrics showing bytes scanned per query and aggregate them per day/week/month. This is the most accurate input for cost modeling.",
-  },
-  {
-    q: "What if I don't have metrics yet?",
-    a: "Start with a scenario estimate: queries/day x time range x approximate GB/hour of logs in scope, then validate later with real query metrics.",
-  },
-  {
-    q: "Why do scan bills spike?",
-    a: "Broad queries over long time ranges, missing filters, and incident investigations can scan huge datasets. Repeated dashboards/queries can create recurring scan volume.",
-  },
-  {
-    q: "How do I validate the estimate?",
-    a: "Compare predicted scanned GB/day to the actual scanned-bytes metrics for a representative week, then adjust query patterns and time ranges.",
-  },
-];
+  "How to estimate CloudWatch Logs Insights cost: model GB scanned per query, query frequency, and time range. Includes a quick calculator workflow and common pitfalls.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What is the key input for Logs Insights pricing?",
+      a: "GB scanned. You can estimate it from log volume (GB/day), the time range you query, and how often you run queries (dashboards + incident searches).",
+    },
+    {
+      q: "Why is the estimate so sensitive to time range?",
+      a: "Because scanning is roughly proportional to the amount of data in the time window. Querying 24 hours instead of 1 hour can multiply scanned GB by ~24×.",
+    },
+  ]}
 >
+  <p>
+    Logs Insights is typically priced by <strong>GB scanned</strong>. If you don’t have measured “GB scanned” numbers yet,
+    you can get a planning estimate from three inputs: <strong>log volume (GB/day)</strong>,{" "}
+    <strong>time range per query</strong>, and <strong>query frequency</strong>.
+  </p>
+
+  <h2>Step 1: estimate log volume (GB/day)</h2>
+  <ul>
+    <li>Use measured ingestion GB/day if you have it (best).</li>
+    <li>If not, estimate from requests/day × bytes/log and convert to GB/day.</li>
+    <li>Separate noisy success logs from error/security logs; they behave differently.</li>
+  </ul>
   <p class="muted">
-    Query scan cost depends on how many bytes your queries scan. You can estimate it from actual query metrics (best) or
-    from query patterns and dataset size (good enough for planning).
+    Related: <a href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>.
   </p>
 
-  <h2>1) From query metrics (best)</h2>
-  <p>
-    Use any available "bytes scanned" or "GB scanned" metrics per query and aggregate to a daily total. This gives you a
-    direct input for the scan cost calculator.
-  </p>
-
-  <h2>2) From query patterns (scenario planning)</h2>
-  <p>
-    Estimate:
-    <br />
-    <strong>scanned GB/day ~ queries/day x (GB in scope per query)</strong>
-  </p>
+  <h2>Step 2: estimate scanned GB per query</h2>
   <p class="muted">
-    "GB in scope" is driven by the time range and how broad your query is. Narrow filters early to reduce scope.
+    First-order approximation (single log group): scanned GB/query ~= (GB/day) × (query_hours / 24).
   </p>
+  <ul>
+    <li>If you query 1 hour of data, query_hours/24 ~= 1/24.</li>
+    <li>If you query 7 days, query_hours/24 ~= 7.</li>
+    <li>If you query multiple log groups, add them (or use total GB/day for those groups).</li>
+  </ul>
 
-  <h2>3) Use a calculator</h2>
+  <h2>Step 3: estimate query frequency (the hidden driver)</h2>
+  <ul>
+    <li>
+      <strong>Dashboards</strong>: users/day × dashboard views/day × refreshes/view.
+    </li>
+    <li>
+      <strong>Ad-hoc queries</strong>: engineer queries/day (incident days can be 10–50× higher).
+    </li>
+    <li>
+      <strong>Scheduled jobs</strong>: recurring searches and reports that run automatically.
+    </li>
+  </ul>
+
+  <h2>Turn it into a monthly estimate</h2>
+  <p class="muted">Monthly scanned GB ~= scanned GB/query × queries/day × 30.4</p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights cost calculator</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Generic scan cost</a>
+  </div>
+
+  <h2>Worked example (planning)</h2>
+  <ul>
+    <li>Ingestion for queried groups: 60 GB/day</li>
+    <li>Typical time range: 2 hours -> query_hours/24 ~= 0.083</li>
+    <li>Scanned GB/query ~= 60 * 0.083 ~= 5 GB/query</li>
+    <li>Queries/day: 200 (dashboards + ad-hoc)</li>
+    <li>Monthly scanned ~= 5 * 200 * 30.4 ~= 30,400 GB scanned/month</li>
+  </ul>
+  <p class="muted">Treat this as an estimate and validate with measured scan data as soon as possible.</p>
+
+  <h2>Incident multiplier (simple planning)</h2>
   <p>
-    Use <a href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights Cost Calculator</a> to translate scanned
-    GB/day into a monthly estimate.
+    If you have 2 incident days per month where query volume is 10× higher and time ranges are wider, you can add a
+    small “incident add-on” instead of pretending every day is identical.
   </p>
+  <ul>
+    <li>Incident add-on ~= (scanned/day during incidents - normal scanned/day) × incident days</li>
+  </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
-    <li>Long time ranges by default (for example 30 days) for routine queries.</li>
-    <li>Missing filters (scan everything then filter in the UI).</li>
-    <li>Recurring dashboards that run broad queries frequently.</li>
-    <li>Incident investigations that scan large datasets repeatedly.</li>
+    <li>Using a “last 30 days” default window for routine dashboards.</li>
+    <li>Ignoring incident behavior (many repeated broad searches).</li>
+    <li>Scanning noisy success logs to answer a question about errors.</li>
+    <li>Not separating environments (prod vs staging) when modeling queries.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudwatch-logs-insights-cost-optimization/">Reduce scan cost</a>
-    <a class="btn" href="/guides/aws-cloudwatch-logs-insights-pricing/">Logs Insights pricing</a>
-    <a class="btn" href="/guides/log-costs/">Log costs</a>
-    <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Scan cost tool</a>
-  </div>
-</GuideLayout>
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Measure actual scanned GB from a representative week once you have access.</li>
+    <li>Validate dashboards: time range, refresh rate, and number of queries executed per view.</li>
+    <li>Validate which log groups are included in common queries (scope is the main lever).</li>
+  </ul>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

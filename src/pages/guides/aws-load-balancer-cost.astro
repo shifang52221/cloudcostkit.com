@@ -3,67 +3,127 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Load balancer costs: what to include beyond node spend";
 const description =
-  "A practical guide to load balancer costs: fixed hourly charges, traffic-based components, and common patterns that increase spend in Kubernetes and web architectures.";
+  "A practical guide to load balancer costs: fixed hourly charges, usage-based capacity units (LCU/NLCU), and the architecture patterns that quietly increase spend in Kubernetes and web stacks.";
+const faqs = [
+  {
+    q: "What are the two main load balancer cost components?",
+    a: "A fixed hourly charge per load balancer plus a usage-based component (often billed as LCU/NLCU hours) driven by traffic and connection patterns.",
+  },
+  {
+    q: "Why does cost spike even when compute is stable?",
+    a: "Because load balancer usage scales with requests, connections, bytes processed, and rule evaluations/TLS overhead depending on the product—even if your instances are unchanged.",
+  },
+  {
+    q: "What’s the fastest way to estimate load balancer cost?",
+    a: "Count load balancers (LB-hours), estimate average LCU/NLCU per hour from metrics, then price both components. Add a peak scenario for incident hours.",
+  },
+];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-load-balancer-cost"
-  lastUpdated="2026-01-22"
-  faqs={[
-    {
-      q: "What are the two main load balancer cost components?",
-      a: "A fixed hourly charge per load balancer plus a usage-based component (often billed as LCU/NLCU hours).",
-    },
-    {
-      q: "Why does cost spike even when compute is stable?",
-      a: "Because load balancer cost can scale with requests, connections, bytes processed, and TLS overhead (depending on the product).",
-    },
-  ]}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-load-balancer-cost" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Load balancers can become a major cost line item even when compute is stable. The typical drivers are always-on
-    hourly charges and traffic-based components that scale with throughput or connection patterns.
+    Load balancers become a major line item when you have many always-on LBs or when traffic patterns drive high capacity
+    unit usage. A good estimate separates <strong>LB-hours</strong> (how many) from <strong>usage</strong> (how busy) and
+    validates both with real metrics.
   </p>
 
-  <h2>What to model</h2>
+  <h2>The cost model (simple and reliable)</h2>
   <ul>
-    <li>Number of load balancers and hours/month</li>
-    <li>Capacity unit-hours (LCU for ALB, NLCU for NLB)</li>
-    <li>Request rate, connection count, and TLS overhead (depending on provider billing model)</li>
+    <li>
+      <strong>Fixed</strong>: load balancer count × hours/month × $/LB-hour
+    </li>
+    <li>
+      <strong>Usage</strong>: avg LCU/NLCU per hour × hours/month × $/unit-hour
+    </li>
+    <li>
+      <strong>Peak scenario</strong>: repeat the usage line for “busy/incident hours” if peaks happen frequently
+    </li>
   </ul>
-  <p class="muted" style="margin-top:10px">
-    Use <a href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a> to estimate fixed +
-    usage components using your pricing inputs.
+  <p class="muted">
+    Tooling: <a href="/calculators/aws-load-balancer-cost-calculator/">load balancer cost calculator</a> and{" "}
+    <a href="/calculators/aws-load-balancer-lcu-calculator/">LCU/NLCU calculator</a>.
   </p>
 
-  <h2>Common cost patterns</h2>
-  <ul>
-    <li>One load balancer per service in Kubernetes (too many LBs)</li>
-    <li>High-throughput APIs or large downloads</li>
-    <li>Long-lived connections and chatty clients</li>
-  </ul>
-
-  <h2>Related tools</h2>
+  <h2>What drives LCU/NLCU usage (the part that surprises budgets)</h2>
   <p>
-    <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">ALB LCU / NLB NLCU calculator</a>
-    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a>
-    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer calculator</a>
-    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
+    Capacity unit billing is usually the max of several dimensions. The exact thresholds depend on the product, but the
+    drivers are consistent:
+  </p>
+  <ul>
+    <li><strong>New connections rate</strong>: many short-lived connections increase units.</li>
+    <li><strong>Active connections</strong>: long-lived connections (streaming/WebSockets) increase units.</li>
+    <li><strong>Bytes processed</strong>: large downloads/uploads and uncompressed payloads increase units.</li>
+    <li><strong>Rules/processing</strong>: complex routing can add a separate driver in some models.</li>
+  </ul>
+  <p class="muted">
+    Deep dive: <a href="/guides/aws-load-balancer-lcu-explained/">LCU/NLCU explained</a> and{" "}
+    <a href="/guides/aws-load-balancer-estimate-lcu/">estimate LCU from metrics</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Common architecture patterns that inflate LB spend</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <strong>One load balancer per service</strong> (especially in Kubernetes): LB-hours scale with microservice count.
+    </li>
+    <li>
+      <strong>“Everything through the LB”</strong>: large static assets and downloads that should be cached at the edge.
+    </li>
+    <li>
+      <strong>Retry storms</strong>: incidents multiply requests and connections even if successful traffic is unchanged.
+    </li>
+    <li>
+      <strong>Chatty clients</strong>: frequent reconnects and short timeouts increase new connections.
+    </li>
+    <li>
+      <strong>Cross-AZ routing</strong>: can add transfer costs outside the load balancer line item.
+    </li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>How to validate the estimate (in one week)</h2>
+  <ul>
+    <li>Count load balancers and confirm they’re intentional (remove abandoned ones).</li>
+    <li>Pull a representative week of metrics and compute avg + p95 LCU/NLCU per hour.</li>
+    <li>Compare peak hours: are they daily (baseline) or rare (incidents)?</li>
+    <li>
+      Cross-check the “top drivers” against reality: bytes processed vs connection churn vs rules.
+    </li>
+  </ul>
+
+  <h2>Quick inventory worksheet (copy/paste)</h2>
+  <ul>
+    <li><strong>LB count</strong>: how many per environment (prod/stage/dev) and why each exists</li>
+    <li><strong>Hours</strong>: always-on (730) vs scheduled (business hours)</li>
+    <li><strong>Average units/hour</strong>: LCU/NLCU from a representative week</li>
+    <li><strong>Peak units/hour</strong>: p95 hour and “incident hour” scenarios</li>
+    <li><strong>Bytes processed</strong>: GB/hour baseline and peak</li>
+    <li><strong>Connection churn</strong>: new connections/sec during normal vs incident windows</li>
+  </ul>
+  <p class="muted">
+    This worksheet is enough to find whether you should optimize LB-hours (count) or unit-hours (traffic patterns).
+  </p>
+
+  <h2>Next steps</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-load-balancer-cost-optimization/">Optimize load balancer cost</a>
+    <a class="btn" href="/guides/aws-alb-vs-nlb-cost/">ALB vs NLB cost</a>
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/elasticloadbalancing/pricing/" target="_blank" rel="nofollow noopener">
+        Elastic Load Balancing pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html" target="_blank" rel="nofollow noopener">
+        ALB CloudWatch metrics (for estimation inputs)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html" target="_blank" rel="nofollow noopener">
+        NLB CloudWatch metrics (for estimation inputs)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

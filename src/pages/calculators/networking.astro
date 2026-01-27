@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Networking calculators | ${SITE.name}`;
+const description =
+  "Networking cost calculators for egress, CDN bandwidth/requests, API requests, and transfer boundaries (cross-region, cross-AZ).";
+const slots = SITE.adsenseSlots;
+
+const tools = TOOLS.filter((t) => t.category === "Networking");
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/networking">
+  <section class="card hero">
+    <h1>Networking calculators</h1>
+    <p>Model bandwidth and request-driven networking costs using explicit boundaries and effective rates.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/networking-costs/">Guide: networking costs</a>
+      <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Start with boundaries</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Internet egress (to the public internet)</li>
+        <li>Cross-region transfer</li>
+        <li>Cross-AZ / intra-region transfer</li>
+        <li>CDN edge bandwidth vs origin egress (cache fill)</li>
+      </ul>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Common mistakes</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Using CDN bandwidth as a proxy for origin egress (double-counting or missing cache fill).</li>
+        <li>Mixing GB vs GiB or applying a single $/GB across multiple transfer paths.</li>
+        <li>Ignoring retries/timeouts that multiply requests and bytes during incidents.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} networking tools</div>
+    <div class="grid">
+      {tools.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}/`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+</BaseLayout>
+

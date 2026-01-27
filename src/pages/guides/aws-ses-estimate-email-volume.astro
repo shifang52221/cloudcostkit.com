@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Estimate email volume per month (transactional + marketing)";
 const description =
-  "How to estimate monthly email volume for SES cost models: from user actions, campaigns, and retry factors. Includes a fast model, sanity checks, and validation tips.";
+  "A practical workflow to estimate monthly email volume for SES cost models: derive transactional volume from user actions, campaign volume from calendars, and add a defendable retry/duplicate factor for incident spikes.";
 const faqs = [
   {
     q: "What's the fastest model for transactional email volume?",
-    a: "Emails/month ~ monthly active users x average emails per user per month (password resets, receipts, alerts). Add a retry/duplicate factor if your system can resend.",
+    a: "Emails/month ≈ monthly active users × average transactional emails per user per month (receipts, password resets, alerts). Then add a retry/duplicate factor if your system can resend.",
   },
   {
     q: "How should I model marketing campaigns?",
-    a: "Campaign emails/month ~ recipients per campaign x campaigns per month. Include test sends and segment variations if they are significant.",
+    a: "Campaign emails/month ≈ recipients per campaign × campaigns per month. Include test sends, segment variants, and resend logic when they are significant.",
   },
   {
-    q: "Why do email volumes spike?",
-    a: "Incidents and retry loops. Alert storms and duplicate notification logic can multiply sends quickly.",
+    q: "Why do volumes spike?",
+    a: "Incidents and retry loops. Alert storms and duplicate notification logic can multiply sends quickly and can dominate the monthly total.",
   },
   {
     q: "How do I validate the estimate?",
-    a: "Compare the estimate against a real week of send logs/metrics and scale to monthly. Validate separately for transactional vs marketing.",
+    a: "Compare the estimate against a representative week of send logs/metrics and scale to monthly, separately for transactional and marketing.",
   },
 ];
 ---
@@ -27,46 +27,106 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-ses-estimate-email-volume"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    For SES pricing, the key input is emails per month. Build the estimate from your product flows and marketing
-    calendar, then add a buffer for retries and duplicates.
+  <p>
+    SES budgets depend on one input: <strong>emails per month</strong>. The trick is that “normal week” and “incident week”
+    behave very differently. This guide gives you a simple model for baseline volume plus a peak/incident factor so you
+    don’t get surprised.
   </p>
 
-  <h2>Method 1: Transactional emails (product-driven)</h2>
+  <h2>Step 1: split volume by intent (because variability differs)</h2>
   <ul>
-    <li>Receipts/confirmations: orders/month x emails per order.</li>
-    <li>Password resets/signups: events/month x emails per event.</li>
-    <li>Alerts/notifications: events/month x recipients (if you notify multiple recipients).</li>
+    <li><strong>Transactional</strong>: receipts, signups, password resets, security notifications</li>
+    <li><strong>Product notifications</strong>: workflow alerts, digests, reminders</li>
+    <li><strong>Marketing</strong>: campaigns, newsletters, onboarding sequences</li>
   </ul>
 
-  <h2>Method 2: Marketing emails (campaign-driven)</h2>
+  <h2>Method A: transactional volume from user actions (baseline)</h2>
+  <p>
+    A defendable baseline is built from events you already track.
+  </p>
   <ul>
-    <li>Recipients per campaign x campaigns per month.</li>
-    <li>Segment variants and A/B tests can multiply sends.</li>
-    <li>Include test sends if they are significant.</li>
+    <li><strong>Orders</strong>: orders/month × emails per order</li>
+    <li><strong>Signups</strong>: signups/month × emails per signup flow</li>
+    <li><strong>Password resets</strong>: resets/month × emails per reset</li>
+    <li><strong>Notifications</strong>: notification events/month × recipients per event</li>
+  </ul>
+  <p class="muted">
+    If you don’t have events broken out yet, start with MAU × avg emails per user and refine later.
+  </p>
+
+  <h2>Method B: marketing volume from campaign calendar</h2>
+  <ul>
+    <li><strong>Campaign sends</strong>: recipients per campaign × campaigns/month</li>
+    <li><strong>Variants</strong>: A/B tests and segment splits multiply sends</li>
+    <li><strong>Test sends</strong>: internal tests and previews (small, but include if frequent)</li>
+    <li><strong>Resends</strong>: resend-to-non-openers can add a predictable extra %</li>
   </ul>
 
-  <h2>Retries and duplicates</h2>
+  <h2>Step 2: add the “retry/duplicate” factor (the common spike driver)</h2>
+  <p>
+    Real systems resend. Your goal is to model it explicitly.
+  </p>
   <ul>
-    <li>Add a retry factor if you resend on timeouts or failures.</li>
-    <li>Incident alert storms can spike volume (and cost) for a month.</li>
-    <li>Dedupe message IDs so retries do not generate duplicates.</li>
+    <li><strong>Retry factor</strong>: timeouts and transient failures cause resend attempts</li>
+    <li><strong>Duplicate factor</strong>: bugs or race conditions send multiple emails for one event</li>
+    <li><strong>Alert storm factor</strong>: incidents trigger high-frequency notifications</li>
+  </ul>
+  <p class="muted">
+    Practical approach: keep two scenarios: baseline (e.g., +3–10%) and incident month (e.g., +30–200%) depending on your product.
+  </p>
+
+  <h2>Step 3: sanity checks (catch bad assumptions fast)</h2>
+  <ul>
+    <li>Does the estimate match your historical “emails/day” shape (weekday vs weekend)?</li>
+    <li>Is marketing bursty (campaign days) vs transactional steady?</li>
+    <li>Are you double-counting recipients (multiple recipients per event)?</li>
+    <li>Do you have a “silent resend” job that retries failed deliveries in bulk?</li>
+  </ul>
+
+  <h2>Worked example (structure)</h2>
+  <ul>
+    <li>Transactional: 200k orders/month × 1 email/order = 200k</li>
+    <li>Password resets: 30k/month × 1 = 30k</li>
+    <li>Notifications: 100k events/month × 2 recipients = 200k</li>
+    <li>Marketing: 2 campaigns/month × 500k recipients = 1,000k</li>
+    <li>Baseline subtotal = 1.43M emails/month</li>
+    <li>Add +5% retry/duplicate baseline → 1.50M</li>
+    <li>Incident month scenario: +50% alerts/retries → 2.15M</li>
   </ul>
 
   <h2>Turn volume into cost</h2>
-  <p>
-    Use <a href="/calculators/aws-ses-cost-calculator/">AWS SES Cost Calculator</a> with your volume estimate and effective
-    $ per 1,000 emails pricing.
+  <p class="muted">
+    Use <a href="/calculators/aws-ses-cost-calculator/">AWS SES cost calculator</a> with your baseline and incident volume.
   </p>
 
-  <h2>Related reading</h2>
+  <h2>How to validate with real data</h2>
+  <ul>
+    <li>Pick a representative week of send logs/metrics and compute average daily sends.</li>
+    <li>Validate separately for transactional vs marketing (their curves differ).</li>
+    <li>Check resend/duplicate rate by message idempotency keys or provider event logs.</li>
+  </ul>
+
+  <h2>Related guides</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-ses-pricing/">SES pricing</a>
-    <a class="btn" href="/guides/aws-ses-cost-optimization/">SES optimization</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+    <a class="btn" href="/guides/aws-ses-cost-optimization/">SES cost optimization</a>
+    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/ses/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SES pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/ses/latest/dg/send-email-concepts.html" target="_blank" rel="nofollow noopener">
+        SES sending concepts
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

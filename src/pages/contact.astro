@@ -23,5 +23,40 @@ const [emailUser, emailDomain] = SITE.email.split("@");
         ({emailUser} [at] {emailDomain})
       </noscript>
     </p>
+
+    <h2 style="margin:18px 0 10px">If you’re asking for help</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Include the page URL and the provider/region you care about.</li>
+      <li>Share your measured driver (requests/month, GB/month, retention days, instance-hours) and how you got it.</li>
+      <li>Tell us if you want a baseline estimate or a peak/incident scenario.</li>
+      <li>If something looks wrong, include the exact inputs you used (screenshots are fine).</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Tool requests</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Describe the service and the key billable units (requests, GB processed, GB-month, hours).</li>
+      <li>List the line items you want included/excluded (transfer, logs, replication, add-ons).</li>
+      <li>Share one real-world example scenario so we can build a useful default.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">What we can (and can’t) do</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>We can</strong>: help you model drivers, boundaries, and common missing line items.</li>
+      <li><strong>We can</strong>: fix calculator bugs and improve wording, units, and validation checklists.</li>
+      <li><strong>We can’t</strong>: provide official quotes or guarantee your final bill (tiers/regions/rounding vary).</li>
+      <li><strong>We can’t</strong>: access your provider billing data—share only what you’re comfortable sharing.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Response time</h2>
+    <p class="muted" style="margin:0">
+      We typically respond within a few business days. If your request is time-sensitive, include that context in the
+      message.
+    </p>
+
+    <h2 style="margin:18px 0 10px">Privacy note</h2>
+    <p class="muted" style="margin:0">
+      Calculator inputs run in your browser. Some pages store inputs in your browser storage to keep your values between
+      visits. See <a href="/privacy-policy/">Privacy Policy</a>.
+    </p>
   </section>
 </BaseLayout>

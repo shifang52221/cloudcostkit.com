@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "SNS cost optimization (reduce deliveries and retries)";
 const description =
-  "A high-leverage playbook to reduce SNS costs: reduce fan-out, reduce delivery retries, and avoid alert storms. Includes validation steps and related tools.";
+  "A high-leverage playbook to reduce SNS costs: reduce fan-out (deliveries), reduce delivery retries by fixing endpoints, and prevent alert storms with dedupe and rate limits — with a validation plan.";
 const faqs = [
   {
     q: "What's the biggest lever for SNS cost?",
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: "How do I validate optimizations?",
-    a: "Track publishes, deliveries, and retry rate before/after. Validate that filtering and topic splits do not break consumers.",
+    a: "Track publishes, deliveries, failure rate, and retry volume before/after. Validate that filter policies and topic splits don’t break required consumers.",
   },
 ];
 ---
@@ -27,47 +27,97 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-sns-cost-optimization"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    SNS costs scale mainly with deliveries. The best savings come from reducing unnecessary fan-out and preventing
-    retries during failures.
+  <p>
+    SNS costs are usually delivery-driven. The fastest way to save is to reduce <strong>deliveries</strong> (fan-out) and
+    reduce <strong>retries</strong> (failures and timeouts). This playbook focuses on changes that reduce spend without
+    breaking message semantics.
   </p>
 
-  <h2>1) Reduce fan-out and unnecessary deliveries</h2>
+  <h2>Step 0: baseline the two volumes (publishes vs deliveries)</h2>
   <ul>
-    <li>Use filter policies so subscribers receive only relevant messages.</li>
-    <li>Split high-fan-out topics into narrower topics by event type.</li>
-    <li>Avoid sending large payloads to many subscribers; use pointers to objects when appropriate.</li>
+    <li>Publishes/day by topic</li>
+    <li>Deliveries/day by topic and protocol</li>
+    <li>Failure rate and retry behavior (incident windows matter)</li>
+    <li>Average matched fan-out after filter policies</li>
+  </ul>
+  <p class="muted">
+    If you need a quick estimate first: <a href="/guides/aws-sns-estimate-deliveries/">estimate deliveries</a>
+  </p>
+
+  <h2>1) Reduce fan-out (deliveries) without losing routing clarity</h2>
+  <ul>
+    <li><strong>Use filter policies</strong>: deliver only relevant messages to each subscriber.</li>
+    <li><strong>Split topics by intent</strong>: narrow high-fan-out topics so subscribers don’t receive irrelevant events.</li>
+    <li><strong>Avoid broadcast payloads</strong>: send a pointer to an object instead of large payloads to many subscribers.</li>
+    <li><strong>Remove dead subscriptions</strong>: stale endpoints create failures and retries.</li>
   </ul>
 
-  <h2>2) Reduce retries and failures</h2>
+  <h2>2) Reduce retries by fixing endpoints (retries are a cost + reliability incident)</h2>
   <ul>
     <li>Fix slow/erroring HTTP endpoints that cause repeated delivery attempts.</li>
-    <li>Use dead-letter queues and backoff patterns to avoid retry storms.</li>
-    <li>Monitor delivery success rates and latency.</li>
+    <li>Use dead-letter queues for failed deliveries where appropriate.</li>
+    <li>Set timeouts and backoff intentionally; don’t let failures keep retrying forever.</li>
+    <li>Alert on increased failure rate early; it’s cheaper to fix the endpoint than to pay for retries.</li>
   </ul>
 
   <h2>3) Control alert storms</h2>
   <ul>
-    <li>Dedupe and rate-limit alerts at the source.</li>
-    <li>Group alerts by incident window instead of per-event notifications.</li>
+    <li><strong>Dedupe</strong>: one incident should produce a bounded number of notifications.</li>
+    <li><strong>Rate-limit</strong>: cap notifications per key (service, customer, incident id).</li>
+    <li><strong>Group</strong>: prefer “digest per minute” for noisy signals instead of per-event alerts.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>4) Validate that savings didn’t move elsewhere</h2>
+  <p>
+    Optimizing SNS can shift load to downstream systems (SQS consumers, HTTP endpoints). Validate the end-to-end cost:
+  </p>
   <ul>
-    <li>Validate fan-out: average subscribers per publish after filter policies.</li>
-    <li>Track retry rate and endpoint failures; address failures before scaling up.</li>
-    <li>After changes, confirm consumers still receive required events.</li>
+    <li>SQS request volume (if SNS fans out to SQS)</li>
+    <li>Downstream API costs and logging volume (retries often multiply both)</li>
+    <li>Error rates and latency (don’t “save” by dropping messages silently)</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Quantify before/after</h2>
+  <ul>
+    <li>Deliveries saved = deliveries/day before − deliveries/day after</li>
+    <li>Retry reduction = failed deliveries before − after</li>
+    <li>Fan-out reduction = matched subscribers per publish before − after</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-sns-cost-calculator/">SNS cost calculator</a>
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Reducing publishes but leaving fan-out unchanged (deliveries stay high).</li>
+    <li>Adding filter policies but not validating match rate (no real fan-out reduction).</li>
+    <li>Ignoring failures; retries can dominate “quiet” topics during incidents.</li>
+    <li>Building alert systems without dedupe/rate limits (inevitable storm later).</li>
+    <li>Not removing stale subscriptions (they create ongoing failure/retry cost).</li>
+  </ul>
+
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-sns-cost-calculator/">SNS cost</a>
     <a class="btn" href="/guides/aws-sns-pricing/">SNS pricing</a>
     <a class="btn" href="/guides/aws-sns-estimate-deliveries/">Estimate deliveries</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-sqs-cost-optimization/">SQS cost optimization</a>
+    <a class="btn" href="/guides/messaging-costs/">Messaging cost hub</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/sns/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SNS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html" target="_blank" rel="nofollow noopener">
+        SNS message filtering (fan-out reduction)
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

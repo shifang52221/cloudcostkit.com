@@ -1,85 +1,154 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CloudFront cache hit rate: how it changes origin egress costs";
+const title = "CloudFront cache hit rate: how it changes origin egress cost";
 const description =
-  "Cache hit rate strongly influences origin egress (cache fill) and overall CDN cost. Learn a simple way to estimate origin egress from hit rate and traffic.";
-
-const faqs = [
-  {
-    "q": "What is the main cost driver?",
-    "a": "It depends on the service, but most cloud bills scale with one or two primary drivers (requests, GB processed, GB-month, or instance-hours)."
-  },
-  {
-    "q": "How do I estimate quickly?",
-    "a": "Start with a measured baseline where possible and use a blended effective rate for planning."
-  },
-  {
-    "q": "How do I validate?",
-    "a": "Compare your estimate against a real week of metrics/billing and verify units and boundaries."
-  }
-];
-
+  "Cache hit rate strongly influences origin requests and origin egress (cache fill). Learn a simple model, what breaks hit rate, and the practical levers to improve it safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudfront-cache-hit-rate"
-  lastUpdated="2026-01-22"
- faqs={faqs}>
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Why does cache hit rate matter for cost?",
+      a: "Because cache misses become origin requests and origin bytes. Even if CDN bandwidth is fixed, a low hit rate can increase origin egress and origin compute costs.",
+    },
+    {
+      q: "What usually lowers hit rate the most?",
+      a: "Short TTLs, frequent invalidations, and cache fragmentation from query strings, cookies, or varying headers.",
+    },
+    {
+      q: "Is the simple hit-rate model exact?",
+      a: "No, but it is a good budgeting baseline. Real systems have TTL expiry, invalidations, multi-POP fills, and compression differences that can move the number.",
+    },
+  ]}
+>
   <p>
-    CDN pricing is usually focused on edge bandwidth and requests, but <strong>origin egress</strong> can become a major
-    hidden line item. Cache hit rate is the key knob.
+    CDN pricing is usually dominated by edge bandwidth and requests, but <strong>origin egress</strong> can become a
+    major hidden line item. Cache hit rate is the primary knob that changes how much traffic reaches your origin.
   </p>
 
-  <h2>Simple model</h2>
-  <p>
-    Start with your expected edge bandwidth (GB/month). If your cache hit rate is H (for example, 0.85), then a simple
-    approximation is:
-  </p>
+  <h2>Definitions (what "hit rate" means)</h2>
   <ul>
     <li>
-      Origin egress (GB/month) = edge bandwidth (GB/month) x (1 - H)
+      <strong>Cache hit</strong>: request served from an edge cache without going to the origin.
+    </li>
+    <li>
+      <strong>Cache miss</strong>: request goes to the origin (and often fills the cache).
+    </li>
+    <li>
+      <strong>Hit rate</strong>: hits / (hits + misses) over a time window.
     </li>
   </ul>
-  <p>
-    This is not perfect, but it is good enough for budgeting. Low TTLs, invalidations, and multi-region fills can raise
-    origin egress beyond this baseline.
+
+  <h2>A simple cost model (good for budgeting)</h2>
+  <p>Start with your expected edge traffic and an assumed hit rate H (e.g., 0.85).</p>
+  <ul>
+    <li>Origin requests/month ~= edge requests/month * (1 - H)</li>
+    <li>Origin egress GB/month ~= edge bandwidth GB/month * (1 - H)</li>
+  </ul>
+  <p class="muted">
+    This is a baseline. Short TTLs, invalidations, and multi-region fills can increase origin traffic beyond the simple
+    (1 - H) factor.
   </p>
 
-  <h2>How to improve hit rate (and reduce origin egress)</h2>
+  <h2>What breaks cache hit rate (and raises origin cost)</h2>
   <ul>
-    <li>Use stable caching headers and longer TTLs for static assets.</li>
-    <li>Avoid unnecessary cache-busting for large files.</li>
-    <li>Reduce unique-object patterns (e.g., per-user URLs) where possible.</li>
+    <li>
+      <strong>Cache fragmentation</strong>: forwarding many query strings, cookies, or headers creates many cache keys.
+    </li>
+    <li>
+      <strong>Short TTLs</strong>: frequent revalidation forces more origin requests.
+    </li>
+    <li>
+      <strong>Frequent invalidations</strong>: purging popular content reduces hits during deploy windows.
+    </li>
+    <li>
+      <strong>Uncacheable responses</strong>: missing or restrictive Cache-Control headers.
+    </li>
+    <li>
+      <strong>Cache fills</strong>: when the same object is fetched by many edge locations, a single miss can become
+      multiple origin fetches (especially right after deploys).
+    </li>
+  </ul>
+
+  <h2>How to improve hit rate safely</h2>
+  <ul>
+    <li>
+      <strong>Use versioned asset URLs</strong> (content-hashed filenames) so you rarely need invalidations.
+    </li>
+    <li>
+      <strong>Normalize cache keys</strong>: only include the query params/cookies/headers that truly change responses.
+    </li>
+    <li>
+      <strong>Set intentional TTLs</strong>: long TTL for static assets; shorter TTL for HTML; avoid "0 by default".
+    </li>
+    <li>
+      <strong>Separate dynamic endpoints</strong>: keep truly dynamic, personalized endpoints out of the cache path.
+    </li>
+    <li>
+      <strong>Use Origin Shield (when appropriate)</strong>: reduces multi-POP cache fill by centralizing origin fetches.
+    </li>
+  </ul>
+
+  <h2>Worked example (sanity check)</h2>
+  <p>If your CDN serves 10,000 GB/month at the edge:</p>
+  <ul>
+    <li>At 90% hit rate: origin egress ~= 10,000 GB * (1 - 0.90) ~= 1,000 GB/month</li>
+    <li>At 70% hit rate: origin egress ~= 10,000 GB * (1 - 0.70) ~= 3,000 GB/month</li>
+  </ul>
+  <p class="muted">
+    A temporary hit rate drop during deployments can show up as a visible origin egress spike, even if edge bandwidth is
+    unchanged.
+  </p>
+
+  <h2>Cache key checklist (avoid fragmentation)</h2>
+  <ul>
+    <li>Only forward query params that change the response.</li>
+    <li>Only forward cookies that change the response (auth cookies often make responses uncacheable).</li>
+    <li>Only vary on headers you need; avoid varying on large or unstable headers.</li>
+    <li>Confirm caching behavior for 200s and for common 4xx/5xx responses.</li>
+  </ul>
+
+  <h2>Measure and validate</h2>
+  <ul>
+    <li>Measure hit rate on a real distribution, not a single endpoint or a single day.</li>
+    <li>Track both edge bytes and origin bytes to validate the origin reduction assumption.</li>
+    <li>Validate whether compression changes "bytes at edge" vs "bytes at origin".</li>
+    <li>Validate origin request spikes during deploy windows and invalidations.</li>
   </ul>
 
   <h2>Related tools</h2>
   <p>
-    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
-    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
     <a class="btn" href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+    <a class="btn" href="/guides/aws-cloudfront-invalidation-pricing/">Invalidation pricing</a>
   </p>
 
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
-    <a class="btn" href="/guides/aws-cloudfront-invalidation-pricing/">CloudFront invalidation pricing</a>
-    <a class="btn" href="/guides/aws-cloudfront-logs-cost/">CloudFront logs cost</a>
-  </div>
-
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      CloudFront caching:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+    <li>
+      CloudFront metrics:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/monitoring-using-cloudwatch.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
 </GuideLayout>
+

@@ -1,86 +1,132 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "gp2 vs gp3 cost: when gp3 saves money (and when it doesn’t)";
+const title = "gp2 vs gp3 cost: how to choose (EBS)";
 const description =
-  "A practical guide to compare gp2 vs gp3 cost: baseline storage pricing, performance add-ons (IOPS/throughput), and how to avoid overpaying for unused performance.";
-const faqs = [
-  {
-    q: "Is gp3 always cheaper than gp2?",
-    a: "Often, but not always. gp3 can be cheaper because it decouples storage from performance, but if you buy extra IOPS/throughput you can offset savings.",
-  },
-  {
-    q: "What’s the fastest way to compare?",
-    a: "Model storage GB-month plus any required performance add-ons (IOPS/throughput). Use your measured IOPS/throughput requirements, not peak-only guesses.",
-  },
-  {
-    q: "What’s the most common mistake?",
-    a: "Paying for performance headroom you don’t need. Many volumes are sized for capacity, but performance add-ons are left at high defaults.",
-  },
-];
+  "A practical comparison of EBS gp2 vs gp3: how pricing and performance knobs differ, when gp3 is cheaper, and what to validate before switching.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-gp2-vs-gp3-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Is gp3 always cheaper than gp2?",
+      a: "Often, but not always. The cost depends on your volume size and how much IOPS/throughput you provision. You should model your workload and validate performance.",
+    },
+    {
+      q: "What is the key difference for cost modeling?",
+      a: "gp3 lets you provision performance (IOPS/throughput) more independently from size. That can reduce cost when gp2 forces you to over-size volumes to get performance.",
+    },
+  ]}
 >
   <p>
-    gp2 vs gp3 decisions are usually about <strong>decoupling storage and performance</strong>. gp3 lets you buy storage
-    separately from IOPS/throughput, which can reduce cost when you were overpaying for performance on gp2.
+    gp2 and gp3 are general-purpose EBS volume types. Cost comparisons often go wrong when you compare only the $/GB
+    number and ignore that performance knobs and baselines can force you to over-provision.
   </p>
 
-  <h2>What to model</h2>
+  <h2>How the cost model differs</h2>
   <ul>
-    <li>Storage GB-month (baseline)</li>
-    <li>Required IOPS and throughput (from metrics)</li>
-    <li>Any performance add-ons you need to buy (if applicable)</li>
+    <li>
+      <strong>gp2</strong>: performance is more tightly coupled to volume size; you may grow GB just to get IOPS.
+    </li>
+    <li>
+      <strong>gp3</strong>: you can provision size, IOPS, and throughput more independently (within limits).
+    </li>
   </ul>
-
-  <h2>How to compare (practical workflow)</h2>
-  <ol>
-    <li>Measure steady IOPS and throughput requirements.</li>
-    <li>Model gp3 storage + performance add-ons using your pricing assumptions.</li>
-    <li>Compare to gp2 baseline for the same storage size.</li>
-  </ol>
+  <table>
+    <thead>
+      <tr>
+        <th>Knob</th>
+        <th>gp2</th>
+        <th>gp3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>GB-month</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>IOPS</td>
+        <td>Often tied to size</td>
+        <td>Provisioned explicitly</td>
+      </tr>
+      <tr>
+        <td>Throughput</td>
+        <td>Limited/implicit</td>
+        <td>Provisioned explicitly</td>
+      </tr>
+    </tbody>
+  </table>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
-    <a class="btn" href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS & throughput explained</a>
+    <a class="btn" href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS/throughput explained</a>
   </div>
 
-  <h2>Where gp3 usually wins</h2>
+  <h2>When gp3 tends to win</h2>
   <ul>
-    <li>Volumes sized for capacity where gp2 performance was “wasted”.</li>
-    <li>Workloads that need predictable performance without increasing storage size.</li>
+    <li>You have many moderately sized volumes and want predictable performance without over-sizing.</li>
+    <li>You want to set explicit IOPS/throughput targets based on measured utilization.</li>
+    <li>You want to separate “capacity growth” decisions from “performance” decisions.</li>
   </ul>
 
-  <h2>Where gp3 can lose</h2>
+  <h2>When gp2 can still be fine</h2>
   <ul>
-    <li>When you buy large IOPS/throughput add-ons that exceed what you really use.</li>
-    <li>When workload performance is bursty and you don’t model peaks separately.</li>
+    <li>Your volumes are already sized primarily for capacity and meet performance needs without tuning.</li>
+    <li>You have low to moderate IOPS needs and do not need tight performance controls.</li>
   </ul>
 
-  <h2>Related</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
-    <a class="btn" href="/guides/aws-ebs-cost-optimization/">EBS cost optimization</a>
-    <a class="btn" href="/guides/aws-ebs-snapshot-cost/">EBS snapshot cost</a>
-  </div>
-
-  <h2>Validation checklist</h2>
+  <h2>Simple decision heuristic</h2>
   <ul>
-    <li>Validate storage utilization, IOPS, throughput, and latency for a representative week.</li>
-    <li>Separate steady-state vs peak windows (backups/migrations/batch).</li>
-    <li>After changes, confirm application SLOs and storage latency remain stable.</li>
+    <li>If you are increasing volume size mainly to "get more IOPS", gp3 is usually worth modeling.</li>
+    <li>If you rarely touch performance settings and your workload is not I/O sensitive, gp2 may be sufficient.</li>
+    <li>If you need predictable performance targets per volume, gp3 is generally easier to reason about.</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
-    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost</a>
-    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
-    <a class="btn" href="/guides/aws-ebs-cost-optimization/">EBS optimization</a>
-  </div>
+  <h2>Worked workflow: compare with measured utilization</h2>
+  <ol>
+    <li>Measure current IOPS and throughput utilization (average and p95) for a representative week.</li>
+    <li>Identify which volumes are “oversized for performance” (large GB but low usage).</li>
+    <li>Model gp3 with explicit IOPS/throughput targets and compare monthly cost.</li>
+    <li>Validate performance in a canary or staging environment before migrating a fleet.</li>
+  </ol>
 
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Comparing only $/GB and ignoring IOPS/throughput needs.</li>
+    <li>Using peak metrics as a baseline (over-provisioning performance).</li>
+    <li>Changing volume type without a validation window and rollback plan.</li>
+    <li>Forgetting snapshots: volume changes do not reduce snapshot retention unless policies change too.</li>
+  </ul>
+
+  <h2>Migration checklist (safe switching)</h2>
+  <ul>
+    <li>Pick a representative set of volumes (different workloads and sizes).</li>
+    <li>Capture baseline latency, IOPS, throughput, and error rates for a week.</li>
+    <li>Switch in canary and validate p95 latency under the same workload.</li>
+    <li>Roll out gradually, and keep a rollback path for the workloads that are sensitive.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      EBS pricing:{" "}
+      <a href="https://aws.amazon.com/ebs/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ebs/pricing
+      </a>
+    </li>
+    <li>
+      EBS volume types:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

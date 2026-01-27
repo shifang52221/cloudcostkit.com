@@ -3,48 +3,55 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "ECS autoscaling cost pitfalls (and how to avoid them)";
 const description =
-  "A practical guide to ECS autoscaling cost pitfalls: noisy CPU metrics, retry storms, scaling oscillations, and hidden line items (logs, NAT/egress, load balancers).";
-const faqs = [
-  {
-    q: "Why does ECS autoscaling increase cost unexpectedly?",
-    a: "Because scaling triggers can be noisy and overreact to transient spikes. Without smoothing and correct target utilization, the system can oscillate and spend most of the time above average capacity.",
-  },
-  {
-    q: "What’s a safer utilization target?",
-    a: "Many teams target 60–80% average utilization to keep headroom for bursts and deployments and reduce oscillations.",
-  },
-  {
-    q: "What non-compute costs grow with autoscaling?",
-    a: "Logs (ingestion), NAT/egress, and sometimes load balancer capacity units can scale with traffic and retries, not just task count.",
-  },
-];
+  "A practical guide to ECS autoscaling cost pitfalls: noisy signals, oscillations, retry storms, and the non-compute line items that scale with traffic (logs, NAT/egress, load balancers).";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecs-autoscaling-cost-pitfalls"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Why does ECS autoscaling increase cost unexpectedly?",
+      a: "Because scaling triggers can be noisy and overreact to transient spikes. Without correct targets and cooldowns, the system can oscillate and spend most of the time above average capacity.",
+    },
+    {
+      q: "What non-compute costs grow with autoscaling?",
+      a: "Logs (ingestion), NAT/egress, and load balancer capacity can scale with traffic and retries, not just task count.",
+    },
+  ]}
 >
-  <p class="muted">
-    ECS autoscaling should reduce cost by matching capacity to demand. In practice, teams often see higher bills because
-    scaling is noisy, retries multiply traffic, and non-compute line items grow with volume.
+  <p>
+    Autoscaling should reduce cost by matching capacity to demand. When costs go up, it usually means one of three
+    things: <strong>oscillation</strong>, <strong>retry storms</strong>, or <strong>non-compute line items</strong> are
+    growing with traffic.
   </p>
 
   <h2>1) Noisy signals cause oscillation</h2>
   <ul>
     <li>CPU% can spike briefly (GC, cold caches, bursty traffic) and trigger scale-out.</li>
-    <li>If scale-in is slow or cautious, you spend long periods above average.</li>
-    <li>Use smoothing/windows and validate target utilization.</li>
+    <li>If scale-in is slow or conservative, you spend long periods above the true average.</li>
+    <li>Fix: use smoothing windows, realistic targets, and cooldowns that match task startup time.</li>
   </ul>
 
-  <h2>2) Retries multiply traffic (and cost)</h2>
+  <h2>2) Target utilization is not a "maximize CPU" goal</h2>
+  <p class="muted">
+    Many teams set targets too high, then see latency and retries. That can increase both compute and non-compute costs.
+  </p>
   <ul>
-    <li>Retries increase request volume, logs, and sometimes egress/NAT.</li>
-    <li>Timeouts and backoff matter as much as scaling rules.</li>
+    <li>Pick a target that preserves headroom for deploys and bursts.</li>
+    <li>Separate scaling for CPU-bound vs IO-bound services (CPU is not the only bottleneck).</li>
+    <li>Validate with p95 latency and error rate, not only utilization.</li>
   </ul>
 
-  <h2>3) Hidden line items scale with traffic</h2>
+  <h2>3) Retries multiply traffic (and cost)</h2>
+  <ul>
+    <li>Timeouts and transient errors trigger client retries and SDK retries.</li>
+    <li>Retries increase request volume, logs, and sometimes egress/NAT.</li>
+    <li>Fix: backoff, circuit breakers, and faster failure detection before scaling reacts.</li>
+  </ul>
+
+  <h2>4) Hidden line items scale with traffic</h2>
   <ul>
     <li><strong>Logs</strong>: ingestion grows with request volume and verbosity.</li>
     <li><strong>NAT/egress</strong>: external calls and downloads can spike costs.</li>
@@ -56,30 +63,46 @@ const faqs = [
     <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
   </div>
 
-  <h2>4) Validate task sizing</h2>
-  <p>
-    Over-sized tasks keep cost high even when scaling works. Use a sizing calculator and target utilization.
-  </p>
+  <h2>5) Task sizing mistakes look like "autoscaling problems"</h2>
+  <ul>
+    <li>Over-sized tasks keep cost high even when scaling works.</li>
+    <li>Under-sized tasks cause timeouts and retries, which trigger scale-out and inflate costs.</li>
+    <li>Fix: size tasks from measured p95 usage and validate headroom.</li>
+  </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-ecs-task-sizing-calculator/">ECS task sizing calculator</a>
     <a class="btn" href="/guides/aws-ecs-task-sizing/">ECS task sizing guide</a>
   </div>
-  <p class="muted" style="margin-top:14px">
-    Full model: <a href="/guides/aws-ecs-cost-model-beyond-compute/">ECS cost model beyond compute</a>.
-  </p>
+
+  <h2>Stability checklist (quick wins)</h2>
+  <ul>
+    <li>Scale-out should react faster than scale-in (avoid immediate oscillation).</li>
+    <li>Match cooldowns to task startup time (slow startup + fast scale-in causes flapping).</li>
+    <li>Use multiple signals for safety (latency/error rate + CPU), not CPU alone.</li>
+    <li>Keep a "busy month" scenario: deploys and incidents change behavior.</li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Compare desired vs running tasks: do you spend long periods above baseline after spikes?</li>
+    <li>Track retries/timeouts during spikes (cost and reliability signal).</li>
+    <li>Track log ingestion GB/day and NAT processed GB during scaling events.</li>
+    <li>After changes, validate p95 latency and error rate during a busy window.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      ECS autoscaling:{" "}
+      <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html" rel="nofollow noopener" target="_blank">
+        docs.aws.amazon.com
+      </a>
+    </li>
+    <li>
+      CloudWatch pricing (logs/metrics often show up here):{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -3,19 +3,19 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Lambda vs Fargate cost: a practical comparison (unit economics)";
 const description =
-  "How to compare Lambda vs Fargate cost using unit economics: cost per 1M requests, steady vs bursty traffic, and the line items that usually decide the winner (logs, transfer, idle time).";
+  "Compare Lambda vs Fargate cost with unit economics: cost per 1M requests (Lambda) versus average running tasks (Fargate), plus the non-compute line items that often dominate (logs, load balancers, transfer).";
 const faqs = [
   {
-    q: "When is Lambda cheaper than Fargate?",
-    a: "Lambda often wins for bursty or spiky workloads, low average utilization, and event-driven patterns. The key is paying only for execution time instead of keeping capacity running.",
+    q: "When does Lambda tend to be cheaper than Fargate?",
+    a: "When workloads are spiky or low-volume, because you pay per invocation and only for execution time. Lambda can be especially cost-effective for event-driven and intermittent tasks.",
   },
   {
-    q: "When is Fargate cheaper than Lambda?",
-    a: "Fargate can win for steady high-throughput workloads, long-running compute, or when per-request overhead dominates. At scale, a steady service can be cheaper than per-invocation pricing.",
+    q: "When does Fargate tend to be cheaper than Lambda?",
+    a: "When workloads are steady and always-on, because you can run a predictable baseline of tasks and avoid per-invocation overhead. Fargate also avoids some cold-start behavior for long-running services.",
   },
   {
-    q: "What's the fastest way to compare them?",
-    a: "Compute cost per 1M requests (or cost per request) for Lambda using your duration and memory. For Fargate, estimate steady monthly compute from vCPU/memory-hours, then compare at the same throughput.",
+    q: "What should I compare besides compute cost?",
+    a: "Latency behavior (cold starts), scaling model, and the adjacent bills: logs, load balancers, and networking transfer. Those often change the decision more than compute rates.",
   },
 ];
 ---
@@ -23,69 +23,106 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-lambda-vs-fargate-cost"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    "Lambda vs Fargate cost" comparisons go wrong when you compare list prices without normalizing workload shape. Use a
-    unit-economics approach: cost per request (or per 1M requests) for expected duration, and a steady-state monthly
-    compute budget for the container service.
+    Lambda vs Fargate cost comparisons work best when you convert both into the same mental model: <strong>cost per unit
+    of work</strong>. Lambda is “requests + GB-seconds”. Fargate is “average running tasks × vCPU/GB-hours”. This guide
+    shows how to compare and what usually decides the winner.
   </p>
 
-  <h2>Step 1: estimate Lambda unit cost</h2>
-  <p>
-    For Lambda, cost is driven by invocations and GB-seconds (duration x memory). Estimate a few scenarios (p50/p95
-    duration and a realistic memory setting).
-  </p>
-  <p>
-    Tool: <a href="/calculators/aws-lambda-cost-calculator/">AWS Lambda cost calculator</a>.
-  </p>
-  <p class="muted">
-    Compare directly: <a href="/calculators/aws-lambda-vs-fargate-cost-calculator/">Lambda vs Fargate cost calculator</a>.
-  </p>
-
-  <h2>Step 2: estimate container steady-state cost</h2>
-  <p>
-    For Fargate-style services, cost is closer to "capacity x hours": vCPU-hours and memory-hours. If traffic is steady,
-    you typically pay continuously.
-  </p>
-  <p>
-    Tool: <a href="/calculators/aws-fargate-cost-calculator/">AWS Fargate cost calculator</a>.
-  </p>
-  <p class="muted">
-    If you prefer an approximation, you can also model steady compute with an instance hourly rate using{" "}
-    <a href="/calculators/compute-instance-cost-calculator/">compute instance cost</a> and treat it as a baseline.
-  </p>
-
-  <h2>Step 3: add the line items that usually decide the winner</h2>
+  <h2>Step 0: define the unit of work</h2>
   <ul>
-    <li><strong>Logging</strong>: ingestion + retention can dominate for verbose services. Use <a href="/guides/log-costs/">log costs</a>.</li>
-    <li><strong>Data transfer</strong>: NAT/egress patterns can change totals. Use <a href="/calculators/data-egress-cost-calculator/">egress cost</a>.</li>
-    <li><strong>Idle time</strong>: containers pay for idle capacity; Lambda pays only for execution.</li>
-    <li><strong>Retries/timeouts</strong>: retry storms multiply Lambda cost quickly.</li>
+    <li><strong>API workloads</strong>: cost per 1M requests at typical duration and payload size.</li>
+    <li><strong>Jobs/queues</strong>: cost per 1M messages or cost per job run.</li>
+    <li><strong>Streaming</strong>: cost per GB processed or per batch window.</li>
+  </ul>
+
+  <h2>Step 1: model Lambda with unit economics</h2>
+  <ul>
+    <li><strong>Requests</strong>: invocations per month (often priced per 1M).</li>
+    <li><strong>Compute</strong>: GB-seconds = duration × configured memory.</li>
+    <li><strong>Peak scenario</strong>: include incident/retry windows and long-tail duration.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost calculator</a>
+    <a class="btn" href="/guides/aws-lambda-pricing/">Lambda pricing</a>
+  </div>
+
+  <h2>Step 2: model Fargate from average running tasks</h2>
+  <ul>
+    <li><strong>vCPU-hours</strong> = avg tasks × vCPU per task × hours/month</li>
+    <li><strong>GB-hours</strong> = avg tasks × memory GB per task × hours/month</li>
+    <li><strong>Schedules</strong>: non-prod and batch often run far less than 730 hours/month</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+    <a class="btn" href="/guides/aws-fargate-pricing/">Fargate pricing</a>
+  </div>
+
+  <h2>What usually decides the winner</h2>
+  <ul>
+    <li>
+      <strong>Burstiness</strong>: if the workload is idle most of the time, Lambda often wins by not paying a baseline.
+    </li>
+    <li>
+      <strong>Always-on behavior</strong>: if you need constant capacity (steady API traffic), Fargate’s predictable baseline can win.
+    </li>
+    <li>
+      <strong>Cold starts and tail latency</strong>: cold-start mitigation (like provisioned concurrency) can change Lambda economics.
+    </li>
+    <li>
+      <strong>Operational model</strong>: long-lived services with many connections often fit Fargate better; event jobs often fit Lambda better.
+    </li>
+  </ul>
+
+  <h2>Include the non-compute bills (they matter in both)</h2>
+  <ul>
+    <li><strong>Logs</strong>: ingestion GB/day + retention; verbose logs can dominate.</li>
+    <li><strong>Load balancers</strong>: always-on baseline for many service architectures.</li>
+    <li><strong>Networking</strong>: NAT processed GB, cross-AZ transfer, and internet egress.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Transfer cost</a>
+  </div>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Comparing Lambda with a single duration number and missing long-tail/incident windows.</li>
+    <li>Forgetting provisioned concurrency cost when you enable it for latency.</li>
+    <li>Budgeting Fargate from peak tasks instead of average tasks (idle is the cost).</li>
+    <li>Ignoring logs and transfer until they become top drivers.</li>
+    <li>Not validating with billing after the first month (assumptions drift quickly).</li>
+  </ul>
+
+  <h2>How to validate after you choose</h2>
+  <ul>
+    <li>For Lambda: compare billed GB-seconds and request count to the modeled unit economics.</li>
+    <li>For Fargate: compare billed vCPU/GB hours to the modeled average running tasks.</li>
+    <li>For both: verify logs, LB, and transfer lines match your assumptions.</li>
   </ul>
 
   <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/aws-lambda-pricing/">Lambda pricing</a>
-    <a class="btn" href="/guides/aws-fargate-pricing/">Fargate pricing</a>
-    <a class="btn" href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS cost</a>
-    <a class="btn" href="/guides/aws-lambda-concurrency-and-cold-starts/">Concurrency & cold starts</a>
+    <a class="btn" href="/guides/aws-fargate-cost-optimization/">Fargate cost optimization</a>
+    <a class="btn" href="/guides/aws-fargate-vs-ec2-cost/">Fargate vs EC2</a>
     <a class="btn" href="/guides/aws-lambda-cost-optimization/">Lambda cost optimization</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>
+      <a href="https://aws.amazon.com/lambda/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Lambda pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://aws.amazon.com/fargate/pricing/" target="_blank" rel="nofollow noopener">
+        AWS Fargate pricing
+      </a>
+    </li>
   </ul>
-
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
 </GuideLayout>

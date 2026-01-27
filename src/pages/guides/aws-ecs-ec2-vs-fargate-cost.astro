@@ -3,99 +3,136 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "ECS on EC2 vs ECS on Fargate cost: a practical decision checklist";
 const description =
-  "Compare ECS on EC2 vs ECS on Fargate cost with a practical checklist: compute model, idle capacity, packing efficiency, and the line items teams forget (load balancers, logs, NAT/egress, cross-AZ).";
-const faqs = [
-  {
-    q: "When is ECS on EC2 cheaper than ECS on Fargate?",
-    a: "ECS on EC2 often wins for steady workloads when you can keep instances highly utilized, apply commitments, and pack services efficiently.",
-  },
-  {
-    q: "When is ECS on Fargate cheaper than ECS on EC2?",
-    a: "Fargate can win when workloads are spiky or uncertain, when EC2 would be underutilized, or when you want to avoid paying for idle instance capacity.",
-  },
-  {
-    q: "What do teams forget to include in both models?",
-    a: "ALB/NLB baseline and LCU/NLCU, log ingestion + retention, NAT gateway processed traffic, internet egress, and cross-AZ transfer.",
-  },
-];
+  "Compare ECS on EC2 vs ECS on Fargate cost with a practical checklist: utilization, packing efficiency, idle capacity, and the non-compute line items that often decide the winner.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecs-ec2-vs-fargate-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "When is ECS on EC2 cheaper than ECS on Fargate?",
+      a: "EC2 often wins for steady workloads when you can keep instances highly utilized, pack services efficiently, and apply commitments.",
+    },
+    {
+      q: "When is ECS on Fargate cheaper than ECS on EC2?",
+      a: "Fargate can win when workloads are spiky or uncertain and EC2 would be underutilized (paying for idle). It also reduces operational overhead.",
+    },
+  ]}
 >
   <p>
-    The “ECS on EC2 vs ECS on Fargate cost” decision is usually about <strong>utilization</strong> and{" "}
-    <strong>operational overhead</strong>. Compute is only the baseline - networking, logs, and load balancers frequently
-    decide the winner.
+    The ECS on EC2 vs ECS on Fargate decision is usually not “which list price is lower”. It is about{" "}
+    <strong>utilization</strong>, <strong>packing efficiency</strong>, and how much you pay for <strong>idle capacity</strong>.
+    After compute, the winner is often decided by <strong>logs</strong>, <strong>load balancers</strong>, and{" "}
+    <strong>networking</strong>.
   </p>
 
-  <h2>Step 1: normalize the workload</h2>
+  <h2>Step 1: normalize the workload (use average, not peak)</h2>
   <ul>
-    <li>Average running tasks over the month (not peak).</li>
-    <li>Average CPU/memory usage (and how it changes during bursts).</li>
-    <li>Traffic shape: steady, bursty, or scheduled down.</li>
+    <li>Average running tasks over the month (baseline + busy month scenario).</li>
+    <li>CPU and memory usage distribution (p50/p95), not just requests/limits.</li>
+    <li>Traffic shape: steady, bursty, or scheduled down (non-prod scheduling matters).</li>
   </ul>
 
-  <h2>Step 2: compare compute-only first</h2>
-  <p>
-    Use compute-only as a baseline, then add other line items.
+  <h2>Step 2: compute-only baseline (then stop)</h2>
+  <p class="muted">
+    Compute-only is a useful baseline, but it rarely predicts the total bill. Use it as step zero, then add the line
+    items that dominate.
   </p>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator/">ECS on EC2 vs Fargate calculator</a>
+    <a class="btn" href="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator/">ECS EC2 vs Fargate calculator</a>
     <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 calculator</a>
     <a class="btn" href="/calculators/aws-ecs-task-sizing-calculator/">ECS task sizing</a>
   </div>
 
-  <h2>Step 3: add the line items that dominate ECS bills</h2>
+  <h2>Step 3: what changes the math (the real decision drivers)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Driver</th>
+        <th>EC2</th>
+        <th>Fargate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Idle capacity</td>
+        <td>You pay for idle instances unless you can schedule down or pack workloads</td>
+        <td>You usually pay only for running tasks</td>
+      </tr>
+      <tr>
+        <td>Packing efficiency</td>
+        <td>High packing reduces cost dramatically</td>
+        <td>Packing is per-task; fragmentation can still exist</td>
+      </tr>
+      <tr>
+        <td>Ops overhead</td>
+        <td>You manage instances, scaling, AMIs, patching</td>
+        <td>Less infra management, faster iteration</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Step 4: add the line items that often dominate ECS bills</h2>
   <ul>
-    <li><strong>Load balancers</strong>: hourly + LCU/NLCU for each ALB/NLB.</li>
-    <li><strong>Logs</strong>: ingestion + retention (and scan/search if applicable).</li>
-    <li><strong>Networking</strong>: NAT processed traffic, egress, and cross-AZ transfer.</li>
-    <li><strong>Storage</strong>: EBS and snapshots for ECS on EC2 services that use volumes.</li>
+    <li><strong>Load balancers</strong>: hourly + capacity units for each ALB/NLB.</li>
+    <li><strong>Logs</strong>: ingestion + retention baseline (and scans during incidents).</li>
+    <li><strong>Networking</strong>: NAT processed GB, internet egress, and cross-AZ transfer.</li>
+    <li><strong>Storage</strong>: EBS and snapshots for EC2 services that attach volumes.</li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
-    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer cost</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway</a>
+    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
   </div>
+
+  <h2>Worked example (why utilization dominates)</h2>
+  <p class="muted">
+    If EC2 runs at 30% average utilization due to fragmentation and headroom, you are paying ~3.3× the effective compute
+    you need. If you can pack to 70% utilization, the EC2 model can become very competitive.
+  </p>
+  <ul>
+    <li>EC2 at 30% utilization -> effective “paid capacity” multiplier ~ 1 / 0.30 ~= 3.3×</li>
+    <li>EC2 at 70% utilization -> multiplier ~ 1 / 0.70 ~= 1.4×</li>
+  </ul>
 
   <h2>Practical guidance</h2>
   <ul>
     <li>
-      Prefer <strong>ECS on EC2</strong> when you can keep instances packed and you already manage fleets with
-      commitments.
+      Prefer <strong>ECS on EC2</strong> when workloads are steady and you can pack well (and/or apply commitments).
     </li>
     <li>
-      Prefer <strong>ECS on Fargate</strong> when you value simplicity and your workloads have significant idle time or
-      uncertain steady-state.
+      Prefer <strong>Fargate</strong> when workloads are spiky, you cannot keep EC2 utilization high, or you want simpler operations.
     </li>
-    <li>Revisit after measuring average utilization and non-compute line items.</li>
+    <li>
+      Re-evaluate after measuring non-compute line items (logs, NAT, load balancers) for a real week.
+    </li>
   </ul>
-
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/guides/aws-ecs-pricing/">ECS pricing</a>,{" "}
-    <a href="/guides/aws-fargate-vs-ec2-cost/">Fargate vs EC2</a>.
-  </p>
-  <p class="muted" style="margin-top:10px">
-    Don’t forget: <a href="/guides/aws-ecs-cost-model-beyond-compute/">ECS cost model beyond compute</a>.
-  </p>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Measure average and p95 task CPU/memory usage for a representative week.</li>
+    <li>Measure how many load balancers exist and whether they are shared.</li>
+    <li>Measure log ingestion GB/day and retention; validate query scan behavior during incidents.</li>
+    <li>Measure NAT processed GB and egress GB for the traffic path your service actually uses.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      ECS pricing:{" "}
+      <a href="https://aws.amazon.com/ecs/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ecs/pricing
+      </a>
+    </li>
+    <li>
+      Fargate pricing:{" "}
+      <a href="https://aws.amazon.com/fargate/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/fargate/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

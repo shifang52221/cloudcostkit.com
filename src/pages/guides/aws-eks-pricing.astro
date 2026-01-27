@@ -3,68 +3,177 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "EKS pricing: what to include in a realistic cost estimate";
 const description =
-  "A practical EKS pricing checklist: nodes, control plane, load balancers, storage, logs/metrics, and data transfer - with calculators to estimate each part.";
+  "A practical EKS pricing checklist: nodes, control plane, load balancers, storage, logs/metrics, and data transfer — with calculators to estimate each part.";
 const faqs = [
   {
     q: "What is the biggest EKS cost driver?",
-    a: "Usually node compute. But for many real clusters, logs/metrics, load balancers, NAT gateways, and cross-AZ traffic can be significant.",
+    a: "Usually node compute (node-hours). But for many real clusters, logs/metrics, load balancers, NAT gateways, and cross-AZ traffic can be meaningful.",
   },
   {
     q: "Why do EKS estimates miss?",
-    a: "They model only nodes. A realistic estimate includes control plane fees, storage, networking transfer, and observability.",
+    a: "They model only nodes. A realistic estimate includes the control plane fee, storage/snapshots, networking transfer, and observability volume.",
   },
   {
     q: "How should I size nodes for budgeting?",
-    a: "Start from pod requests, add overhead/headroom, then convert to node count. Validate against a representative week of metrics once you have them.",
+    a: "Start from pod requests, subtract overhead, reserve headroom, then convert to a node count. Validate against a representative week of metrics once you have them.",
   },
   {
     q: "What should I validate after deploying?",
-    a: "Check: node-hours, load balancer count, NAT GB processed, cross-AZ transfer, and log ingestion GB/day. These are common surprises.",
+    a: "Node-hours, load balancer count, NAT processed GB, cross-AZ transfer, and log ingestion GB/day are common surprises to check early.",
   },
 ];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-eks-pricing"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-eks-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    The easiest way to underestimate EKS cost is to model only nodes. Node compute is usually the biggest part, but a
-    realistic budget includes several surrounding line items.
+    The easiest way to underestimate EKS cost is to model only nodes. Nodes are usually the biggest line item, but a
+    realistic budget includes a fixed per-cluster fee, storage and snapshots, load balancers, networking transfer, and
+    observability volume. Use this page as a checklist and a template for a first-pass estimate.
   </p>
 
-  <h2>Step 1: Baseline node cost</h2>
-  <p>
-    Start by sizing nodes from workload requests, then apply a blended $/hour. Tools:
-    <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits</a> and{" "}
-    <a href="/calculators/kubernetes-node-cost-calculator/">node cost</a>.
+  <h2>1) Control plane (fixed fee per cluster)</h2>
+  <ul>
+    <li>
+      Estimate monthly control plane cost as <strong>clusters × $/hour × 730</strong>.
+    </li>
+    <li>
+      It matters most for many small clusters (dev/test/stage sprawl), not for one large production cluster.
+    </li>
+  </ul>
+  <p class="muted">
+    Guide: <a href="/guides/aws-eks-control-plane-cost/">EKS control plane cost</a>
   </p>
 
-  <h2>Step 2: Include the common add-ons</h2>
+  <h2>2) Nodes (compute + attached storage)</h2>
+  <p>
+    Most clusters are node-hour driven. Start from requests-based sizing and a utilization target, then convert to node
+    count and node-hours.
+  </p>
   <ul>
-    <li><strong>Control plane fee</strong>: fixed hourly fee in many managed Kubernetes offerings.</li>
-    <li><strong>Load balancers / gateways</strong>: can be significant for high-traffic services.</li>
-    <li><strong>Storage</strong>: PVs, snapshots, and object storage buckets.</li>
-    <li><strong>Logs and metrics</strong>: often the biggest surprise cost.</li>
-    <li><strong>Data transfer</strong>: cross-zone/region traffic and internet egress.</li>
+    <li>
+      <strong>Node-hours</strong>: node count × hours/month (and separate always-on vs scheduled groups if applicable).
+    </li>
+    <li>
+      <strong>Packing efficiency</strong>: topology constraints, DaemonSets, and pod caps reduce real utilization.
+    </li>
+    <li>
+      <strong>Attached storage</strong>: EBS root volumes and any node-local storage are separate line items.
+    </li>
   </ul>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Control plane: cluster count x $/hour x 730.</li>
-    <li>Networking: check NAT gateway GB processed and cross-AZ transfer.</li>
-    <li>Observability: check log ingestion GB/day and metrics cardinality growth.</li>
-    <li>Load balancers: count of always-on load balancers and capacity-unit drivers.</li>
-  </ul>
-
-  <h2>Related tools</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost</a>
-    <a class="btn" href="/guides/aws-eks-control-plane-cost/">Control plane cost</a>
-    <a class="btn" href="/calculators/kubernetes-observability-cost-calculator/">Observability cost</a>
-    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Transfer cost</a>
+    <a class="btn" href="/guides/aws-eks-node-sizing/">Node sizing guide</a>
+    <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Node cost calculator</a>
+  </div>
+
+  <h2>3) Load balancers and ingress</h2>
+  <p>
+    Load balancers are often a hidden baseline cost because they’re always-on. The drivers are “how many” and “how much
+    traffic/capacity”.
+  </p>
+  <ul>
+    <li>Count the always-on LBs (one-per-service patterns can multiply quickly).</li>
+    <li>Model capacity units for typical and peak traffic windows.</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-load-balancer-cost-calculator/">load balancer cost calculator</a>
+  </p>
+
+  <h2>4) Observability (logs and metrics)</h2>
+  <p>
+    For many teams, observability becomes the “surprise bill” after the cluster is stable. If you don’t model it, your
+    estimate is fragile.
+  </p>
+  <ul>
+    <li>
+      <strong>Logs</strong>: ingestion GB/day × retention (plus any scan/search costs).
+    </li>
+    <li>
+      <strong>Metrics</strong>: time series count grows with cardinality (labels) and scrape frequency.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/kubernetes-observability-cost-calculator/">Kubernetes observability</a>
     <a class="btn" href="/guides/aws-logging-cost-reduction/">Reduce logging costs</a>
   </div>
+
+  <h2>5) Networking: NAT, cross-AZ, and internet egress</h2>
+  <p>
+    Kubernetes often increases east-west traffic (service-to-service calls). If traffic crosses AZs or routes through
+    NAT, costs can show up fast.
+  </p>
+  <ul>
+    <li>
+      <strong>NAT</strong>: processed GB for private workloads calling public endpoints or AWS services without endpoints.
+    </li>
+    <li>
+      <strong>Cross-AZ</strong>: service chatter and load balancer routing can create steady transfer.
+    </li>
+    <li>
+      <strong>Internet egress</strong>: APIs, downloads, and CDN origin traffic.
+    </li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer calculator</a>
+  </p>
+
+  <h2>6) Storage and snapshots (PVs and backups)</h2>
+  <ul>
+    <li>
+      <strong>PVs</strong>: GB-month for block storage and the growth rate over time.
+    </li>
+    <li>
+      <strong>Snapshots</strong>: snapshot GB-month and retention policy.
+    </li>
+  </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-ebs-snapshot-cost/">EBS snapshot cost</a>
+  </p>
+
+  <h2>First-pass estimate template (inputs to collect)</h2>
+  <ul>
+    <li>Cluster count (by environment and region)</li>
+    <li>Average node count + instance $/hour (or blended on-demand/spot mix)</li>
+    <li>Always-on load balancer count and rough traffic/capacity assumptions</li>
+    <li>Log ingestion GB/day and retention (days)</li>
+    <li>NAT processed GB/month and cross-AZ transfer assumptions</li>
+    <li>PV storage GB-month and snapshot retention</li>
+  </ul>
+  <p class="muted">
+    If you’re missing a number, write down an assumption and validate it after deployment instead of pretending it’s zero.
+  </p>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Budgeting from peak nodes (overestimates) or from perfect packing (underestimates) without headroom.</li>
+    <li>Cluster sprawl in non-prod making fixed per-cluster fees and add-ons balloon.</li>
+    <li>One load balancer per service creating a large always-on baseline.</li>
+    <li>Ignoring log/metric growth (cardinality) until the bill arrives.</li>
+    <li>Accidental NAT and cross-AZ traffic from “it just works” routing.</li>
+  </ul>
+
+  <h2>How to validate after the first month</h2>
+  <ul>
+    <li>Group EKS costs by service and usage type: confirm your top 3 drivers match your model.</li>
+    <li>Check node-hours vs the planned node count; investigate fragmentation if it’s higher than expected.</li>
+    <li>Review load balancer count and utilization; consolidate where appropriate.</li>
+    <li>Measure log ingestion GB/day and retention; tune verbosity and sampling intentionally.</li>
+    <li>Check NAT processed GB and cross-AZ transfer; adjust routing and endpoints if needed.</li>
+  </ul>
+
+  <h2>Related calculators</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/eks-cost-calculator/">EKS cost</a>
+    <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests & limits</a>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+  </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/eks/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon EKS pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

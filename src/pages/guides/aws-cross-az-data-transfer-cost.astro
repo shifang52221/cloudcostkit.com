@@ -1,82 +1,121 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cross-AZ data transfer cost: why it shows up and how to estimate it";
+const title = "Cross-AZ data transfer cost (AWS): what causes it and how to estimate";
 const description =
-  "Cross-AZ traffic can become a large VPC data transfer line item. Learn common sources (service calls, load balancers, multi-AZ storage), how to estimate GB/month, and how to reduce it safely.";
-const faqs = [
-  {
-    q: "What causes cross-AZ data transfer costs?",
-    a: "East-west traffic between services in different AZs, load balancer patterns, multi-AZ database/storage replication, and chatty microservices can create large cross-AZ GB/month totals.",
-  },
-  {
-    q: "How do I estimate cross-AZ GB/month?",
-    a: "Use VPC Flow Logs or service metrics when available. If you only have throughput charts, convert Mbps to GB/month and apply a reasonable split for cross-AZ traffic.",
-  },
-  {
-    q: "Is cross-AZ always bad?",
-    a: "No. Multi-AZ architectures improve availability. The goal is to avoid accidental cross-AZ traffic (for example, forcing every request to cross AZ due to placement or routing).",
-  },
-];
+  "A practical guide to cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cross-az-data-transfer-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Why do teams get surprised by cross-AZ charges?",
+      a: "Because cross-AZ traffic is often accidental: uneven load balancing, cross-zone connections, and services talking across zones by default.",
+    },
+    {
+      q: "What is the key input for estimating cross-AZ cost?",
+      a: "GB/month that crosses Availability Zones. Once you have that, you apply the per-GB rate for your region and the relevant traffic boundary.",
+    },
+  ]}
 >
   <p>
-    Cross-AZ data transfer often looks like a small per-GB rate, but it scales with total traffic. In microservice and
-    data pipeline architectures, this can exceed compute for some workloads.
+    Cross-AZ data transfer costs appear when bytes move between Availability Zones inside a region. The cost is easy to
+    model once you know <strong>GB/month crossing zones</strong>, but the hard part is identifying what causes the cross-AZ
+    traffic in your architecture.
   </p>
 
-  <h2>Common sources of cross-AZ traffic</h2>
+  <h2>Common causes of cross-AZ transfer</h2>
   <ul>
-    <li>Service-to-service calls between workloads placed in different AZs.</li>
-    <li>Load balancer routing patterns that send requests across AZs frequently.</li>
-    <li>Cross-AZ data replication for managed databases and storage systems.</li>
-    <li>Centralized logging/metrics pipelines pulling from multiple AZs.</li>
+    <li>
+      <strong>Load balancers</strong>: traffic enters one AZ and is forwarded to targets in another (cross-zone patterns).
+    </li>
+    <li>
+      <strong>Databases</strong>: multi-AZ replication and client connections crossing AZ boundaries.
+    </li>
+    <li>
+      <strong>Kubernetes</strong>: pods in AZ A calling services/endpoints in AZ B (uneven scheduling or service topology).
+    </li>
+    <li>
+      <strong>NAT gateways</strong>: workloads in one AZ using a NAT gateway in another can create cross-AZ bytes.
+    </li>
+    <li>
+      <strong>Shared services</strong>: centralized logging, proxies, or caches in a single AZ serving multi-AZ workloads.
+    </li>
   </ul>
 
-  <h2>How to estimate GB/month</h2>
+  <h2>How to estimate cross-AZ GB/month</h2>
   <ol>
-    <li>Start with flow logs or service metrics to identify cross-AZ flows.</li>
-    <li>If you only have throughput charts, convert average Mbps to GB/month with the <a href="/calculators/unit-converter/">Units converter</a>.</li>
-    <li>Multiply the cross-AZ portion (percent of traffic that crosses AZ boundaries) by your effective $/GB rate.</li>
+    <li>
+      <strong>Start from traffic volume</strong>: total GB delivered/processed for the service boundary (API, LB, service mesh).
+    </li>
+    <li>
+      <strong>Estimate cross-AZ fraction</strong>: what percent of traffic crosses zones (0% if perfectly zone-local, often 5–50% in practice).
+    </li>
+    <li>
+      <strong>Cross-AZ GB/month</strong> ~= total GB/month × cross-AZ fraction.
+    </li>
   </ol>
-  <p>
-    Use <a href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer cost calculator</a> to model the
-    cross-AZ line item.
+  <div class="btn-row">
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost calculator</a>
+    <a class="btn" href="/calculators/unit-converter/">Unit converter</a>
+  </div>
+
+  <h2>Where to get the inputs (practical)</h2>
+  <ul>
+    <li>
+      <strong>VPC Flow Logs</strong>: measure bytes between subnets/ENIs tagged by AZ.
+    </li>
+    <li>
+      <strong>Load balancer metrics</strong>: identify uneven target distribution and cross-zone behavior windows.
+    </li>
+    <li>
+      <strong>Kubernetes topology</strong>: compare client pod AZ vs endpoint AZ distributions.
+    </li>
+  </ul>
+  <p class="muted">
+    If you cannot measure yet, use a conservative range (for example 10–30%) and validate later with flow logs.
   </p>
 
-  <h2>How to reduce cross-AZ spend (without losing availability)</h2>
+  <h2>How to reduce cross-AZ cost safely</h2>
   <ul>
-    <li>Co-locate chatty dependencies in the same AZ when safe and supported (or use locality-aware routing).</li>
-    <li>Reduce payload sizes and call frequency (batching, caching).</li>
-    <li>Validate load balancer configuration and traffic distribution.</li>
-    <li>Measure before changing: avoid trading cost for fragility unintentionally.</li>
+    <li>
+      <strong>Keep traffic zone-local</strong>: ensure targets/endpoints are evenly spread across AZs and clients prefer same-AZ targets.
+    </li>
+    <li>
+      <strong>Avoid centralized single-AZ dependencies</strong>: caches, proxies, and NAT should be deployed per AZ where possible.
+    </li>
+    <li>
+      <strong>Validate LB and client behavior</strong>: confirm routing policies actually keep traffic local under load and during scale events.
+    </li>
+    <li>
+      <strong>Watch failure modes</strong>: some cross-AZ traffic is the “safety cost” during partial AZ failures; optimize without reducing resilience.
+    </li>
   </ul>
-
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer guide</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>
-  </div>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Measure cross-AZ GB/day from flow logs for at least 7 days.</li>
+    <li>Confirm cross-AZ fraction during deploys and scale events (often worse than steady state).</li>
+    <li>After changes, validate both cost reduction and resilience behavior during AZ degradation.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      EC2 data transfer pricing:{" "}
+      <a href="https://aws.amazon.com/ec2/pricing/on-demand/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ec2/pricing/on-demand
+      </a>
+    </li>
+    <li>
+      VPC Flow Logs:{" "}
+      <a href="https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html" rel="nofollow noopener" target="_blank">
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

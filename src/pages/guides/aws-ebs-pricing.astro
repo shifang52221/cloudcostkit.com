@@ -1,74 +1,128 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS EBS pricing (what to include)";
+const title = "EBS pricing: what to model (storage, performance, snapshots)";
 const description =
-  "A practical checklist for estimating EBS costs: storage, provisioned IOPS/throughput (when applicable), snapshots, and common pitfalls.";
+  "A practical EBS pricing checklist: volume GB-month, provisioned IOPS/throughput (when applicable), snapshot storage, and the operational patterns that create cost spikes.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What are the core EBS cost components?",
-      a: "Storage (GB-month) is the baseline. Some volume types also bill for provisioned IOPS and/or provisioned throughput. Snapshots are billed separately as snapshot storage.",
+      a: "Volume storage (GB-month) is the baseline. Some volume types also bill for provisioned IOPS and/or throughput. Snapshots are billed separately as snapshot storage.",
     },
     {
       q: "Do snapshots count as EBS storage?",
-      a: "Snapshots are typically separate snapshot storage charges, not EBS volume GB-month. Budget them as a separate line item.",
+      a: "Snapshots are usually a separate snapshot storage line item, not the volume GB-month line item. Model snapshots explicitly.",
     },
   ]}
 >
+  <p>
+    EBS pricing is easy to estimate once you separate three buckets: <strong>volume storage</strong>,
+    <strong>provisioned performance</strong> (when applicable), and <strong>snapshots</strong>. Most underestimates come
+    from treating snapshots as “included” or forgetting performance settings on gp3/io1/io2 style volumes.
+  </p>
+
+  <h2>1) Volume storage (GB-month)</h2>
+  <ul>
+    <li>
+      Count provisioned volume size by class (e.g. 20 GB roots, 500 GB data, 2 TB databases).
+    </li>
+    <li>
+      Multiply by your region $/GB-month per volume type.
+    </li>
+    <li>
+      For fleets, model 3–5 volume classes rather than a single average (databases behave differently from roots).
+    </li>
+  </ul>
+
+  <h2>2) Provisioned performance (only when it applies)</h2>
   <p class="muted">
-    EBS cost estimates usually go wrong for two reasons: (1) mixing up volume storage vs snapshots, and (2) forgetting
-    performance charges when your volume type bills for IOPS/throughput.
+    Some volume types allow (or require) you to provision IOPS and/or throughput. If you set those above baseline, it is
+    a separate cost driver.
+  </p>
+  <ul>
+    <li>
+      <strong>IOPS</strong>: provisioned IOPS above baseline (or dedicated IOPS volume types).
+    </li>
+    <li>
+      <strong>Throughput</strong>: provisioned MB/s above baseline (not relevant for every type).
+    </li>
+    <li>
+      <strong>Common mistake</strong>: sizing to a single peak event. Use p95 and add a small buffer.
+    </li>
+  </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3</a>,{" "}
+    <a href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS and throughput sizing</a>.
   </p>
 
-  <h2>1) Start with storage (GB-month)</h2>
-  <p>
-    Use the average allocated volume size (or average used if your billing model differs) and multiply by $/GB-month for
-    your region and volume type.
+  <h2>3) Snapshots (separate storage line item)</h2>
+  <ul>
+    <li>
+      Snapshot storage grows with <strong>change rate</strong> and <strong>retention</strong>, not just volume size.
+    </li>
+    <li>
+      Copies across regions or accounts create additional stored GB.
+    </li>
+    <li>
+      Long retention on write-heavy volumes is the common “silent” snapshot cost driver.
+    </li>
+  </ul>
+  <p class="muted">
+    Guide: <a href="/guides/aws-ebs-snapshot-cost/">EBS snapshot cost</a>.
   </p>
 
-  <h2>2) Add performance charges only if they apply</h2>
-  <p>
-    Some volume types include baseline performance and do not bill separately for IOPS/throughput. Others allow
-    provisioning performance with additional charges. If you’re unsure, model two scenarios: “storage-only” and
-    “storage + provisioned performance”.
-  </p>
+  <h2>A fast estimation workflow</h2>
+  <ol>
+    <li>Group volumes into 3–5 classes (type + size + workload).</li>
+    <li>For each class: estimate GB-month and (if applicable) IOPS/throughput settings.</li>
+    <li>For snapshots: estimate change rate and retention window per class.</li>
+    <li>Validate against a real week of utilization and a real month of snapshot retention behavior.</li>
+  </ol>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost calculator</a>
+  </div>
 
-  <h2>3) Model snapshots separately</h2>
-  <p>
-    Snapshot retention and churn can create meaningful recurring storage spend. If you take frequent snapshots or keep
-    long retention, add a separate snapshot GB-month line item.
-  </p>
-
-  <h2>4) Use a calculator for scenarios</h2>
-  <p>
-    Use <a href="/calculators/aws-ebs-cost-calculator/">AWS EBS Cost Calculator</a> to estimate storage + optional
-    performance charges using your effective pricing inputs.
-  </p>
-  <p class="muted" style="margin-top:14px">
-    Related: <a href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost calculator</a>,{" "}
-    <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>,{" "}
-    <a href="/guides/aws-ebs-snapshot-cost/">EBS snapshot cost guide</a>.
-  </p>
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Keeping unattached volumes after migrations and instance termination.</li>
+    <li>Over-sizing volume GB to chase performance instead of tuning IOPS/throughput (or switching to gp3).</li>
+    <li>Snapshot retention without lifecycle policies (daily snapshots kept forever).</li>
+    <li>Non-prod volumes with prod-sized disks and prod retention policies.</li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate storage utilization, IOPS, throughput, and latency for a representative week.</li>
-    <li>Separate steady-state vs peak windows (backups/migrations/batch).</li>
-    <li>After changes, confirm application SLOs and storage latency remain stable.</li>
+    <li>Measure used space and growth rate per volume class (baseline + busy month).</li>
+    <li>Measure p95 IOPS/throughput and verify it matches provisioned settings.</li>
+    <li>Measure snapshot retained GB trend and confirm lifecycle policies actually delete.</li>
+    <li>After changes, validate latency and error rates for the workload (not only IOPS).</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
-    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost</a>
-    <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
-    <a class="btn" href="/guides/aws-ebs-cost-optimization/">EBS optimization</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      EBS pricing:{" "}
+      <a href="https://aws.amazon.com/ebs/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ebs/pricing
+      </a>
+    </li>
+    <li>
+      EBS volume types:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

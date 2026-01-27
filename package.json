@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "dev:lan": "astro dev --host 0.0.0.0 --port 4321",
     "generate:guides": "node scripts/generate-guides.mjs",
+    "audit:seo": "node scripts/seo-audit.mjs",
     "build": "node scripts/generate-guides.mjs && astro build",
     "preview": "astro preview",
     "preview:lan": "astro preview --host 0.0.0.0 --port 4321",

@@ -3,67 +3,114 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "SNS pricing: what to model (publishes, deliveries, fan-out)";
 const description =
-  "A practical SNS pricing checklist: publish requests, delivery requests by protocol mix, fan-out, and incident-driven retry spikes.";
+  "A practical SNS pricing checklist: publish requests, delivery requests by protocol mix, fan-out after filter policies, and the retry/alert-storm patterns that create surprise delivery volume.";
+const faqs = [
+  {
+    q: "What typically drives SNS cost?",
+    a: "Delivery volume. Fan-out (messages × subscribers) can make deliveries much larger than publishes. Protocol mix also matters for effective pricing.",
+  },
+  {
+    q: "Why do costs spike during incidents?",
+    a: "Alert storms and retries. More publishes plus repeated delivery attempts can multiply deliveries, especially for high fan-out topics.",
+  },
+  {
+    q: "What’s the fastest way to build a budget model?",
+    a: "Estimate publishes/month, estimate deliveries/month (publish × matched subscribers), add a retry multiplier for failure periods, then price with a blended per-1M rate and validate with metrics.",
+  },
+];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-sns-pricing"
-  lastUpdated="2026-01-22"
-  faqs={[
-    {
-      q: "What typically drives SNS cost?",
-      a: "Delivery volume. Fan-out (messages x subscribers) can make deliveries much larger than publishes. Protocol mix also matters for effective pricing.",
-    },
-    {
-      q: "Why do costs spike during incidents?",
-      a: "Alert storms and retries. More publishes plus repeated delivery attempts can multiply deliveries, especially for high fan-out topics.",
-    },
-  ]}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-sns-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    SNS-style costs are easiest to model as <strong>publishes</strong> plus <strong>deliveries</strong>. The key is that
-    deliveries can be much larger than publishes when topics have many subscribers.
+    SNS cost models are easiest when you treat them as <strong>publishes</strong> plus <strong>deliveries</strong>. The
+    key idea: deliveries can be much larger than publishes because of fan-out, and retries can multiply delivery
+    attempts during failures. This page is a checklist for a realistic estimate.
   </p>
 
-  <h2>What to model</h2>
+  <h2>What to include in the model</h2>
   <ul>
-    <li>
-      <strong>Publishes/month</strong>: how many messages you publish to topics
-    </li>
-    <li>
-      <strong>Deliveries/month</strong>: messages delivered to subscription endpoints
-    </li>
-    <li>
-      <strong>Fan-out</strong>: average subscribers per message (after filter policies)
-    </li>
-    <li>
-      <strong>Protocol mix</strong>: use an effective blended $ per 1M deliveries
-    </li>
+    <li><strong>Publishes/month</strong>: how many messages you publish</li>
+    <li><strong>Deliveries/month</strong>: how many messages are delivered to endpoints</li>
+    <li><strong>Fan-out</strong>: average matched subscribers per publish (after filter policies)</li>
+    <li><strong>Protocol mix</strong>: different subscription protocols can have different effective rates</li>
+    <li><strong>Retry multiplier</strong>: delivery failures cause repeated attempts</li>
   </ul>
-
-  <h2>A fast estimate</h2>
   <p class="muted">
-    Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS Cost Calculator</a> to estimate publish + delivery charges
-    (plus optional transfer). Then refine deliveries with measurements and fan-out assumptions.
+    Tool: <a href="/calculators/aws-sns-cost-calculator/">AWS SNS cost calculator</a>
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Step 1: estimate publishes</h2>
   <ul>
-    <li>Validate publishes/month and deliveries/month from a representative time window (avoid incident spikes).</li>
-    <li>Model fan-out after filter policies (matched deliveries, not subscribed endpoints).</li>
-    <li>Watch for spike drivers: alert storms, retries, and downstream endpoint failures.</li>
+    <li>Split by topic: a few topics often dominate publishes.</li>
+    <li>Separate prod vs non-prod (test topics can be noisy).</li>
+    <li>Keep an “incident day” scenario if alerts are a big use case.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Step 2: estimate deliveries (fan-out is the multiplier)</h2>
+  <p>
+    A fast first-pass formula:
+  </p>
+  <ul>
+    <li><strong>Deliveries/month ≈ publishes/month × matched subscribers per publish</strong></li>
+    <li>Use matched subscribers, not “subscribers total” (filter policies reduce effective fan-out).</li>
+  </ul>
+  <p class="muted">
+    Workflow: <a href="/guides/aws-sns-estimate-deliveries/">estimate SNS deliveries</a>
+  </p>
+
+  <h2>Step 3: add the retry/alert-storm scenarios</h2>
+  <ul>
+    <li><strong>Retry scenario</strong>: failing endpoints multiply delivery attempts.</li>
+    <li><strong>Alert storm scenario</strong>: incident triggers high-frequency publishes to high-fan-out topics.</li>
+    <li><strong>Downstream coupling</strong>: if SNS fans out to SQS/HTTP endpoints, failures can cascade and amplify retries.</li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Modeling publishes and forgetting deliveries (fan-out is where cost grows).</li>
+    <li>Using “subscribers per topic” instead of “matched subscribers per publish”.</li>
+    <li>Ignoring retries and treating failures as “rare” (incidents can dominate monthly variance).</li>
+    <li>Broadcasting large payloads to many subscribers instead of sending pointers (object links).</li>
+    <li>Not separating non-prod traffic (test loops can create high publish/delivery volume).</li>
+  </ul>
+
+  <h2>How to validate after you deploy</h2>
+  <ul>
+    <li>Compare publishes and deliveries from a representative week to your baseline model.</li>
+    <li>Check delivery failure rate; if failures are non-trivial, expect higher effective deliveries.</li>
+    <li>Validate fan-out after filters: are you delivering broadly when you intended narrow topics?</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li><strong>Publishes/month</strong> = Σ publishes by topic</li>
+    <li><strong>Matched fan-out</strong> = subscriptions × filter match rate</li>
+    <li><strong>Baseline deliveries</strong> = publishes × matched fan-out</li>
+    <li><strong>Peak deliveries</strong> = baseline deliveries × (1 + retry factor) during incident/busy hours</li>
+    <li><strong>Monthly cost</strong> = publishes priced + deliveries priced (use blended per-1M rates)</li>
+  </ul>
+  <p class="muted">
+    If you don’t know match rate or retry factor, model scenarios (e.g., 20%/50%/80% match; 0%/5%/20% retries) and validate later.
+  </p>
+
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-sns-cost-calculator/">SNS cost</a>
+    <a class="btn" href="/guides/aws-sns-cost-optimization/">SNS cost optimization</a>
+    <a class="btn" href="/guides/aws-sns-estimate-deliveries/">Estimate deliveries</a>
     <a class="btn" href="/guides/aws-sqs-vs-sns-cost/">SQS vs SNS</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+    <a class="btn" href="/guides/messaging-costs/">Messaging cost hub</a>
   </div>
 
-  <p class="muted" style="margin-top:14px">
-    Comparison: <a href="/guides/aws-sqs-vs-sns-cost/">SQS vs SNS cost</a>.
-  </p>
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/sns/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SNS pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html" target="_blank" rel="nofollow noopener">
+        Amazon SNS Developer Guide
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

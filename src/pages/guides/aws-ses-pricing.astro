@@ -3,59 +3,111 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "SES pricing: what to model (send volume + payload size)";
 const description =
-  "A practical AWS SES pricing checklist: emails sent, payload size (optional transfer), and common sources of cost spikes for product and marketing email.";
+  "A practical AWS SES pricing checklist: emails sent, optional payload/attachment size assumptions, and the operational patterns (retries, alert storms, duplicates) that create surprise spend.";
+const faqs = [
+  {
+    q: "What typically drives SES cost?",
+    a: "Email volume. If you include payload and attachments in your model, large emails can also increase transfer-like costs depending on your setup and billing lines.",
+  },
+  {
+    q: "Why do email bills spike during incidents?",
+    a: "Retry loops and alert storms. If your system retries aggressively or sends duplicate notifications, volume can multiply quickly.",
+  },
+  {
+    q: "What’s the fastest way to estimate SES cost?",
+    a: "Estimate emails/month (transactional + marketing), price per 1,000 sends, then add a peak scenario for incident-driven retries and duplicate sends.",
+  },
+];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-ses-pricing"
-  lastUpdated="2026-01-22"
-  faqs={[
-    {
-      q: "What typically drives SES cost?",
-      a: "Email volume. Large payloads and attachments can add transfer-related costs, and dedicated IPs or add-ons can add fixed monthly charges.",
-    },
-    {
-      q: "Why do email bills spike during incidents?",
-      a: "Retry loops and alert storms. If your system retries aggressively or sends duplicate notifications, volume can multiply quickly.",
-    },
-  ]}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-ses-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    SES cost modeling is usually straightforward: <strong>emails sent</strong> multiplied by your effective <strong>$ per
-    1,000 emails</strong>. If you send large payloads or attachments, you may also want to model transfer-like costs.
+    SES pricing models are usually linear: <strong>emails sent</strong> × <strong>effective $ per 1,000 emails</strong>.
+    The difficult part is getting the volume right (and not ignoring incident multipliers). If you send large templates
+    or attachments, add a payload-size assumption as a separate line item so you can reason about trade-offs.
   </p>
 
-  <h2>What to model</h2>
+  <h2>What to include in your estimate</h2>
   <ul>
-    <li>
-      <strong>Emails/month</strong>: transactional + marketing volume
-    </li>
-    <li>
-      <strong>Average email size</strong>: templates, images, and attachments (optional)
-    </li>
-    <li>
-      <strong>Add-ons</strong>: dedicated IPs or other features you enable
-    </li>
+    <li><strong>Emails/month</strong>: transactional + marketing + notifications</li>
+    <li><strong>Peak/incident scenario</strong>: retries, duplicates, and alert storms</li>
+    <li><strong>Average email size</strong> (optional): templates, images, and attachments</li>
+    <li><strong>Dedicated IP / add-ons</strong> (if used): treat as fixed baseline line items</li>
   </ul>
-
-  <h2>A fast estimate</h2>
   <p class="muted">
-    Use <a href="/calculators/aws-ses-cost-calculator/">AWS SES Cost Calculator</a> to estimate send charges and optional
-    transfer from average email size.
+    Tool: <a href="/calculators/aws-ses-cost-calculator/">AWS SES cost calculator</a>
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Step 1: estimate email volume (separate by intent)</h2>
   <ul>
-    <li>Separate transactional vs marketing volume (different variability and spike patterns).</li>
-    <li>Watch for incident spikes: alert storms and retry loops can multiply sends quickly.</li>
-    <li>Validate average email size if you include transfer/attachment assumptions.</li>
+    <li><strong>Transactional</strong>: password reset, receipts, signup confirmation, security alerts</li>
+    <li><strong>Product notifications</strong>: digests, alerts, workflow messages</li>
+    <li><strong>Marketing</strong>: campaigns, newsletters, onboarding sequences</li>
+  </ul>
+  <p class="muted">
+    Workflow: <a href="/guides/aws-ses-estimate-email-volume/">estimate email volume per month</a>
+  </p>
+
+  <h2>Step 2: price baseline sends</h2>
+  <p>
+    Baseline monthly send cost is typically:
+  </p>
+  <ul>
+    <li><strong>Baseline cost ≈ emails/month × $/1,000 emails</strong></li>
+    <li>
+      Keep separate assumptions for transactional vs marketing if they have different variability (marketing can be bursty).
+    </li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Step 3: add the incident multipliers (the common budget miss)</h2>
+  <ul>
+    <li><strong>Retry loops</strong>: timeouts and downstream failures can cause repeated sends.</li>
+    <li><strong>Duplicate notification logic</strong>: one user action triggers multiple sends accidentally.</li>
+    <li><strong>Alert storms</strong>: incidents trigger high-frequency alerts to large recipient sets.</li>
+  </ul>
+  <p class="muted">
+    A simple approach: add a “duplicates/retries factor” (for example +5% baseline, +50% in peak month) and validate after you deploy.
+  </p>
+
+  <h2>Step 4: include payload size only if it’s meaningful</h2>
+  <p>
+    Many teams can ignore payload size for budgeting. Include it when you send large templates or attachments, or when you
+    route email content through a path with measurable data-transfer billing.
+  </p>
+  <ul>
+    <li>Estimate average email size (kB) for transactional vs marketing templates.</li>
+    <li>Prefer links to downloads instead of attachments when feasible.</li>
+    <li>Use the same unit conventions (MB vs MiB) when you convert sizes.</li>
+  </ul>
+  <p class="muted">
+    Helper: <a href="/calculators/unit-converter/">units converter</a>
+  </p>
+
+  <h2>How to validate after the first month</h2>
+  <ul>
+    <li>Compare actual sends/day to your baseline and identify campaign vs incident spikes.</li>
+    <li>Track retry/duplicate rate (resends and idempotency failures).</li>
+    <li>Validate deliverability (bounces/complaints) when you change templates or volume.</li>
+  </ul>
+
+  <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ses-cost-calculator/">SES cost</a>
+    <a class="btn" href="/guides/aws-ses-cost-optimization/">SES cost optimization</a>
+    <a class="btn" href="/guides/aws-ses-estimate-email-volume/">Estimate email volume</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
+    <a class="btn" href="/guides/messaging-costs/">Messaging cost hub</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/ses/pricing/" target="_blank" rel="nofollow noopener">
+        AWS SES pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/ses/latest/dg/send-email-concepts.html" target="_blank" rel="nofollow noopener">
+        SES sending concepts (deliverability and sending patterns)
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

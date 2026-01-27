@@ -3,104 +3,157 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "API Gateway vs ALB vs CloudFront cost: what to compare (requests, transfer, add-ons)";
 const description =
-  "A practical cost comparison of API Gateway, Application Load Balancer (ALB), and CloudFront. Compare request pricing, data transfer, caching, WAF, and where each option tends to win.";
-const faqs = [
-  {
-    q: "Which is cheaper: API Gateway or ALB?",
-    a: "It depends on request volume, payload size, and features (auth, throttling, custom domains). For large payloads, data transfer and caching usually dominate, so architecture often matters more than the per-request price.",
-  },
-  {
-    q: "Where does CloudFront fit in?",
-    a: "CloudFront (and CDNs generally) can reduce origin/API traffic by caching and optimizing transfer. If responses are cacheable or large, a CDN often reduces total cost by cutting requests and bytes flowing through the API layer.",
-  },
-  {
-    q: "What's the fastest way to compare options?",
-    a: "Use the same traffic inputs (requests/month and average response size) and price each option with a simple model. Then add feature add-ons (WAF, logs, custom domains) as separate line items.",
-  },
-];
+  "A practical cost comparison of API Gateway, Application Load Balancer (ALB), and CloudFront. Compare request pricing, data transfer, caching impact, WAF, logs, and the hidden line items that change the answer.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-vs-alb-vs-cloudfront-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Which is cheaper: API Gateway or ALB?",
+      a: "It depends on request volume, payload size, and which features you need. For large payloads, transfer and caching usually matter more than the per-request price.",
+    },
+    {
+      q: "Where does CloudFront fit in?",
+      a: "CloudFront is a CDN layer. It can reduce origin/API traffic via caching and can change the cost outcome by cutting origin requests and origin transfer.",
+    },
+    {
+      q: "What's the fastest way to compare options?",
+      a: "Use the same traffic inputs (requests/month, average response size, cache hit rate) and price each option as a simple model. Then add feature add-ons (WAF, logs, custom domains) as separate line items.",
+    },
+  ]}
 >
   <p>
-    People often compare API Gateway, ALB, and CloudFront as "three ways to serve traffic". Cost comparisons go wrong
+    People often compare API Gateway, ALB, and CloudFront as “three ways to serve traffic”. Cost comparisons go wrong
     when you compare only one line item (like request price) and ignore transfer, caching, and add-ons.
   </p>
 
   <h2>Start with the same inputs</h2>
   <ul>
-    <li><strong>Requests/month</strong> (average + peak scenarios)</li>
-    <li><strong>Average response size</strong> (compressed over the wire)</li>
-    <li><strong>Cacheability</strong> (hit rate if you can cache)</li>
-    <li><strong>Traffic path</strong> (internet vs private/VPC, cross-region, etc.)</li>
+    <li>
+      <strong>Requests/month</strong> (baseline + busy-month scenario)
+    </li>
+    <li>
+      <strong>Average response size</strong> over the wire (compressed)
+    </li>
+    <li>
+      <strong>Cacheability</strong> (expected cache hit rate if using a CDN)
+    </li>
+    <li>
+      <strong>Traffic path</strong> (internet vs private/VPC, cross-region boundaries)
+    </li>
   </ul>
 
-  <h2>Core cost buckets</h2>
-  <ul>
-    <li><strong>Request-based charges</strong>: per request or per million requests.</li>
-    <li><strong>Data transfer</strong>: $/GB for bytes delivered (and sometimes processed).</li>
-    <li><strong>Add-ons</strong>: WAF, logs, custom domains/certs, caching, and other features you rely on.</li>
-  </ul>
+  <h2>What you pay for (high-level)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Primary drivers</th>
+        <th>Common “hidden” drivers</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>API Gateway</td>
+        <td>Requests + transfer</td>
+        <td>Access logs, WAF, downstream compute (Lambda), retries</td>
+      </tr>
+      <tr>
+        <td>ALB</td>
+        <td>Hours + processed data / capacity units</td>
+        <td>Cross-zone, logs, WAF, upstream compute, health check traffic</td>
+      </tr>
+      <tr>
+        <td>CloudFront</td>
+        <td>Edge bandwidth + edge requests</td>
+        <td>Origin egress (cache misses), invalidations, logs/analytics</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <h2>When each option tends to win</h2>
+  <h2>Why CloudFront can change the answer</h2>
+  <p>
+    CloudFront doesn’t replace an API by itself; it changes the traffic profile. If responses are cacheable, a CDN can
+    reduce the number of origin/API requests and the amount of origin transfer, which often matters more than the per
+    request price.
+  </p>
   <ul>
     <li>
-      <strong>API Gateway</strong>: often chosen for API features (auth, throttling, usage plans). Cost sensitivity is
-      mainly requests + response bytes.
+      Origin requests/month ~= edge requests/month × (1 - cache hit rate)
     </li>
     <li>
-      <strong>ALB</strong>: can be cost-effective for steady high throughput and flexible routing. Data processed/LCU
-      style billing can be the main driver.
-    </li>
-    <li>
-      <strong>CloudFront</strong>: wins when caching reduces API/origin requests or when bandwidth dominates. Even when
-      CDN adds cost, it can reduce total system spend by cutting upstream load.
+      Origin egress GB/month ~= edge bandwidth GB/month × (1 - cache hit rate)
     </li>
   </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-cloudfront-cache-hit-rate/">CloudFront cache hit rate</a>.
+  </p>
 
   <h2>A fast comparison workflow</h2>
   <ol>
     <li>
-      Model API request + response transfer with{" "}
-      <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost calculator</a>.
+      Estimate requests/month: <a href="/guides/aws-api-gateway-estimate-requests/">request volume methods</a>.
     </li>
     <li>
-      Model CDN bandwidth/requests with{" "}
-      <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a> (or{" "}
-      <a href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>).
+      Estimate transfer from response size: <a href="/calculators/api-response-size-transfer-calculator/">response size
+      to transfer</a>.
+    </li>
+    <li>
+      Model API request + transfer with <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost
+      calculator</a>.
+    </li>
+    <li>
+      Model CDN bandwidth/requests with <a href="/calculators/cloudfront-cost-calculator/">CloudFront cost calculator</a>{" "}
+      (or <a href="/calculators/cdn-cost-calculator/">generic CDN</a>).
     </li>
     <li>
       Model ALB with <a href="/calculators/aws-load-balancer-cost-calculator/">AWS load balancer cost calculator</a>.
     </li>
     <li>
-      Add add-ons as separate line items: <a href="/calculators/aws-waf-cost-calculator/">WAF</a>,{" "}
-      <a href="/guides/aws-cloudwatch-logs-pricing/">logs</a>, etc.
+      Add add-ons as separate line items: <a href="/calculators/aws-waf-cost-calculator/">WAF</a>, logs, custom domains,
+      and any downstream compute.
     </li>
   </ol>
 
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>
-    <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
-    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
-  </div>
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Comparing only request fees and ignoring transfer (often dominates for non-trivial payloads).</li>
+    <li>Using uncompressed payload sizes (overstates transfer).</li>
+    <li>Assuming a cache hit rate without validating cacheability and caching headers.</li>
+    <li>Ignoring retries/timeouts (can multiply requests and bytes during incidents).</li>
+    <li>Forgetting log/analytics costs (CloudWatch, S3, Athena, SIEM ingestion).</li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Validate a real week of requests and transfer from metrics/logs (not only peak RPS).</li>
+    <li>Validate cache hit rate with a test distribution before committing to a CDN-driven savings claim.</li>
+    <li>Confirm pricing boundaries: region, internet egress vs internal transfer, and which layer emits logs.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      API Gateway pricing:{" "}
+      <a href="https://aws.amazon.com/api-gateway/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/api-gateway/pricing
+      </a>
+    </li>
+    <li>
+      Elastic Load Balancing pricing (ALB):{" "}
+      <a href="https://aws.amazon.com/elasticloadbalancing/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/elasticloadbalancing/pricing
+      </a>
+    </li>
+    <li>
+      CloudFront pricing:{" "}
+      <a href="https://aws.amazon.com/cloudfront/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudfront/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

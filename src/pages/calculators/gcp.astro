@@ -18,7 +18,39 @@ const slots = SITE.adsenseSlots;
     <div class="btn-row" style="margin-top:12px">
       <a class="btn" href="/guides/gcp/">GCP cost guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/methodology/">Methodology</a>
     </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">A practical GCP estimate</h2>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Start with measurable drivers (requests/month, GB/month, GB-month, hours).</li>
+        <li>Separate internet egress, inter-zone, and cross-region transfer.</li>
+        <li>Model logs/metrics as ingestion + retention + scan/query.</li>
+        <li>Validate boundaries (internal vs internet) before trusting totals.</li>
+      </ol>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn" href="/calculators/networking/">Networking</a>
+        <a class="btn" href="/calculators/logging/">Logging</a>
+        <a class="btn" href="/calculators/storage/">Storage</a>
+        <a class="btn" href="/calculators/kubernetes/">Kubernetes</a>
+      </div>
+    </section>
+
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Common pitfalls</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Under-modeling inter-zone transfer (it can be frequent in multi-zone architectures).</li>
+        <li>Confusing CDN bandwidth with origin egress (cache fill vs edge delivery).</li>
+        <li>High-cardinality metrics labels creating “quietly growing” bills.</li>
+        <li>Ignoring storage growth and lifecycle transitions (hot → cold → archive).</li>
+      </ul>
+      <p class="muted" style="margin:12px 0 0">
+        Start with <a href="/guides/cloud-cost-estimation-checklist/">estimation checklist</a> if you’re missing major line items.
+      </p>
+    </section>
   </section>
 
   <section class="card section">
@@ -69,4 +101,3 @@ const slots = SITE.adsenseSlots;
     </p>
   </section>
 </BaseLayout>
-

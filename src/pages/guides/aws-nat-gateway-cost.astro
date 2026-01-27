@@ -3,74 +3,110 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "NAT gateway costs: why they spike and how to estimate them";
 const description =
-  "NAT gateways can create surprising bills because costs scale with both time and traffic. Learn a practical way to estimate and reduce NAT gateway spend.";
+  "NAT gateways can create surprising bills because costs scale with both time and traffic. Learn a practical way to estimate gateway-hours + GB processed, find the top traffic sources, and validate savings after fixes.";
+const faqs = [
+  {
+    q: "What are the two NAT Gateway cost components?",
+    a: "A fixed hourly cost (gateway-hours) plus a traffic-based cost for GB processed through the NAT gateway.",
+  },
+  {
+    q: "What counts as “GB processed”?",
+    a: "Traffic that traverses the NAT gateway (for example, workloads in private subnets reaching public endpoints or services through the NAT path).",
+  },
+  {
+    q: "Why do NAT bills spike during incidents?",
+    a: "Retries and timeouts multiply outbound calls. Autoscaling can also trigger large downloads (images and updates), increasing processed GB quickly.",
+  },
+];
 ---
-<GuideLayout
-  title={title}
-  description={description}
-  canonicalPath="/guides/aws-nat-gateway-cost"
-  lastUpdated="2026-01-22"
-  faqs={[
-    {
-      q: "What are the two NAT Gateway cost components?",
-      a: "A fixed hourly cost (gateway-hours) plus a traffic-based cost for GB processed through the NAT gateway.",
-    },
-    {
-      q: "What traffic counts as “GB processed”?",
-      a: "Traffic that traverses the NAT gateway (for example, instances in private subnets reaching the internet for updates or external APIs).",
-    },
-  ]}
->
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-nat-gateway-cost" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    NAT gateway bills are often surprising because they combine a fixed hourly component with traffic-based charges. If
-    you put high-throughput workloads behind NAT, costs can spike quickly.
+    NAT gateway bills are often surprising because they combine a fixed hourly baseline with traffic-based processing
+    charges. If you put high-throughput or “chatty outbound” workloads behind NAT, costs can scale faster than compute.
+    This page shows a simple model and a workflow to estimate and validate the drivers.
   </p>
 
-  <h2>What to model</h2>
+  <h2>The cost model (what to budget)</h2>
   <ul>
-    <li>Hours/month the NAT gateway is provisioned (usually ~730 if always on)</li>
-    <li>GB/month processed through NAT (egress to the internet, software updates, external APIs)</li>
+    <li><strong>Gateway-hours</strong>: gateways × hours/month (730 for always-on)</li>
+    <li><strong>GB processed</strong>: total GB traversing NAT per month</li>
+    <li><strong>Total</strong>: gateway-hours × $/hour + GB processed × $/GB (plus any related transfer/egress lines)</li>
+  </ul>
+  <p class="muted">
+    Tool: <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a>
+  </p>
+
+  <h2>Why NAT costs spike (the common root causes)</h2>
+  <ul>
+    <li><strong>Container image pulls</strong>: large images pulled by many nodes/tasks, especially during scaling events.</li>
+    <li><strong>OS/package updates</strong>: fleets doing repeated downloads through NAT.</li>
+    <li><strong>External APIs/SaaS</strong>: high-throughput outbound calls from private workloads.</li>
+    <li><strong>Log shipping</strong>: exporting logs to external destinations through NAT.</li>
+    <li><strong>Retry storms</strong>: a small outage can multiply outbound traffic and processed GB.</li>
   </ul>
 
-  <h2>How to estimate GB/month</h2>
-  <p>
-    Start from flow logs or egress monitoring. If you only have throughput charts, convert Mbps to GB/month using the
-    <a href="/calculators/unit-converter/">Units Converter</a>.
-  </p>
-  <p class="muted" style="margin-top:10px">
-    Use <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a> to estimate the hourly +
-    traffic components using your effective pricing.
+  <h2>How to estimate GB processed (3 practical methods)</h2>
+  <ol>
+    <li>
+      <strong>From NAT gateway metrics</strong>: sum bytes over a representative window and scale to monthly.
+    </li>
+    <li>
+      <strong>From VPC Flow Logs</strong>: filter to NAT gateway ENIs and sum bytes.
+    </li>
+    <li>
+      <strong>From throughput charts</strong>: convert average Mbps to GB/month (good for a first pass).
+    </li>
+  </ol>
+  <p class="muted">
+    Step-by-step: <a href="/guides/aws-nat-gateway-estimate-gb-processed/">estimate NAT GB processed</a>
   </p>
 
-  <h2>How to reduce NAT spend</h2>
+  <h2>Architecture gotchas (where costs hide)</h2>
   <ul>
-    <li>Use VPC endpoints / private access for common services where applicable</li>
-    <li>Cache software updates and container images</li>
-    <li>Keep traffic in-region where possible</li>
+    <li>
+      <strong>Non-prod always-on</strong>: dev/test running 730h/month creates baseline gateway-hours.
+    </li>
+    <li>
+      <strong>Accidental NAT path to AWS services</strong>: traffic to AWS APIs can still go through NAT when endpoints/private access aren’t used.
+    </li>
+    <li>
+      <strong>Cross-AZ routing</strong>: centralized egress patterns can introduce cross-AZ transfer in addition to NAT.
+    </li>
+    <li>
+      <strong>Multi-AZ HA choices</strong>: more NAT gateways can improve locality/availability but increases gateway-hours—model the trade-off explicitly.
+    </li>
+  </ul>
+  <p class="muted">
+    If you’re comparing NAT vs endpoints/private connectivity:{" "}
+    <a href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints cost</a>.
+  </p>
+
+  <h2>Validation checklist (do this after changes)</h2>
+  <ul>
+    <li>Confirm gateway-hours didn’t stay flat due to unused gateways left running.</li>
+    <li>Confirm GB processed dropped and identify which traffic source changed.</li>
+    <li>Check for shifted costs: data transfer/cross-AZ and internet egress can move when routing changes.</li>
+    <li>Re-check incident windows: if retries still spike, the problem will return.</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <p>
-    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost calculator</a>
-    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost calculator</a>
-    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">Data transfer calculator</a>
-    <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>
-    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
-  </p>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Validate GB processed from NAT metrics or flow logs (representative week).</li>
-    <li>Identify the top traffic sources: images, updates, external APIs, log shipping.</li>
-    <li>After changes, confirm reduced GB processed and stable application behavior.</li>
-  </ul>
-
-  <h2>Related tools</h2>
+  <h2>Next steps</h2>
   <div class="btn-row">
-    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate GB processed</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT optimization</a>
-    <a class="btn" href="/guides/aws-network-costs/">AWS network hub</a>
+    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a>
+    <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints optimization</a>
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/vpc/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon VPC pricing (NAT Gateway pricing)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html" target="_blank" rel="nofollow noopener">
+        NAT gateway documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

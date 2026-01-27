@@ -3,74 +3,136 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "CloudFront invalidation pricing: when it matters and how to estimate";
 const description =
-  "A practical guide to CloudFront invalidation costs: what to count, why cache-busting patterns can create surprising invalidation volume, and how to reduce invalidations safely.";
-const faqs = [
-  {
-    q: "Do invalidations usually dominate CDN cost?",
-    a: "Usually no. Bandwidth and request fees are often larger. But invalidations can become a real line item if you invalidate frequently at large scale or if invalidations lower cache hit rate and increase origin egress.",
-  },
-  {
-    q: "What's the common cause of high invalidation volume?",
-    a: "Cache-busting patterns that invalidate broad wildcards (like /*) or frequent deployments that invalidate many paths repeatedly.",
-  },
-  {
-    q: "How do I reduce invalidation-related costs?",
-    a: "Prefer versioned asset URLs (content hashes) so old objects can expire naturally, narrow invalidation scope, and use longer TTLs where safe.",
-  },
-];
+  "A practical guide to CloudFront invalidation costs: what to count, why broad invalidations reduce cache hit rate, and safer cache-busting patterns that avoid repeated invalidations.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudfront-invalidation-pricing"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Do invalidations usually dominate CDN cost?",
+      a: "Usually no. Bandwidth and request fees are often larger. But invalidations can become a real line item at scale, and they can indirectly increase cost by lowering cache hit rate.",
+    },
+    {
+      q: "What is the most common cause of high invalidation volume?",
+      a: "Frequent deployments that invalidate many paths repeatedly, especially broad wildcards like /*.",
+    },
+    {
+      q: "What's the safest way to reduce invalidations?",
+      a: "Use versioned asset URLs (content hashes) so old objects can expire naturally, and scope invalidations to the few paths that truly changed.",
+    },
+  ]}
 >
-  <p class="muted">
-    Invalidations are part of operating a CDN. The cost impact is often indirect: aggressive invalidation reduces cache
-    hit rate and can push more traffic to the origin (cache fill / origin egress).
+  <p>
+    Invalidations are part of operating a CDN, but their cost impact is often <strong>indirect</strong>: aggressive
+    invalidation lowers cache hit rate and pushes more traffic to the origin (origin requests + origin egress).
   </p>
 
-  <h2>What to count</h2>
+  <h2>What counts as "invalidation volume"</h2>
   <ul>
-    <li>How often you invalidate (deploy frequency)</li>
-    <li>How many paths you invalidate per deploy</li>
-    <li>Whether you invalidate broad wildcards (like /*)</li>
+    <li>
+      <strong>Batch count</strong>: how many invalidation requests you create per day/week (often tied to deploy frequency)
+    </li>
+    <li>
+      <strong>Paths per batch</strong>: explicit paths + wildcard paths
+    </li>
+    <li>
+      <strong>Blast radius</strong>: whether you invalidate popular objects or broad patterns (for example, <code>/*</code>)
+    </li>
   </ul>
 
-  <h2>Why invalidations can increase total cost</h2>
+  <h2>Direct vs indirect costs</h2>
   <ul>
-    <li>Lower cache hit rate for popular objects</li>
-    <li>More origin requests and origin egress (cache fill)</li>
-    <li>More load on the API or origin layer during deploy windows</li>
+    <li>
+      <strong>Direct</strong>: CloudFront charges for invalidation requests beyond included quotas (check current pricing
+      for your account).
+    </li>
+    <li>
+      <strong>Indirect</strong>: reduced cache hit rate during deploy windows - more origin requests and origin egress.
+    </li>
+  </ul>
+  <p class="muted">
+    If you invalidate frequently, the indirect cost (origin egress + origin load) can be larger than the direct
+    invalidation line item.
+  </p>
+
+  <h2>A simple estimation workflow</h2>
+  <ol>
+    <li>Count invalidation batches/month.</li>
+    <li>Count paths invalidated per batch (wildcards included).</li>
+    <li>Identify which invalidated paths are popular (those drive the hit rate drop).</li>
+    <li>
+      Convert hit rate drop into origin traffic using the <a href="/guides/aws-cloudfront-cache-hit-rate/">hit rate model</a>.
+    </li>
+  </ol>
+
+  <h2>When invalidations are actually needed</h2>
+  <ul>
+    <li>
+      <strong>HTML / app shell</strong>: you may need to invalidate a small set of routes after deploys.
+    </li>
+    <li>
+      <strong>User-generated content</strong>: if you must purge quickly, invalidate only that prefix (for example, a single path subtree).
+    </li>
+    <li>
+      <strong>Security issues</strong>: broad invalidations are sometimes justified, but treat them as an operational event and measure impact.
+    </li>
   </ul>
 
-  <h2>Safer patterns</h2>
+  <h2>Safer patterns (avoid invalidations where possible)</h2>
   <ul>
-    <li>Use versioned asset URLs (hash-based filenames) for static assets.</li>
-    <li>Invalidate only the paths that truly changed.</li>
-    <li>Use sensible TTLs and caching headers so you invalidate less often.</li>
+    <li>
+      <strong>Version static assets</strong> with content hashes so deployments never need to purge JS/CSS/images.
+    </li>
+    <li>
+      <strong>Use a TTL strategy</strong>: long TTL for hashed assets; shorter TTL for HTML.
+    </li>
+    <li>
+      <strong>Invalidate narrowly</strong>: purge only the specific HTML routes that changed (avoid <code>/*</code>).
+    </li>
+    <li>
+      <strong>Avoid cache fragmentation</strong>: keep cache keys stable (do not forward unnecessary query strings/cookies).
+    </li>
+    <li>
+      <strong>Prefer versioned URLs over purges</strong>: if you can change the URL, you rarely need to invalidate.
+    </li>
   </ul>
-
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
-    <a class="btn" href="/guides/aws-cloudfront-cache-hit-rate/">Cache hit rate and origin egress</a>
-    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
-  </div>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Track hit rate before/after deploys to quantify real impact.</li>
+    <li>Track origin request and origin byte spikes during deploy windows.</li>
+    <li>Confirm your cache key policy so invalidations target the content you intend.</li>
+    <li>Confirm users see new content without requiring broad purges.</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Related links</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-cloudfront-cache-hit-rate/">Cache hit rate</a>
+    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudFront invalidations:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+    <li>
+      CloudFront pricing:{" "}
+      <a href="https://aws.amazon.com/cloudfront/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudfront/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

@@ -1,74 +1,112 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "ECR cost optimization (retention, smaller images, fewer pulls)";
+const title = "ECR cost optimization: retention, smaller images, fewer pulls";
 const description =
-  "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, and reduce redundant pulls in CI and clusters. Includes validation steps and related tools.";
-const faqs = [
-  {
-    q: "What's the biggest lever to reduce ECR cost?",
-    a: "Retention policies. Deleting old tags/images usually reduces stored GB-month more than any other change.",
-  },
-  {
-    q: "How can pulls create hidden costs?",
-    a: "Frequent CI pulls and cold starts can create large transfer volume, especially across billable network paths. Reducing redundant pulls and keeping traffic in-region can help.",
-  },
-  {
-    q: "Why do ECR bills spike?",
-    a: "CI rebuild frequency and tag retention. If pipelines push many images/day and retention is long, storage grows quickly. Multi-arch duplication can also add storage.",
-  },
-  {
-    q: "How do I validate improvements?",
-    a: "Measure stored GB-month and pull traffic for a representative week. After retention/image changes, confirm storage and pulls drop without breaking rollback needs.",
-  },
-];
+  "A high-leverage playbook to reduce AWS ECR cost: enforce retention, shrink images, reduce redundant pulls in CI and clusters, and validate savings without breaking rollbacks.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecr-cost-optimization"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What's the biggest lever to reduce ECR cost?",
+      a: "Retention policies. Deleting old tags/images usually reduces stored GB-month more than any other change.",
+    },
+    {
+      q: "How do pulls create hidden costs?",
+      a: "Frequent CI pulls and cluster scale-outs can create large transfer volume. The cost depends on network boundaries (same region vs cross-region vs internet/NAT).",
+    },
+  ]}
 >
-  <p class="muted">
-    ECR cost reduction is mostly about reducing stored GB-month and avoiding unnecessary transfer. The highest impact
-    changes are operational, not micro-optimizations.
+  <p>
+    ECR cost reduction is mostly about two drivers: <strong>stored GB-month</strong> and <strong>transfer</strong>. The
+    highest impact changes are operational: retention, image size, and avoiding redundant pulls.
   </p>
 
-  <h2>1) Enforce retention policies</h2>
+  <h2>Step 0: identify your dominant driver</h2>
   <ul>
-    <li>Keep only the last N tags per repo (or last D days) for CI images.</li>
+    <li>
+      <strong>Storage dominates</strong>: lots of tags, long retention, large images, multi-arch duplication.
+    </li>
+    <li>
+      <strong>Transfer dominates</strong>: frequent pulls from CI and autoscaling clusters, especially across boundaries.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost calculator</a>
+    <a class="btn" href="/guides/aws-ecr-pricing/">ECR pricing</a>
+  </div>
+
+  <h2>1) Enforce retention policies (highest leverage)</h2>
+  <ul>
+    <li>Keep only last N tags per repo (or last D days) for CI images.</li>
     <li>Delete untagged images and old build artifacts.</li>
     <li>Keep long retention only for pinned releases and rollback candidates.</li>
+    <li>Separate prod vs non-prod repos/tags so non-prod can have aggressive retention safely.</li>
   </ul>
+  <p class="muted">
+    If you are unsure, start with a conservative retention window and expand only for repos that need rollback depth.
+  </p>
 
-  <h2>2) Shrink images</h2>
+  <h2>2) Shrink images (reduces both storage and transfer)</h2>
   <ul>
     <li>Use multi-stage builds and slim base images.</li>
     <li>Remove build tools and caches from runtime images.</li>
-    <li>Prefer fewer layers and avoid copying large artifacts unintentionally.</li>
+    <li>Keep layers stable (small diffs) so rebuilds do not rewrite huge layers each time.</li>
+    <li>Audit large artifacts (node_modules, debug symbols, logs) that accidentally end up in images.</li>
   </ul>
 
-  <h2>3) Reduce redundant pulls</h2>
+  <h2>3) Reduce redundant pulls (CI and autoscaling are the usual source)</h2>
   <ul>
     <li>Use node-level caching and avoid re-pulling identical tags unnecessarily.</li>
-    <li>Keep CI runners and clusters in the same region/account where possible.</li>
-    <li>Use immutable tags/digests to avoid accidental cache misses.</li>
+    <li>Prefer immutable tags/digests so caching is reliable.</li>
+    <li>Keep CI runners and clusters in the same region when possible (avoid cross-region pulls).</li>
+    <li>During cluster scale-out, confirm new nodes are not pulling multiple times per deployment.</li>
+  </ul>
+
+  <h2>4) Avoid duplication (multi-arch and multi-region)</h2>
+  <ul>
+    <li>Multi-arch builds can store multiple variants; validate whether you need all architectures.</li>
+    <li>Multi-region replication can reduce transfer but increases storage (multiple copies of the same images).</li>
+    <li>Keep replication only for workloads that truly run cross-region.</li>
+  </ul>
+
+  <h2>Operational guardrails (prevent future cost creep)</h2>
+  <ul>
+    <li>Set default retention rules for new repos (teams rarely come back later).</li>
+    <li>Standardize tagging: release tags are limited; CI tags are short-lived.</li>
+    <li>Track top repos by stored GB-month and review quarterly.</li>
+    <li>During incidents and big deploys, watch for pull storms from fresh nodes.</li>
   </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Measure stored GB-month by repo and confirm retention is actually deleting.</li>
-    <li>Measure pull traffic: CI and autoscaling events often dominate.</li>
+    <li>Measure stored GB-month by repo class and confirm retention is actually deleting.</li>
+    <li>Measure pull traffic during autoscaling days and CI bursts (not just steady state).</li>
     <li>Confirm rollback behavior still works after reducing retention.</li>
+    <li>After changes, compare a real month of storage and transfer to your estimate.</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost</a>
-    <a class="btn" href="/guides/aws-ecr-estimate-storage-gb-month/">Estimate storage GB-month</a>
-    <a class="btn" href="/guides/aws-ecr-pricing/">ECR pricing</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-  </div>
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      ECR pricing:{" "}
+      <a href="https://aws.amazon.com/ecr/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ecr/pricing
+      </a>
+    </li>
+    <li>
+      ECR lifecycle policies:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/lifecycle-policies.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
-

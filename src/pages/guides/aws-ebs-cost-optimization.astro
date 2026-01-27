@@ -1,74 +1,129 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS EBS cost optimization (high-leverage fixes)";
+const title = "EBS cost optimization: volumes, IOPS/throughput, and snapshots";
 const description =
-  "A practical playbook to reduce EBS spend: right-size volumes, avoid over-provisioned IOPS/throughput, and manage snapshots intentionally. Includes validation steps and related tools.";
-const faqs = [
-  {
-    q: "What's the fastest way to cut EBS cost?",
-    a: "Right-size volume GB and remove over-provisioned IOPS/throughput. These changes reduce recurring spend immediately.",
-  },
-  {
-    q: "Can snapshots create recurring costs?",
-    a: "Yes. Snapshot storage becomes a steady monthly cost if retention is long or data churn is high.",
-  },
-  {
-    q: "Why do teams overpay for EBS performance?",
-    a: "They provision for peak 24/7. Peaks are often rare (backups, migrations, batch). Validate performance needs with real metrics before paying for permanent high IOPS/throughput.",
-  },
-  {
-    q: "How do I validate that rightsizing is safe?",
-    a: "Use a staged approach: shrink/adjust non-critical volumes first, validate latency and queue depth, and keep rollback options (snapshots/AMIs) for critical workloads.",
-  },
-];
+  "A practical playbook to reduce EBS spend: right-size volume GB, choose the right volume type (gp2 vs gp3), avoid over-provisioned IOPS/throughput, and control snapshot growth safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-cost-optimization"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What usually drives EBS spend?",
+      a: "Volume GB-month plus (for some types) provisioned IOPS and throughput. Snapshots can become a second major driver over time.",
+    },
+    {
+      q: "What's the fastest safe EBS cost win?",
+      a: "Delete unattached volumes and right-size oversized volumes. Then consider gp2 to gp3 migrations if performance needs allow.",
+    },
+  ]}
 >
-  <p class="muted">
-    EBS spend is often quiet but constant. Small over-provisioning across many volumes becomes a large monthly bill. The
-    best savings come from right-sizing capacity and paying for performance only where it is actually needed.
+  <p>
+    EBS cost is usually not “mysterious”: it’s mostly <strong>GB-month</strong>, plus <strong>IOPS/throughput</strong>
+    for some volume types, plus <strong>snapshots</strong>. The waste comes from unattached volumes, oversized volumes,
+    and default performance settings that are higher than required.
   </p>
 
-  <h2>1) Right-size GB first</h2>
+  <h2>Step 0: identify your dominant driver</h2>
   <ul>
-    <li>Identify volumes with low utilization and reduce size where safe.</li>
-    <li>Forecast growth so you don't over-provision far ahead.</li>
-    <li>Remove unused volumes left behind by old instances and experiments.</li>
+    <li>
+      <strong>Capacity</strong>: large volumes provisioned far above actual usage.
+    </li>
+    <li>
+      <strong>Performance</strong>: provisioned IOPS/throughput set above what workloads use.
+    </li>
+    <li>
+      <strong>Snapshots</strong>: long retention and frequent snapshots on large changing datasets.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost</a>
+  </div>
+
+  <h2>High-leverage savings levers</h2>
+  <ul>
+    <li>
+      <strong>Delete unattached volumes</strong>: orphaned volumes accumulate after instance termination and migrations.
+    </li>
+    <li>
+      <strong>Right-size GB</strong>: reduce volume size where safe (after validating used space and growth).
+    </li>
+    <li>
+      <strong>Choose the right type</strong>: gp3 often provides better cost control than gp2 for many workloads.
+    </li>
+    <li>
+      <strong>Right-size IOPS/throughput</strong>: set based on measured utilization, not defaults.
+    </li>
+    <li>
+      <strong>Snapshot lifecycle</strong>: keep only what you need; avoid keeping daily snapshots forever.
+    </li>
   </ul>
 
-  <h2>2) Avoid paying for unused performance</h2>
+  <h2>Common cost traps</h2>
   <ul>
-    <li>Compare provisioned IOPS/throughput to actual usage.</li>
-    <li>Keep a typical and peak scenario (peaks are often batch or maintenance windows).</li>
-    <li>Reduce provisioned performance and validate latency/queue depth.</li>
+    <li>Oversized root volumes (default AMI settings) across large fleets.</li>
+    <li>Provisioned performance far above actual usage (especially for “just in case”).</li>
+    <li>Snapshots without lifecycle policies, retained indefinitely.</li>
+    <li>Staging/dev volumes with production-sized disks and retention policies.</li>
   </ul>
 
-  <h2>3) Treat snapshots as a policy, not a default</h2>
+  <h2>Snapshot cost drivers (what actually increases snapshot GB)</h2>
   <ul>
-    <li>Set retention intentionally (keep only what you need).</li>
-    <li>Reduce churn where possible (churn drives snapshot growth).</li>
-    <li>Audit policies and clean up unused snapshots.</li>
+    <li>
+      <strong>Change rate</strong>: snapshots store changed blocks over time; write-heavy workloads can grow snapshot usage.
+    </li>
+    <li>
+      <strong>Retention</strong>: keeping daily snapshots for months usually dominates.
+    </li>
+    <li>
+      <strong>Copies</strong>: copied snapshots across regions or accounts create additional stored GB.
+    </li>
   </ul>
+  <p class="muted">
+    If snapshots are a top line item, start by reviewing retention and copies before touching performance settings.
+  </p>
+
+  <h2>Right-sizing workflow (practical)</h2>
+  <ol>
+    <li>List top volumes by GB-month cost and identify unattached volumes.</li>
+    <li>For each class, measure used space, growth, and p95 IOPS/throughput.</li>
+    <li>Decide: reduce size, change type (gp2 vs gp3), or reduce provisioned performance.</li>
+    <li>Validate in canary, then roll across the fleet with monitoring and rollback.</li>
+  </ol>
+  <p class="muted">
+    Related: <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>,{" "}
+    <a href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS and throughput sizing</a>.
+  </p>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate storage utilization, IOPS, throughput, and latency for a representative week.</li>
-    <li>Compare peak windows (backups/migrations) separately from steady state.</li>
-    <li>After changes, confirm application SLOs and storage latency remain stable.</li>
+    <li>For each volume class, measure used space and growth rate (busy month included).</li>
+    <li>Measure IOPS and throughput utilization before changing performance settings.</li>
+    <li>For gp2->gp3 changes, validate latency and throughput under representative load.</li>
+    <li>After snapshot policy changes, validate restore requirements (RPO/RTO) are still met.</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
-    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost</a>
-    <a class="btn" href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS/throughput</a>
-    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
-  </div>
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      EBS pricing:{" "}
+      <a href="https://aws.amazon.com/ebs/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/ebs/pricing
+      </a>
+    </li>
+    <li>
+      EBS volume types:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
-

@@ -1,75 +1,115 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate CloudWatch custom metrics (quick methods)";
+const title = "Estimate CloudWatch custom metrics (time series count)";
 const description =
-  "A practical way to estimate CloudWatch custom metrics count: start from services x metrics, then multiply dimensions carefully to avoid high-cardinality surprises.";
+  "How to estimate CloudWatch custom metric volume for cost models: count unique time series (metric name * dimension combinations), model high-cardinality dimensions, and validate with inventory methods.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-metrics-estimate-custom-metrics"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
-      q: "What's the fastest way to estimate custom metrics count?",
-      a: "Start from services x key metrics per service, then multiply by the dimensions you actually use (cluster/namespace/pod/etc).",
+      q: "What is the right unit to estimate for custom metrics?",
+      a: "Time series (unique metric + dimension combination). Cost often scales with how many unique series you emit, not how many datapoints you write.",
     },
     {
-      q: "What's the #1 mistake in metrics estimates?",
-      a: "High-cardinality dimensions (like pod_id or user_id) that multiply the number of unique series/metrics.",
+      q: "What causes custom metric estimates to be wrong?",
+      a: "High-cardinality dimensions (podId, tenantId, userId), copying metrics across environments, and multiple agents exporting the same metrics under different names.",
     },
   ]}
 >
+  <p>
+    For CloudWatch custom metrics, the key planning input is the number of <strong>unique time series</strong>. A time
+    series is typically one metric name plus one specific set of dimension values. If you add a dimension that has many
+    unique values, you multiply your series count quickly.
+  </p>
+
+  <h2>Step 0: the basic formula</h2>
+  <p class="muted">Time series ~= metric names * unique dimension combinations * environments</p>
+  <ul>
+    <li>If a metric has no dimensions, each metric name is usually one series per environment.</li>
+    <li>If a metric has dimensions (service, region, statusCode, etc.), each combination becomes a separate series.</li>
+  </ul>
+
+  <h2>Step 1: inventory where custom metrics come from</h2>
+  <ul>
+    <li>
+      <strong>App instrumentation</strong>: custom business and service metrics you emit (latency, error rate, queue lag).
+    </li>
+    <li>
+      <strong>Agents</strong>: exporters (Kubernetes/EC2 agents) that emit per-node/pod/container metrics.
+    </li>
+    <li>
+      <strong>Log-based metrics</strong>: metric filters that turn log patterns into metrics.
+    </li>
+  </ul>
+
+  <h2>Step 2: identify "multipliers" (the cardinality drivers)</h2>
+  <ul>
+    <li>
+      <strong>Per instance/pod</strong>: instanceId, podName, containerId -> series scale with fleet size.
+    </li>
+    <li>
+      <strong>Per tenant/customer</strong>: tenantId/customerId -> series scale with customer growth.
+    </li>
+    <li>
+      <strong>Per endpoint</strong>: path/method -> series scale with API surface area.
+    </li>
+    <li>
+      <strong>Per region/AZ</strong>: region/az -> series multiply across deployment topology.
+    </li>
+  </ul>
   <p class="muted">
-    For planning, you want a reasonable estimate of "how many distinct metrics/series will I pay for?" You can get close
-    with a simple approach: base metrics x dimensions.
+    If a dimension is unbounded (new values keep appearing), treat it as a risk and model a growth scenario.
   </p>
 
-  <h2>1) Start from services and key metrics</h2>
-  <p>
-    List your services (or teams) and the key metrics you actually alert on or dashboard. Start small; avoid counting
-    every default metric.
-  </p>
+  <h2>Three practical estimation methods</h2>
+  <ul>
+    <li>
+      <strong>From instrumentation config</strong>: count metric names and dimension sets in your code or monitoring-as-code templates.
+    </li>
+    <li>
+      <strong>From agent inventory</strong>: estimate per-node/per-pod metric series and multiply by average fleet size.
+    </li>
+    <li>
+      <strong>From CloudWatch inventory</strong>: count active time series by namespace and dimension keys from a representative week.
+    </li>
+  </ul>
 
-  <h2>2) Multiply dimensions carefully</h2>
-  <p>
-    Each dimension label can multiply the number of unique series. For example:
-    <br />
-    <strong>service x environment x cluster x namespace x pod</strong> can explode quickly.
-  </p>
+  <h2>Worked example (why dimensions matter)</h2>
+  <ul>
+    <li>Metric: <code>http_requests</code> with dimensions service and status</li>
+    <li>Services: 12, statuses: 5 -> combinations: 60</li>
+    <li>Environments: prod + staging -> 120 series</li>
+    <li>If you add a tenantId dimension with 1,000 tenants -> 120,000 series</li>
+  </ul>
+  <p class="muted">This is why "one extra dimension" can dominate the entire CloudWatch bill.</p>
 
-  <h2>3) Validate with real counts</h2>
-  <p>
-    When you have metrics, validate the actual number of custom metrics/active series in your billing/monitoring view and
-    update your model.
-  </p>
-
-  <h2>4) Use a calculator for monthly cost</h2>
-  <p>
-    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch Metrics Cost Calculator</a> to translate your
-    custom metrics + alarms + dashboards into a monthly estimate.
-  </p>
-
-  <h2>Related guides</h2>
+  <h2>Turn series into cost</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-pricing/">CloudWatch metrics pricing</a>
-    <a class="btn" href="/guides/aws-cloudwatch-dashboards-pricing/">CloudWatch dashboards pricing</a>
-    <a class="btn" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">Estimate metrics API requests</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
+    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a>
   </div>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>List the top namespaces and the top dimensions used (those explain most series).</li>
+    <li>Model baseline vs busy month (fleet size and tenant growth scenarios).</li>
+    <li>Confirm you don't have duplicated exporters emitting equivalent series.</li>
+    <li>Once deployed, compare estimate vs measured active series from a real week.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudWatch pricing:{" "}
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudwatch/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

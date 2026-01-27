@@ -3,79 +3,141 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "CloudFront logs cost: estimate storage, retention, and queries";
 const description =
-  "How to estimate CloudFront log costs: log volume (GB/day), retention (GB-month), and downstream query/scan costs in log analytics tools. Includes practical cost-control levers.";
-const faqs = [
-  {
-    q: "What is the common surprise with CDN logs?",
-    a: "The downstream bill. Storage and especially query/scan costs can exceed the CDN log delivery line item, particularly during incident response or frequent dashboards.",
-  },
-  {
-    q: "What inputs do I need to estimate log cost?",
-    a: "Average log ingestion volume (GB/day), retention days, and your query/scan habits (how often you run searches and how many GB you scan).",
-  },
-  {
-    q: "How do I reduce log costs without losing visibility?",
-    a: "Shorten retention for noisy logs, sample high-volume endpoints, and avoid repeated large scans by improving filters, partitions, and dashboards.",
-  },
-];
+  "How to estimate CloudFront log costs: log volume (GB/day), retention (GB-month), and downstream query/scan costs (Athena/SIEM). Includes practical cost-control levers.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudfront-logs-cost"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "What is the common surprise with CDN logs?",
+      a: "The downstream bill. Storage and especially query/scan costs can exceed the logging line item, particularly during incident response or heavy dashboards.",
+    },
+    {
+      q: "What inputs do I need to estimate log cost?",
+      a: "Average log ingestion volume (GB/day), retention days, and query/scan habits (how often you search and how many GB you scan).",
+    },
+    {
+      q: "How do I reduce log costs without losing visibility?",
+      a: "Use retention tiers, avoid repeated broad scans, and route only high-value signals into expensive tooling. Optimize query patterns and partitioning.",
+    },
+  ]}
 >
   <p>
-    CloudFront log costs are usually not "CloudFront pricing" itself. They show up as storage, analytics, and SIEM
-    ingestion. Estimate them like any other log pipeline: ingestion, retention, and scan/query.
+    CloudFront log costs rarely show up as a single “CloudFront fee”. They usually appear as <strong>S3 storage</strong>,
+    <strong>analytics scans</strong>, and <strong>SIEM/log platform ingestion</strong>. Estimate them like any other log
+    pipeline: ingestion, retention, and query/scan.
+  </p>
+
+  <h2>Step 0: know which log stream you enabled</h2>
+  <ul>
+    <li>
+      <strong>Standard access logs</strong>: delivered to an S3 bucket; your costs are mostly S3 + analytics on top.
+    </li>
+    <li>
+      <strong>Real-time logs</strong>: delivered to a real-time destination (often a stream); costs depend on the
+      pipeline you choose.
+    </li>
+  </ul>
+  <p class="muted">
+    If you forward logs into another platform (CloudWatch Logs, Datadog, Splunk, etc.), include that platform’s ingestion
+    and retention pricing as well.
   </p>
 
   <h2>1) Estimate log ingestion (GB/day)</h2>
   <p>
-    Start from request volume and average bytes per log line if you do not have measured ingestion yet. If you already
-    ship logs into a tool, use the measured GB/day.
+    A rough model starts from request volume: standard access logs are “about one record per request”. The missing
+    variable is <strong>bytes per log line</strong>, which depends on fields and header lengths.
   </p>
+  <ul>
+    <li>requests/day × bytes/log ~= bytes/day</li>
+    <li>bytes/day / 1e9 ~= GB/day</li>
+  </ul>
   <p class="muted">
-    Guide: <a href="/guides/estimate-log-ingestion-gb-per-day/">estimate log ingestion (GB/day)</a>.
+    Related: <a href="/guides/estimate-log-ingestion-gb-per-day/">estimate log ingestion (GB/day)</a>.
   </p>
 
-  <h2>2) Convert retention into GB-month</h2>
+  <h2>2) Convert retention into GB-month (storage baseline)</h2>
   <p class="muted">
-    Steady-state model: retention GB-month is approximately ingestion GB/day x retention days.
+    Steady-state model: retained GB ~= ingestion GB/day × retention days.
   </p>
   <p>
     Guide: <a href="/guides/log-retention-storage-cost/">log retention storage cost</a>.
   </p>
 
-  <h2>3) Add query/scan costs (the line item that can dominate)</h2>
+  <h2>3) Add query/scan costs (often dominates)</h2>
   <ul>
-    <li>How often you query (dashboards, incident response, scheduled jobs)</li>
-    <li>How many GB you scan per query</li>
+    <li>
+      <strong>Frequency</strong>: dashboards, scheduled jobs, incident response searches
+    </li>
+    <li>
+      <strong>Scan size</strong>: GB scanned per query (filters and partitions change this dramatically)
+    </li>
+    <li>
+      <strong>Downstream joins</strong>: combining CDN logs with app logs and WAF logs increases scan volume
+    </li>
   </ul>
   <p class="muted">
-    Tooling: <a href="/calculators/log-search-scan-cost-calculator/">log search scan cost</a>.
+    Tool: <a href="/calculators/log-search-scan-cost-calculator/">log search scan cost</a>.
   </p>
 
-  <h2>Related guides</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
-    <a class="btn" href="/guides/log-costs/">Estimating log costs</a>
-    <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
-  </div>
+  <h2>Cost control levers (keep visibility)</h2>
+  <ul>
+    <li>
+      <strong>Retention tiers</strong>: short retention for raw logs; longer retention for aggregated/security signals.
+    </li>
+    <li>
+      <strong>Partition well</strong>: store logs by date prefix so queries scan days, not months.
+    </li>
+    <li>
+      <strong>Avoid repeated broad scans</strong>: use targeted queries and dashboards that don’t scan “all time”.
+    </li>
+    <li>
+      <strong>Route selectively</strong>: forward only high-value subsets (errors, specific paths, security events) into
+      expensive tooling.
+    </li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Measure actual log GB/day from the destination (S3, CloudWatch, SIEM) for a representative week.</li>
+    <li>Confirm retention settings and lifecycle policies (including any replicated copies).</li>
+    <li>Measure query scan GB for your real dashboards and incident playbooks.</li>
   </ul>
 
-  <h2>Related reading</h2>
+  <h2>Related links</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
+    <a class="btn" href="/guides/aws-cloudfront-pricing/">CloudFront pricing</a>
+    <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
+    <a class="btn" href="/guides/log-costs/">Log costs (overview)</a>
   </div>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudFront logging:{" "}
+      <a
+        href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+    <li>
+      S3 pricing (common storage destination):{" "}
+      <a href="https://aws.amazon.com/s3/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/s3/pricing
+      </a>
+    </li>
+    <li>
+      Athena pricing (common query engine):{" "}
+      <a href="https://aws.amazon.com/athena/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/athena/pricing
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

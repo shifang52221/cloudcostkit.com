@@ -1,77 +1,115 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "DynamoDB RCU/WCU explained (for cost estimates)";
+const title = "DynamoDB RCU/WCU explained (with sizing examples)";
 const description =
-  "Understand how reads and writes translate to DynamoDB capacity and cost drivers: item size, consistency, and the pitfalls that break estimates. Includes validation steps and related tools.";
-const faqs = [
-  {
-    q: "Why does item size matter for DynamoDB cost?",
-    a: "Capacity consumption is sensitive to item size. Larger items consume more read/write capacity and increase storage and transfer costs.",
-  },
-  {
-    q: "Do strongly consistent reads cost more?",
-    a: "They can consume more read capacity than eventually consistent reads. For estimates, model both scenarios if you are not sure.",
-  },
-  {
-    q: "What breaks DynamoDB estimates most often?",
-    a: "Hot partitions, retries/timeouts, and oversized items. These can multiply requests and capacity usage compared to the simple average model.",
-  },
-  {
-    q: "How do I validate the estimate?",
-    a: "Measure real request rates and item sizes for a representative window, then compare predicted cost drivers against billing and throttling metrics.",
-  },
-];
+  "A practical explanation of DynamoDB read and write capacity units (RCU/WCU): how item size affects units, how to estimate from requests, and the pitfalls that make estimates wrong.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-dynamodb-rcu-wcu-explained"
-  lastUpdated="2026-01-22"
-  faqs={faqs}
+  lastUpdated="2026-01-27"
+  faqs={[
+    {
+      q: "Why does item size matter so much for DynamoDB cost?",
+      a: "Because read and write units are tied to how much data an operation processes. Larger items consume more units per request.",
+    },
+    {
+      q: "Are scans always expensive?",
+      a: "Scans can be expensive because they read many items to return a small subset. If you scan large ranges routinely, reads often dominate the bill.",
+    },
+  ]}
 >
-  <p class="muted">
-    Even if you use on-demand pricing, it helps to understand RCU/WCU because the underlying driver is still how much
-    work the database does. The two most common estimate breakers are item size and hot partitions.
+  <p>
+    DynamoDB pricing is often described as “RCU/WCU”, but the part that trips teams up is that units are not “one request
+    equals one unit”. The effective units depend on <strong>item size</strong>, <strong>access pattern</strong>, and
+    whether you scan or query targeted keys.
   </p>
 
-  <h2>1) The two drivers: read work and write work</h2>
+  <h2>Step 1: define what you need to size</h2>
   <ul>
-    <li><strong>Reads</strong>: scale with request rate, item size, and consistency.</li>
-    <li><strong>Writes</strong>: scale with write rate and item size.</li>
+    <li>
+      <strong>Reads</strong>: requests/second and average item size returned (plus worst-case ranges).
+    </li>
+    <li>
+      <strong>Writes</strong>: writes/second and average item size written.
+    </li>
+    <li>
+      <strong>Extras</strong>: GSIs and transactional operations can change effective units.
+    </li>
   </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost calculator</a>
+    <a class="btn" href="/guides/aws-dynamodb-pricing/">DynamoDB pricing</a>
+  </div>
 
-  <h2>2) Practical budgeting approach</h2>
-  <ul>
-    <li>Estimate monthly read and write request volume.</li>
-    <li>Estimate average item size (and consider a typical vs peak scenario).</li>
-    <li>Use a blended effective rate that matches your region and plan.</li>
-  </ul>
+  <h2>Step 2: the “item size multiplier” intuition</h2>
   <p class="muted">
-    Tool: <a href="/calculators/aws-dynamodb-cost-calculator/">AWS DynamoDB Cost Calculator</a>
+    If you double the item size, you often increase the consumed capacity per operation. This is why data shape changes
+    can change the bill without any traffic change.
   </p>
-
-  <h2>3) Common pitfalls that inflate cost</h2>
   <ul>
-    <li><strong>Large items</strong>: bigger payloads increase both request cost and storage.</li>
-    <li><strong>Hot partitions</strong>: uneven access causes throttling and retries (more billable attempts).</li>
-    <li><strong>Retries and timeouts</strong>: failures can turn 1 request into many billable attempts.</li>
-    <li><strong>Chatty access patterns</strong>: many small requests rather than batched reads/writes.</li>
+    <li>Small items: per-request units are closer to the minimum.</li>
+    <li>Large items: per-request units increase; scans become especially expensive.</li>
+    <li>Indexes: writing one item can mean writing multiple index entries.</li>
+  </ul>
+
+  <h2>Step 3: sizing examples (planning)</h2>
+  <p>
+    Treat these as workflow examples, not exact pricing rules. Always validate with official pricing and measured
+    consumption for your table.
+  </p>
+  <ul>
+    <li>
+      <strong>Example A (reads)</strong>: 200 read requests/second, small items, mostly key queries -> reads dominate by request volume.
+    </li>
+    <li>
+      <strong>Example B (writes)</strong>: 50 write requests/second, large items, multiple indexes -> writes dominate due to amplification.
+    </li>
+    <li>
+      <strong>Example C (scan trap)</strong>: “find recent failures” implemented as a scan -> reads dominate because you read many items to return a few.
+    </li>
+  </ul>
+
+  <h2>How to estimate in practice</h2>
+  <ol>
+    <li>Measure request volume (baseline + busy month).</li>
+    <li>Measure item sizes (average and p95) for read and write paths.</li>
+    <li>List GSIs and determine which write paths update them.</li>
+    <li>Identify scans and replace with key-based queries where possible.</li>
+  </ol>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Assuming one request equals one unit (item size changes it).</li>
+    <li>Forgetting that GSIs add write amplification and storage copies.</li>
+    <li>Ignoring retries/timeouts that multiply requests during incidents.</li>
+    <li>Using scans for user-facing traffic or dashboards.</li>
   </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Measure request rates and item sizes for at least 7 days.</li>
-    <li>Check for hot keys/partitions and retry loops.</li>
-    <li>After changes, confirm throttling and retry volume drop.</li>
+    <li>Validate item size distribution (average and p95) from real items.</li>
+    <li>Validate what percent of reads are scans vs queries.</li>
+    <li>Validate GSI count and projections; quantify amplification.</li>
+    <li>After changes, compare a real week of usage and adjust your model.</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/aws-dynamodb-pricing/">DynamoDB pricing</a>
-    <a class="btn" href="/guides/aws-dynamodb-cost-optimization/">DynamoDB optimization</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
-  </div>
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      DynamoDB pricing:{" "}
+      <a href="https://aws.amazon.com/dynamodb/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/dynamodb/pricing
+      </a>
+    </li>
+    <li>
+      DynamoDB developer guide:{" "}
+      <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html" rel="nofollow noopener" target="_blank">
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
 

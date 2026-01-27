@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Storage calculators | ${SITE.name}`;
+const description =
+  "Storage cost calculators for object storage GB-month, requests, replication/copies, archival retrieval, and storage growth over time.";
+const slots = SITE.adsenseSlots;
+
+const tools = TOOLS.filter((t) => t.category === "Storage");
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/storage">
+  <section class="card hero">
+    <h1>Storage calculators</h1>
+    <p>Model GB-month stored, request fees, replication/copies, and egress separately to avoid surprises.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/storage-costs/">Guide: storage costs</a>
+      <a class="btn" href="/guides/backups-and-snapshots-costs/">Guide: backups & snapshots</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">What to include</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Average stored size (GB-month), not just end-of-month size.</li>
+        <li>Requests (GET/PUT/LIST) for small-object and high-request workloads.</li>
+        <li>Replication/copy volume (changed GB/month), not total stored GB.</li>
+        <li>Egress for reads to internet/CDN/or other regions.</li>
+      </ul>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Validation checklist</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Validate storage class mix and lifecycle transitions (hot → cold → archive).</li>
+        <li>Validate whether pricing uses GB vs GiB and per-1k vs per-10k request units.</li>
+        <li>Separate CDN bandwidth from origin egress to avoid double-counting.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} storage tools</div>
+    <div class="grid">
+      {tools.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}/`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+</BaseLayout>
+

@@ -3,23 +3,23 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "How to reduce logging and observability costs (without losing signal)";
 const description =
-  "Practical techniques to reduce log and metrics costs: sampling, retention tiers, label hygiene, and source-side filtering - with calculators to quantify impact.";
+  "Practical techniques to reduce log and metrics costs: source-side filtering, sampling, retention strategy, and label/cardinality hygiene — with calculators to quantify savings and a validation checklist.";
 const faqs = [
   {
     q: "What usually drives logging cost spikes?",
-    a: "Volume and cardinality. Common causes are debug logs left on, noisy endpoints, retry storms during incidents, high-cardinality labels in metrics, and verbose access logs.",
+    a: "Ingestion volume and cardinality. Common causes are debug logs left on, noisy endpoints, retry storms during incidents, high-cardinality labels in metrics, and verbose access logs.",
   },
   {
     q: "Is sampling safe?",
-    a: "Sampling is safest when you keep full fidelity for errors and important events, and sample low-value logs (debug/info) at the source. Always validate that you can still answer your core questions.",
+    a: "Sampling is safest when you keep full fidelity for errors and important events, and sample low-value logs (debug/info) at the source. Validate that your core investigations still work.",
   },
   {
-    q: "What's the best first lever?",
-    a: "Source-side filtering and format hygiene. Dropping low-value logs before ingestion typically beats any downstream tuning because it reduces ingestion, retention, and query costs together.",
+    q: "What’s the best first lever?",
+    a: "Source-side filtering. Dropping low-value logs before ingestion reduces ingestion, retention, and query costs together.",
   },
   {
     q: "How do I quantify savings quickly?",
-    a: "Estimate current ingestion GB/day and scan/query volume, then model a reduction factor (for example -30% ingestion) and compare monthly costs.",
+    a: "Estimate current ingestion GB/day and retention days. Model a reduction factor (e.g., -30% ingestion) and compare monthly costs before/after.",
   },
 ];
 ---
@@ -27,48 +27,114 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-logging-cost-reduction"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    Observability cost usually grows because volume and cardinality grow silently. The best reductions come from removing
-    low-value data before it is ingested, and keeping high-value data longer.
+    Observability bills usually grow because <strong>volume</strong> and <strong>cardinality</strong> grow silently. The
+    highest-leverage reductions come from removing low-value data <em>before</em> it’s ingested, while keeping the high
+    value signals (errors, latency, key business events) reliable for debugging.
   </p>
 
-  <h2>High-impact levers (in priority order)</h2>
+  <h2>What to measure first (so you optimize the right thing)</h2>
   <ul>
-    <li><strong>Source-side filtering</strong>: drop noisy logs before shipping.</li>
-    <li><strong>Sampling</strong>: keep full fidelity for errors, sample debug/info.</li>
-    <li><strong>Retention tiers</strong>: short retention for hot logs, longer retention for sparse high-value logs.</li>
-    <li><strong>Label hygiene</strong>: avoid high-cardinality labels in metrics.</li>
+    <li><strong>Log ingestion</strong>: GB/day by source (service, endpoint, environment)</li>
+    <li><strong>Retention</strong>: days kept per log group / category</li>
+    <li><strong>Query/scan</strong>: how much you scan/search (this can be a separate bill)</li>
+    <li><strong>Metrics series</strong>: time series count and top high-cardinality labels</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log search/scan cost</a>
+    <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost</a>
+  </div>
+
+  <h2>High-impact levers (priority order)</h2>
+  <ol>
+    <li>
+      <strong>Source-side filtering</strong>: drop noisy logs before shipping (debug/info for hot paths, health checks).
+    </li>
+    <li>
+      <strong>Sampling</strong>: keep full fidelity for errors; sample high-volume success logs.
+    </li>
+    <li>
+      <strong>Retention strategy</strong>: short retention for noisy logs, longer for sparse high-value logs.
+    </li>
+    <li>
+      <strong>Format hygiene</strong>: smaller structured logs (avoid huge JSON payloads, duplicate fields).
+    </li>
+    <li>
+      <strong>Cardinality hygiene</strong>: stop exploding metric labels (userId, requestId, full URL, stack traces as labels).
+    </li>
+  </ol>
+
+  <h2>1) Reduce volume at the source (the “saves everywhere” fix)</h2>
+  <ul>
+    <li>Turn off debug logs by default; use timeboxed flags for temporary debugging.</li>
+    <li>Drop low-value endpoints: health checks, static asset requests, frequent polling.</li>
+    <li>Collapse repetitive logs: “request started” + “request finished” can be merged or sampled.</li>
+    <li>Prefer counters and metrics for high-frequency events instead of logs.</li>
   </ul>
 
-  <h2>Quantify the impact</h2>
+  <h2>2) Sample without losing signal</h2>
+  <p>Sampling is safe when you keep the important paths unsampled:</p>
   <ul>
-    <li>
-      Start with ingestion: <a href="/calculators/log-cost-calculator/">log cost calculator</a> and{" "}
-      <a href="/guides/estimate-log-ingestion-gb-per-day/">estimate ingestion GB/day</a>.
-    </li>
-    <li>
-      Add query/scan: <a href="/calculators/log-search-scan-cost-calculator/">log search/scan cost</a>.
-    </li>
-    <li>
-      Metrics cardinality: <a href="/calculators/metrics-timeseries-cost-calculator/">metrics time series cost</a>.
-    </li>
+    <li><strong>Never sample</strong>: errors, warnings, security events, deployment markers.</li>
+    <li><strong>Sample</strong>: successful requests on hot endpoints, verbose debug/info logs.</li>
+    <li><strong>Keep traces</strong>: consider tracing for deep investigations instead of logging full payloads.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>3) Retention tiers (keep what matters longer)</h2>
   <ul>
-    <li>Reduce volume at the source, then validate you still catch errors and key business events.</li>
-    <li>Track a before/after week: ingestion GB/day, scan GB/day, and top noisy sources.</li>
-    <li>Set hard limits for debug logging (timeboxed feature flags).</li>
+    <li><strong>Hot</strong>: short retention for high-volume logs you rarely query.</li>
+    <li><strong>Warm</strong>: medium retention for operational investigations.</li>
+    <li><strong>Archive</strong>: long retention only for compliance and sparse high-value events.</li>
+  </ul>
+  <p class="muted">
+    A common mistake is uniform retention across everything; it turns low-value noise into a steady storage bill.
+  </p>
+
+  <h2>4) Fix the “incident multipliers”</h2>
+  <ul>
+    <li><strong>Retry storms</strong>: retries multiply both traffic and logs; fix timeouts and backoff.</li>
+    <li><strong>Deploy storms</strong>: temporary error spikes can create huge log bursts.</li>
+    <li><strong>Bot/noise</strong>: abusive traffic creates large access log volume with little business value.</li>
+  </ul>
+
+  <h2>5) Metrics cardinality hygiene (avoid the silent series explosion)</h2>
+  <ul>
+    <li>Don’t label metrics with high-uniqueness fields (requestId, userId, full path, stack trace).</li>
+    <li>Bucket values (status family, route template, tenant tier) instead of raw identifiers.</li>
+    <li>Audit top label keys and explicitly ban the worst offenders.</li>
+  </ul>
+
+  <h2>Validate in a “before/after week” report</h2>
+  <ul>
+    <li>Ingestion GB/day by top sources (did the intended source actually drop?)</li>
+    <li>Scan/query volume (did you reduce searchable data without breaking investigations?)</li>
+    <li>Error detection (do you still catch and diagnose incidents fast?)</li>
+    <li>Metrics series count (did cardinality stabilize?)</li>
   </ul>
 
   <h2>Related guides</h2>
   <div class="btn-row">
-    <a class="btn" href="/guides/log-costs/">Log costs</a>
-    <a class="btn" href="/guides/log-retention-storage-cost/">Retention cost</a>
     <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
     <a class="btn" href="/guides/aws-cloudwatch-logs-insights-pricing/">Logs Insights pricing</a>
+    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/metrics-costs/">Metrics costs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/cloudwatch/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon CloudWatch pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html" target="_blank" rel="nofollow noopener">
+        CloudWatch Logs documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

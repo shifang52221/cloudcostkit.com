@@ -1,51 +1,82 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate API requests per month (RPS to monthly volume)";
+const title = "Estimate API requests per month (RPS, logs, and metrics)";
 const description =
-  "How to estimate API request volume for cost models: from RPS charts, from logs, and from daily traffic assumptions.";
+  "How to estimate monthly API request volume for cost models: from CloudWatch metrics, from access logs, and from RPS charts (with common pitfalls like retries and health checks).";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-estimate-requests"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "How do I convert RPS to requests per month?",
-      a: "Requests/month = average RPS x 60 x 60 x 24 x days. Use an average RPS over a representative period (and consider peaks separately for capacity).",
+      a: "Requests/month = average RPS × 60 × 60 × 24 × days. Use average RPS over a representative period and model peaks separately for capacity.",
     },
     {
       q: "Should I use peak RPS or average RPS for cost?",
-      a: "Use average for cost and peak for capacity. For cost, the bill tracks total requests and bytes, not the peak moment.",
+      a: "Use average for cost and peak for capacity. Bills track total requests and bytes, not the peak moment.",
+    },
+    {
+      q: "Do retries count as billable requests?",
+      a: "Yes. If the retry hits the gateway, it is a real request and should be included in the model.",
     },
   ]}
 >
   <p>
-    For request-priced services, the fastest path to a decent estimate is turning a request rate chart into a monthly
-    request count.
+    If your cost driver is “$ per request”, you need a defensible <strong>requests/month</strong> number. The key is to
+    estimate from a measured source (metrics or logs) and include <strong>retries</strong> and <strong>automated
+    traffic</strong>.
   </p>
 
-  <h2>Method 1: From average RPS</h2>
+  <h2>Method 1: use API metrics (best if available)</h2>
+  <ul>
+    <li>Use API request count metrics for a representative window (7–30 days).</li>
+    <li>Sum daily totals, then scale to a month (or take an average day and multiply by 30.4).</li>
+    <li>Segment by stage/environment (prod vs staging) if they are billed separately in your model.</li>
+  </ul>
+  <p class="muted">
+    Tip: use two windows (normal week and peak week) to create a “baseline” and “busy month” range.
+  </p>
+
+  <h2>Method 2: count from access logs (good when metrics are missing)</h2>
+  <ul>
+    <li>Count log lines per day for the API stage you care about.</li>
+    <li>Exclude synthetic checks if they are frequent and not user-driven.</li>
+    <li>Keep retries: if they hit the API, they are billable traffic.</li>
+  </ul>
+  <p class="muted">
+    Related: <a href="/guides/aws-api-gateway-access-logs-cost/">API Gateway access logs cost</a>.
+  </p>
+
+  <h2>Method 3: convert from RPS (fastest early estimate)</h2>
   <ul>
     <li>
-      <strong>Requests/month = avg RPS x 60 x 60 x 24 x days</strong>
+      <strong>Requests/month = avg RPS × 60 × 60 × 24 × days</strong>
     </li>
-    <li>Choose the avg RPS over a representative period (last 7/30/90 days).</li>
-    <li>Segment by environment if you have separate endpoints (prod vs staging).</li>
+    <li>If you only have peak RPS, apply a duty cycle (e.g., 20% of peak) and validate later.</li>
+    <li>For bursty workloads, integrate by hour/day instead of using a single average.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
+  </div>
+
+  <h2>Method 4: users × actions (useful before you have telemetry)</h2>
+  <ul>
+    <li>Estimate daily active users × API calls per user per day.</li>
+    <li>Split heavy endpoints (search, list, export) into their own call estimates.</li>
+    <li>Model background workers (sync jobs, webhooks, queue consumers) explicitly.</li>
   </ul>
 
-  <h2>Method 2: From logs</h2>
+  <h2>Common pitfalls</h2>
   <ul>
-    <li>Sum request counts per day from access logs, then multiply/average to a month.</li>
-    <li>Exclude synthetic checks if they are frequent and not user-driven.</li>
-    <li>Include retries if they hit the API (they are real billable requests).</li>
-  </ul>
-
-  <h2>Method 3: From users x actions</h2>
-  <ul>
-    <li>Estimate daily active users x API calls per user per day.</li>
-    <li>Use separate estimates for heavy endpoints (search, list, export).</li>
+    <li>Using peak RPS as an “average” and overstating cost by 5–20×.</li>
+    <li>Missing retries and timeouts (they can double or triple traffic during incidents).</li>
+    <li>Ignoring automated traffic (health checks, bots, cron jobs, integrations).</li>
+    <li>Mixing environments (prod + staging) when you only want production.</li>
   </ul>
 
   <h2>Next: turn volume into cost</h2>
@@ -56,17 +87,23 @@ const description =
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate requests/month from logs or analytics; do not rely on a single peak RPS snapshot.</li>
-    <li>Validate payload sizes (response KB/MB) because transfer can dominate for large payload APIs.</li>
-    <li>Re-check incident windows: retries/timeouts can multiply requests and transfer.</li>
+    <li>Cross-check at least two sources (metrics + logs, or metrics + analytics).</li>
+    <li>Validate the busiest endpoints separately (they often dominate total requests).</li>
+    <li>Confirm whether the request count includes cached hits (CDN) vs origin requests (API).</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
-    <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
-    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      API Gateway metrics (CloudWatch):{" "}
+      <a
+        href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

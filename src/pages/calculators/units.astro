@@ -1,0 +1,137 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config/site";
+import { TOOLS } from "../../lib/tools";
+import AdSlot from "../../components/AdSlot.astro";
+
+const title = `Units & conversions | ${SITE.name}`;
+const description =
+  "Units and conversions for cloud billing: GB vs GiB, Mbps vs MB/s, and monthly transfer estimates from throughput.";
+const slots = SITE.adsenseSlots;
+
+const tools = TOOLS.filter((t) => t.category === "Units");
+---
+<BaseLayout title={title} description={description} canonicalPath="/calculators/units">
+  <section class="card hero">
+    <h1>Units & conversions</h1>
+    <p>Most bad cost estimates start as unit mistakes. Convert explicitly before you model pricing tiers.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+      <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Quick conversions</h2>
+      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>
+          <strong>Mbps → MB/s</strong>: divide by 8 (megabits to megabytes).
+        </li>
+        <li>
+          <strong>GB ↔ GiB</strong>: GB is decimal (10^9 bytes). GiB is binary (2^30 bytes).{" "}
+          <span class="muted">1 GiB ≈ 1.074 GB.</span>
+        </li>
+        <li>
+          <strong>Per 10k vs per 1M</strong>: normalize pricing units first (a 100× error is common).
+        </li>
+        <li>
+          <strong>Hours/month</strong>: for estimates, 730 is a typical month; adjust for schedules.
+        </li>
+      </ul>
+    </section>
+
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">Throughput → monthly GB</h2>
+      <p class="muted" style="margin:10px 0 0">
+        A safe workflow for transfer estimates:
+      </p>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+        <li>Convert Mbps to MB/s (divide by 8).</li>
+        <li>Multiply by a utilization factor (average / peak).</li>
+        <li>Multiply by seconds/day and hours/day (or 730h/month for always-on).</li>
+        <li>Convert MB to GB (divide by 1000 if your pricing is per GB).</li>
+      </ol>
+      <p class="muted" style="margin-top:10px">
+        Example: 50 Mbps average, 12 hours/day → (50/8) MB/s × 12 × 3600 × 30 / 1000 ≈ 810 GB/month.
+      </p>
+    </section>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Where your inputs come from</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>
+        <strong>Requests</strong>: load balancer metrics, API gateway metrics, or application dashboards (RPS).
+      </li>
+      <li>
+        <strong>Transfer</strong>: CDN origin egress, load balancer processed bytes, or VPC flow logs summaries.
+      </li>
+      <li>
+        <strong>Storage</strong>: allocated vs used (billing often charges allocated, monitoring often shows used).
+      </li>
+      <li>
+        <strong>Time</strong>: scheduled uptime (work hours) vs always-on (730h/month).
+      </li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Common mistakes (and how to avoid them)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Mixing bits and bytes</strong>: “Mb” is bits; “MB” is bytes. Double-check the capital B.</li>
+      <li><strong>Using GiB numbers with GB pricing</strong>: convert before multiplying by $/GB.</li>
+      <li><strong>Assuming 100% utilization</strong>: average throughput is often far lower than peak.</li>
+      <li><strong>Forgetting per-request unit size</strong>: “per 10k” vs “per 1M” changes everything.</li>
+      <li><strong>Using the wrong month length</strong>: scheduled workloads rarely run 730 hours.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validate after you deploy</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Compare estimated monthly GB to actual “bytes transferred” in your provider metrics.</li>
+      <li>In billing/Cost Explorer, group by usage type and confirm the unit (GB, requests, hours).</li>
+      <li>Re-check after traffic changes: launches, batch jobs, and incident retries can shift averages fast.</li>
+    </ul>
+  </section>
+
+  <section class="card section" style="margin-top:18px">
+    <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} unit tools</div>
+    <div class="grid">
+      {tools.map((t) => (
+        <a class="card2 tool col-6" href={`/calculators/${t.slug}/`}>
+          <div class="tool-title">{t.title}</div>
+          <div class="tool-desc">{t.description}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Sources</h2>
+    <ul>
+      <li>
+        AWS data transfer pricing (GB units vary by service):{" "}
+        <a href="https://aws.amazon.com/ec2/pricing/on-demand/#Data_Transfer" target="_blank" rel="nofollow noopener">
+          AWS EC2 On-Demand pricing
+        </a>
+      </li>
+      <li>
+        Example of AWS documentation using decimal GB units in storage contexts:{" "}
+        <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingBucket.html" target="_blank" rel="nofollow noopener">
+          Amazon S3 User Guide
+        </a>
+      </li>
+    </ul>
+    <p class="muted">
+      Assumptions: pricing pages use the provider’s billing units (often decimal GB). Convert your monitoring numbers to
+      the same unit before multiplying by rates.
+    </p>
+  </section>
+
+  <section class="section">
+    <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
+  </section>
+</BaseLayout>

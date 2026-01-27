@@ -3,13 +3,13 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "CloudTrail pricing: what to model (management vs data events)";
 const description =
-  "A practical CloudTrail pricing checklist: management events, data events, optional Insights, and the costs that sit downstream of audit logs.";
+  "A practical CloudTrail pricing checklist: separate management, data, and Insights events, then add downstream storage and query costs for your audit log pipeline.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudtrail-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What usually drives CloudTrail spend?",
@@ -17,13 +17,17 @@ const description =
     },
     {
       q: "What should I include besides event charges?",
-      a: "Downstream costs: storage, analysis, and SIEM ingestion. Audit logs are frequently forwarded to S3 and then queried or shipped into another tool.",
+      a: "Downstream costs: storage, analysis, and SIEM ingestion. Audit logs are often delivered to S3 and then queried or shipped into another tool.",
+    },
+    {
+      q: "Why do CloudTrail costs spike during incidents?",
+      a: "Retry storms and automated tooling can multiply API calls. Those become real events and also increase downstream ingestion and query volume.",
     },
   ]}
 >
   <p>
-    CloudTrail-style costs are easiest to estimate when you separate <strong>event volume</strong> by type and then apply
-    your effective per-event pricing. The most important split is management vs data events.
+    CloudTrail estimates are easiest when you split <strong>event volume</strong> by type and then apply your effective
+    per-event pricing. The single most important split is <strong>management vs data events</strong>.
   </p>
 
   <h2>What to model</h2>
@@ -35,38 +39,100 @@ const description =
       <strong>Data events</strong>: high-volume data-plane operations (can grow rapidly)
     </li>
     <li>
-      <strong>Insights events</strong> (if enabled): additional detection signals with their own pricing
+      <strong>Insights events</strong> (if enabled): additional detections with their own pricing model
     </li>
     <li>
-      <strong>Downstream</strong>: storage + query + external ingest costs
+      <strong>Downstream</strong>: storage + query + external ingest costs (S3/Athena/SIEM/CloudWatch)
     </li>
   </ul>
 
-  <h2>A fast estimate</h2>
+  <h2>Before pricing: define scope (this changes everything)</h2>
+  <ul>
+    <li>
+      <strong>Accounts and regions</strong>: multi-account footprints multiply audit volume and downstream storage.
+    </li>
+    <li>
+      <strong>Data event resources</strong>: which buckets/prefixes/functions are in scope (avoid "all resources" defaults).
+    </li>
+    <li>
+      <strong>Retention expectations</strong>: how long you keep raw logs vs derived signals.
+    </li>
+  </ul>
   <p class="muted">
-    Use <a href="/calculators/aws-cloudtrail-cost-calculator/">AWS CloudTrail Cost Calculator</a> for a quick event-only
-    estimate, then add downstream storage/analysis and any security tool ingestion.
+    If you are doing a budget for the first time, start with a narrow scope and expand with measurement.
   </p>
+
+  <h2>A fast estimation workflow</h2>
+  <ol>
+    <li>
+      <strong>Estimate events/month</strong> for each bucket (management, data, insights).
+    </li>
+    <li>
+      <strong>Apply region pricing</strong> to each bucket (use official pricing for your region).
+    </li>
+    <li>
+      <strong>Add downstream costs</strong>: storage retention and query scans (often larger than expected).
+    </li>
+  </ol>
+  <p class="muted">
+    Related: <a href="/guides/aws-cloudtrail-estimate-events/">estimate CloudTrail events/month</a>.
+  </p>
+
+  <h2>Downstream costs (frequently larger than expected)</h2>
+  <ul>
+    <li>
+      <strong>S3 storage</strong>: retained GB-month based on retention days and compression.
+    </li>
+    <li>
+      <strong>Query/scan</strong>: Athena or log platform scans (GB scanned per query * query frequency).
+    </li>
+    <li>
+      <strong>SIEM ingestion</strong>: forwarding everything into an expensive tool often dominates the total.
+    </li>
+    <li>
+      <strong>Copies and pipelines</strong>: replicated buckets, multiple destinations, and cross-account aggregation add storage and query duplication.
+    </li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/guides/log-retention-storage-cost/">Retention cost</a>
+    <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Query scan cost</a>
+  </div>
 
   <h2>Common pitfalls</h2>
   <ul>
-    <li>Enabling data events broadly without a volume estimate.</li>
-    <li>Retry storms and automated tooling inflating API call volume.</li>
-    <li>Forgetting downstream costs (S3 storage, Athena queries, SIEM ingestion).</li>
+    <li>Enabling data events broadly without a volume estimate (volume can be orders of magnitude higher).</li>
+    <li>Forgetting automation and retries (deploys and incidents inflate event counts).</li>
+    <li>Ignoring downstream costs (S3 retention, Athena scans, SIEM ingestion).</li>
+    <li>Mixing environments/accounts in one estimate when governance differs.</li>
+    <li>Building dashboards that scan months of logs when a day-level query would answer the question.</li>
   </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate the primary driver with measured usage from a representative window.</li>
-    <li>Confirm units and pricing units (per 10k vs per 1M, GB vs GiB) before trusting the estimate.</li>
-    <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+    <li>Measure event counts for at least 7 days and split by management vs data vs insight.</li>
+    <li>Confirm which resources and event types are included in your selectors.</li>
+    <li>Measure query scan sizes using your real investigations and dashboards.</li>
+    <li>Confirm retention and lifecycle policies (including any replicated copies).</li>
   </ul>
 
-  <h2>Related reading</h2>
-  <div class="btn-row">
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
-    <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
-    <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
-  </div>
-
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudTrail pricing:{" "}
+      <a href="https://aws.amazon.com/cloudtrail/pricing/" rel="nofollow noopener" target="_blank">
+        aws.amazon.com/cloudtrail/pricing
+      </a>
+    </li>
+    <li>
+      CloudTrail concepts (event types):{" "}
+      <a
+        href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+

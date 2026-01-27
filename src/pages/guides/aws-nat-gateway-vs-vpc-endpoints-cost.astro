@@ -3,19 +3,19 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "NAT Gateway vs VPC endpoints cost: when PrivateLink wins";
 const description =
-  "Compare NAT Gateway vs VPC endpoints (Interface/Gateway endpoints) cost. Learn when endpoint fees beat NAT GB processed, and how to model both without missing transfer line items.";
+  "Compare NAT Gateway vs VPC endpoints (Interface/Gateway endpoints) cost: model gateway-hours + GB processed versus endpoint-hours + per-GB, estimate how much NAT traffic endpoints remove, and avoid transfer surprises.";
 const faqs = [
   {
     q: "Why are NAT Gateway bills so high?",
-    a: "NAT cost has two drivers: gateway-hours and GB processed. Large recurring downloads, container image pulls, and chatty outbound traffic can drive GB processed quickly.",
+    a: "NAT cost has two drivers: gateway-hours and GB processed. Large recurring downloads, container image pulls, and chatty outbound traffic can drive processed GB quickly.",
   },
   {
     q: "Do VPC endpoints always reduce cost?",
-    a: "Not always. Endpoints add their own hourly charges (and sometimes per-GB), but they can reduce or eliminate NAT GB processed for common services. You need to model your traffic mix.",
+    a: "Not always. Endpoints add hourly charges (and sometimes per-GB). They reduce cost when they remove a meaningful portion of NAT-processed GB and don’t introduce new transfer costs.",
   },
   {
     q: "What's the fastest way to decide?",
-    a: "List the top destinations behind NAT (S3, ECR, STS, package repos, external APIs). If most traffic is to AWS services that support endpoints, endpoints often reduce NAT GB processed materially.",
+    a: "Identify what traffic is going through NAT. If most of it is to AWS services that support endpoints, endpoints often reduce NAT processed GB materially. Validate with flow logs/metrics.",
   },
 ];
 ---
@@ -23,90 +23,114 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-nat-gateway-vs-vpc-endpoints-cost"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    NAT Gateway is often the first surprise "networking bill" teams see. A common fix is to keep traffic private with
-    VPC endpoints (Interface endpoints / PrivateLink, or Gateway endpoints where supported). This guide shows how to
-    compare the costs in a practical way.
+    NAT Gateway is often the first surprise “networking bill” teams see. A common fix is to keep AWS-service traffic
+    private with VPC endpoints (Interface endpoints / PrivateLink, or Gateway endpoints where available). This guide
+    shows how to compare costs without hand-waving: estimate NAT processed GB, estimate endpoint-hours, and model how
+    much NAT traffic endpoints actually remove.
   </p>
 
-  <h2>What you're comparing</h2>
+  <h2>What you’re comparing (two different cost shapes)</h2>
   <ul>
     <li>
-      <strong>NAT Gateway</strong>: hourly gateway cost + traffic-based GB processed.
+      <strong>NAT Gateway</strong>: gateway-hours + GB processed (traffic-driven; spikes with downloads and retries).
     </li>
     <li>
-      <strong>VPC endpoints</strong>: endpoint hourly cost (and sometimes per-GB), plus whatever data transfer applies for
-      your path.
+      <strong>VPC endpoints</strong>: endpoint-hours (often per AZ) + sometimes per-GB processing (more fixed; scales with sprawl).
     </li>
   </ul>
+
+  <h2>Step 1: estimate NAT processed GB (baseline + peak)</h2>
+  <p>
+    You need a rough monthly processed GB. Use metrics/flow logs when possible:
+    <a href="/guides/aws-nat-gateway-estimate-gb-processed/"> estimate NAT GB processed</a>.
+  </p>
+  <p class="muted">
+    Keep two scenarios: a normal week (baseline) and an incident/busy week (peaks often dominate monthly variance).
+  </p>
+
+  <h2>Step 2: estimate how much of that GB endpoints can remove</h2>
+  <p>
+    Endpoints don’t remove all NAT traffic — they remove the portion that is headed to services you can keep on the
+    private path. A practical way to estimate is to group NAT egress by destination.
+  </p>
+  <ul>
+    <li><strong>AWS-service destinations</strong>: good candidates for endpoints/private access.</li>
+    <li><strong>Public internet/SaaS</strong>: endpoints won’t help; you still need NAT or other egress.</li>
+  </ul>
+  <p class="muted">
+    If you can’t attribute yet, start with scenarios (30% / 60% / 90% NAT reduction) and refine later.
+  </p>
+
+  <h2>Step 3: compare monthly costs with a scenario table</h2>
+  <ul>
+    <li>
+      <strong>NAT cost</strong> = gateway-hours × $/hour + GB processed × $/GB
+    </li>
+    <li>
+      <strong>Endpoint cost</strong> = endpoint-hours × $/hour (+ optional per-GB) + remaining NAT cost for residual internet egress
+    </li>
+  </ul>
+  <p class="muted">
+    The breakeven is usually “does the endpoint remove enough processed GB to beat its hourly baseline?”
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost</a>
+    <a class="btn" href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">Interface endpoint cost</a>
+    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
+  </div>
 
   <h2>When endpoints usually win</h2>
   <ul>
-    <li>High-volume access to AWS services from private subnets (common CI/CD and node bootstrapping traffic).</li>
-    <li>Frequent container image pulls (ECR) and package updates.</li>
-    <li>Large fleets that multiply the same outbound downloads.</li>
+    <li>Large fleets pulling the same artifacts (images, packages) from AWS services repeatedly.</li>
+    <li>High-volume private workloads calling AWS APIs frequently (steady GB processed through NAT).</li>
+    <li>Teams that can standardize endpoints and avoid endpoint sprawl (ownership and lifecycle).</li>
   </ul>
 
-  <h2>Step 1: estimate what drives NAT GB processed</h2>
-  <p>
-    You need a rough monthly GB processed. Use metrics/flow logs when possible:
-    <a href="/guides/aws-nat-gateway-estimate-gb-processed/"> estimate NAT GB processed</a>.
-  </p>
+  <h2>When endpoints may not win</h2>
+  <ul>
+    <li>Most NAT traffic is to the public internet or third-party SaaS (endpoints don’t remove it).</li>
+    <li>Non-prod sprawl creates many endpoints across many AZs that stay always-on.</li>
+    <li>Routing changes introduce cross-AZ transfer that offsets NAT savings.</li>
+  </ul>
 
-  <h2>Step 2: model NAT cost</h2>
+  <h2>Don’t forget transfer boundaries (where “savings” can move)</h2>
   <p>
-    Use <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost calculator</a> for the baseline.
-  </p>
-
-  <h2>Step 3: model the endpoint alternative</h2>
-  <p>
-    For endpoints, treat it as a separate monthly line item: endpoint-hours plus any per-GB charges that apply to your
-    plan. The key is to decide how much NAT GB processed the endpoint removes.
-  </p>
-  <p class="muted">
-    Practical approach: start with a percentage reduction scenario (for example, 30%, 60%, 90%) and see the break-even.
-  </p>
-
-  <h2>Don't forget transfer boundaries</h2>
-  <p>
-    Some "savings" plans accidentally increase cross-AZ or cross-region traffic. If your architecture moves traffic across
-    boundaries, model it explicitly:
+    Some migrations reduce NAT GB processed but increase cross-AZ transfer or internet egress in a different line item.
+    Model transfer explicitly if your traffic crosses boundaries:
     <a href="/guides/aws-vpc-data-transfer/"> VPC data transfer guide</a>.
   </p>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost</a>
-    <a class="btn" href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC interface endpoint cost</a>
-    <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC data transfer cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a>
-  </div>
+  <h2>Validation checklist (after rollout)</h2>
+  <ul>
+    <li>Confirm NAT processed GB dropped by the expected percentage.</li>
+    <li>Confirm endpoint-hours match the intended footprint (no unexpected AZ/sprawl).</li>
+    <li>Check for shifted spend: cross-AZ transfer and internet egress.</li>
+    <li>Re-check incident windows; retries can recreate NAT spikes even after endpoints.</li>
+  </ul>
 
   <h2>Related guides</h2>
   <div class="btn-row">
+    <a class="btn" href="/guides/aws-nat-gateway-cost/">NAT gateway costs</a>
     <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
     <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
-    <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>
-    <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints cost optimization</a>
-    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+    <a class="btn" href="/guides/aws-privatelink-cost-optimization/">PrivateLink cost optimization</a>
   </div>
 
-  <h2>Validation checklist</h2>
+  <h2>Sources</h2>
   <ul>
-    <li>Validate GB processed from NAT metrics or flow logs (representative week).</li>
-    <li>Identify the top traffic sources: images, updates, external APIs, log shipping.</li>
-    <li>After changes, confirm reduced GB processed and stable application behavior.</li>
+    <li>
+      <a href="https://aws.amazon.com/vpc/pricing/" target="_blank" rel="nofollow noopener">
+        Amazon VPC pricing (NAT Gateway and endpoints)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html" target="_blank" rel="nofollow noopener">
+        AWS PrivateLink documentation
+      </a>
+    </li>
   </ul>
-
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a>
-    <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate GB processed</a>
-    <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT optimization</a>
-    <a class="btn" href="/guides/aws-network-costs/">AWS network hub</a>
-  </div>
-
 </GuideLayout>

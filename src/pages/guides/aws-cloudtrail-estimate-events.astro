@@ -1,62 +1,128 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate CloudTrail events per month (fast methods)";
+const title = "Estimate CloudTrail events per month (practical methods)";
 const description =
-  "How to estimate CloudTrail event volume for cost models: from logs and metrics, and how to separate management vs data events.";
+  "How to estimate CloudTrail event volume for cost models: count from CloudTrail Lake or S3-delivered logs, split management vs data events, and include retries and automation.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudtrail-estimate-events"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "Why should I separate management and data events?",
-      a: "They often differ by orders of magnitude. Data events can explode in volume for busy services, so treating them as a single bucket can hide the true driver.",
+      a: "They often differ by orders of magnitude. Data events can explode in volume for busy services, so treating them as one bucket hides the real driver.",
     },
     {
       q: "What if I can't measure events yet?",
-      a: "Estimate from API call rates and automated job frequency, then validate with a short measurement window once logging is enabled.",
+      a: "Estimate from automation and service activity, then validate with a short measurement window once logging is enabled.",
+    },
+    {
+      q: "Do retries inflate CloudTrail volume?",
+      a: "Yes. Timeouts and retry storms multiply API calls and therefore events. Include incident windows in your risk scenario.",
     },
   ]}
 >
   <p>
-    For an audit-log cost model, you mainly need one number: <strong>events per month</strong>. The best estimates break
-    it down by event type so you can see what actually drives cost.
+    For an audit-log cost model, you mainly need one number: <strong>events/month</strong>. The best estimates break it
+    down by event type so you can see what actually drives cost and where to optimize.
   </p>
 
-  <h2>Method 1: Count events from stored logs</h2>
+  <h2>Step 0: pick the counting source</h2>
   <ul>
-    <li>Count records/day from your CloudTrail delivery location.</li>
-    <li>Separate by event type (management vs data) if possible.</li>
-    <li>Use a representative time window (at least a week for spiky workloads).</li>
+    <li>
+      <strong>CloudTrail Lake</strong>: easiest counting (query the event data store).
+    </li>
+    <li>
+      <strong>S3-delivered CloudTrail logs</strong>: count with Athena or another query engine.
+    </li>
   </ul>
 
-  <h2>Method 2: Estimate from automated activity</h2>
+  <h2>Method 1: count events from CloudTrail Lake</h2>
   <ul>
-    <li>CI/CD, infrastructure automation, and autoscaling can generate many management events.</li>
-    <li>High-volume data services can create far more data events than expected.</li>
-    <li>Account for retries (they are real events).</li>
+    <li>Query a representative time window (7 to 30 days).</li>
+    <li>Split by event category (management vs data vs insight) if available in your schema.</li>
+    <li>Scale to a month (average day * 30.4) and keep a "busy month" scenario for deploy/incident spikes.</li>
   </ul>
+
+  <h2>Method 2: count events from S3 logs (Athena-style)</h2>
+  <p class="muted">
+    Typical approach: count records per day and group by eventCategory. Your table schema may differ; treat this as a
+    pattern, not copy/paste SQL.
+  </p>
+  <pre><code>{`-- Pseudocode: count events/day by category
+SELECT date(from_iso8601_timestamp(eventTime)) AS day,
+       eventCategory,
+       count(*) AS events
+FROM cloudtrail_logs
+WHERE day BETWEEN DATE '2026-01-01' AND DATE '2026-01-07'
+GROUP BY 1, 2
+ORDER BY 1, 2;`}</code></pre>
+  <ul>
+    <li>Use at least 7 days to capture weekday/weekend and deploy patterns.</li>
+    <li>Measure both total events and your top event sources (the loudest services).</li>
+    <li>Include retries: they are real API calls and real audit events.</li>
+  </ul>
+
+  <h2>Step 1.5: find your top sources (the real driver)</h2>
+  <ul>
+    <li>Group by eventSource (service) and eventName to find the highest volume APIs.</li>
+    <li>For data events, identify the resource scope (which bucket/prefix/function is generating volume).</li>
+    <li>Keep a separate bucket for "deploy spike" and "incident spike" weeks.</li>
+  </ul>
+
+  <h2>Method 3: estimate before telemetry exists</h2>
+  <ul>
+    <li>
+      <strong>Automation churn</strong>: CI/CD, IaC, autoscaling, and scheduled jobs generate steady management events.
+    </li>
+    <li>
+      <strong>High-volume data services</strong>: object-level events (for example) can dwarf management events when enabled broadly.
+    </li>
+    <li>
+      <strong>Incidents</strong>: model a spike multiplier for retries/timeouts during partial outages.
+    </li>
+  </ul>
+  <p class="muted">Use this only as a starting point and validate as soon as you can measure real events.</p>
 
   <h2>Turn volume into a cost estimate</h2>
   <p>
     Use <a href="/calculators/aws-cloudtrail-cost-calculator/">AWS CloudTrail Cost Calculator</a> to translate monthly
-    event volume into an estimate using your per-100k prices.
+    event volume into an estimate using your effective per-event rates.
   </p>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Use a representative window (at least 7 days) to smooth deploy and incident spikes.</li>
-    <li>Separate management events vs data events and model them independently.</li>
-    <li>Include retries: they generate real events and can multiply volume during failures.</li>
+    <li>Separate management vs data vs insight and model them independently.</li>
+    <li>Compare "normal" and "busy" weeks; deploys and incidents often dominate event counts.</li>
+    <li>Confirm which resources and event selectors are enabled (scope changes event volume dramatically).</li>
+    <li>Confirm whether you are counting only the accounts/regions you intend to budget for.</li>
   </ul>
 
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/aws-cloudtrail-cost-calculator/">CloudTrail cost</a>
-    <a class="btn" href="/guides/aws-cloudtrail-pricing/">CloudTrail pricing</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
-  </div>
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      CloudTrail Lake:{" "}
+      <a
+        href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+    <li>
+      CloudTrail log file format:{" "}
+      <a
+        href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-examples.html"
+        rel="nofollow noopener"
+        target="_blank"
+      >
+        docs.aws.amazon.com
+      </a>
+    </li>
+  </ul>
 </GuideLayout>
+
