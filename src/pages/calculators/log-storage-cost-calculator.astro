@@ -10,15 +10,16 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/log-storage-cost-calculator"
-  intro="Many teams keep a short hot window for fast search, then move older logs to a cheaper cold/archive tier. This calculator estimates steady-state storage cost for a 2-tier model (hot + optional cold), including archive fraction and a compression factor if your vendor bills on stored size."
+  intro="Many teams keep a short hot window for fast search, then move older logs to a cheaper cold/archive tier. This calculator estimates steady-state storage cost for a 2-tier model (hot + optional cold), including archive fraction and a compression factor if your vendor bills on stored size. Compare baseline vs peak volume if your logs spike."
   examples={[
     "Hot: 14 days at $0.03/GB-month + Cold: 90 additional days at $0.01/GB-month (archive 100%).",
     "Archive only audit logs (e.g., 20% of volume) instead of archiving everything.",
   ]}
   includes={[
-    "Hot retention storage cost (GB/day × hot days × $/GB-month).",
+    "Hot retention storage cost (GB/day x hot days x $/GB-month).",
     "Optional cold/archive storage cost for additional days.",
     "Optional archive fraction and compression ratio.",
+    "Baseline vs peak comparison for volume spikes.",
   ]}
   excludes={[
     "Ingestion charges (use Log Ingestion calculator).",
@@ -26,9 +27,10 @@ const description =
     "Provider-specific minimums and retrieval charges for cold tiers.",
   ]}
   how={[
-    "Hot stored GB ≈ GB/day × hot retention days.",
-    "Cold stored GB ≈ GB/day × archive fraction × cold days × compression ratio.",
-    "Monthly storage cost = (hot stored GB × hot $/GB-month) + (cold stored GB × cold $/GB-month).",
+    "Hot stored GB = GB/day x hot retention days.",
+    "Cold stored GB = GB/day x archive fraction x cold days x compression ratio.",
+    "Monthly storage cost = (hot stored GB x hot $/GB-month) + (cold stored GB x cold $/GB-month).",
+    "Use a peak scenario when incident logging increases volume.",
   ]}
   faqs={[
     {
@@ -64,4 +66,3 @@ const description =
     </ul>
   </div>
 </CalculatorLayout>
-

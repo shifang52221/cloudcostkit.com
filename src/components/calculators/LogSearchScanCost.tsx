@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLogScanCost } from "../../lib/calc/logScan";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -7,6 +7,8 @@ import { clamp } from "../../lib/math";
 export function LogSearchScanCostCalculator() {
   const [gbScannedPerDay, setGbScannedPerDay] = useNumberParamState("LogSearchScanCost.gbScannedPerDay", 800);
   const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("LogSearchScanCost.pricePerGbUsd", 0.005);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogSearchScanCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogSearchScanCost.peakMultiplierPct", 150);
 
   const result = useMemo(() => {
     return estimateLogScanCost({
@@ -14,6 +16,15 @@ export function LogSearchScanCostCalculator() {
       pricePerGbUsd: clamp(pricePerGbUsd, 0, 1e6),
     });
   }, [gbScannedPerDay, pricePerGbUsd]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const safeMultiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateLogScanCost({
+      gbScannedPerDay: clamp(gbScannedPerDay, 0, 1e12) * safeMultiplier,
+      pricePerGbUsd: clamp(pricePerGbUsd, 0, 1e6),
+    });
+  }, [gbScannedPerDay, peakMultiplierPct, pricePerGbUsd, showPeakScenario]);
 
   return (
     <div className="calc-grid">
@@ -42,6 +53,33 @@ export function LogSearchScanCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Use a peak month or incident spike.</div>
+            </div>
+          ) : null}
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -50,6 +88,8 @@ export function LogSearchScanCostCalculator() {
                 onClick={() => {
                   setGbScannedPerDay(800);
                   setPricePerGbUsd(0.005);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(150);
                 }}
               >
                 Reset example
@@ -71,8 +111,43 @@ export function LogSearchScanCostCalculator() {
             <div className="v">{formatCurrency2(result.monthlyCostUsd)}</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">GB/day</th>
+                  <th className="num">Monthly GB</th>
+                  <th className="num">Monthly cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.gbScannedPerDay, 2)}</td>
+                  <td className="num">{formatNumber(result.monthlyGbScanned, 0)}</td>
+                  <td className="num">{formatCurrency2(result.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.gbScannedPerDay, 2)}</td>
+                  <td className="num">{formatNumber(peakResult.monthlyGbScanned, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.gbScannedPerDay - result.gbScannedPerDay, 2)}</td>
+                  <td className="num">{formatNumber(peakResult.monthlyGbScanned - result.monthlyGbScanned, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.monthlyCostUsd - result.monthlyCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

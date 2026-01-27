@@ -5,34 +5,40 @@ import { KubernetesRequestsLimitsCalculator } from "../../components/calculators
 
 const title = "Kubernetes Cost Calculator";
 const description =
-  "Estimate Kubernetes cluster cost by sizing nodes from pod requests and applying per-node pricing. Educational use only.";
+  "Estimate Kubernetes cluster cost by sizing nodes from pod requests, checking pod limits, and applying per-node pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/kubernetes-cost-calculator"
-  intro="Kubernetes costs are mostly compute. A practical first estimate is: (1) size nodes from CPU/memory requests, then (2) multiply by a per-node hourly rate. This page walks you through both steps."
+  intro="Kubernetes costs are mostly compute. A practical first estimate is: (1) size nodes from CPU/memory requests (including max pods per node), then (2) multiply by a per-node hourly rate. Model baseline vs peak to avoid under-budgeting."
   examples={[
     "Start from pod requests to estimate node count; then multiply by $/hour to get a monthly estimate.",
-    "If memory limits node count, memory is the bottleneck even when CPU looks low.",
+    "Compare baseline vs peak pods to see how autoscaling changes node count and cost.",
   ]}
   includes={[
-    "Requests/limits sizing into cluster totals and node estimate.",
+    "Requests/limits sizing into cluster totals and node estimate (including max pods per node).",
+    "Baseline vs peak sizing summary and bottleneck highlight.",
     "Node cost estimate from node count, $/hour, and expected uptime.",
   ]}
   excludes={[
     "Control plane fees, load balancers, storage, observability, and egress (add separately).",
-    "Bin packing constraints (affinities, max pods per node) that can increase node count.",
+    "Scheduling constraints like affinities, taints, daemonsets, and topology spread that can increase node count.",
   ]}
   how={[
-    "Step 1: Convert per-pod requests into total CPU/memory and an estimated node count.",
+    "Step 1: Convert per-pod requests into total CPU/memory and an estimated node count with pod limits.",
     "Step 2: Estimate monthly node cost from node count and $/hour pricing.",
+    "Step 3: Compare baseline vs peak scenarios to stress-test the estimate.",
     "Add separate line items for managed control plane, storage, load balancers, logs/metrics, and egress.",
   ]}
   faqs={[
     {
       q: "Why estimate from requests, not limits?",
       a: "Scheduling uses requests. Limits matter for throttling/OOM risk but aren't a good baseline for capacity planning.",
+    },
+    {
+      q: "Why does max pods per node matter?",
+      a: "Kubernetes enforces a per-node pod limit (often 110). Even if CPU/memory is available, pod limits can force more nodes.",
     },
     {
       q: "What else should I include in a full Kubernetes cost model?",
@@ -44,14 +50,14 @@ const description =
     },
     {
       q: "How should I think about autoscaling?",
-      a: "Use average (typical) node count for budgeting, and check peak node count for risk. A blended utilization/uptime assumption is usually more accurate than using peak 24/7.",
+      a: "Use a baseline (typical) node count for budgeting, then compare a peak scenario to understand risk and headroom.",
     },
     {
       q: "Should I use on-demand, spot, or commitments?",
       a: "Use the effective blended $/hour you actually expect to pay. If you mix on-demand + commitments + spot, compute a blended rate and test sensitivity.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost checklist" },
     { href: "/guides/kubernetes-cost-model-beyond-nodes", label: "Guide: cost model beyond nodes" },
@@ -67,6 +73,9 @@ const description =
     <p class="muted" style="margin-top:8px">
       Use representative requests (not peak limits). Then pick an allocatable % to leave room for kube-system and
       headroom.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      Set a max pods per node value if your CNI enforces pod caps, and compare baseline vs peak to understand scale risk.
     </p>
     <p class="muted" style="margin-top:8px">
       This Kubernetes cost calculator focuses on the biggest driver: node spend. Treat the result as a baseline, then
@@ -127,4 +136,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

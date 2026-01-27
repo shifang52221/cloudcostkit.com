@@ -10,10 +10,10 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/log-ingestion-cost-calculator"
-  intro="Most log platforms charge for ingestion. This calculator estimates monthly ingestion volume and cost using either measured GB/day or an event-rate model (events/s × bytes/event). Model retention storage and scan/search as separate line items."
+  intro="Most log platforms charge for ingestion. This calculator estimates monthly ingestion volume and cost using either measured GB/day or an event-rate model (events/s x bytes/event). Use a baseline and peak scenario to stress-test log spikes."
   examples={[
-    "If you know GB/day, use it directly: monthly GB ~ GB/day × billing days.",
-    "If you only know event rate: GB/day ~ events/s × 86,400 × bytes/event ÷ 1e9 (decimal GB).",
+    "If you know GB/day, use it directly: monthly GB ~ GB/day x billing days.",
+    "If you only know event rate: GB/day ~ events/s x 86,400 x bytes/event / 1e9 (decimal GB).",
   ]}
   includes={[
     "Monthly ingestion volume from GB/day and billing days.",
@@ -26,8 +26,8 @@ const description =
     "Indexing and vendor-specific add-ons.",
   ]}
   how={[
-    "If you have measured ingestion: monthly GB = GB/day × billing days; ingestion cost = monthly GB × $/GB.",
-    "If you estimate from events: GB/day ≈ events/s × 86,400 × bytes/event ÷ 1e9.",
+    "If you have measured ingestion: monthly GB = GB/day x billing days; ingestion cost = monthly GB x $/GB.",
+    "If you estimate from events: GB/day = events/s x 86,400 x bytes/event / 1e9.",
     "Keep a baseline and a peak scenario (incident traffic and retries often spike logs).",
   ]}
   faqs={[
@@ -37,7 +37,7 @@ const description =
     },
     {
       q: "How do I estimate bytes per event?",
-      a: "Sample real events (e.g., 100–1000 lines), measure payload size in bytes, and use an average plus a peak multiplier for verbose logs.",
+      a: "Sample real events (e.g., 100-1000 lines), measure payload size in bytes, and use an average plus a peak multiplier for verbose logs.",
     },
     {
       q: "What if I have multiple log sources?",
@@ -59,7 +59,7 @@ const description =
     <h2 style="margin-top:0">Next line items (do not forget these)</h2>
     <ul>
       <li>
-        <strong>Retention storage</strong>: if you keep 30–365 days, storage can dominate.
+        <strong>Retention storage</strong>: if you keep 30-365 days, storage can dominate.
         <span class="muted">
           {" "}
           Use <a href="/calculators/log-retention-storage-cost-calculator/">Log retention storage</a>.
@@ -75,4 +75,3 @@ const description =
     </ul>
   </div>
 </CalculatorLayout>
-

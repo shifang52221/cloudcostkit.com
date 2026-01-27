@@ -12,7 +12,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/log-cost-calculator"
-  intro="Log platforms usually charge for (1) ingestion, (2) retention storage (GB-month), and sometimes (3) scan/search. This log cost calculator groups those line items so you can estimate a realistic monthly total."
+  intro="Log platforms usually charge for (1) ingestion, (2) retention storage (GB-month), and sometimes (3) scan/search. This log cost calculator groups those line items so you can estimate a realistic monthly total and compare baseline vs peak months."
   examples={[
     "Estimate ingestion from GB/day, then add retention storage from retention days; optionally add scan charges if you run frequent queries.",
     "Retention increases costs linearly with days; scan costs increase with query volume and GB scanned.",
@@ -30,6 +30,7 @@ const description =
     "Step 1: estimate ingestion charges (GB/day x $/GB x days/month).",
     "Step 2: estimate retained storage steady-state (GB/day x retention days) and apply $/GB-month.",
     "Step 3 (optional): estimate scan/search charges from GB scanned and $/GB pricing.",
+    "Compare baseline vs peak months if traffic or incidents spike logs.",
     "Sum line items to get a total monthly estimate."
   ]}
   faqs={[

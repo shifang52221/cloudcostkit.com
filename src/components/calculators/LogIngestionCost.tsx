@@ -16,6 +16,8 @@ export function LogIngestionCostCalculator() {
   const [avgBytesPerEvent, setAvgBytesPerEvent] = useNumberParamState("LogIngestionCost.avgBytesPerEvent", 800);
   const [daysPerMonth, setDaysPerMonth] = useNumberParamState("LogIngestionCost.daysPerMonth", 30.4);
   const [ingestPricePerGbUsd, setIngestPricePerGbUsd] = useNumberParamState("LogIngestionCost.ingestPricePerGbUsd", 0.5);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogIngestionCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogIngestionCost.peakMultiplierPct", 150);
 
   const result = useMemo(() => {
     const safeDaysPerMonth = clamp(daysPerMonth, 1, 31);
@@ -44,6 +46,20 @@ export function LogIngestionCostCalculator() {
     };
   }, [avgBytesPerEvent, daysPerMonth, eventsPerSecond, gbPerDayIngest, ingestPricePerGbUsd, useEventRateInputs]);
 
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const safeMultiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    const peakGbPerDay = clamp(result.gbPerDayIngest * safeMultiplier, 0, 1e12);
+    const monthlyIngestGb = peakGbPerDay * result.daysPerMonth;
+    const ingestCostUsd = monthlyIngestGb * result.ingestPricePerGbUsd;
+
+    return {
+      gbPerDayIngest: peakGbPerDay,
+      monthlyIngestGb,
+      ingestCostUsd,
+    };
+  }, [peakMultiplierPct, result, showPeakScenario]);
+
   return (
     <div className="calc-grid">
       <div className="panel">
@@ -56,7 +72,7 @@ export function LogIngestionCostCalculator() {
                 checked={useEventRateInputs}
                 onChange={(e) => setUseEventRateInputs(e.target.checked)}
               />
-              Estimate GB/day from events/s × bytes/event (decimal GB)
+              Estimate GB/day from events/s x bytes/event (decimal GB)
             </label>
           </div>
 
@@ -129,6 +145,33 @@ export function LogIngestionCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Use a peak month or incident spike.</div>
+            </div>
+          ) : null}
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -141,6 +184,8 @@ export function LogIngestionCostCalculator() {
                   setAvgBytesPerEvent(800);
                   setDaysPerMonth(30.4);
                   setIngestPricePerGbUsd(0.5);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(150);
                 }}
               >
                 Reset example
@@ -168,20 +213,55 @@ export function LogIngestionCostCalculator() {
           <div className="kpi">
             <div className="k">Assumption</div>
             <div className="v">
-              {formatNumber(result.ingestPricePerGbUsd, 4)} $/GB × {formatNumber(result.daysPerMonth, 1)} days
+              {formatNumber(result.ingestPricePerGbUsd, 4)} $/GB x {formatNumber(result.daysPerMonth, 1)} days
             </div>
           </div>
           {result.useEventRateInputs ? (
             <div className="kpi">
               <div className="k">Derived from events</div>
               <div className="v">
-                {formatNumber(result.eventsPerSecond, 0)} events/s × {formatNumber(result.avgBytesPerEvent, 0)} bytes/event
+                {formatNumber(result.eventsPerSecond, 0)} events/s x {formatNumber(result.avgBytesPerEvent, 0)} bytes/event
               </div>
             </div>
           ) : null}
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">GB/day</th>
+                  <th className="num">Monthly GB</th>
+                  <th className="num">Monthly cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.gbPerDayIngest, 2)}</td>
+                  <td className="num">{formatNumber(result.monthlyIngestGb, 0)}</td>
+                  <td className="num">{formatCurrency2(result.ingestCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.gbPerDayIngest, 2)}</td>
+                  <td className="num">{formatNumber(peakResult.monthlyIngestGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.ingestCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.gbPerDayIngest - result.gbPerDayIngest, 2)}</td>
+                  <td className="num">{formatNumber(peakResult.monthlyIngestGb - result.monthlyIngestGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.ingestCostUsd - result.ingestCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

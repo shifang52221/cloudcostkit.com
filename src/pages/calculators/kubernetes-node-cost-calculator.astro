@@ -10,22 +10,24 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/kubernetes-node-cost-calculator"
-  intro="Once you know your node count and per-node hourly price, you can estimate monthly spend quickly. Use utilization and hours/day to model non-24/7 clusters."
+  intro="Once you know your node count and per-node hourly price, you can estimate monthly spend quickly. Use utilization and hours/day to model non-24/7 clusters, and add a peak scenario to stress-test the estimate."
   examples={[
     "12 nodes at $0.32/hour running 24/7 -> estimate monthly node spend.",
-    "6 nodes at $0.25/hour running 10 hours/day on weekdays -> model dev environment spend.",
+    "12 baseline nodes, 18 peak nodes -> compare peak vs baseline delta.",
   ]}
   includes={[
     "Monthly compute estimate from node count, $/hour, and billable hours.",
+    "Optional peak scenario cost and delta.",
     "Simple utilization model for scheduled/dev environments.",
   ]}
   excludes={[
     "Load balancers, storage, bandwidth, control plane fees, and add-ons.",
-    "Autoscaling dynamics (use multiple scenarios).",
+    "Autoscaling dynamics over time (use multiple scenarios).",
   ]}
   how={[
     "Billable hours per node ~= days per month x hours/day x utilization.",
     "Monthly cost = nodes x billable hours per node x $/hour.",
+    "Optionally add a peak scenario to compare baseline vs peak cost.",
     "This tool estimates node compute only (not load balancers, storage, or data transfer)."
   ]}
   faqs={[
@@ -35,14 +37,18 @@ const description =
     },
     {
       q: "Does this include control plane fees?",
-      a: "No. Some managed Kubernetes services have control plane charges-add those separately."
+      a: "No. Some managed Kubernetes services have control plane charges; add those separately."
+    },
+    {
+      q: "Why include a peak scenario?",
+      a: "It shows how autoscaling or seasonal spikes change your monthly cost and helps avoid under-budgeting."
     },
     {
       q: "What else should I add for a full Kubernetes cost estimate?",
       a: "Common add-ons include load balancers, persistent volumes, NAT/egress, logging/metrics, and control plane fees. Use this calculator for node compute, then layer the rest as separate line items."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost calculator" },
     { href: "/calculators/kubernetes-requests-limits-calculator", label: "Requests & limits sizing" },
@@ -52,6 +58,9 @@ const description =
 >
   <KubernetesNodeCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      Add a peak scenario to model autoscaling or seasonal spikes and compare the delta to your baseline budget.
+    </p>
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>

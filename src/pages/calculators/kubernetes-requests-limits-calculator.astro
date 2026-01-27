@@ -4,29 +4,31 @@ import { KubernetesRequestsLimitsCalculator as KubernetesRequestsLimitsCalculato
 
 const title = "Kubernetes Requests & Limits Calculator";
 const description =
-  "Convert per-pod CPU/memory requests and limits into totals and estimate node count from allocatable capacity. Educational use only.";
+  "Convert per-pod CPU/memory requests and limits into totals and estimate node count from allocatable capacity and pod limits. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/kubernetes-requests-limits-calculator"
-  intro="Requests drive scheduling. This tool converts per-pod requests into cluster totals and estimates how many nodes you need for those requests given an allocatable overhead."
+  intro="Requests drive scheduling. This tool converts per-pod requests into cluster totals and estimates how many nodes you need given allocatable overhead and max pods per node. Use baseline vs peak to stress-test the sizing."
   examples={[
     "60 pods with 250m CPU and 512Mi requests -> estimate total requests and node count for an 8 vCPU / 32 GiB node.",
-    "120 pods with 100m CPU and 256Mi requests -> see whether CPU or memory is the limiting factor.",
+    "120 pods with a 110 pods/node cap -> see how pod limits increase node count.",
   ]}
   includes={[
     "Totals for CPU/memory requests and limits from per-pod values and pod count.",
-    "Node count estimate based on allocatable percentage (headroom).",
+    "Node count estimate based on allocatable percentage and max pods per node.",
+    "Baseline vs peak comparison and bottleneck label.",
   ]}
   excludes={[
-    "Bin packing constraints (pods per node limits, affinities, taints) and daemonset overhead.",
+    "Bin packing constraints (affinities, taints, topology spread) and daemonset overhead.",
     "Network, storage, and control plane costs.",
   ]}
   how={[
     "Total requests = pods x per-pod request (CPU and memory).",
     "Allocatable per node = node capacity x allocatable percentage.",
-    "Node estimate uses the larger of CPU-based and memory-based counts."
+    "Node estimate uses the largest of CPU, memory, and pod-limit counts.",
+    "Compare baseline vs peak to understand scaling risk."
   ]}
   faqs={[
     {
@@ -38,19 +40,23 @@ const description =
       a: "A common planning value is 85-95% depending on kubelet/system reservations, daemonsets, and headroom."
     },
     {
+      q: "What is max pods per node?",
+      a: "Kubernetes enforces a pod cap per node (often 110). Even if CPU/memory fits, pod limits can require more nodes.",
+    },
+    {
       q: "Does this include per-node overhead like daemonsets?",
       a: "Not explicitly. Use a lower allocatable % or increase requests to account for overhead."
     },
     {
       q: "What about cluster autoscaler and bin packing?",
-      a: "This tool is a quick estimate. Real scheduling constraints (max pods per node, affinities, daemonsets) can increase node count. Treat the result as a floor and validate with real packing."
+      a: "This tool is a quick estimate. Real scheduling constraints (affinities, daemonsets, topology spread) can increase node count. Treat the result as a floor and validate with real packing."
     },
     {
       q: "How do I turn this into a cost estimate?",
       a: "Use the resulting node count with the Kubernetes Node Cost Calculator, and add control plane, load balancers, storage, and observability costs separately."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost calculator" },
     { href: "/guides/kubernetes-requests-limits", label: "Guide: requests & limits" },
@@ -61,6 +67,9 @@ const description =
 >
   <KubernetesRequestsLimitsCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      Use the peak multiplier to model traffic spikes, and set max pods per node to capture CNI pod caps.
+    </p>
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>

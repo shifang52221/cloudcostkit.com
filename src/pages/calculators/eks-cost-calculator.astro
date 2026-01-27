@@ -5,29 +5,30 @@ import { KubernetesRequestsLimitsCalculator } from "../../components/calculators
 
 const title = "EKS Cost Calculator";
 const description =
-  "Estimate EKS-style Kubernetes costs by sizing nodes from pod requests and applying per-node pricing. Educational use only.";
+  "Estimate EKS-style Kubernetes costs by sizing nodes from pod requests, checking pod limits, and applying per-node pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/eks-cost-calculator"
-  intro="EKS costs are usually driven by node compute. This EKS cost calculator helps you size nodes from pod requests and then estimate monthly cost using a per-node $/hour assumption. Add control plane, storage, and observability as separate line items."
+  intro="EKS costs are usually driven by node compute. This EKS cost calculator helps you size nodes from pod requests (including max pods per node) and then estimate monthly cost using a per-node $/hour assumption. Compare baseline vs peak and add control plane, storage, and observability as separate line items."
   examples={[
     "Use representative pod requests to estimate node count, then multiply by blended $/hour and uptime.",
-    "If memory is the bottleneck, node count is driven by memory requests even when CPU looks low.",
+    "Compare baseline vs peak to see how autoscaling changes node count and cost.",
   ]}
   includes={[
-    "Requests/limits sizing into cluster totals and node estimate.",
+    "Requests/limits sizing into cluster totals and node estimate (including max pods per node).",
+    "Baseline vs peak sizing summary and bottleneck highlight.",
     "Node cost estimate from node count, $/hour, and expected uptime.",
   ]}
   excludes={[
     "Control plane fees, load balancers, storage, logs/metrics, and data egress (add separately).",
-    "Scheduling constraints (affinities, max pods per node) that can increase node count.",
+    "Scheduling constraints (affinities, taints, topology spread) and daemonset overhead that can increase node count.",
   ]}
   how={[
-    "Step 1: Convert per-pod requests into totals and an estimated node count.",
+    "Step 1: Convert per-pod requests into totals and an estimated node count with pod limits.",
     "Step 2: Estimate monthly node cost from node count and $/hour pricing.",
-    "Step 3: Add separate line items for control plane, storage, observability, and egress."
+    "Step 3: Compare baseline vs peak scenarios and then add separate line items for control plane, storage, observability, and egress."
   ]}
   faqs={[
     {
@@ -38,8 +39,12 @@ const description =
       q: "Should I size by requests or limits?",
       a: "Scheduling uses requests. Limits are a safety ceiling and can be much higher than requests.",
     },
+    {
+      q: "Why does max pods per node matter?",
+      a: "EKS nodes also enforce a pod cap (often 110). That limit can force more nodes even if CPU/memory fits.",
+    },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-27"
   related={[
     { href: "/calculators/kubernetes-cost-calculator", label: "Kubernetes cost calculator (generic)" },
     { href: "/guides/aws-eks-pricing", label: "Guide: EKS pricing" },
@@ -53,6 +58,9 @@ const description =
     <p class="muted" style="margin-top:8px">
       Use representative requests (not peak limits). Choose an allocatable % to reserve capacity for kube-system and
       headroom.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      Include max pods per node if your CNI enforces pod caps, and compare baseline vs peak to avoid surprises.
     </p>
   </div>
   <KubernetesRequestsLimitsCalculator client:load />
@@ -95,4 +103,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

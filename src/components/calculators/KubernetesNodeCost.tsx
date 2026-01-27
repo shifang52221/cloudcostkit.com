@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateComputeCost } from "../../lib/calc/compute";
 import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -9,6 +9,8 @@ export function KubernetesNodeCostCalculator() {
   const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("KubernetesNodeCost.pricePerHourUsd", 0.32);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("KubernetesNodeCost.utilizationPct", 100);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("KubernetesNodeCost.hoursPerDay", 24);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("KubernetesNodeCost.showPeakScenario", false);
+  const [peakNodes, setPeakNodes] = useNumberParamState("KubernetesNodeCost.peakNodes", 18);
 
   const result = useMemo(() => {
     return estimateComputeCost({
@@ -18,6 +20,16 @@ export function KubernetesNodeCostCalculator() {
       hoursPerDay: clamp(hoursPerDay, 0, 24),
     });
   }, [nodes, pricePerHourUsd, utilizationPct, hoursPerDay]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    return estimateComputeCost({
+      instances: clamp(peakNodes, 0, 1e9),
+      pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
+      utilizationPct: clamp(utilizationPct, 0, 100),
+      hoursPerDay: clamp(hoursPerDay, 0, 24),
+    });
+  }, [hoursPerDay, peakNodes, pricePerHourUsd, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -57,7 +69,7 @@ export function KubernetesNodeCostCalculator() {
               step={1}
               onChange={(e) => setUtilizationPct(+e.target.value)}
             />
-            <div className="hint">Use &lt;100% if nodes aren’t running 24/7.</div>
+            <div className="hint">Use &lt;100% if nodes aren't running 24/7.</div>
           </div>
           <div className="field field-3">
             <div className="label">Hours/day</div>
@@ -72,6 +84,32 @@ export function KubernetesNodeCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak nodes</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakNodes}
+                min={0}
+                step={1}
+                onChange={(e) => setPeakNodes(+e.target.value)}
+              />
+              <div className="hint">Use peak month node count.</div>
+            </div>
+          ) : null}
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -82,6 +120,8 @@ export function KubernetesNodeCostCalculator() {
                   setPricePerHourUsd(0.32);
                   setUtilizationPct(100);
                   setHoursPerDay(24);
+                  setShowPeakScenario(false);
+                  setPeakNodes(18);
                 }}
               >
                 Reset example
@@ -104,9 +144,20 @@ export function KubernetesNodeCostCalculator() {
               {formatNumber(result.billableHoursPerInstance, 0)} hr ({formatPercent(result.utilizationPct, 0)})
             </div>
           </div>
+          {peakResult ? (
+            <div className="kpi">
+              <div className="k">Peak monthly node cost</div>
+              <div className="v">{formatCurrency2(peakResult.monthlyCostUsd)}</div>
+            </div>
+          ) : null}
+          {peakResult ? (
+            <div className="kpi">
+              <div className="k">Peak delta</div>
+              <div className="v">{formatCurrency2(peakResult.monthlyCostUsd - result.monthlyCostUsd)}</div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
-

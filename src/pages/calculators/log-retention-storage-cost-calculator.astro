@@ -10,14 +10,15 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/log-retention-storage-cost-calculator"
-  intro="Retention turns a daily log stream into a steady-state stored dataset. This calculator estimates retained GB and monthly storage cost using a simple model: retained GB ≈ GB/day × retention days."
+  intro="Retention turns a daily log stream into a steady-state stored dataset. This calculator estimates retained GB and monthly storage cost using a simple model: retained GB = GB/day x retention days. Compare baseline vs peak when volume spikes."
   examples={[
-    "50 GB/day with 30-day retention → ~1,500 GB retained steady-state (before vendor-specific compression rules).",
-    "If you retain 90–365 days, storage often becomes the dominant log line item.",
+    "50 GB/day with 30-day retention = ~1,500 GB retained steady-state (before vendor-specific compression rules).",
+    "If you retain 90-365 days, storage often becomes the dominant log line item.",
   ]}
   includes={[
-    "Steady-state retained volume estimate (GB/day × retention days).",
+    "Steady-state retained volume estimate (GB/day x retention days).",
     "Monthly storage estimate from retained GB and $/GB-month.",
+    "Baseline vs peak storage comparison for volume spikes.",
   ]}
   excludes={[
     "Ingestion charges (use Log Ingestion calculator).",
@@ -25,8 +26,9 @@ const description =
     "Tiered hot/cold storage modeling (use Tiered Log Storage calculator).",
   ]}
   how={[
-    "Retained volume (steady state) ≈ GB/day × retention days.",
-    "Monthly storage cost = retained GB × $/GB-month.",
+    "Retained volume (steady state) = GB/day x retention days.",
+    "Monthly storage cost = retained GB x $/GB-month.",
+    "Use peak multiplier when incident logging increases volume.",
     "If retention differs by log type, model each log type separately and sum.",
   ]}
   faqs={[
@@ -58,13 +60,13 @@ const description =
     <h2 style="margin-top:0">A practical retention policy (by log class)</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
       <li>
-        <strong>Access/ingress logs</strong>: 7–14 days hot retention (high volume, mostly operational value).
+        <strong>Access/ingress logs</strong>: 7-14 days hot retention (high volume, mostly operational value).
       </li>
       <li>
-        <strong>Application logs</strong>: 14–30 days (enough for incident timelines).
+        <strong>Application logs</strong>: 14-30 days (enough for incident timelines).
       </li>
       <li>
-        <strong>Audit/security logs</strong>: 90–365 days (compliance-driven; keep volume controlled).
+        <strong>Audit/security logs</strong>: 90-365 days (compliance-driven; keep volume controlled).
       </li>
     </ul>
     <p class="muted" style="margin-top:10px">
@@ -78,8 +80,7 @@ const description =
     <ul>
       <li>Validate measured ingestion (GB/day) for your top sources, not a blended average.</li>
       <li>Validate retention settings per table/source (defaults often drift).</li>
-      <li>Validate what the vendor bills as “stored GB” (compressed size vs ingested size differs by provider).</li>
+      <li>Validate what the vendor bills as stored GB (compressed size vs ingested size differs by provider).</li>
     </ul>
   </div>
 </CalculatorLayout>
-

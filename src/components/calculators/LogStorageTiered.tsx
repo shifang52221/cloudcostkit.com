@@ -14,6 +14,8 @@ export function LogStorageTieredCostCalculator() {
   const [coldPricePerGbMonthUsd, setColdPricePerGbMonthUsd] = useNumberParamState("LogStorageTiered.coldPricePerGbMonthUsd", 0.01);
   const [archiveFraction, setArchiveFraction] = useNumberParamState("LogStorageTiered.archiveFraction", 1);
   const [coldCompressionRatio, setColdCompressionRatio] = useNumberParamState("LogStorageTiered.coldCompressionRatio", 1);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogStorageTiered.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogStorageTiered.peakMultiplierPct", 150);
 
   const result = useMemo(() => {
     const safeGbPerDay = clamp(gbPerDay, 0, 1e12);
@@ -62,6 +64,59 @@ export function LogStorageTieredCostCalculator() {
     gbPerDay,
     hotPricePerGbMonthUsd,
     hotRetentionDays,
+  ]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const safeMultiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    const safeGbPerDay = clamp(gbPerDay, 0, 1e12) * safeMultiplier;
+    const safeHotDays = clamp(hotRetentionDays, 0, 3650);
+    const safeHotPrice = clamp(hotPricePerGbMonthUsd, 0, 1e6);
+
+    const safeColdEnabled = Boolean(enableColdTier);
+    const safeColdDays = safeColdEnabled ? clamp(coldAdditionalDays, 0, 3650) : 0;
+    const safeColdPrice = safeColdEnabled ? clamp(coldPricePerGbMonthUsd, 0, 1e6) : 0;
+    const safeArchiveFraction = safeColdEnabled ? clamp(archiveFraction, 0, 1) : 0;
+    const safeCompressionRatio = safeColdEnabled ? clamp(coldCompressionRatio, 0, 1) : 0;
+
+    const hotStoredGb = safeGbPerDay * safeHotDays;
+    const hotCostUsd = hotStoredGb * safeHotPrice;
+
+    const coldStoredGb = safeGbPerDay * safeArchiveFraction * safeCompressionRatio * safeColdDays;
+    const coldCostUsd = coldStoredGb * safeColdPrice;
+
+    const totalStoredGb = hotStoredGb + coldStoredGb;
+    const totalMonthlyStorageCostUsd = hotCostUsd + coldCostUsd;
+    const totalRetentionDays = safeHotDays + safeColdDays;
+
+    return {
+      gbPerDay: safeGbPerDay,
+      hotRetentionDays: safeHotDays,
+      hotPricePerGbMonthUsd: safeHotPrice,
+      enableColdTier: safeColdEnabled,
+      coldAdditionalDays: safeColdDays,
+      coldPricePerGbMonthUsd: safeColdPrice,
+      archiveFraction: safeArchiveFraction,
+      coldCompressionRatio: safeCompressionRatio,
+      hotStoredGb,
+      hotCostUsd,
+      coldStoredGb,
+      coldCostUsd,
+      totalStoredGb,
+      totalMonthlyStorageCostUsd,
+      totalRetentionDays,
+    };
+  }, [
+    archiveFraction,
+    coldAdditionalDays,
+    coldCompressionRatio,
+    coldPricePerGbMonthUsd,
+    enableColdTier,
+    gbPerDay,
+    hotPricePerGbMonthUsd,
+    hotRetentionDays,
+    peakMultiplierPct,
+    showPeakScenario,
   ]);
 
   return (
@@ -143,7 +198,7 @@ export function LogStorageTieredCostCalculator() {
           </div>
 
           <div className="field field-3">
-            <div className="label">Archive fraction (0–1)</div>
+            <div className="label">Archive fraction (0-1)</div>
             <input
               type="number"
               inputMode="decimal"
@@ -158,7 +213,7 @@ export function LogStorageTieredCostCalculator() {
           </div>
 
           <div className="field field-3">
-            <div className="label">Cold compression ratio (0–1)</div>
+            <div className="label">Cold compression ratio (0-1)</div>
             <input
               type="number"
               inputMode="decimal"
@@ -171,6 +226,33 @@ export function LogStorageTieredCostCalculator() {
             />
             <div className="hint">Use 1 if the vendor bills on the same GB for cold storage.</div>
           </div>
+
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Use a peak month or incident spike.</div>
+            </div>
+          ) : null}
 
           <div className="field field-6">
             <div className="btn-row">
@@ -186,6 +268,8 @@ export function LogStorageTieredCostCalculator() {
                   setColdPricePerGbMonthUsd(0.01);
                   setArchiveFraction(1);
                   setColdCompressionRatio(1);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(150);
                 }}
               >
                 Reset example
@@ -227,8 +311,43 @@ export function LogStorageTieredCostCalculator() {
             <div className="v">{formatNumber(result.totalStoredGb, 0)} GB</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">GB/day</th>
+                  <th className="num">Stored GB</th>
+                  <th className="num">Monthly cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.gbPerDay, 2)}</td>
+                  <td className="num">{formatNumber(result.totalStoredGb, 0)}</td>
+                  <td className="num">{formatCurrency2(result.totalMonthlyStorageCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.gbPerDay, 2)}</td>
+                  <td className="num">{formatNumber(peakResult.totalStoredGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalMonthlyStorageCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.gbPerDay - result.gbPerDay, 2)}</td>
+                  <td className="num">{formatNumber(peakResult.totalStoredGb - result.totalStoredGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalMonthlyStorageCostUsd - result.totalMonthlyStorageCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

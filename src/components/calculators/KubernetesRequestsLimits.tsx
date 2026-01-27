@@ -13,6 +13,8 @@ export function KubernetesRequestsLimitsCalculator() {
   const [nodeCpuCores, setNodeCpuCores] = useNumberParamState("KubernetesRequestsLimits.nodeCpuCores", 8);
   const [nodeMemGiB, setNodeMemGiB] = useNumberParamState("KubernetesRequestsLimits.nodeMemGiB", 32);
   const [nodeAllocatablePct, setNodeAllocatablePct] = useNumberParamState("KubernetesRequestsLimits.nodeAllocatablePct", 90);
+  const [maxPodsPerNode, setMaxPodsPerNode] = useNumberParamState("KubernetesRequestsLimits.maxPodsPerNode", 110);
+  const [peakPodMultiplierPct, setPeakPodMultiplierPct] = useNumberParamState("KubernetesRequestsLimits.peakPodMultiplierPct", 125);
 
   const result = useMemo(() => {
     return estimateK8sResources({
@@ -24,6 +26,7 @@ export function KubernetesRequestsLimitsCalculator() {
       nodeCpuCores: clamp(nodeCpuCores, 0.25, 2048),
       nodeMemGiB: clamp(nodeMemGiB, 0.5, 8192),
       nodeAllocatablePct: clamp(nodeAllocatablePct, 50, 100) / 100,
+      maxPodsPerNode: clamp(maxPodsPerNode, 0, 10000),
     });
   }, [
     pods,
@@ -34,7 +37,48 @@ export function KubernetesRequestsLimitsCalculator() {
     nodeCpuCores,
     nodeMemGiB,
     nodeAllocatablePct,
+    maxPodsPerNode,
   ]);
+
+  const peakResult = useMemo(() => {
+    const safeMultiplier = clamp(peakPodMultiplierPct, 100, 1000) / 100;
+    const peakPods = Math.ceil(clamp(pods, 0, 1e8) * safeMultiplier);
+
+    return estimateK8sResources({
+      pods: peakPods,
+      cpuRequestMillicores: clamp(cpuRequestMillicores, 0, 1e9),
+      memRequestMiB: clamp(memRequestMiB, 0, 1e12),
+      cpuLimitMillicores: clamp(cpuLimitMillicores, 0, 1e9),
+      memLimitMiB: clamp(memLimitMiB, 0, 1e12),
+      nodeCpuCores: clamp(nodeCpuCores, 0.25, 2048),
+      nodeMemGiB: clamp(nodeMemGiB, 0.5, 8192),
+      nodeAllocatablePct: clamp(nodeAllocatablePct, 50, 100) / 100,
+      maxPodsPerNode: clamp(maxPodsPerNode, 0, 10000),
+    });
+  }, [
+    cpuLimitMillicores,
+    cpuRequestMillicores,
+    maxPodsPerNode,
+    memLimitMiB,
+    memRequestMiB,
+    nodeAllocatablePct,
+    nodeCpuCores,
+    nodeMemGiB,
+    peakPodMultiplierPct,
+    pods,
+  ]);
+
+  const peakPods = Math.ceil(clamp(pods, 0, 1e8) * (clamp(peakPodMultiplierPct, 100, 1000) / 100));
+  const peakDeltaNodes = peakResult.nodesNeededForRequests - result.nodesNeededForRequests;
+
+  const bottleneckLabel = (r: typeof result) => {
+    const maxNodes = r.nodesNeededForRequests;
+    if (maxNodes === 0) return "None";
+    if (r.nodesByPodLimit === maxNodes && r.nodesByPodLimit > 0) return "Max pods per node";
+    if (r.nodesByCpuRequest === maxNodes && r.nodesByCpuRequest > 0) return "CPU requests";
+    if (r.nodesByMemRequest === maxNodes && r.nodesByMemRequest > 0) return "Memory requests";
+    return "Mixed";
+  };
 
   return (
     <div className="calc-grid">
@@ -133,6 +177,93 @@ export function KubernetesRequestsLimitsCalculator() {
             <div className="hint">Reserve capacity for kubelet/daemonsets/overhead.</div>
           </div>
 
+          <div className="field field-3">
+            <div className="label">Max pods per node</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={maxPodsPerNode}
+              min={0}
+              step={1}
+              onChange={(e) => setMaxPodsPerNode(+e.target.value)}
+            />
+            <div className="hint">Set to 0 to ignore pod limits.</div>
+          </div>
+
+          <div className="field field-3">
+            <div className="label">Peak pods multiplier (%)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={peakPodMultiplierPct}
+              min={100}
+              max={1000}
+              step={5}
+              onChange={(e) => setPeakPodMultiplierPct(+e.target.value)}
+            />
+            <div className="hint">Model a peak month (traffic spikes, reprocessing, incidents).</div>
+          </div>
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setPods(30);
+                  setCpuRequestMillicores(200);
+                  setMemRequestMiB(384);
+                  setCpuLimitMillicores(400);
+                  setMemLimitMiB(768);
+                  setNodeCpuCores(4);
+                  setNodeMemGiB(16);
+                  setNodeAllocatablePct(85);
+                  setMaxPodsPerNode(60);
+                  setPeakPodMultiplierPct(140);
+                }}
+              >
+                Small service
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setPods(80);
+                  setCpuRequestMillicores(300);
+                  setMemRequestMiB(512);
+                  setCpuLimitMillicores(600);
+                  setMemLimitMiB(1024);
+                  setNodeCpuCores(8);
+                  setNodeMemGiB(32);
+                  setNodeAllocatablePct(90);
+                  setMaxPodsPerNode(110);
+                  setPeakPodMultiplierPct(150);
+                }}
+              >
+                Prod baseline
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setPods(120);
+                  setCpuRequestMillicores(400);
+                  setMemRequestMiB(768);
+                  setCpuLimitMillicores(800);
+                  setMemLimitMiB(1536);
+                  setNodeCpuCores(16);
+                  setNodeMemGiB(64);
+                  setNodeAllocatablePct(85);
+                  setMaxPodsPerNode(110);
+                  setPeakPodMultiplierPct(180);
+                }}
+              >
+                High traffic
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -147,6 +278,8 @@ export function KubernetesRequestsLimitsCalculator() {
                   setNodeCpuCores(8);
                   setNodeMemGiB(32);
                   setNodeAllocatablePct(90);
+                  setMaxPodsPerNode(110);
+                  setPeakPodMultiplierPct(125);
                 }}
               >
                 Reset example
@@ -172,12 +305,58 @@ export function KubernetesRequestsLimitsCalculator() {
             <div className="v">{formatNumber(result.nodesNeededForRequests, 0)}</div>
           </div>
           <div className="kpi">
+            <div className="k">Bottleneck</div>
+            <div className="v">{bottleneckLabel(result)}</div>
+          </div>
+          <div className="kpi">
             <div className="k">Allocatable per node</div>
             <div className="v">
               {formatNumber(result.allocatableCpu, 2)} cores / {formatNumber(result.allocatableMemGiB, 2)} GiB (
               {formatPercent(result.nodeAllocatablePct, 0)})
             </div>
           </div>
+          <div className="kpi">
+            <div className="k">Max pods per node</div>
+            <div className="v">{maxPodsPerNode > 0 ? formatNumber(maxPodsPerNode, 0) : "Ignored"}</div>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th className="num">Pods</th>
+                <th className="num">Nodes</th>
+                <th className="num">CPU req (cores)</th>
+                <th className="num">Mem req (GiB)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Baseline</td>
+                <td className="num">{formatNumber(result.pods, 0)}</td>
+                <td className="num">{formatNumber(result.nodesNeededForRequests, 0)}</td>
+                <td className="num">{formatNumber(result.totalCpuRequestCores, 2)}</td>
+                <td className="num">{formatNumber(result.totalMemRequestGiB, 2)}</td>
+              </tr>
+              <tr>
+                <td>Peak</td>
+                <td className="num">{formatNumber(peakPods, 0)}</td>
+                <td className="num">{formatNumber(peakResult.nodesNeededForRequests, 0)}</td>
+                <td className="num">{formatNumber(peakResult.totalCpuRequestCores, 2)}</td>
+                <td className="num">{formatNumber(peakResult.totalMemRequestGiB, 2)}</td>
+              </tr>
+              <tr>
+                <td>Delta</td>
+                <td className="num">{formatNumber(peakPods - result.pods, 0)}</td>
+                <td className="num">{formatNumber(peakDeltaNodes, 0)}</td>
+                <td className="num">{formatNumber(peakResult.totalCpuRequestCores - result.totalCpuRequestCores, 2)}</td>
+                <td className="num">{formatNumber(peakResult.totalMemRequestGiB - result.totalMemRequestGiB, 2)}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <details style={{ marginTop: 12 }}>
@@ -207,4 +386,3 @@ export function KubernetesRequestsLimitsCalculator() {
     </div>
   );
 }
-

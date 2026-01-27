@@ -9,6 +9,7 @@ export function estimateK8sResources(opts: {
   nodeCpuCores: number;
   nodeMemGiB: number;
   nodeAllocatablePct?: number;
+  maxPodsPerNode?: number;
 }) {
   const pods = Math.floor(clamp(opts.pods, 0, 1e8));
   const cpuRequestMillicores = clamp(opts.cpuRequestMillicores, 0, 1e9);
@@ -19,6 +20,7 @@ export function estimateK8sResources(opts: {
   const nodeCpuCores = clamp(opts.nodeCpuCores, 0.25, 2048);
   const nodeMemGiB = clamp(opts.nodeMemGiB, 0.5, 8192);
   const nodeAllocatablePct = clamp(opts.nodeAllocatablePct ?? 0.9, 0.5, 1);
+  const maxPodsPerNode = clamp(opts.maxPodsPerNode ?? 0, 0, 1e6);
 
   const totalCpuRequestCores = (pods * cpuRequestMillicores) / 1000;
   const totalCpuLimitCores = (pods * cpuLimitMillicores) / 1000;
@@ -30,7 +32,8 @@ export function estimateK8sResources(opts: {
 
   const nodesByCpuRequest = allocatableCpu > 0 ? Math.ceil(totalCpuRequestCores / allocatableCpu) : 0;
   const nodesByMemRequest = allocatableMemGiB > 0 ? Math.ceil(totalMemRequestGiB / allocatableMemGiB) : 0;
-  const nodesNeededForRequests = Math.max(nodesByCpuRequest, nodesByMemRequest);
+  const nodesByPodLimit = maxPodsPerNode > 0 ? Math.ceil(pods / maxPodsPerNode) : 0;
+  const nodesNeededForRequests = Math.max(nodesByCpuRequest, nodesByMemRequest, nodesByPodLimit);
 
   return {
     pods,
@@ -41,6 +44,7 @@ export function estimateK8sResources(opts: {
     nodeCpuCores,
     nodeMemGiB,
     nodeAllocatablePct,
+    maxPodsPerNode,
     totalCpuRequestCores,
     totalCpuLimitCores,
     totalMemRequestGiB,
@@ -49,7 +53,7 @@ export function estimateK8sResources(opts: {
     allocatableMemGiB,
     nodesByCpuRequest,
     nodesByMemRequest,
+    nodesByPodLimit,
     nodesNeededForRequests,
   };
 }
-
