@@ -8,7 +8,7 @@ const description =
 const faqs = [
   {
     q: "What usually drives API gateway costs?",
-    a: "Request volume and data transfer are the most common drivers. Logging and analytics can dominate if you emit large logs per request.",
+    a: "Request volume and data transfer are the most common drivers. Logging and analytics can dominate if you emit large logs per request or keep long retention.",
   },
   {
     q: "How do I estimate quickly?",
@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "How do I validate?",
-    a: "Validate request volume from a representative window and explicitly validate retry behavior (which multiplies requests and logs).",
+    a: "Validate request volume from a representative window and explicitly validate retry behavior (which multiplies requests, transfer, and logs).",
   },
 ];
 ---
@@ -24,50 +24,91 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-api-management-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     API Management pricing is easiest to estimate with a driver model: <strong>requests</strong>, <strong>transfer</strong>,
-    and <strong>logs</strong>. Underestimates usually come from retry storms, large payloads, or unbounded access logs.
+    and <strong>logs</strong>. Underestimates usually come from retry storms, large payload endpoints, and unbounded access logs.
   </p>
+
+  <h2>0) Define what you are protecting</h2>
+  <ul>
+    <li>
+      <strong>Which APIs</strong>: not all endpoints have the same payload sizes or traffic.
+    </li>
+    <li>
+      <strong>Baseline vs peak</strong>: incidents and deploys can multiply retries and traffic.
+    </li>
+    <li>
+      <strong>Logging plan</strong>: always-on full logs vs targeted sampling (logging can become the second bill).
+    </li>
+  </ul>
 
   <h2>1) Requests (per month)</h2>
   <p>
-    Start from RPS, convert to monthly requests, then split by endpoint group if you have a large range of response sizes
-    (e.g., “small JSON” vs “large exports”).
+    Start from RPS, convert to monthly requests, then split endpoints into at least two buckets if response sizes vary
+    significantly (for example: small JSON vs large exports).
   </p>
-  <p>
-    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>,{" "}
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
     <a href="/calculators/api-request-cost-calculator/">API request cost</a>.
   </p>
 
   <h2>2) Response transfer (GB/month)</h2>
   <p>
-    Estimate transfer from response size and request volume. If you front your APIs with a CDN, keep CDN edge bandwidth
+    Estimate transfer from response size and request volume. If you front APIs with a CDN, keep CDN edge bandwidth
     separate from origin egress and avoid double-counting.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
     <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
   </p>
 
   <h2>3) Logs and observability</h2>
   <p>
-    Access logs and application logs scale with requests. A simple estimate is:
-    <strong>bytes logged per request × monthly requests</strong>. If you store logs for weeks, retention can become a large
-    secondary driver.
+    Access logs and application logs scale with requests. A simple estimate is: <strong>bytes logged per request * monthly requests</strong>.
+    If you store logs for weeks, retention becomes a large secondary driver.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
     <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>4) Retry behavior (the hidden multiplier)</h2>
   <ul>
-    <li>Validate retry rates and timeouts (retries multiply requests, transfer, and logs).</li>
-    <li>Validate average response size using real traffic samples (model “big endpoints” separately).</li>
-    <li>Validate log bytes/request and retention window (don’t assume “logs are small”).</li>
+    <li>Timeouts and client retries multiply requests and transfer.</li>
+    <li>Failed authentication loops can create high request rates with small payloads (cheap transfer, expensive requests/logs).</li>
+    <li>Backfills and replays often look like a one-time event but run for weeks.</li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>Transfer GB/month</strong> = requests/month * avg response size (GB) (split "large endpoints" separately)
+    </li>
+    <li>
+      <strong>Logs GB/month</strong> = requests/month * bytes logged per request / 1e9 (approx)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using one average response size across endpoints with wildly different payloads.</li>
+    <li>Ignoring retry storms (requests and logs multiply during incidents).</li>
+    <li>Double-counting CDN bandwidth and origin egress as the same GB.</li>
+    <li>Assuming logs are small; high-cardinality logs can explode ingestion.</li>
+    <li>Estimating only the gateway and ignoring downstream cost (compute, databases, and logs).</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>Validate request volume from a representative week and scale to monthly.</li>
+    <li>Sample real responses to confirm average payload sizes for your top endpoints.</li>
+    <li>Validate log bytes/request and retention windows (and dashboard scan windows).</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -77,5 +118,18 @@ const faqs = [
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/api-management/" target="_blank" rel="nofollow noopener">
+        Azure API Management pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/api-management/" target="_blank" rel="nofollow noopener">
+        API Management documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

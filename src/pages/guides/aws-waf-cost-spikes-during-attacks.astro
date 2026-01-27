@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-waf-cost-spikes-during-attacks"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -44,10 +44,34 @@ const faqs = [
     Simple approximation: <strong>extra requests = surge RPS x surge seconds</strong>. Then add to your steady
     requests/month.
   </p>
+  <ul>
+    <li>
+      Keep two scenarios: <strong>baseline</strong> (typical month) and <strong>attack</strong> (surge traffic for a few hours/days).
+    </li>
+    <li>
+      Include <strong>blocked</strong> and <strong>allowed</strong> requests together (evaluated requests).
+    </li>
+  </ul>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-waf-estimate-requests/">Estimate WAF requests</a>
     <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
   </div>
+
+  <h2>Worked surge example (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Baseline</strong>: 500 RPS sustained -&gt; convert to monthly requests.
+    </li>
+    <li>
+      <strong>Attack</strong>: +5,000 RPS for 6 hours/day for 3 days -&gt; extra requests = 5,000 * (6 * 3600) * 3.
+    </li>
+    <li>
+      <strong>Total</strong>: baseline monthly + extra attack requests.
+    </li>
+  </ul>
+  <p class="muted">
+    The purpose is not perfect math; it is to avoid budgeting only the steady state and getting surprised by the peak.
+  </p>
 
   <h2>Step 3: reduce evaluated requests (high leverage)</h2>
   <ul>
@@ -56,12 +80,30 @@ const faqs = [
     <li><strong>Block</strong> obvious bot paths and bad user agents with targeted rules.</li>
     <li><strong>Move traffic up</strong> the stack: stop bad traffic at the CDN edge when possible.</li>
   </ul>
+  <ul>
+    <li>
+      Use a <strong>narrow allowlist</strong> for truly public endpoints during incidents (reduce evaluation surface).
+    </li>
+    <li>
+      Keep <strong>one high-confidence emergency policy</strong> ready (temporary controls tend to become permanent if you do not review them).
+    </li>
+  </ul>
 
   <h2>Step 4: don't let security logging become the bigger bill</h2>
   <ul>
     <li>Sample or filter logs for high-volume endpoints where full fidelity isn't required.</li>
     <li>Set retention intentionally for noisy logs.</li>
     <li>Optimize queries and dashboards to avoid repeated large scans.</li>
+  </ul>
+  <p class="muted">
+    If you need detailed investigation, prefer targeted logging for specific rules or short windows instead of always-on full-fidelity logs.
+  </p>
+
+  <h2>How to validate after an attack</h2>
+  <ul>
+    <li>Reconcile evaluated requests (allowed + blocked) against the WAF bill for the same window.</li>
+    <li>Compare baseline days vs attack days and keep the peak scenario for future budgets.</li>
+    <li>Check whether logging and dashboards caused repeated scans of large windows during incident response.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -84,5 +126,19 @@ const faqs = [
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/waf/pricing/" target="_blank" rel="nofollow noopener">
+        AWS WAF pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/waf/latest/developerguide/logging.html" target="_blank" rel="nofollow noopener">
+        AWS WAF logging
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>

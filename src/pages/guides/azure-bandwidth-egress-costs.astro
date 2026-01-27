@@ -24,7 +24,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-bandwidth-egress-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -32,37 +32,74 @@ const faqs = [
     boundaries: <strong>internet egress</strong>, <strong>cross-region transfer</strong>, and <strong>origin egress to CDN</strong>.
   </p>
 
-  <h2>1) Break down traffic by destination</h2>
+  <h2>1) Break down traffic by destination (define the boundary)</h2>
   <ul>
-    <li>To the internet (end users, third-party APIs, SaaS)</li>
+    <li>To the internet (end users, partners, third-party APIs, SaaS)</li>
     <li>Cross-region (replication, multi-region services, DR)</li>
-    <li>To a CDN origin (cache fill, misses)</li>
+    <li>To a CDN origin (cache fill, misses, revalidation)</li>
+  </ul>
+  <p class="muted">
+    Most budgeting mistakes are boundary mistakes: counting the same GB twice, or pricing the wrong path with a blended rate.
+  </p>
+
+  <h2>2) Estimate GB/month (pick the best method you can)</h2>
+  <h3>Method A: From billing exports (best for budgets)</h3>
+  <ul>
+    <li>Identify outbound transfer usage types and sum by month.</li>
+    <li>Break down by region and by service (one noisy service can dominate egress).</li>
   </ul>
 
-  <h2>2) Convert your metrics to GB/month</h2>
-  <p>
-    If you have Mbps charts, convert to GB/month using a representative average. If you have request rates, estimate average
-    response size and multiply by requests.
-  </p>
-  <p>
-    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
-    <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>.
-  </p>
+  <h3>Method B: From throughput charts (good first pass)</h3>
+  <ul>
+    <li>Convert Mbps to GB/month with the <a href="/calculators/unit-converter/">Units Converter</a>.</li>
+    <li>Apply a boundary share (internet vs cross-region vs CDN origin) and test low/medium/high sensitivity.</li>
+  </ul>
 
-  <h2>3) Apply an effective blended rate (for planning)</h2>
+  <h3>Method C: From requests and payload size</h3>
+  <ul>
+    <li>requests/month * avg response size = transfer volume (split large endpoints separately)</li>
+    <li>
+      Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
+      <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
+    </li>
+  </ul>
+
+  <h2>3) Apply an effective rate (for planning)</h2>
   <p>
-    For budgeting, it’s acceptable to use a blended effective rate per GB and refine later. The key is to avoid
-    double-counting (e.g., counting CDN edge bandwidth as origin egress).
+    For budgeting, it is acceptable to use a blended effective rate per GB and refine later. The key is to avoid
+    double-counting (for example, counting CDN edge bandwidth as origin egress).
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
   <ul>
-    <li>Validate what is billed as egress vs internal traffic (don’t assume all outbound is billed equally).</li>
-    <li>Validate CDN origin egress separately from edge bandwidth and cache hit rate behavior.</li>
-    <li>Validate units (GB vs GiB) and time windows (monthly vs rolling windows).</li>
+    <li>
+      <strong>Internet egress</strong> = GB/month delivered to end users (separate CDN bandwidth from origin egress)
+    </li>
+    <li>
+      <strong>CDN origin egress</strong> = cache misses/month * object size (GB) + revalidation traffic
+    </li>
+    <li>
+      <strong>Cross-region</strong> = replication GB/month + cross-region reads GB/month
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Double-counting CDN bandwidth and origin egress as the same GB.</li>
+    <li>Mixing regions and applying one $/GB to multiple transfer paths.</li>
+    <li>Unit mistakes: GB vs GiB and Mbps vs MB/s.</li>
+    <li>Ignoring peak events (backfills, audits, incidents) that dominate a month.</li>
+    <li>Assuming all outbound is billed equally (internal vs internet vs cross-region differ).</li>
+  </ul>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Reconcile your modeled GB/month boundaries against one real billing cycle.</li>
+    <li>Spot-check the top destinations/services to confirm the boundary mapping is correct.</li>
+    <li>Keep a separate peak scenario for backfills and incident windows.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -72,5 +109,13 @@ const faqs = [
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/bandwidth/" target="_blank" rel="nofollow noopener">
+        Azure Bandwidth pricing
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

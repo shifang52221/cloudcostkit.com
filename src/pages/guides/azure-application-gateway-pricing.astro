@@ -8,11 +8,11 @@ const description =
 const faqs = [
   {
     q: "What usually drives Application Gateway cost?",
-    a: "Gateway-hours are the baseline, but throughput and request volume (plus WAF and logging) often decide the real bill.",
+    a: "Gateway-hours are the baseline, but traffic processed and request volume (plus WAF and logging) often decide the real bill.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Start with hours + expected request rate and response size to estimate monthly GB. Add separate estimates for WAF and logs if enabled.",
+    a: "Start with hours plus expected request rate and response size to estimate monthly GB. Add separate estimates for WAF and logs if enabled.",
   },
   {
     q: "How do I validate?",
@@ -24,54 +24,92 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-application-gateway-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
-    L7 load balancer bills usually scale with <strong>time</strong>, <strong>traffic processed</strong>, and sometimes
-    <strong>requests</strong>. The main mistake is to estimate only “one gateway” without modeling traffic and log volume.
+    L7 gateway bills usually scale with <strong>time</strong>, <strong>traffic processed</strong>, and sometimes <strong>requests</strong>.
+    The main mistake is to budget only "one gateway" without modeling traffic and log volume (or missing peak windows).
   </p>
+
+  <h2>0) Define the gateway scope</h2>
+  <ul>
+    <li>
+      <strong>Environments</strong>: prod + staging + dev (hours multiply quickly).
+    </li>
+    <li>
+      <strong>Public vs private</strong>: internet-facing gateways often have meaningful egress and WAF/log exposure.
+    </li>
+    <li>
+      <strong>Baseline vs peak</strong>: gateways are designed for peaks; cost and reliability both depend on peak behavior.
+    </li>
+  </ul>
 
   <h2>1) Time (gateway-hours)</h2>
   <p>
-    Start with the number of gateways and hours per month. If you run multiple environments (dev/stage/prod), model them
+    Start with the number of gateways and hours per month. If you run multiple regions or multiple environments, model them
     separately.
   </p>
 
-  <h2>2) Requests and response sizes</h2>
+  <h2>2) Requests and response sizes (traffic processed)</h2>
   <p>
-    Request volume and response sizes determine traffic processed. If you know only RPS, convert to monthly requests, then
-    estimate average response size to get GB transferred.
+    Request volume and response sizes determine traffic processed. If you only know RPS, convert to monthly requests, then
+    estimate average response size to get GB/month.
   </p>
-  <p>
-    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → requests</a>,{" "}
+  <p class="muted">
+    Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
     <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>.
   </p>
 
   <h2>3) Data transfer (egress)</h2>
   <p>
     If the gateway sends data to the internet, outbound transfer is often billed separately and can dominate cost for
-    high-bandwidth apps.
+    high-bandwidth apps. Keep CDN bandwidth separate from origin egress if you front the gateway with a CDN.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
   </p>
 
-  <h2>4) WAF and logging</h2>
+  <h2>4) WAF and logging (the "second bill")</h2>
   <p>
     If WAF and access logs are enabled, model them separately. WAF is request-driven; logs are volume-driven (GB ingested +
-    retention).
+    retention + query scans). During incidents, both can spike.
   </p>
-  <p>
-    Tools: <a href="/calculators/cdn-request-cost-calculator/">Request cost</a>,{" "}
-    <a href="/calculators/log-cost-calculator/">Log cost</a>.
+  <p class="muted">
+    Tools: <a href="/calculators/log-cost-calculator/">Log cost</a>,{" "}
+    <a href="/guides/request-based-pricing/">Request-based pricing</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
   <ul>
-    <li>Validate peak vs average RPS/GB (capacity and scaling depend on peaks).</li>
-    <li>Validate retry/timeout patterns that multiply requests and traffic processed.</li>
-    <li>Validate whether WAF and access logs are enabled and what retention window applies.</li>
+    <li>
+      <strong>Gateway baseline</strong> = gateways * hours/month
+    </li>
+    <li>
+      <strong>Requests/month</strong> = baseline + peak (include retries)
+    </li>
+    <li>
+      <strong>GB/month</strong> = requests/month * avg response size (GB)
+    </li>
+    <li>
+      <strong>Logs</strong> = (bytes/request) * requests/month + retention + query scans
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Estimating only average traffic and missing peak spikes (deploys, incidents, bots).</li>
+    <li>Ignoring retry storms that multiply requests and logs.</li>
+    <li>Double-counting CDN bandwidth and origin egress as the same GB.</li>
+    <li>Turning on verbose access logs without retention and sampling guardrails.</li>
+    <li>Budgeting prod only and forgetting staging/dev gateways.</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>Validate peak vs average RPS/GB (capacity and cost depend on peaks).</li>
+    <li>Validate response sizes by sampling your largest endpoints separately.</li>
+    <li>Confirm whether WAF and access logs are enabled and what retention window applies.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -81,4 +119,18 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/application-gateway/" target="_blank" rel="nofollow noopener">
+        Application Gateway pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/application-gateway/" target="_blank" rel="nofollow noopener">
+        Application Gateway documentation
+      </a>
+    </li>
+  </ul>
 </GuideLayout>

@@ -24,7 +24,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-blob-storage-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -65,6 +65,9 @@ const faqs = [
     For colder tiers and archived data, retrieval and early-deletion rules can be a hidden cost driver. Separately model:
     retrieval GB, retrieval requests, and any minimum storage duration penalties.
   </p>
+  <p class="muted">
+    Tip: if you restore frequently (weekly workflows, audits, reprocessing), you may not be an archive workload. Model a baseline month and a peak month explicitly.
+  </p>
 
   <h2>5) Egress (outbound bandwidth)</h2>
   <p>
@@ -76,11 +79,53 @@ const faqs = [
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
   </p>
 
+  <h2>Decision checklist (tiers and redundancy)</h2>
+  <ul>
+    <li>
+      <strong>Access pattern</strong>: hot vs cool vs archive depends on read frequency and restore SLA.
+    </li>
+    <li>
+      <strong>Object size</strong>: many small objects increase operation costs and operational overhead.
+    </li>
+    <li>
+      <strong>Redundancy</strong>: replication choices affect both storage and transfer. Treat them as separate line items.
+    </li>
+    <li>
+      <strong>Delivery path</strong>: CDN bandwidth and origin egress are different GB; do not double-count.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Storage</strong> = average GB-month (split hot/cool/archive)
+    </li>
+    <li>
+      <strong>Operations</strong> = read ops + write ops (split by request class if needed)
+    </li>
+    <li>
+      <strong>Replication</strong> = replicated GB-month + replicated GB transferred
+    </li>
+    <li>
+      <strong>Transfer</strong> = internet egress + CDN origin egress + cross-region (modeled separately)
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using end-of-month storage size instead of average GB-month.</li>
+    <li>Ignoring operations for small-object workloads (operations can dominate).</li>
+    <li>Modeling "bucket size" but missing egress and replication boundaries.</li>
+    <li>Double-counting CDN bandwidth and origin egress.</li>
+    <li>Ignoring peak restores/backfills (the peak month often drives cost).</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Confirm whether you are estimating GB or GiB and keep units consistent end-to-end.</li>
     <li>Separate storage, requests, replication, and egress into distinct line items (no blended assumptions).</li>
     <li>When using a CDN, validate origin egress separately from edge bandwidth.</li>
+    <li>After one cycle, reconcile usage types (storage vs operations vs transfer) against the model and keep a peak scenario.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -98,5 +143,18 @@ const faqs = [
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/storage-costs/">Storage costs</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/storage/blobs/" target="_blank" rel="nofollow noopener">
+        Azure Blob Storage pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/storage/blobs/" target="_blank" rel="nofollow noopener">
+        Blob Storage documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

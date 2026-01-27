@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-waf-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What typically drives WAF cost?",
@@ -26,7 +26,7 @@ const description =
     <strong>request-based charge</strong> that scales with total evaluated requests.
   </p>
 
-  <h2>What to model</h2>
+  <h2>What to model (baseline + variable)</h2>
   <ul>
     <li>
       <strong>Web ACL count</strong>: how many ACLs you maintain (often per environment/app)
@@ -41,18 +41,64 @@ const description =
       <strong>Downstream</strong>: log delivery, storage, search/analytics, and SIEM ingestion
     </li>
   </ul>
+  <p class="muted">
+    The two most common budgeting failures are (1) modeling only the baseline and missing request spikes and (2) paying a second bill for logs and analysis.
+  </p>
 
-  <h2>A fast estimate</h2>
+  <h2>A fast estimate (baseline + spike)</h2>
   <p class="muted">
     Use <a href="/calculators/aws-waf-cost-calculator/">AWS WAF Cost Calculator</a> for the baseline + request model, then
     add log/analysis and any security tooling.
   </p>
+  <ul>
+    <li>
+      Baseline scenario: typical month requests and current ACL/rule inventory.
+    </li>
+    <li>
+      Spike scenario: attack/bot window where evaluated requests are much higher.
+    </li>
+  </ul>
+
+  <h2>Worked estimate template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Baseline</strong> = ACLs + rules (and any managed add-ons you actually use)
+    </li>
+    <li>
+      <strong>Requests/month</strong> = evaluated requests (allowed + blocked), baseline + spike
+    </li>
+    <li>
+      <strong>Logs</strong> = (bytes per request) * requests/month + retention + query scans
+    </li>
+  </ul>
+
+  <h2>Where to get inputs (evidence path)</h2>
+  <ul>
+    <li>
+      <strong>Evaluated requests</strong>: from WAF metrics/logs for a representative week; keep a separate spike window.
+    </li>
+    <li>
+      <strong>ACL and rule inventory</strong>: list ACLs by environment and identify duplicated policies (sprawl is common).
+    </li>
+    <li>
+      <strong>Log volume</strong>: measure bytes per event and multiply by events/day; do not assume "logs are small".
+    </li>
+  </ul>
 
   <h2>Common pitfalls</h2>
   <ul>
     <li>Underestimating request volume during incidents (bot traffic, attacks).</li>
     <li>Keeping many almost-identical ACLs and rules across environments.</li>
     <li>Streaming full logs everywhere without volume controls.</li>
+    <li>Measuring allowed requests only and forgetting blocked traffic in evaluated volume.</li>
+    <li>Using one average and missing peak hours (spikes drive the bill).</li>
+  </ul>
+
+  <h2>How to validate the pricing model</h2>
+  <ul>
+    <li>Reconcile evaluated requests against the bill for the same window (baseline week + spike window).</li>
+    <li>Confirm rule/ACL inventory matches what is deployed (copy/paste ACL sprawl is common).</li>
+    <li>Verify logging controls: sampling, retention, and dashboard query windows.</li>
   </ul>
 
   <h2>Related guides</h2>
@@ -75,5 +121,19 @@ const description =
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/waf/pricing/" target="_blank" rel="nofollow noopener">
+        AWS WAF pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/waf/latest/developerguide/logging.html" target="_blank" rel="nofollow noopener">
+        AWS WAF logging
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>

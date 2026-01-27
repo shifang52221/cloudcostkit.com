@@ -12,11 +12,11 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate events per request, average event size, and request volume. Convert to GB/day and GB/month, then apply retention days.",
+    a: "Estimate events per request, average event size, and request volume. Convert to GB/day and GB/month, then apply retention days and query scan behavior.",
   },
   {
     q: "How do I validate?",
-    a: "Validate sampling rates, validate incident behavior (errors/retries multiply events), and validate retention settings for each telemetry type.",
+    a: "Validate sampling rates, validate incident behavior (errors and retries multiply events), and validate retention settings for each telemetry type.",
   },
 ];
 ---
@@ -24,43 +24,82 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-application-insights-pricing"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
     Application Insights is a telemetry pipeline. Costs are predictable if you model it as:
-    <strong>events × size → GB ingested → retention storage → query scans</strong>.
+    <strong>events * size -> GB ingested -> retention storage -> query scans</strong>.
   </p>
+
+  <h2>0) Define what you send</h2>
+  <ul>
+    <li>
+      <strong>Telemetry types</strong>: requests, dependencies, exceptions, traces, custom events.
+    </li>
+    <li>
+      <strong>High-volume paths</strong>: a few endpoints often generate most traffic (and most telemetry).
+    </li>
+    <li>
+      <strong>Baseline vs incident</strong>: incidents multiply errors, retries, and event sizes.
+    </li>
+  </ul>
 
   <h2>1) Ingestion volume (GB/month)</h2>
   <p>
-    A reliable first estimate is: <strong>requests × telemetry events per request × bytes per event</strong>. Model separate
-    lines for high-volume sources (requests, dependencies, exceptions, traces) rather than one blended average.
+    A reliable first estimate is: <strong>requests * events per request * bytes per event</strong>. Model separate lines
+    for high-volume sources rather than one blended average.
   </p>
-  <p>
+  <p class="muted">
     Tool: <a href="/calculators/log-ingestion-cost-calculator/">Log/telemetry ingestion</a>.
   </p>
 
-  <h2>2) Sampling</h2>
+  <h2>2) Sampling (the biggest cost lever)</h2>
   <p>
-    Sampling is the biggest cost lever. If you sample traces at 10%, your ingestion can drop ~10×. During incidents,
-    exceptions and retries can multiply events, so sampling and filters matter.
+    Sampling is the highest leverage knob. If you sample traces at 10%, ingestion can drop by ~10x for that stream. During
+    incidents, exceptions and retries can multiply events, so sampling and filters matter.
   </p>
+  <ul>
+    <li>Prefer targeted full-fidelity for short windows (investigation) over always-on full-fidelity.</li>
+    <li>Keep an incident plan: what gets sampled more or less when traffic spikes.</li>
+  </ul>
 
   <h2>3) Retention and query scans</h2>
   <p>
-    Retention multiplies stored GB. Queries and dashboards can scan large windows repeatedly; model refresh frequency and
-    scan windows explicitly.
+    Retention multiplies stored GB. Dashboards and alerts can scan large windows repeatedly; model refresh frequency and
+    scan windows explicitly so the "analysis bill" does not surprise you.
   </p>
-  <p>
+  <p class="muted">
     Tools: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
     <a href="/calculators/log-search-scan-cost-calculator/">Scan/query</a>.
   </p>
 
-  <h2>Validation checklist</h2>
+  <h2>Worked estimate template (copy/paste)</h2>
   <ul>
-    <li>Validate sampling and filters (especially traces) and confirm what is kept vs dropped.</li>
-    <li>Validate incident behavior: errors/retries multiply telemetry events and ingestion volume.</li>
+    <li>
+      <strong>Ingestion GB/month</strong> = requests/month * events/request * bytes/event / 1e9 (approx)
+    </li>
+    <li>
+      <strong>Retention GB-month</strong> = ingestion GB/day * retention days (order-of-magnitude)
+    </li>
+    <li>
+      <strong>Query scans</strong> = dashboard refreshes/day * scan window (days) * ingestion GB/day
+    </li>
+  </ul>
+
+  <h2>Common pitfalls</h2>
+  <ul>
+    <li>Using one average: a few endpoints can dominate traffic and telemetry.</li>
+    <li>Leaving traces at full fidelity for all services and all environments.</li>
+    <li>Not accounting for incident multipliers (errors and retries can 10x event volume).</li>
+    <li>Dashboards scanning wide windows frequently (quiet scan cost).</li>
+    <li>Keeping long retention by default without a clear reason.</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>Validate sampling and filters and confirm what is kept vs dropped.</li>
+    <li>Validate incident behavior: errors and retries multiply telemetry events and ingestion volume.</li>
     <li>Validate dashboards/alerts for wide time windows that scan lots of data frequently.</li>
   </ul>
 
@@ -71,5 +110,18 @@ const faqs = [
     <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Retention</a>
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Scan</a>
   </div>
-</GuideLayout>
 
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://azure.microsoft.com/pricing/details/monitor/" target="_blank" rel="nofollow noopener">
+        Azure Monitor pricing (reference)
+      </a>
+    </li>
+    <li>
+      <a href="https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview" target="_blank" rel="nofollow noopener">
+        Application Insights documentation
+      </a>
+    </li>
+  </ul>
+</GuideLayout>

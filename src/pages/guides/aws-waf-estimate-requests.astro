@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-waf-estimate-requests"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={[
     {
       q: "What's the fastest way to estimate requests/month?",
@@ -26,6 +26,19 @@ const description =
     then adds a safety factor for bot spikes and incidents.
   </p>
 
+  <h2>Step 0: define evaluated requests (the number that matters)</h2>
+  <ul>
+    <li>
+      <strong>Evaluated</strong> = allowed + blocked. For cost, you usually want the evaluated volume.
+    </li>
+    <li>
+      <strong>Scope</strong>: one host/path protected by WAF can have a very different request profile than the rest of the site.
+    </li>
+    <li>
+      <strong>Two scenarios</strong>: baseline month + attack month (peaks drive real bills).
+    </li>
+  </ul>
+
   <h2>Method 1: From average RPS</h2>
   <ul>
     <li>
@@ -40,18 +53,59 @@ const description =
     <li>Use the request count metric from your CDN or load balancer and roll it up to a month.</li>
     <li>Segment by host/path if only some traffic is protected by WAF.</li>
   </ul>
+  <p class="muted">
+    If you have multiple apps behind one gateway, measure by hostname (or listener) so the "noisy one" does not hide.
+  </p>
 
   <h2>Method 3: From logs</h2>
   <ul>
     <li>Count request records per day from access logs/WAF logs, then average to monthly.</li>
     <li>Include blocked traffic and retries; they are still evaluated.</li>
   </ul>
+  <p class="muted">
+    Logs are best when you need to separate paths (login, search, uploads) because bot activity is usually concentrated on a few endpoints.
+  </p>
+
+  <h2>Worked example (baseline + spike)</h2>
+  <ul>
+    <li>
+      <strong>Baseline</strong>: 1,000 RPS sustained -&gt; convert to monthly.
+    </li>
+    <li>
+      <strong>Spike</strong>: +10,000 RPS for 2 hours/day for 5 days -&gt; extra requests = 10,000 * (2 * 3600) * 5.
+    </li>
+    <li>
+      <strong>Total evaluated</strong>: baseline + extra spike requests.
+    </li>
+  </ul>
+  <p class="muted">
+    Use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a> for the baseline conversion, then add the spike as extra requests.
+  </p>
 
   <h2>Turn volume into cost</h2>
   <p>
     Use <a href="/calculators/aws-waf-cost-calculator/">AWS WAF Cost Calculator</a> to translate ACLs, rules, and request
     volume into an estimate.
   </p>
+  <ul>
+    <li>Save a baseline scenario and an attack scenario so you can compare without losing assumptions.</li>
+    <li>If you log WAF events, estimate log ingestion separately (logs can be the second bill).</li>
+  </ul>
+
+  <h2>Common multipliers (why your estimate is low)</h2>
+  <ul>
+    <li>Retry storms and client timeouts multiplying requests during incidents.</li>
+    <li>Bot traffic concentrated on a few endpoints (login/search) that must be modeled separately.</li>
+    <li>Cache misses (or disabled caching) pushing all requests through evaluation rather than serving from cache.</li>
+    <li>Multi-tenant gateways where one app generates most requests.</li>
+  </ul>
+
+  <h2>How to validate the estimate</h2>
+  <ul>
+    <li>Compare your modeled evaluated requests to one week of real request counts (CDN/LB/WAF logs) scaled to monthly.</li>
+    <li>Keep a peak scenario for the largest spike window you see (attacks, bot waves, scraping).</li>
+    <li>Confirm whether blocked requests are included in the evaluated volume you used.</li>
+  </ul>
 
   <h2>Related guides</h2>
   <div class="btn-row">
@@ -73,5 +127,14 @@ const description =
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/waf/pricing/" target="_blank" rel="nofollow noopener">
+        AWS WAF pricing
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>

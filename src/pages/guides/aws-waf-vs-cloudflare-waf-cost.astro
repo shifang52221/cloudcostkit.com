@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-waf-vs-cloudflare-waf-cost"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-01-27"
   faqs={faqs}
 >
   <p>
@@ -42,12 +42,31 @@ const faqs = [
     Tooling: <a href="/guides/aws-waf-estimate-requests/">estimate WAF requests</a> and model a surge scenario.
   </p>
 
+  <h2>Worked comparison template (copy/paste)</h2>
+  <ul>
+    <li>
+      <strong>Baseline</strong>: evaluated requests/month + policies/rules you run in steady state
+    </li>
+    <li>
+      <strong>Attack</strong>: extra evaluated requests during spikes (hours/days) + any temporary rules you enable
+    </li>
+    <li>
+      <strong>Logs & analytics</strong>: ingestion GB/day + retention days + query/scan frequency for dashboards
+    </li>
+    <li>
+      <strong>Extras</strong>: bot management, rate limiting, and any features you actually use (avoid comparing "default plans" to "fully loaded configs")
+    </li>
+  </ul>
+
   <h2>2) Compare baseline policy/rule costs</h2>
   <ul>
     <li>How many apps/environments require distinct policies?</li>
     <li>How many rule groups (managed + custom) do you need?</li>
     <li>Do you pay extra for bot management, rate limiting, or advanced features?</li>
   </ul>
+  <p class="muted">
+    In practice, "how many distinct policies do we maintain?" is often the real baseline driver (copy/paste sprawl creates both cost and operational risk).
+  </p>
 
   <h2>3) Don't ignore the second bill: logs and analytics</h2>
   <ul>
@@ -55,12 +74,30 @@ const faqs = [
     <li>Retention (GB-month)</li>
     <li>Query/scan costs for dashboards and incident response</li>
   </ul>
+  <p class="muted">
+    If you ship every event into logs and run wide-window dashboards, the log bill can rival the WAF bill.
+  </p>
 
   <h2>4) Operational and architecture constraints</h2>
   <ul>
     <li>Where traffic is filtered (edge vs origin) and how that affects origin egress.</li>
     <li>How quickly you can deploy rule changes safely.</li>
     <li>How you export events into your existing security tooling.</li>
+  </ul>
+  <ul>
+    <li>
+      Consider <strong>where bad traffic stops</strong>. If a platform stops traffic earlier, you may reduce origin load and downstream logging/compute costs.
+    </li>
+    <li>
+      Consider <strong>failure modes</strong>: a misconfigured rule rollout can create an outage and a cost spike (retries and incidents multiply traffic).
+    </li>
+  </ul>
+
+  <h2>How to validate the choice</h2>
+  <ul>
+    <li>Run a short measurement window and estimate evaluated requests/day under normal traffic.</li>
+    <li>Keep an explicit spike scenario (your worst bot wave/attack window) and compare costs under that stress.</li>
+    <li>Verify the logging plan: what is logged, where it lands, and how long it is retained.</li>
   </ul>
 
   <h2>Related guides</h2>
@@ -83,5 +120,19 @@ const faqs = [
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>
+      <a href="https://aws.amazon.com/waf/pricing/" target="_blank" rel="nofollow noopener">
+        AWS WAF pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://www.cloudflare.com/plans/" target="_blank" rel="nofollow noopener">
+        Cloudflare plans and pricing (reference)
+      </a>
+    </li>
+  </ul>
 
 </GuideLayout>
