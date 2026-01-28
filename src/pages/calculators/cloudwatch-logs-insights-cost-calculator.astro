@@ -10,13 +10,15 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/cloudwatch-logs-insights-cost-calculator"
-  intro="Logs Insights-style pricing is often driven by how much data your queries scan. This calculator estimates monthly query scan cost from scanned GB/day and your per-GB scan price."
+  intro="Logs Insights-style pricing is often driven by how much data your queries scan. This calculator estimates monthly query scan cost from scanned GB/day and your per-GB scan price, and compares baseline vs peak query volume."
   examples={[
-    "800 GB/day scanned at $0.005/GB -> about 24,320 GB scanned/month and ~$122/month.",
+    "800 GB/day scanned at $0.005/GB = about 24,320 GB scanned/month and ~$122/month.",
+    "Use a peak multiplier for incident dashboards and query bursts.",
   ]}
   includes={[
     "Query scan cost estimate from GB scanned per day and $/GB scan pricing.",
     "Useful for CloudWatch Logs Insights and similar per-scan log query models.",
+    "Baseline vs peak comparison for scan spikes.",
   ]}
   excludes={[
     "Log ingestion charges and retention storage (model separately).",
@@ -25,6 +27,7 @@ const description =
   how={[
     "Monthly scanned GB ~ GB scanned per day x 30.4.",
     "Scan cost = monthly scanned GB x scan price per GB.",
+    "Use a peak multiplier when dashboards refresh more often or scan wider windows.",
     "This tool estimates scan-only (not ingestion or retention).",
   ]}
   faqs={[
@@ -37,7 +40,7 @@ const description =
       a: "Reduce time ranges, filter early, avoid dashboards that repeatedly run broad queries, and reduce total log volume at source.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-cloudwatch-logs-insights-pricing", label: "Guide: Logs Insights pricing" },
     { href: "/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb", label: "Guide: estimate scanned GB" },
@@ -79,4 +82,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-
