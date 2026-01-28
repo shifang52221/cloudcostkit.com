@@ -1,4 +1,4 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CdnRequestCostCalculator as CdnRequestCostCalculatorComponent } from "../../components/calculators/CdnRequestCost";
 
@@ -10,14 +10,16 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-request-cost-calculator"
-  intro="Some CDNs charge per request (in addition to bandwidth). This calculator estimates request fees from your monthly request volume and pricing."
+  intro="Some CDNs charge per request (in addition to bandwidth). This calculator estimates request fees from your monthly request volume and pricing, and compares baseline vs peak traffic."
   examples={[
     "300,000,000 requests/month at $0.0075 per 10k requests is about $225/month.",
     "1.2B requests/month at $0.01 per 10k requests is about $1,200/month.",
+    "Model a peak month if bots or incidents spike request volume.",
   ]}
   includes={[
     "Request-fee estimate from requests/month and $ per 10k requests pricing.",
     "Useful for comparing CDN plans where requests are billed separately.",
+    "Baseline vs peak comparison for request spikes.",
   ]}
   excludes={[
     "Bandwidth costs (use CDN Bandwidth Cost Calculator).",
@@ -26,6 +28,7 @@ const description =
   how={[
     "Request cost = (requests per month / 10,000) x price per 10k requests.",
     "Use the price and request class that matches your CDN billing model.",
+    "Use a peak multiplier when traffic spikes or cache busting increases requests.",
     "This tool estimates request fees only (not bandwidth).",
     "If you have multiple request classes, model them as separate scenarios and add them up."
   ]}
@@ -47,7 +50,7 @@ const description =
       a: "Transport protocols can change connection behavior, but billing is usually based on requests rather than connections. Use your CDN's definition of a billable request."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
@@ -66,7 +69,7 @@ const description =
       <li><strong>Regions</strong>: if pricing varies by geography, model your top regions separately and add them up.</li>
     </ul>
     <p class="muted" style="margin-top:10px">
-      Use the “Pricing unit” selector in the calculator to enter $/10k or $/1M directly (it keeps the same effective rate).
+      Use the 鈥淧ricing unit鈥?selector in the calculator to enter $/10k or $/1M directly (it keeps the same effective rate).
     </p>
   </div>
 

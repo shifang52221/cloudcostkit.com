@@ -1,22 +1,24 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { MetricsTimeseriesCostCalculator as MetricsTimeseriesCostCalculatorComponent } from "../../components/calculators/MetricsTimeseriesCost";
 
 const title = "Metrics Time Series Cost Calculator";
 const description =
-  "Estimate monthly metrics cost from active series and $ per series‑month pricing. Educational use only.";
+  "Estimate monthly metrics cost from active series and $ per series-month pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/metrics-timeseries-cost-calculator"
-  intro="Metrics platforms often charge based on the number of active time series. This calculator estimates monthly cost from your active series count and per‑series pricing."
+  intro="Metrics platforms often charge based on the number of active time series. This calculator estimates monthly cost from your active series count and per-series pricing, and compares baseline vs peak scenarios."
   examples={[
-    "50,000 active series at $0.0005 per series-month → $25/month.",
+    "50,000 active series at $0.0005 per series-month = ~$25/month.",
+    "Compare baseline vs peak series counts to understand cardinality spikes.",
   ]}
   includes={[
     "Monthly cost estimate from active time series count and per-series pricing.",
     "Helpful for comparing metric-label cardinality tradeoffs.",
+    "Baseline vs peak comparison for series growth spikes.",
   ]}
   excludes={[
     "Ingestion bytes, retention, and query fees if your provider bills those separately.",
@@ -25,6 +27,7 @@ const description =
   how={[
     "Monthly cost = active series x price per series-month.",
     "Active series definitions vary by provider (labels, churn window, etc.).",
+    "Use a peak multiplier to model incident spikes or onboarding bursts.",
     "Use this tool for planning and comparisons, then validate in billing docs."
   ]}
   faqs={[
@@ -37,7 +40,7 @@ const description =
       a: "Reduce high-cardinality labels, drop noisy metrics, and aggregate where possible."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-search-scan-cost-calculator", label: "Log scan cost" },
