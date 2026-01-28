@@ -1,4 +1,4 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CloudwatchLogsCostCalculator } from "../../components/calculators/CloudwatchLogsCost";
 
@@ -10,24 +10,27 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/cloudwatch-log-cost-calculator"
-  intro="CloudWatch Logs cost usually comes from three drivers: ingestion (GB), retention storage (GB-month), and Logs Insights scans (GB scanned). This calculator groups those line items into one model so you can estimate a realistic monthly total."
+  intro="CloudWatch Logs cost usually comes from three drivers: ingestion (GB), retention storage (GB-month), and Logs Insights scans (GB scanned). This calculator groups those line items into one model so you can estimate a realistic monthly total and compare baseline vs peak months."
   examples={[
     "Model baseline ingestion + retention first, then optionally add Logs Insights scans if you query heavily.",
     "Retention can dominate when you keep high-volume logs for 90+ days; scans can dominate when dashboards query broad windows.",
+    "Use a peak multiplier when incidents or deploys spike ingestion and scans.",
   ]}
   includes={[
     "Ingestion estimate from GB/day and $/GB.",
     "Retention storage estimate from GB/day, retention days, and $/GB-month.",
     "Optional Logs Insights scan estimate from scanned GB/day and $/GB scanned.",
+    "Baseline vs peak comparison for incident spikes.",
   ]}
   excludes={[
     "Exports/subscription filters to other systems (which may have their own ingestion charges).",
     "Vendor-specific minimums and advanced features (anomaly detection, premium analytics).",
   ]}
   how={[
-    "Ingestion cost = (GB/day × billing days) × $/GB.",
-    "Retention storage (steady state) ≈ (GB/day × retention days) × $/GB-month.",
-    "Optional: Logs Insights scan cost = (GB scanned/day × billing days) × $/GB scanned.",
+    "Ingestion cost = (GB/day x billing days) x $/GB.",
+    "Retention storage (steady state) = (GB/day x retention days) x $/GB-month.",
+    "Optional: Logs Insights scan cost = (GB scanned/day x billing days) x $/GB scanned.",
+    "Model a peak month for incident logging and dashboard spikes.",
     "Sum the line items for a monthly estimate.",
   ]}
   faqs={[
@@ -44,7 +47,7 @@ const description =
       a: "Drop noisy logs at source, shorten retention for low-value logs, and reduce broad Insights queries (narrow time windows and filter early).",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/cloudwatch-logs-insights-cost-calculator", label: "CloudWatch Logs Insights scan cost" },
     { href: "/calculators/log-cost-calculator", label: "Log cost calculator (generic)" },
@@ -65,7 +68,7 @@ const description =
         <strong>Dashboards and alerts</strong>: frequent refresh + wide windows can multiply Insights scan volume.
       </li>
       <li>
-        <strong>Retention drift</strong>: log groups often default to “never expire” unless explicitly set.
+        <strong>Retention drift</strong>: log groups often default to "never expire" unless explicitly set.
       </li>
     </ul>
   </div>
@@ -74,9 +77,8 @@ const description =
     <h2 style="margin-top:0">Validate after changes</h2>
     <ul>
       <li>Validate ingestion GB/day for your largest log groups (ingress, API, audit).</li>
-      <li>Validate retention days per log group and ensure defaults are not “forever”.</li>
+      <li>Validate retention days per log group and ensure defaults are not "forever".</li>
       <li>Validate Insights scanned bytes for dashboards/alerts (query frequency matters as much as window size).</li>
     </ul>
   </div>
 </CalculatorLayout>
-

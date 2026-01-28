@@ -1,4 +1,4 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
@@ -11,10 +11,11 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-cost-calculator"
-  intro="Most CDN bills have two big line items: bandwidth and requests. This page helps you estimate both, then add them to get a total monthly CDN cost estimate."
+  intro="Most CDN bills have two big line items: bandwidth and requests. This page helps you estimate both, then add them to get a total monthly CDN cost estimate and compare baseline vs peak scenarios."
   examples={[
     "Bandwidth: 4,000 GB/month at $0.06/GB -> $240/month; Requests: 300M/month at $0.0075 per 10k -> $225/month; Total -> ~$465/month.",
     "Bandwidth dominates for large media; requests dominate for API-like traffic with small payloads.",
+    "Build a baseline and a peak scenario to avoid under-budgeting during launches or incidents.",
   ]}
   includes={[
     "Bandwidth estimate from GB/month and $/GB pricing.",
@@ -56,7 +57,7 @@ const description =
       a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
     { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
@@ -109,7 +110,7 @@ const description =
       </li>
     </ul>
     <p class="muted" style="margin-top:10px">
-      Tip: use the new “Save scenario” button at the top to keep a baseline and peak link you can revisit.
+      Tip: use the new "Save scenario" button at the top to keep a baseline and peak link you can revisit.
     </p>
   </div>
 
