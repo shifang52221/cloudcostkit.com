@@ -4,28 +4,30 @@ import { UnitConverterCalculator } from "../../components/calculators/UnitConver
 
 const title = "Cloud Units Converter";
 const description =
-  "Convert GB↔GiB and Mbps↔MB/s, plus estimate monthly transfer from throughput, utilization, and hours/day. Educational use only.";
+  "Convert GB to GiB and Mbps to MB/s, plus estimate monthly transfer from throughput, utilization, and hours/day, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/unit-converter"
-  intro="Cloud pricing and dashboards mix decimal and binary units. This page converts common storage and bandwidth units and helps estimate monthly transfer from throughput."
+  intro="Cloud pricing and dashboards mix decimal and binary units. Convert common storage and bandwidth units, then compare baseline vs peak transfer estimates."
   examples={[
     "1,000 GB ~ 931.32 GiB.",
     "100 Mbps at 30% utilization over 24h/day ~ monthly transfer estimate (GB/month).",
+    "Peak 200% scenario shows the spike in monthly transfer."
   ]}
   includes={[
-    "GB↔GiB and Mbps↔MB/s conversions.",
-    "Throughput → monthly transfer estimate for planning.",
+    "GB to GiB and Mbps to MB/s conversions.",
+    "Throughput to monthly transfer estimate for planning.",
+    "Baseline vs peak scenario table for transfer spikes.",
   ]}
   excludes={[
     "Protocol overhead and peak/diurnal patterns (use scenarios).",
     "Provider-specific billing unit rounding rules.",
   ]}
   how={[
-    "GB↔GiB uses 1 GiB = 1.073741824 GB.",
-    "Mbps↔MB/s uses 8 bits = 1 byte.",
+    "GB to GiB uses 1 GiB = 1.073741824 GB.",
+    "Mbps to MB/s uses 8 bits = 1 byte.",
     "Monthly transfer estimate multiplies throughput by utilization and time."
   ]}
   faqs={[
@@ -38,7 +40,7 @@ const description =
       a: "No. It's a simplified estimate. Real workloads vary by peak/off-peak patterns and protocol overhead."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },

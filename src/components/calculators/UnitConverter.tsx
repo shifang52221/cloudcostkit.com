@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import {
   gbToGib,
   gibToGb,
@@ -17,6 +17,8 @@ export function UnitConverterCalculator() {
   const [mBps, setMBps] = useNumberParamState("UnitConverter.mBps", 12.5);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("UnitConverter.utilizationPct", 30);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("UnitConverter.hoursPerDay", 24);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("UnitConverter.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("UnitConverter.peakMultiplierPct", 200);
 
   const conv = useMemo(() => {
     const gbVal = clamp(gb, 0, 1e18);
@@ -42,6 +44,21 @@ export function UnitConverterCalculator() {
       monthlyGb: monthly.gbTransferred,
     };
   }, [gb, gib, mbps, mBps, utilizationPct, hoursPerDay]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    const peakMbps = clamp(mbps, 0, 1e12) * multiplier;
+    const monthly = throughputToMonthlyTransferGb({
+      mbps: peakMbps,
+      utilizationPct: clamp(utilizationPct, 0, 100),
+      hoursPerDay: clamp(hoursPerDay, 0, 24),
+    });
+    return {
+      mbps: peakMbps,
+      monthlyGb: monthly.gbTransferred,
+    };
+  }, [hoursPerDay, mbps, peakMultiplierPct, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -115,6 +132,87 @@ export function UnitConverterCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to throughput (Mbps).</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setGb(500);
+                  setGib(465.66);
+                  setMbps(50);
+                  setMBps(6.25);
+                  setUtilizationPct(20);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Light traffic
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setGb(2000);
+                  setGib(1862.65);
+                  setMbps(200);
+                  setMBps(25);
+                  setUtilizationPct(35);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(230);
+                }}
+              >
+                SaaS baseline
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setGb(5000);
+                  setGib(4656.61);
+                  setMbps(600);
+                  setMBps(75);
+                  setUtilizationPct(45);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(200);
+                }}
+              >
+                Streaming burst
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -127,6 +225,8 @@ export function UnitConverterCalculator() {
                   setMBps(12.5);
                   setUtilizationPct(30);
                   setHoursPerDay(24);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(200);
                 }}
               >
                 Reset example
@@ -140,19 +240,19 @@ export function UnitConverterCalculator() {
         <h3>Results</h3>
         <div className="kpis">
           <div className="kpi">
-            <div className="k">GB → GiB</div>
+            <div className="k">GB to GiB</div>
             <div className="v">{formatNumber(conv.gibFromGb, 2)} GiB</div>
           </div>
           <div className="kpi">
-            <div className="k">GiB → GB</div>
+            <div className="k">GiB to GB</div>
             <div className="v">{formatNumber(conv.gbFromGib, 2)} GB</div>
           </div>
           <div className="kpi">
-            <div className="k">Mbps → MB/s</div>
+            <div className="k">Mbps to MB/s</div>
             <div className="v">{formatNumber(conv.mBpsFromMbps, 2)} MB/s</div>
           </div>
           <div className="kpi">
-            <div className="k">MB/s → Mbps</div>
+            <div className="k">MB/s to Mbps</div>
             <div className="v">{formatNumber(conv.mbpsFromMBps, 2)} Mbps</div>
           </div>
           <div className="kpi">
@@ -160,8 +260,41 @@ export function UnitConverterCalculator() {
             <div className="v">{formatNumber(conv.monthlyGb, 0)} GB / month</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Throughput (Mbps)</th>
+                  <th className="num">Monthly transfer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(conv.mbpsVal, 0)}</td>
+                  <td className="num">{formatNumber(conv.monthlyGb, 0)} GB</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.mbps, 0)}</td>
+                  <td className="num">{formatNumber(peakResult.monthlyGb, 0)} GB</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.mbps - conv.mbpsVal, 0)}</td>
+                  <td className="num">{formatNumber(peakResult.monthlyGb - conv.monthlyGb, 0)} GB</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
+
 
