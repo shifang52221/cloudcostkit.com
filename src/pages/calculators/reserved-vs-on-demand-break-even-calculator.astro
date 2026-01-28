@@ -1,30 +1,32 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ReservedBreakEvenCalculator } from "../../components/calculators/ReservedBreakEven";
 
 const title = "Reserved vs On-demand Break-even Calculator";
 const description =
-  "Estimate the break-even usage where a committed rate beats on-demand, given hourly pricing and upfront costs. Educational use only.";
+  "Estimate the break-even usage where a committed rate beats on-demand, given hourly pricing and upfront costs, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/reserved-vs-on-demand-break-even-calculator"
-  intro="Commitments can lower hourly rates but may include upfront payments. This calculator estimates the usage point where commitments break even versus on-demand."
+  intro="Commitments can lower hourly rates but may include upfront payments. Compare baseline vs peak usage to see payback sensitivity."
   examples={[
-    "On-demand $0.12/hr vs committed $0.075/hr with $300 upfront → estimate break-even hours.",
+    "On-demand $0.12/hr vs committed $0.075/hr with $300 upfront -> estimate break-even hours.",
+    "Peak 220% scenario highlights faster payback when utilization spikes."
   ]}
   includes={[
     "Break-even usage estimate from hourly savings and upfront cost.",
     "Monthly savings estimate excluding upfront (for planning).",
+    "Baseline vs peak scenario table for usage shifts.",
   ]}
   excludes={[
     "Term length, discount rate, and flexibility risk (use a full ROI model for decisions).",
     "Provider-specific commitment utilization constraints.",
   ]}
   how={[
-    "Hourly savings = on-demand hourly − committed hourly.",
-    "Break-even hours = upfront ÷ hourly savings (if savings > 0).",
+    "Hourly savings = on-demand hourly - committed hourly.",
+    "Break-even hours = upfront / hourly savings (if savings > 0).",
     "Monthly savings = hourly savings x hours per month (excluding upfront)."
   ]}
   faqs={[
@@ -41,7 +43,7 @@ const description =
       a: "730 is a common approximation. If you have non-24/7 workloads, use your expected billable hours."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },
     { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
@@ -77,3 +79,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

@@ -1,22 +1,24 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { RpsToMonthlyRequestsCalculator as RpsToMonthlyRequestsCalculatorComponent } from "../../components/calculators/RpsToMonthlyRequests";
 
 const title = "RPS to Monthly Requests Calculator";
 const description =
-  "Estimate monthly request volume from RPS, utilization, and hours per day. Educational use only.";
+  "Estimate monthly request volume from RPS, utilization, and hours per day, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/rps-to-monthly-requests-calculator"
-  intro="If you think in RPS, convert to monthly requests to estimate request-based fees and plan capacity."
+  intro="If you think in RPS, convert to monthly requests to estimate request-based fees and plan capacity. Compare baseline vs peak traffic."
   examples={[
-    "2,500 RPS at 35% utilization, 24 hours/day → estimate monthly requests.",
+    "2,500 RPS at 35% utilization, 24 hours/day -> estimate monthly requests.",
+    "Peak 230% scenario highlights request surges."
   ]}
   includes={[
     "Monthly request estimate from RPS, utilization, and hours/day.",
     "Useful for request-metered services (API gateways, CDNs, serverless).",
+    "Baseline vs peak scenario table for volume spikes.",
   ]}
   excludes={[
     "Seasonality, bursty peak shapes, and retries (use scenarios).",
@@ -37,7 +39,7 @@ const description =
       a: "It's how much of the time you're near the given RPS (e.g., 30% if you're at peak only part of the day)."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/api-request-cost-calculator", label: "API request cost" },
     { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
@@ -77,3 +79,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

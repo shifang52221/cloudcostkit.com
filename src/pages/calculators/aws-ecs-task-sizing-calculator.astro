@@ -1,23 +1,25 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsEcsTaskSizingCalculator as AwsEcsTaskSizingCalculatorComponent } from "../../components/calculators/AwsEcsTaskSizing";
 
-const title = "ECS Task Sizing Calculator (CPU & memory → task count)";
+const title = "ECS Task Sizing Calculator (CPU & memory -> task count)";
 const description =
-  "Estimate how many ECS tasks you need from average CPU (vCPU) and memory (GB) demand, per-task sizing, and a target utilization. Educational use only.";
+  "Estimate how many ECS tasks you need from average CPU (vCPU) and memory (GB) demand, per-task sizing, and a target utilization, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ecs-task-sizing-calculator"
-  intro="Estimate required ECS tasks from average resource demand. Enter total vCPU/memory needed, per-task vCPU/memory, and a target utilization to get a recommended task count."
+  intro="Estimate required ECS tasks from average resource demand. Compare baseline vs peak demand to set a safe recommended task count."
   examples={[
-    "If your service needs ~2 vCPU and ~4 GB on average, and each task is 0.5 vCPU / 1 GB at 70% utilization → estimate tasks.",
+    "If your service needs ~2 vCPU and ~4 GB on average, and each task is 0.5 vCPU / 1 GB at 70% utilization -> estimate tasks.",
     "Use average demand, not peak. Add headroom for spikes and deployments.",
+    "Peak 180% scenario shows how many tasks to reserve for burst traffic."
   ]}
   includes={[
     "Task count estimate from average vCPU and memory demand.",
     "Target utilization to keep headroom (planning).",
+    "Baseline vs peak scenario table for recommended tasks.",
   ]}
   excludes={[
     "Pricing (use Fargate or EC2 pricing calculators after sizing).",
@@ -43,7 +45,7 @@ const description =
       a: "For ECS on Fargate, use the Fargate cost calculator (vCPU-hours + GB-hours). For ECS on EC2, estimate required instances and use the EC2 cost calculator.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-ecs-task-sizing", label: "Guide: ECS task sizing" },
     { href: "/guides/aws-ecs-pricing", label: "Guide: ECS pricing" },
@@ -84,4 +86,5 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+
 

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateReservedBreakEven } from "../../lib/calc/reserved";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -9,6 +9,8 @@ export function ReservedBreakEvenCalculator() {
   const [reservedHourlyUsd, setReservedHourlyUsd] = useNumberParamState("ReservedBreakEven.reservedHourlyUsd", 0.075);
   const [upfrontUsd, setUpfrontUsd] = useNumberParamState("ReservedBreakEven.upfrontUsd", 300);
   const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("ReservedBreakEven.hoursPerMonth", 730);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ReservedBreakEven.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ReservedBreakEven.peakMultiplierPct", 200);
 
   const result = useMemo(() => {
     return estimateReservedBreakEven({
@@ -18,6 +20,20 @@ export function ReservedBreakEvenCalculator() {
       hoursPerMonth: clamp(hoursPerMonth, 1, 10000),
     });
   }, [onDemandHourlyUsd, reservedHourlyUsd, upfrontUsd, hoursPerMonth]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateReservedBreakEven({
+      onDemandHourlyUsd: clamp(onDemandHourlyUsd, 0, 1e6),
+      reservedHourlyUsd: clamp(reservedHourlyUsd, 0, 1e6),
+      upfrontUsd: clamp(upfrontUsd, 0, 1e12),
+      hoursPerMonth: clamp(hoursPerMonth, 1, 10000) * multiplier,
+    });
+  }, [hoursPerMonth, onDemandHourlyUsd, peakMultiplierPct, reservedHourlyUsd, showPeakScenario, upfrontUsd]);
+
+  const paybackMonths = result.monthlySavingsUsd > 0 ? upfrontUsd / result.monthlySavingsUsd : null;
+  const peakPaybackMonths = peakResult && peakResult.monthlySavingsUsd > 0 ? upfrontUsd / peakResult.monthlySavingsUsd : null;
 
   return (
     <div className="calc-grid">
@@ -69,6 +85,81 @@ export function ReservedBreakEvenCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to hours per month.</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setOnDemandHourlyUsd(0.12);
+                  setReservedHourlyUsd(0.075);
+                  setUpfrontUsd(300);
+                  setHoursPerMonth(300);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Dev/test
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setOnDemandHourlyUsd(0.12);
+                  setReservedHourlyUsd(0.075);
+                  setUpfrontUsd(300);
+                  setHoursPerMonth(730);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                Always-on
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setOnDemandHourlyUsd(0.22);
+                  setReservedHourlyUsd(0.14);
+                  setUpfrontUsd(1200);
+                  setHoursPerMonth(730);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                High spend
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -79,6 +170,8 @@ export function ReservedBreakEvenCalculator() {
                   setReservedHourlyUsd(0.075);
                   setUpfrontUsd(300);
                   setHoursPerMonth(730);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(200);
                 }}
               >
                 Reset example
@@ -114,8 +207,45 @@ export function ReservedBreakEvenCalculator() {
             <div className="v">{formatCurrency2(result.monthlySavingsUsd)}</div>
           </div>
         </div>
+
+        {showPeakScenario ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Hours/month</th>
+                  <th className="num">On-demand</th>
+                  <th className="num">Committed</th>
+                  <th className="num">Savings</th>
+                  <th className="num">Payback (mo)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.hoursPerMonth, 0)}</td>
+                  <td className="num">{formatCurrency2(result.monthlyOnDemandUsd)}</td>
+                  <td className="num">{formatCurrency2(result.monthlyReservedUsd)}</td>
+                  <td className="num">{formatCurrency2(result.monthlySavingsUsd)}</td>
+                  <td className="num">{paybackMonths === null ? "n/a" : formatNumber(paybackMonths, 1)}</td>
+                </tr>
+                {peakResult ? (
+                  <tr>
+                    <td>Peak</td>
+                    <td className="num">{formatNumber(peakResult.hoursPerMonth, 0)}</td>
+                    <td className="num">{formatCurrency2(peakResult.monthlyOnDemandUsd)}</td>
+                    <td className="num">{formatCurrency2(peakResult.monthlyReservedUsd)}</td>
+                    <td className="num">{formatCurrency2(peakResult.monthlySavingsUsd)}</td>
+                    <td className="num">{peakPaybackMonths === null ? "n/a" : formatNumber(peakPaybackMonths, 1)}</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-
