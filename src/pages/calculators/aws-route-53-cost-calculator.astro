@@ -4,20 +4,22 @@ import { AwsRoute53CostCalculator as AwsRoute53CostCalculatorComponent } from ".
 
 const title = "AWS Route 53 Cost Calculator";
 const description =
-  "Estimate Route 53-style costs from hosted zones, DNS query volume, and health checks. Educational use only.";
+  "Estimate Route 53-style costs from hosted zones, DNS query volume, and health checks, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-route-53-cost-calculator"
-  intro="Estimate Route 53-style costs with a simple model: hosted zone monthly fees + standard DNS query charges + health checks. Use your effective pricing and your measured query volume."
+  intro="Estimate Route 53-style costs with a simple model: hosted zone monthly fees + standard DNS query charges + health checks. Compare baseline vs peak query volume with your pricing."
   examples={[
     "20 hosted zones, 500M queries/month, and 10 health checks using your $/zone, $/1M queries, and $/health-check-month pricing.",
+    "Peak 220% scenario highlights DNS spikes during incidents."
   ]}
   includes={[
     "Hosted zone fees from zone count and $/zone-month.",
     "Standard DNS query charges from queries/month and $ per 1M queries.",
     "Health check charges from check count and $/check-month.",
+    "Baseline vs peak scenario table for query spikes.",
   ]}
   excludes={[
     "Advanced routing and feature add-ons unless modeled separately.",
@@ -39,7 +41,7 @@ const description =
       a: "Use measured query counts from Route 53 metrics or resolver logs over a representative time window, then roll up to monthly.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-route-53-pricing", label: "Guide: Route 53 pricing" },
     { href: "/guides/aws-route-53-estimate-dns-queries", label: "Guide: estimate DNS queries" },
@@ -79,4 +81,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

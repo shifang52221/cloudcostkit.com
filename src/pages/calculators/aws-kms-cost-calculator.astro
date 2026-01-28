@@ -4,19 +4,21 @@ import { AwsKmsCostCalculator as AwsKmsCostCalculatorComponent } from "../../com
 
 const title = "AWS KMS Cost Calculator";
 const description =
-  "Estimate AWS KMS-style costs from key-months and monthly request volume. Educational use only.";
+  "Estimate AWS KMS-style costs from key-months and monthly request volume, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-kms-cost-calculator"
-  intro="Estimate KMS-style costs with a simple model: customer managed key-months plus request charges. Use your effective region pricing and your request volume."
+  intro="Estimate KMS-style costs with a simple model: customer managed key-months plus request charges. Compare baseline vs peak request volume with your pricing."
   examples={[
     "50 keys at $1/key-month and 300M requests/month at $0.03 per 10k requests.",
+    "Peak 220% scenario highlights incident-driven KMS spikes."
   ]}
   includes={[
     "Key-month charges from key count and $/key-month.",
     "Request charges from requests/month and $ per 10k requests.",
+    "Baseline vs peak scenario table for request spikes.",
   ]}
   excludes={[
     "Multi-region keys and custom key stores unless modeled separately.",
@@ -37,7 +39,7 @@ const description =
       a: "Reduce request volume: avoid per-request encryption in hot paths when not needed, use envelope encryption appropriately, and fix retry loops that amplify KMS calls.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-kms-pricing", label: "Guide: KMS pricing" },
     { href: "/guides/aws-kms-estimate-requests", label: "Guide: estimate KMS requests" },
@@ -77,4 +79,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

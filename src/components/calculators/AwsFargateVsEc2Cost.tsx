@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+﻿import React, { useMemo } from "react";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateFargateCost } from "../../lib/calc/fargate";
 import { estimateComputeCost } from "../../lib/calc/compute";
 import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
@@ -7,6 +7,8 @@ import { clamp } from "../../lib/math";
 
 export function AwsFargateVsEc2CostCalculator() {
   const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsFargateVsEc2Cost.hoursPerMonth", 730);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsFargateVsEc2Cost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsFargateVsEc2Cost.peakMultiplierPct", 180);
 
   const [tasks, setTasks] = useNumberParamState("AwsFargateVsEc2Cost.tasks", 6);
   const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsFargateVsEc2Cost.vcpuPerTask", 0.5);
@@ -38,6 +40,28 @@ export function AwsFargateVsEc2CostCalculator() {
     pricePerGbHourUsd,
   ]);
 
+  const fargatePeak = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateFargateCost({
+      tasks: clamp(tasks, 0, 1e9) * multiplier,
+      vcpuPerTask: clamp(vcpuPerTask, 0, 1e3),
+      memoryGbPerTask: clamp(memoryGbPerTask, 0, 1e6),
+      hoursPerMonth: normalizedHoursPerMonth,
+      pricePerVcpuHourUsd: clamp(pricePerVcpuHourUsd, 0, 1e3),
+      pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
+    });
+  }, [
+    memoryGbPerTask,
+    normalizedHoursPerMonth,
+    peakMultiplierPct,
+    pricePerGbHourUsd,
+    pricePerVcpuHourUsd,
+    showPeakScenario,
+    tasks,
+    vcpuPerTask,
+  ]);
+
   const ec2 = useMemo(() => {
     return estimateComputeCost({
       instances: clamp(instances, 0, 1e9),
@@ -47,6 +71,18 @@ export function AwsFargateVsEc2CostCalculator() {
       daysPerMonth: normalizedDaysPerMonth,
     });
   }, [instances, pricePerInstanceHourUsd, normalizedDaysPerMonth]);
+
+  const ec2Peak = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateComputeCost({
+      instances: clamp(instances, 0, 1e9) * multiplier,
+      pricePerHourUsd: clamp(pricePerInstanceHourUsd, 0, 1e6),
+      utilizationPct: 100,
+      hoursPerDay: 24,
+      daysPerMonth: normalizedDaysPerMonth,
+    });
+  }, [instances, normalizedDaysPerMonth, peakMultiplierPct, pricePerInstanceHourUsd, showPeakScenario]);
 
   const deltaUsd = fargate.totalCostUsd - ec2.monthlyCostUsd;
   const winner = deltaUsd > 0 ? "EC2" : deltaUsd < 0 ? "Fargate" : "Tie";
@@ -68,6 +104,31 @@ export function AwsFargateVsEc2CostCalculator() {
               onChange={(e) => setHoursPerMonth(+e.target.value)}
             />
           </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to avg tasks and instances.</div>
+            </div>
+          ) : null}
           <div className="field field-9 muted" style={{ alignSelf: "end" }}>
             Use average running tasks/instances over the month. If you schedule down environments, reduce hours/month.
           </div>
@@ -186,7 +247,7 @@ export function AwsFargateVsEc2CostCalculator() {
             <div className="v">{winner}</div>
           </div>
           <div className="kpi">
-            <div className="k">Difference (Fargate − EC2)</div>
+            <div className="k">Difference (Fargate - EC2)</div>
             <div className="v">
               {formatCurrency2(deltaUsd)}{" "}
               <span className="muted" style={{ fontSize: 12 }}>
@@ -195,6 +256,42 @@ export function AwsFargateVsEc2CostCalculator() {
             </div>
           </div>
         </div>
+
+        {fargatePeak && ec2Peak ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Fargate total</th>
+                  <th className="num">EC2 total</th>
+                  <th className="num">Delta</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatCurrency2(fargate.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(ec2.monthlyCostUsd)}</td>
+                  <td className="num">{formatCurrency2(deltaUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatCurrency2(fargatePeak.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(ec2Peak.monthlyCostUsd)}</td>
+                  <td className="num">{formatCurrency2(fargatePeak.totalCostUsd - ec2Peak.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatCurrency2(fargatePeak.totalCostUsd - fargate.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(ec2Peak.monthlyCostUsd - ec2.monthlyCostUsd)}</td>
+                  <td className="num">{formatCurrency2((fargatePeak.totalCostUsd - ec2Peak.monthlyCostUsd) - deltaUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
 
       <div className="panel">
@@ -223,6 +320,8 @@ export function AwsFargateVsEc2CostCalculator() {
             type="button"
             onClick={() => {
               setHoursPerMonth(730);
+              setShowPeakScenario(false);
+              setPeakMultiplierPct(180);
 
               setTasks(6);
               setVcpuPerTask(0.5);

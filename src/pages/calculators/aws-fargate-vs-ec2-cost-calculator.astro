@@ -4,21 +4,23 @@ import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent
 
 const title = "AWS Fargate vs EC2 Cost Calculator";
 const description =
-  "Compare Fargate vs EC2 compute cost with consistent assumptions. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs. Educational use only.";
+  "Compare Fargate vs EC2 compute cost with consistent assumptions, with baseline vs peak scenarios. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-fargate-vs-ec2-cost-calculator"
-  intro="Compare Fargate (vCPU-hours + memory GB-hours) vs EC2 (instances x $/hour) using average running capacity. This is compute-only; add load balancers, logs, and data transfer for a full model."
+  intro="Compare Fargate (vCPU-hours + memory GB-hours) vs EC2 (instances x $/hour) using average running capacity, then see baseline vs peak differences. This is compute-only."
   examples={[
     "6 tasks at 0.5 vCPU and 1 GB running 730 hours/month vs 3 instances at $0.18/hr.",
     "If EC2 is underutilized, Fargate can be cheaper; if EC2 is packed efficiently with commitments, EC2 often wins.",
+    "Peak 180% scenario validates scaling bursts."
   ]}
   includes={[
     "Fargate compute estimate (vCPU-hours + GB-hours) from average running tasks.",
     "EC2 compute estimate (instance-hours) from average instances and $/instance-hour.",
     "Side-by-side monthly totals and differences.",
+    "Baseline vs peak scenario table for capacity spikes.",
   ]}
   excludes={[
     "EBS storage, data transfer/NAT, load balancers, and other networking costs.",
@@ -44,7 +46,7 @@ const description =
       a: "If you use Savings Plans/Reserved Instances, your effective EC2 $/hour can be lower. Use a blended rate that matches your expected coverage.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-fargate-vs-ec2-cost", label: "Guide: Fargate vs EC2 cost" },
     { href: "/guides/aws-fargate-pricing", label: "Guide: Fargate pricing" },
@@ -88,4 +90,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

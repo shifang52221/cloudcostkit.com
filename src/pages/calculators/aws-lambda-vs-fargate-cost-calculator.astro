@@ -4,21 +4,23 @@ import { AwsLambdaVsFargateCostCalculator as AwsLambdaVsFargateCostCalculatorCom
 
 const title = "AWS Lambda vs Fargate Cost Calculator";
 const description =
-  "Compare Lambda vs Fargate compute cost using the same workload assumptions. Estimate monthly Lambda request + GB-seconds and Fargate vCPU-hours + GB-hours. Educational use only.";
+  "Compare Lambda vs Fargate compute cost using the same workload assumptions, with baseline vs peak scenarios. Estimate monthly Lambda request + GB-seconds and Fargate vCPU-hours + GB-hours. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-lambda-vs-fargate-cost-calculator"
-  intro="Compare Lambda (requests + GB-seconds) vs Fargate (vCPU-hours + GB-hours) using your own pricing inputs. This is a compute-only comparison; add logs, transfer, and load balancers for full TCO."
+  intro="Compare Lambda (requests + GB-seconds) vs Fargate (vCPU-hours + GB-hours) using your own pricing inputs. See baseline vs peak differences in a compute-only comparison."
   examples={[
     "50M requests/month at 120 ms and 512 MB vs 3 tasks running 24/7 at 0.5 vCPU and 1 GB.",
     "For steady high-throughput workloads, Fargate often wins; for bursty spiky workloads, Lambda often wins.",
+    "Peak 180% scenario helps validate incident months."
   ]}
   includes={[
     "Lambda request cost and compute cost (GB-seconds) with optional free tier.",
     "Fargate vCPU-hour and memory GB-hour compute costs from average running tasks.",
     "Side-by-side monthly totals and differences.",
+    "Baseline vs peak scenario table for workload spikes.",
   ]}
   excludes={[
     "Logs/metrics costs (often meaningful for services with high volume).",
@@ -44,7 +46,7 @@ const description =
       a: "Add logs, networking (egress/NAT/cross-AZ), and load balancers. For many services, these line items can be comparable to compute.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-lambda-vs-fargate-cost", label: "Guide: Lambda vs Fargate cost" },
     { href: "/guides/aws-lambda-pricing", label: "Guide: Lambda pricing" },
@@ -87,4 +89,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

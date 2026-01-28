@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+﻿import React, { useMemo } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateFargateCost } from "../../lib/calc/fargate";
 import { estimateLambdaCost } from "../../lib/calc/lambda";
@@ -12,6 +12,8 @@ export function AwsLambdaVsFargateCostCalculator() {
   const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerMillionRequestsUsd", 0.2);
   const [pricePerGbSecondUsd, setPricePerGbSecondUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerGbSecondUsd", 0.0000166667);
   const [includeFreeTier, setIncludeFreeTier] = useBooleanParamState("AwsLambdaVsFargateCost.includeFreeTier", true);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsLambdaVsFargateCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLambdaVsFargateCost.peakMultiplierPct", 180);
 
   const [tasks, setTasks] = useNumberParamState("AwsLambdaVsFargateCost.tasks", 3);
   const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsLambdaVsFargateCost.vcpuPerTask", 0.5);
@@ -39,6 +41,29 @@ export function AwsLambdaVsFargateCostCalculator() {
     includeFreeTier,
   ]);
 
+  const lambdaPeak = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateLambdaCost({
+      invocationsPerMonth: clamp(invocationsPerMonth, 0, 1e18) * multiplier,
+      avgDurationMs: clamp(avgDurationMs, 0, 1e9),
+      memoryMb: clamp(memoryMb, 0, 10_240),
+      pricePerMillionRequestsUsd: clamp(pricePerMillionRequestsUsd, 0, 1e9),
+      pricePerGbSecondUsd: clamp(pricePerGbSecondUsd, 0, 1e3),
+      freeInvocationsPerMonth: includeFreeTier ? 1_000_000 : 0,
+      freeGbSecondsPerMonth: includeFreeTier ? 400_000 : 0,
+    });
+  }, [
+    avgDurationMs,
+    includeFreeTier,
+    invocationsPerMonth,
+    memoryMb,
+    peakMultiplierPct,
+    pricePerGbSecondUsd,
+    pricePerMillionRequestsUsd,
+    showPeakScenario,
+  ]);
+
   const fargate = useMemo(() => {
     return estimateFargateCost({
       tasks: clamp(tasks, 0, 1e9),
@@ -49,6 +74,28 @@ export function AwsLambdaVsFargateCostCalculator() {
       pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
     });
   }, [tasks, vcpuPerTask, memoryGbPerTask, hoursPerMonth, pricePerVcpuHourUsd, pricePerGbHourUsd]);
+
+  const fargatePeak = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateFargateCost({
+      tasks: clamp(tasks, 0, 1e9) * multiplier,
+      vcpuPerTask: clamp(vcpuPerTask, 0, 1e3),
+      memoryGbPerTask: clamp(memoryGbPerTask, 0, 1e6),
+      hoursPerMonth: clamp(hoursPerMonth, 0, 1e6),
+      pricePerVcpuHourUsd: clamp(pricePerVcpuHourUsd, 0, 1e3),
+      pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
+    });
+  }, [
+    hoursPerMonth,
+    memoryGbPerTask,
+    peakMultiplierPct,
+    pricePerGbHourUsd,
+    pricePerVcpuHourUsd,
+    showPeakScenario,
+    tasks,
+    vcpuPerTask,
+  ]);
 
   const deltaUsd = fargate.totalCostUsd - lambda.totalCostUsd;
   const winner = deltaUsd > 0 ? "Lambda" : deltaUsd < 0 ? "Fargate" : "Tie";
@@ -125,6 +172,31 @@ export function AwsLambdaVsFargateCostCalculator() {
               Include AWS free tier
             </label>
           </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to invocations and tasks.</div>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -216,7 +288,7 @@ export function AwsLambdaVsFargateCostCalculator() {
             <div className="v">{winner}</div>
           </div>
           <div className="kpi">
-            <div className="k">Difference (Fargate − Lambda)</div>
+            <div className="k">Difference (Fargate - Lambda)</div>
             <div className="v">
               {formatCurrency2(deltaUsd)}{" "}
               <span className="muted" style={{ fontSize: 12 }}>
@@ -225,6 +297,42 @@ export function AwsLambdaVsFargateCostCalculator() {
             </div>
           </div>
         </div>
+
+        {lambdaPeak && fargatePeak ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Lambda total</th>
+                  <th className="num">Fargate total</th>
+                  <th className="num">Delta</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatCurrency2(lambda.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(fargate.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(deltaUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatCurrency2(lambdaPeak.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(fargatePeak.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(fargatePeak.totalCostUsd - lambdaPeak.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatCurrency2(lambdaPeak.totalCostUsd - lambda.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2(fargatePeak.totalCostUsd - fargate.totalCostUsd)}</td>
+                  <td className="num">{formatCurrency2((fargatePeak.totalCostUsd - lambdaPeak.totalCostUsd) - deltaUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
 
         <div className="muted" style={{ marginTop: 10, fontSize: 12 }}>
           This compares compute-only pricing. Add logs, load balancers, NAT/egress, and retries for a full model.
@@ -266,6 +374,8 @@ export function AwsLambdaVsFargateCostCalculator() {
               setPricePerMillionRequestsUsd(0.2);
               setPricePerGbSecondUsd(0.0000166667);
               setIncludeFreeTier(true);
+              setShowPeakScenario(false);
+              setPeakMultiplierPct(180);
 
               setTasks(3);
               setVcpuPerTask(0.5);
@@ -282,3 +392,4 @@ export function AwsLambdaVsFargateCostCalculator() {
     </div>
   );
 }
+

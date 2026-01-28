@@ -4,20 +4,22 @@ import { AwsFargateCostCalculator as AwsFargateCostCalculatorComponent } from ".
 
 const title = "AWS Fargate Cost Calculator";
 const description =
-  "Estimate AWS Fargate-style monthly compute costs from running tasks, vCPU-hours, and memory GB-hours using your pricing assumptions. Educational use only.";
+  "Estimate AWS Fargate-style monthly compute costs from running tasks, vCPU-hours, and memory GB-hours using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-fargate-cost-calculator"
-  intro="Estimate Fargate-style compute cost from average running tasks, vCPU per task, memory per task, and hours per month. Enter your region pricing to get a planning estimate."
+  intro="Estimate Fargate-style compute cost from average running tasks, vCPU per task, memory per task, and hours per month. Compare baseline vs peak usage with your region pricing."
   examples={[
     "3 tasks running 730 hours/month at 0.5 vCPU and 1 GB each - estimate vCPU-hours + GB-hours charges.",
     "For autoscaling services, use average running tasks, not peak.",
+    "Peak 220% scenario models scaling bursts during launches."
   ]}
   includes={[
     "vCPU-hour and memory GB-hour compute charges (modeled with your $/unit inputs).",
     "A simple steady-state model for average running tasks over a month.",
+    "Baseline vs peak scenario table for autoscaling spikes.",
   ]}
   excludes={[
     "Load balancers, data transfer/egress, NAT, and private link costs (model separately).",
@@ -43,7 +45,7 @@ const description =
       a: "No. Fargate compute is only part of the bill. For many services, transfer (egress/NAT) and logging can be significant separate line items.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-fargate-pricing", label: "Guide: Fargate pricing (what to include)" },
     { href: "/guides/aws-lambda-vs-fargate-cost", label: "Guide: Lambda vs Fargate cost" },

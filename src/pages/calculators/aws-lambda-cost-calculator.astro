@@ -4,20 +4,22 @@ import { AwsLambdaCostCalculator as AwsLambdaCostCalculatorComponent } from "../
 
 const title = "AWS Lambda Cost Calculator";
 const description =
-  "Estimate AWS Lambda-style monthly cost from invocations, duration, memory, and your pricing assumptions. Educational use only.";
+  "Estimate AWS Lambda-style monthly cost from invocations, duration, memory, and your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-lambda-cost-calculator"
-  intro="Estimate Lambda-style serverless cost from request volume and GB-second compute. Use your own region/runtime pricing."
+  intro="Estimate Lambda-style serverless cost from request volume and GB-second compute. Compare baseline vs peak traffic with your region/runtime pricing."
   examples={[
     "50M invocations/month, 120ms avg duration, 512MB memory -> estimate requests + compute charges.",
+    "Peak 220% scenario shows bursty months or incident spikes."
   ]}
   includes={[
     "Request fees from invocations/month and $ per 1M requests.",
     "Compute fees from GB-seconds (invocations x duration x memory GB) and $/GB-second.",
     "Optional free tier deduction (toggle).",
+    "Baseline vs peak scenario table for invocation spikes.",
   ]}
   excludes={[
     "Logging/metrics (for example, CloudWatch), data transfer, and downstream service costs.",
@@ -43,7 +45,7 @@ const description =
       a: "Use p50/p95 duration from your monitoring and the configured memory size. Model a few scenarios if you're unsure.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-lambda-pricing", label: "Guide: Lambda pricing (what to include)" },
     { href: "/guides/aws-lambda-cost-optimization", label: "Guide: Lambda cost optimization" },
