@@ -1,23 +1,25 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsSqsCostCalculator as AwsSqsCostCalculatorComponent } from "../../components/calculators/AwsSqsCost";
 
 const title = "AWS SQS Cost Calculator";
 const description =
-  "Estimate AWS SQS-style monthly request cost from messages, requests per message, and per-million request pricing. Educational use only.";
+  "Estimate AWS SQS-style monthly request cost from messages, requests per message, and per-million request pricing, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-sqs-cost-calculator"
-  intro="Estimate SQS-style request cost with a simple model: messages/month x requests per message x $ per 1M requests. Use your own effective price for Standard/FIFO and region."
+  intro="Estimate SQS-style request cost with a simple model: messages/month x requests per message x $ per 1M requests. Compare baseline vs peak traffic with your pricing."
   examples={[
     "200M messages/month with 3 requests per message at $0.40 per 1M requests.",
+    "Peak 220% scenario highlights retry-heavy spikes."
   ]}
   includes={[
     "Request cost from total request count and $ per 1M requests.",
     "A simple multiplier to account for Receive/Delete/retries (requests per message).",
     "Optional free request allowance.",
+    "Baseline vs peak scenario table for message spikes.",
   ]}
   excludes={[
     "Data transfer, message payload size effects, and downstream service costs.",
@@ -25,7 +27,7 @@ const description =
   ]}
   how={[
     "Total requests = messages per month x requests per message.",
-    "Billable requests = max(total requests − free requests, 0).",
+    "Billable requests = max(total requests -free requests, 0).",
     "Cost = (billable requests / 1,000,000) x $ per 1M requests.",
   ]}
   faqs={[
@@ -42,7 +44,7 @@ const description =
       a: "No. This is only SQS request cost. Model downstream services separately (Lambda, DynamoDB, logs, etc).",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-sqs-pricing", label: "Guide: SQS pricing (what to include)" },
     { href: "/guides/aws-sqs-estimate-requests", label: "Guide: estimate SQS requests" },

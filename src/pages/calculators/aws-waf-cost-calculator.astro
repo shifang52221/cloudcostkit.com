@@ -4,20 +4,22 @@ import { AwsWafCostCalculator as AwsWafCostCalculatorComponent } from "../../com
 
 const title = "AWS WAF Cost Calculator";
 const description =
-  "Estimate AWS WAF-style costs from Web ACL count, rules, and request volume. Educational use only.";
+  "Estimate AWS WAF-style costs from Web ACL count, rules, and request volume, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-waf-cost-calculator"
-  intro="Estimate AWS WAF-style costs with a simple model: Web ACL monthly fees + rule monthly fees + request charges. Use your effective pricing for your region and configuration."
+  intro="Estimate AWS WAF-style costs with a simple model: Web ACL monthly fees + rule monthly fees + request charges. Compare baseline vs peak requests with your pricing."
   examples={[
     "2 Web ACLs, 20 rules, and 200M requests/month using $5/ACL, $1/rule, and $0.60 per 1M requests.",
+    "Peak 220% scenario helps budget for attack or bot spikes."
   ]}
   includes={[
     "Web ACL baseline: number of ACLs x $ per ACL-month.",
     "Rule baseline: number of rules x $ per rule-month.",
     "Request charges: requests/month x $ per million requests.",
+    "Baseline vs peak scenario table for request spikes.",
   ]}
   excludes={[
     "Bot control, CAPTCHA/challenge features, and managed add-ons unless modeled separately.",
@@ -43,7 +45,7 @@ const description =
       a: "Reduce evaluated requests (CDN caching, rate limiting, blocking early) and keep rule count tight. Also control downstream logging/analysis volume.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-waf-pricing", label: "Guide: WAF pricing" },
     { href: "/guides/aws-waf-estimate-requests", label: "Guide: estimate WAF request volume" },

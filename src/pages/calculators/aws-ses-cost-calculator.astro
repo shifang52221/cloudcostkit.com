@@ -4,19 +4,21 @@ import { AwsSesCostCalculator as AwsSesCostCalculatorComponent } from "../../com
 
 const title = "AWS SES Cost Calculator";
 const description =
-  "Estimate SES-style email sending cost from monthly email volume plus optional email size/transfer assumptions. Educational use only.";
+  "Estimate SES-style email sending cost from monthly email volume plus optional email size/transfer assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ses-cost-calculator"
-  intro="Estimate SES-style cost with a simple model: send charges (per 1,000 emails) plus optional transfer from average email size. Use your effective region pricing."
+  intro="Estimate SES-style cost with a simple model: send charges (per 1,000 emails) plus optional transfer from average email size. Compare baseline vs peak volume with your pricing."
   examples={[
     "5M emails/month at $0.10 per 1,000 emails, average 10 KB/email, and $0.09/GB egress.",
+    "Peak 200% scenario helps budget for campaign spikes."
   ]}
   includes={[
     "Send charges from emails/month and $ per 1,000 emails.",
     "Optional transfer estimate from email size and $/GB.",
+    "Baseline vs peak scenario table for volume spikes.",
   ]}
   excludes={[
     "Dedicated IPs, inbound email, and other add-ons unless modeled separately.",
@@ -38,7 +40,7 @@ const description =
       a: "Higher volume than expected (marketing sends), retries/bounces, large templates/attachments increasing payload size, and dedicated IP/add-on usage.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-ses-pricing", label: "Guide: SES pricing" },
     { href: "/guides/aws-ses-estimate-email-volume", label: "Guide: estimate email volume" },
@@ -78,4 +80,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-
