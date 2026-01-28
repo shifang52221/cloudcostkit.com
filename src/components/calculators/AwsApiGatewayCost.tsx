@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateApiGatewayCost } from "../../lib/calc/apiGateway";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -9,6 +9,8 @@ export function AwsApiGatewayCostCalculator() {
   const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsApiGatewayCost.pricePerMillionRequestsUsd", 3.5);
   const [avgResponseKb, setAvgResponseKb] = useNumberParamState("AwsApiGatewayCost.avgResponseKb", 15);
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsApiGatewayCost.egressPricePerGbUsd", 0.09);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsApiGatewayCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsApiGatewayCost.peakMultiplierPct", 180);
 
   const result = useMemo(() => {
     return estimateApiGatewayCost({
@@ -18,6 +20,17 @@ export function AwsApiGatewayCostCalculator() {
       egressPricePerGbUsd: clamp(egressPricePerGbUsd, 0, 1e6),
     });
   }, [requestsPerMonth, pricePerMillionRequestsUsd, avgResponseKb, egressPricePerGbUsd]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateApiGatewayCost({
+      requestsPerMonth: clamp(requestsPerMonth, 0, 1e18) * multiplier,
+      pricePerMillionRequestsUsd: clamp(pricePerMillionRequestsUsd, 0, 1e9),
+      avgResponseKb: clamp(avgResponseKb, 0, 1e9),
+      egressPricePerGbUsd: clamp(egressPricePerGbUsd, 0, 1e6),
+    });
+  }, [avgResponseKb, egressPricePerGbUsd, peakMultiplierPct, pricePerMillionRequestsUsd, requestsPerMonth, showPeakScenario]);
 
   return (
     <div className="calc-grid">
@@ -74,6 +87,81 @@ export function AwsApiGatewayCostCalculator() {
             </div>
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Apply to request volume for seasonal spikes.</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setRequestsPerMonth(120_000_000);
+                  setPricePerMillionRequestsUsd(3.5);
+                  setAvgResponseKb(12);
+                  setEgressPricePerGbUsd(0.09);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                SaaS baseline
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setRequestsPerMonth(600_000_000);
+                  setPricePerMillionRequestsUsd(3.5);
+                  setAvgResponseKb(24);
+                  setEgressPricePerGbUsd(0.09);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                Partner API
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setRequestsPerMonth(1_800_000_000);
+                  setPricePerMillionRequestsUsd(3.0);
+                  setAvgResponseKb(30);
+                  setEgressPricePerGbUsd(0.08);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Public API
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -84,6 +172,8 @@ export function AwsApiGatewayCostCalculator() {
                   setPricePerMillionRequestsUsd(3.5);
                   setAvgResponseKb(15);
                   setEgressPricePerGbUsd(0.09);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(180);
                 }}
               >
                 Reset example
@@ -113,8 +203,43 @@ export function AwsApiGatewayCostCalculator() {
             <div className="v">{formatNumber(result.transferGb, 0)}</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Requests</th>
+                  <th className="num">Transfer (GB)</th>
+                  <th className="num">Total cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.requestsPerMonth, 0)}</td>
+                  <td className="num">{formatNumber(result.transferGb, 0)}</td>
+                  <td className="num">{formatCurrency2(result.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.requestsPerMonth, 0)}</td>
+                  <td className="num">{formatNumber(peakResult.transferGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.requestsPerMonth - result.requestsPerMonth, 0)}</td>
+                  <td className="num">{formatNumber(peakResult.transferGb - result.transferGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalCostUsd - result.totalCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

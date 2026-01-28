@@ -1,21 +1,23 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ApiResponseTransferCalculator } from "../../components/calculators/ApiResponseTransfer";
 
 const title = "API Response Size Transfer Calculator";
 const description =
-  "Estimate monthly transfer volume from daily request count and average API response size. Educational use only.";
+  "Estimate monthly transfer volume from daily request count and average API response size, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/api-response-size-transfer-calculator"
-  intro="Estimate monthly response transfer from request volume and typical response size. Useful for budgeting bandwidth/egress and spotting payload bloat."
+  intro="Estimate monthly response transfer from request volume and typical response size, then compare baseline vs peak traffic."
   examples={[
-    "2,000,000 requests/day with 15 KB average responses ~ ~870 GB/month (estimate).",
+    "2,000,000 requests/day with 15 KB average responses ~ 870 GB/month (estimate).",
+    "Peak 180% scenario highlights incident-driven transfer spikes."
   ]}
   includes={[
     "Monthly transfer estimate from requests/day and average response KB.",
+    "Baseline vs peak scenario table for bandwidth spikes.",
     "Useful for quick egress/CDN planning and cost comparisons.",
   ]}
   excludes={[
@@ -24,7 +26,7 @@ const description =
   ]}
   how={[
     "Requests per month ~ requests/day x 30.4.",
-    "Monthly transfer (GB) ~ requests/month x average response KB ÷ 1024 ÷ 1024.",
+    "Monthly transfer (GB) ~ requests/month x average response KB / 1024 / 1024.",
     "This estimate ignores protocol overhead and retries."
   ]}
   faqs={[
@@ -37,7 +39,7 @@ const description =
       a: "No. This models response payloads. If uploads are significant, model them separately."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
     { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
@@ -47,7 +49,7 @@ const description =
   <ApiResponseTransferCalculator client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">What “response size” should include</h2>
+    <h2 style="margin-top:0">What response size should include</h2>
     <ul>
       <li><strong>Payload bytes</strong>: JSON/HTML/media returned by the endpoint (usually the dominant part).</li>
       <li><strong>Compression</strong>: measure the <em>compressed</em> bytes over the wire if you use gzip/brotli.</li>
@@ -58,9 +60,7 @@ const description =
     <ul>
       <li>From access logs: average <strong>bytes sent</strong> by route (p50/p95 is better than mean).</li>
       <li>From APM: sample response body sizes for hot endpoints and exclude outliers (large downloads).</li>
-      <li>
-        Separate “small API” and “large download” endpoints; mixing them produces an average that fits neither.
-      </li>
+      <li>Separate small API and large download endpoints; mixing them produces an average that fits neither.</li>
     </ul>
 
     <h2>Common multipliers (why bandwidth is higher than payload math)</h2>
@@ -87,7 +87,7 @@ const description =
     <h2>Validate after changes</h2>
     <ul>
       <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that’s when hidden multipliers show up).</li>
+      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
     </ul>
 
     <h2>Next steps</h2>
@@ -100,3 +100,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

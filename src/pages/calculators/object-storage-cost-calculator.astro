@@ -4,20 +4,22 @@ import { ObjectStorageCostCalculator as ObjectStorageCostCalculatorComponent } f
 
 const title = "Object Storage Cost Calculator";
 const description =
-  "Estimate monthly object storage cost from stored GB and request volume (GET/PUT) with customizable per-1k pricing. Educational use only.";
+  "Estimate monthly object storage cost from stored GB and request volume (GET/PUT) with customizable per-1k pricing, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/object-storage-cost-calculator"
-  intro="Object storage costs usually come from stored data and request volume. Use this calculator to estimate the blended monthly cost with your workload assumptions."
+  intro="Object storage costs usually come from stored data and request volume. Use this calculator to estimate the blended monthly cost and compare baseline vs peak traffic."
   examples={[
     "5,000 GB stored, plus 5M GET and 500k PUT requests at your request pricing -> estimate monthly cost.",
     "20 TB stored with low request volume -> storage dominates; requests are usually a rounding error.",
+    "Peak 220% scenario shows how request surges impact total cost."
   ]}
   includes={[
     "Storage cost estimate from average GB stored and $/GB-month pricing.",
     "Request cost estimate for GET and PUT from request counts and per-1k pricing.",
+    "Baseline vs peak scenario table for request spikes.",
   ]}
   excludes={[
     "Retrieval fees, lifecycle transitions, replication, and tiered pricing (model separately).",
@@ -50,7 +52,7 @@ const description =
       a: "Many small objects often increase request volume (PUT/LIST/GET), which can increase request fees. If you store millions of small objects, request costs can become material."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },

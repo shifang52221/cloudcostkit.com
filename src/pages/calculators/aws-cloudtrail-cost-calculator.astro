@@ -4,20 +4,22 @@ import { AwsCloudTrailCostCalculator as AwsCloudTrailCostCalculatorComponent } f
 
 const title = "AWS CloudTrail Cost Calculator";
 const description =
-  "Estimate CloudTrail-style event costs from event volume and per-100k pricing inputs. Educational use only.";
+  "Estimate CloudTrail-style event costs from event volume and per-100k pricing inputs, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-cloudtrail-cost-calculator"
-  intro="Estimate CloudTrail-style costs from event volume: management events, data events, and (optional) Insights events. Use your effective per-100k prices for your region and configuration."
+  intro="Estimate CloudTrail-style costs from event volume: management events, data events, and Insights. Compare baseline vs peak event spikes using your effective per-100k prices."
   examples={[
     "50M management + 10M data + 1M insights events/month with your per-100k pricing inputs.",
+    "Peak 200% scenario helps budget for incident bursts and audits."
   ]}
   includes={[
     "Management events cost estimate from events/month and $ per 100k.",
     "Data events cost estimate from events/month and $ per 100k.",
     "Insights events cost estimate from events/month and $ per 100k (if applicable).",
+    "Baseline vs peak scenario table for event spikes.",
   ]}
   excludes={[
     "Storage, analysis, and downstream costs (S3 storage, Athena, SIEM, etc).",
@@ -37,7 +39,7 @@ const description =
       a: "Pricing can vary by region and configuration, and your total cost may include storage/analysis and downstream systems. Use your effective prices and add other line items you rely on.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-cloudtrail-pricing", label: "Guide: CloudTrail pricing" },
     { href: "/guides/aws-cloudtrail-estimate-events", label: "Guide: estimate CloudTrail events" },
@@ -77,4 +79,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

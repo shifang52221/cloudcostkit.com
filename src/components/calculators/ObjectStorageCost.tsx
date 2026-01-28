@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateObjectStorageCost } from "../../lib/calc/storage";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -11,6 +11,8 @@ export function ObjectStorageCostCalculator() {
   const [putRequestsPerMonth, setPutRequestsPerMonth] = useNumberParamState("ObjectStorageCost.putRequestsPerMonth", 500_000);
   const [getPricePer1kUsd, setGetPricePer1kUsd] = useNumberParamState("ObjectStorageCost.getPricePer1kUsd", 0.0004);
   const [putPricePer1kUsd, setPutPricePer1kUsd] = useNumberParamState("ObjectStorageCost.putPricePer1kUsd", 0.005);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ObjectStorageCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ObjectStorageCost.peakMultiplierPct", 180);
 
   const result = useMemo(() => {
     return estimateObjectStorageCost({
@@ -28,6 +30,28 @@ export function ObjectStorageCostCalculator() {
     putRequestsPerMonth,
     getPricePer1kUsd,
     putPricePer1kUsd,
+  ]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateObjectStorageCost({
+      averageStoredGb: clamp(averageStoredGb, 0, 1e12),
+      storagePricePerGbMonthUsd: clamp(storagePricePerGbMonthUsd, 0, 1e6),
+      getRequestsPerMonth: clamp(getRequestsPerMonth, 0, 1e15) * multiplier,
+      putRequestsPerMonth: clamp(putRequestsPerMonth, 0, 1e15) * multiplier,
+      getPricePer1kUsd: clamp(getPricePer1kUsd, 0, 1e3),
+      putPricePer1kUsd: clamp(putPricePer1kUsd, 0, 1e3),
+    });
+  }, [
+    averageStoredGb,
+    getPricePer1kUsd,
+    getRequestsPerMonth,
+    peakMultiplierPct,
+    putPricePer1kUsd,
+    putRequestsPerMonth,
+    showPeakScenario,
+    storagePricePerGbMonthUsd,
   ]);
 
   return (
@@ -103,6 +127,87 @@ export function ObjectStorageCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to GET/PUT requests only.</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setAverageStoredGb(1200);
+                  setStoragePricePerGbMonthUsd(0.023);
+                  setGetRequestsPerMonth(1_200_000);
+                  setPutRequestsPerMonth(120_000);
+                  setGetPricePer1kUsd(0.0004);
+                  setPutPricePer1kUsd(0.005);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                Media library
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setAverageStoredGb(7000);
+                  setStoragePricePerGbMonthUsd(0.023);
+                  setGetRequestsPerMonth(12_000_000);
+                  setPutRequestsPerMonth(1_200_000);
+                  setGetPricePer1kUsd(0.0004);
+                  setPutPricePer1kUsd(0.005);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                SaaS assets
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setAverageStoredGb(30_000);
+                  setStoragePricePerGbMonthUsd(0.021);
+                  setGetRequestsPerMonth(50_000_000);
+                  setPutRequestsPerMonth(3_000_000);
+                  setGetPricePer1kUsd(0.00035);
+                  setPutPricePer1kUsd(0.0045);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Consumer scale
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -115,6 +220,8 @@ export function ObjectStorageCostCalculator() {
                   setPutRequestsPerMonth(500_000);
                   setGetPricePer1kUsd(0.0004);
                   setPutPricePer1kUsd(0.005);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(180);
                 }}
               >
                 Reset example
@@ -172,8 +279,43 @@ export function ObjectStorageCostCalculator() {
             </table>
           </div>
         </details>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Requests</th>
+                  <th className="num">Request cost</th>
+                  <th className="num">Total cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.getRequestsPerMonth + result.putRequestsPerMonth, 0)}</td>
+                  <td className="num">{formatCurrency2(result.getCostUsd + result.putCostUsd)}</td>
+                  <td className="num">{formatCurrency2(result.totalMonthlyUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.getRequestsPerMonth + peakResult.putRequestsPerMonth, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.getCostUsd + peakResult.putCostUsd)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalMonthlyUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber((peakResult.getRequestsPerMonth + peakResult.putRequestsPerMonth) - (result.getRequestsPerMonth + result.putRequestsPerMonth), 0)}</td>
+                  <td className="num">{formatCurrency2((peakResult.getCostUsd + peakResult.putCostUsd) - (result.getCostUsd + result.putCostUsd))}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalMonthlyUsd - result.totalMonthlyUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

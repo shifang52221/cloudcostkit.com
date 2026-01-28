@@ -1,21 +1,23 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ApiRequestCostCalculator as ApiRequestCostCalculatorComponent } from "../../components/calculators/ApiRequestCost";
 
 const title = "API Request Cost Calculator";
 const description =
-  "Estimate monthly request-based charges from request volume and price per million requests. Educational use only.";
+  "Estimate monthly request-based charges from request volume and price per million requests, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/api-request-cost-calculator"
-  intro="Many APIs and gateways price by request count. Use this calculator to estimate monthly request cost from your volume and per‑million pricing."
+  intro="Many APIs and gateways price by request count. Use this calculator to estimate monthly request cost from your volume and per-million pricing, then compare baseline vs peak traffic."
   examples={[
     "500,000,000 requests/month at $1.00 per 1M requests ~ $500/month.",
+    "Peak 180% scenario turns 500M into 900M requests for budget planning."
   ]}
   includes={[
     "Request-fee estimate from requests/month and $ per 1M requests pricing.",
+    "Baseline vs peak scenario table for traffic spikes.",
     "Useful for API gateways, serverless, and request-metered services.",
   ]}
   excludes={[
@@ -23,7 +25,7 @@ const description =
     "Minimums, free tiers, and tiered steps unless you reflect them in inputs.",
   ]}
   how={[
-    "Request cost = (requests per month ÷ 1,000,000) x price per million requests.",
+    "Request cost = (requests per month / 1,000,000) x price per million requests.",
     "Use your provider's definition of billable requests and any request classes.",
     "This tool ignores data transfer; model bandwidth separately if relevant."
   ]}
@@ -37,7 +39,7 @@ const description =
       a: "Convert from RPS using the RPS to Monthly Requests tool, or use your analytics."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -92,3 +94,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

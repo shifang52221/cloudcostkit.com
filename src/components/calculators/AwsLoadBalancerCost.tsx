@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLoadBalancerCost } from "../../lib/calc/loadBalancer";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -10,6 +10,8 @@ export function AwsLoadBalancerCostCalculator() {
   const [pricePerLbHourUsd, setPricePerLbHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerLbHourUsd", 0.0225);
   const [capacityUnitsPerHour, setCapacityUnitsPerHour] = useNumberParamState("AwsLoadBalancerCost.capacityUnitsPerHour", 5);
   const [pricePerCapacityUnitHourUsd, setPricePerCapacityUnitHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerCapacityUnitHourUsd", 0.008);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsLoadBalancerCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLoadBalancerCost.peakMultiplierPct", 180);
 
   const result = useMemo(() => {
     return estimateLoadBalancerCost({
@@ -20,6 +22,26 @@ export function AwsLoadBalancerCostCalculator() {
       pricePerCapacityUnitHourUsd: clamp(pricePerCapacityUnitHourUsd, 0, 1e6),
     });
   }, [loadBalancers, hoursPerMonth, pricePerLbHourUsd, capacityUnitsPerHour, pricePerCapacityUnitHourUsd]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateLoadBalancerCost({
+      loadBalancers: clamp(loadBalancers, 0, 1e6),
+      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      pricePerLbHourUsd: clamp(pricePerLbHourUsd, 0, 1e6),
+      capacityUnitsPerHour: clamp(capacityUnitsPerHour, 0, 1e12) * multiplier,
+      pricePerCapacityUnitHourUsd: clamp(pricePerCapacityUnitHourUsd, 0, 1e6),
+    });
+  }, [
+    capacityUnitsPerHour,
+    hoursPerMonth,
+    loadBalancers,
+    peakMultiplierPct,
+    pricePerCapacityUnitHourUsd,
+    pricePerLbHourUsd,
+    showPeakScenario,
+  ]);
 
   return (
     <div className="calc-grid">
@@ -86,6 +108,84 @@ export function AwsLoadBalancerCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to capacity units (LCU/NLCU).</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setLoadBalancers(1);
+                  setHoursPerMonth(730);
+                  setPricePerLbHourUsd(0.0225);
+                  setCapacityUnitsPerHour(2);
+                  setPricePerCapacityUnitHourUsd(0.008);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                Startup app
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setLoadBalancers(3);
+                  setHoursPerMonth(730);
+                  setPricePerLbHourUsd(0.0225);
+                  setCapacityUnitsPerHour(12);
+                  setPricePerCapacityUnitHourUsd(0.008);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                Regional SaaS
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setLoadBalancers(8);
+                  setHoursPerMonth(730);
+                  setPricePerLbHourUsd(0.0225);
+                  setCapacityUnitsPerHour(45);
+                  setPricePerCapacityUnitHourUsd(0.008);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Global traffic
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -97,6 +197,8 @@ export function AwsLoadBalancerCostCalculator() {
                   setPricePerLbHourUsd(0.0225);
                   setCapacityUnitsPerHour(5);
                   setPricePerCapacityUnitHourUsd(0.008);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(180);
                 }}
               >
                 Reset example
@@ -126,6 +228,38 @@ export function AwsLoadBalancerCostCalculator() {
             <div className="v">{formatNumber(result.capacityUnitHours, 1)}</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Capacity units</th>
+                  <th className="num">Total cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.capacityUnitHours, 1)}</td>
+                  <td className="num">{formatCurrency2(result.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.capacityUnitHours, 1)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.capacityUnitHours - result.capacityUnitHours, 1)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalCostUsd - result.totalCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );

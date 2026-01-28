@@ -4,20 +4,22 @@ import { AwsDynamoDbCostCalculator as AwsDynamoDbCostCalculatorComponent } from 
 
 const title = "AWS DynamoDB Cost Calculator";
 const description =
-  "Estimate DynamoDB-style monthly cost from read/write request volume and storage pricing assumptions. Educational use only.";
+  "Estimate DynamoDB-style monthly cost from read/write request volume and storage pricing assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-dynamodb-cost-calculator"
-  intro="Estimate DynamoDB-style cost using a simple on-demand-like model: read requests + write requests + storage. Use your effective pricing inputs."
+  intro="Estimate DynamoDB-style cost using a simple on-demand-like model: read requests + write requests + storage. Compare baseline vs peak traffic with your effective pricing inputs."
   examples={[
     "2B reads/month, 500M writes/month, 200GB storage - estimate monthly request + storage charges.",
+    "Peak 200% scenario shows what an incident month costs."
   ]}
   includes={[
     "Read request cost from reads/month x $ per 1M requests.",
     "Write request cost from writes/month x $ per 1M requests.",
     "Storage cost from GB-month x $/GB-month.",
+    "Baseline vs peak scenario table for request spikes.",
   ]}
   excludes={[
     "Provisioned capacity (RCU/WCU) modeling, auto scaling dynamics, and reserved capacity discounts.",
@@ -43,7 +45,7 @@ const description =
       a: "Not included. Model those as additional line items if you use them heavily.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-dynamodb-pricing", label: "Guide: DynamoDB pricing (what to include)" },
     { href: "/guides/aws-dynamodb-rcu-wcu-explained", label: "Guide: RCU/WCU explained" },
@@ -83,4 +85,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

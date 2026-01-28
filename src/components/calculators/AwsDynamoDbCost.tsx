@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateDynamoDbCost } from "../../lib/calc/dynamodb";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -9,6 +9,8 @@ export function AwsDynamoDbCostCalculator() {
   const [writeRequestsPerMonth, setWriteRequestsPerMonth] = useNumberParamState("AwsDynamoDbCost.writeRequestsPerMonth", 500_000_000);
   const [pricePerMillionReadRequestsUsd, setPricePerMillionReadRequestsUsd] = useNumberParamState("AwsDynamoDbCost.pricePerMillionReadRequestsUsd", 0.25);
   const [pricePerMillionWriteRequestsUsd, setPricePerMillionWriteRequestsUsd] = useNumberParamState("AwsDynamoDbCost.pricePerMillionWriteRequestsUsd", 1.25);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsDynamoDbCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsDynamoDbCost.peakMultiplierPct", 180);
 
   const [storageGb, setStorageGb] = useNumberParamState("AwsDynamoDbCost.storageGb", 200);
   const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsDynamoDbCost.pricePerGbMonthUsd", 0.25);
@@ -29,6 +31,28 @@ export function AwsDynamoDbCostCalculator() {
     pricePerMillionWriteRequestsUsd,
     storageGb,
     pricePerGbMonthUsd,
+  ]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateDynamoDbCost({
+      readRequestsPerMonth: clamp(readRequestsPerMonth, 0, 1e18) * multiplier,
+      writeRequestsPerMonth: clamp(writeRequestsPerMonth, 0, 1e18) * multiplier,
+      pricePerMillionReadRequestsUsd: clamp(pricePerMillionReadRequestsUsd, 0, 1e9),
+      pricePerMillionWriteRequestsUsd: clamp(pricePerMillionWriteRequestsUsd, 0, 1e9),
+      storageGb: clamp(storageGb, 0, 1e12),
+      pricePerGbMonthUsd: clamp(pricePerGbMonthUsd, 0, 1e3),
+    });
+  }, [
+    peakMultiplierPct,
+    pricePerGbMonthUsd,
+    pricePerMillionReadRequestsUsd,
+    pricePerMillionWriteRequestsUsd,
+    readRequestsPerMonth,
+    showPeakScenario,
+    storageGb,
+    writeRequestsPerMonth,
   ]);
 
   return (
@@ -105,6 +129,87 @@ export function AwsDynamoDbCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to read/write traffic only.</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setReadRequestsPerMonth(600_000_000);
+                  setWriteRequestsPerMonth(120_000_000);
+                  setPricePerMillionReadRequestsUsd(0.25);
+                  setPricePerMillionWriteRequestsUsd(1.25);
+                  setStorageGb(80);
+                  setPricePerGbMonthUsd(0.25);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                Dev + QA
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setReadRequestsPerMonth(2_800_000_000);
+                  setWriteRequestsPerMonth(700_000_000);
+                  setPricePerMillionReadRequestsUsd(0.25);
+                  setPricePerMillionWriteRequestsUsd(1.25);
+                  setStorageGb(250);
+                  setPricePerGbMonthUsd(0.25);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(200);
+                }}
+              >
+                B2B SaaS
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setReadRequestsPerMonth(8_000_000_000);
+                  setWriteRequestsPerMonth(2_000_000_000);
+                  setPricePerMillionReadRequestsUsd(0.25);
+                  setPricePerMillionWriteRequestsUsd(1.25);
+                  setStorageGb(900);
+                  setPricePerGbMonthUsd(0.23);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Consumer scale
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -117,6 +222,8 @@ export function AwsDynamoDbCostCalculator() {
                   setPricePerMillionWriteRequestsUsd(1.25);
                   setStorageGb(200);
                   setPricePerGbMonthUsd(0.25);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(180);
                 }}
               >
                 Reset example
@@ -154,8 +261,43 @@ export function AwsDynamoDbCostCalculator() {
             <div className="v">{formatNumber(result.writeRequestsPerMonth, 0)}</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Requests</th>
+                  <th className="num">Storage</th>
+                  <th className="num">Total cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.readRequestsPerMonth + result.writeRequestsPerMonth, 0)}</td>
+                  <td className="num">{formatCurrency2(result.storageCostUsd)}</td>
+                  <td className="num">{formatCurrency2(result.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.readRequestsPerMonth + peakResult.writeRequestsPerMonth, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.storageCostUsd)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber((peakResult.readRequestsPerMonth + peakResult.writeRequestsPerMonth) - (result.readRequestsPerMonth + result.writeRequestsPerMonth), 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.storageCostUsd - result.storageCostUsd)}</td>
+                  <td className="num">{formatCurrency2(peakResult.totalCostUsd - result.totalCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-
