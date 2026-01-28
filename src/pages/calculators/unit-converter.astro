@@ -4,7 +4,7 @@ import { UnitConverterCalculator } from "../../components/calculators/UnitConver
 
 const title = "Cloud Units Converter";
 const description =
-  "Convert GB to GiB and Mbps to MB/s, plus estimate monthly transfer from throughput, utilization, and hours/day, with baseline vs peak scenarios. Educational use only.";
+  "Convert GB to GiB and Mbps to MB/s, plus estimate monthly transfer from throughput, utilization, hours/day, and days/month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -19,6 +19,7 @@ const description =
   includes={[
     "GB to GiB and Mbps to MB/s conversions.",
     "Throughput to monthly transfer estimate for planning.",
+    "Days/month input to align with billing cycles.",
     "Baseline vs peak scenario table for transfer spikes.",
   ]}
   excludes={[
@@ -28,7 +29,8 @@ const description =
   how={[
     "GB to GiB uses 1 GiB = 1.073741824 GB.",
     "Mbps to MB/s uses 8 bits = 1 byte.",
-    "Monthly transfer estimate multiplies throughput by utilization and time."
+    "Monthly transfer estimate multiplies throughput by utilization and time.",
+    "Use 30.4 days/month for an average month."
   ]}
   faqs={[
     {

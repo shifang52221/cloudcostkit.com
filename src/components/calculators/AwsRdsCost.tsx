@@ -7,7 +7,8 @@ import { clamp } from "../../lib/math";
 export function AwsRdsCostCalculator() {
   const [instances, setInstances] = useNumberParamState("AwsRdsCost.instances", 1);
   const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("AwsRdsCost.pricePerHourUsd", 0.2);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsRdsCost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsRdsCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsRdsCost.daysPerMonth", 30.4);
 
   const [storageGb, setStorageGb] = useNumberParamState("AwsRdsCost.storageGb", 200);
   const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsRdsCost.pricePerGbMonthUsd", 0.115);
@@ -20,11 +21,13 @@ export function AwsRdsCostCalculator() {
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsRdsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsRdsCost.peakMultiplierPct", 180);
 
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+
   const result = useMemo(() => {
     return estimateRdsCost({
       instances: clamp(instances, 0, 1e6),
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       storageGb: clamp(storageGb, 0, 1e12),
       pricePerGbMonthUsd: clamp(pricePerGbMonthUsd, 0, 1e3),
       backupGb: clamp(backupGb, 0, 1e12),
@@ -35,7 +38,7 @@ export function AwsRdsCostCalculator() {
   }, [
     instances,
     pricePerHourUsd,
-    hoursPerMonth,
+    normalizedHoursPerMonth,
     storageGb,
     pricePerGbMonthUsd,
     backupGb,
@@ -50,7 +53,7 @@ export function AwsRdsCostCalculator() {
     return estimateRdsCost({
       instances: clamp(instances, 0, 1e6),
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       storageGb: clamp(storageGb, 0, 1e12),
       pricePerGbMonthUsd: clamp(pricePerGbMonthUsd, 0, 1e3),
       backupGb: clamp(backupGb, 0, 1e12),
@@ -60,7 +63,6 @@ export function AwsRdsCostCalculator() {
     });
   }, [
     backupGb,
-    hoursPerMonth,
     instances,
     ioRequestsPerMonth,
     peakMultiplierPct,
@@ -70,6 +72,7 @@ export function AwsRdsCostCalculator() {
     pricePerMillionIoRequestsUsd,
     showPeakScenario,
     storageGb,
+    normalizedHoursPerMonth,
   ]);
 
   return (
@@ -100,15 +103,32 @@ export function AwsRdsCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Billable hours (per month)</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
 
           <div className="field field-3">
@@ -216,7 +236,8 @@ export function AwsRdsCostCalculator() {
                 onClick={() => {
                   setInstances(1);
                   setPricePerHourUsd(0.2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setStorageGb(100);
                   setPricePerGbMonthUsd(0.115);
                   setBackupGb(80);
@@ -235,7 +256,8 @@ export function AwsRdsCostCalculator() {
                 onClick={() => {
                   setInstances(2);
                   setPricePerHourUsd(0.35);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setStorageGb(400);
                   setPricePerGbMonthUsd(0.115);
                   setBackupGb(300);
@@ -254,7 +276,8 @@ export function AwsRdsCostCalculator() {
                 onClick={() => {
                   setInstances(4);
                   setPricePerHourUsd(0.7);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setStorageGb(1500);
                   setPricePerGbMonthUsd(0.1);
                   setBackupGb(1200);
@@ -278,7 +301,8 @@ export function AwsRdsCostCalculator() {
                 onClick={() => {
                   setInstances(1);
                   setPricePerHourUsd(0.2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setStorageGb(200);
                   setPricePerGbMonthUsd(0.115);
                   setBackupGb(200);
@@ -354,6 +378,9 @@ export function AwsRdsCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

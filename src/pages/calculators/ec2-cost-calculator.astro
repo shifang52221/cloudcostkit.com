@@ -24,14 +24,14 @@ const description =
     "Spot interruptions and autoscaling dynamics unless you use blended assumptions.",
   ]}
   how={[
-    "Monthly cost = instances x $/hour x hours/month x uptime.",
+    "Monthly cost = instances x $/hour x (hours/day x days/month) x uptime.",
     "If you use commitments (Savings Plans/Reserved), use a blended effective $/hour.",
     "Model storage and transfer as separate line items.",
   ]}
   faqs={[
     {
-      q: "What is a good hours/month value?",
-      a: "A common planning value is ~730 hours/month. Use your billing system's convention if it differs.",
+      q: "What is a good hours/day and days/month value?",
+      a: "Use hours/day and days/month. For always-on, 24 x 30.4 is a common planning baseline; adjust if your billing convention differs.",
     },
     {
       q: "How do I pick a blended $/hour?",
@@ -51,21 +51,22 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Instances</strong>: use average running instances from billing (instance-hours / monthly hours).</li>
+      <li><strong>Hourly rate</strong>: use a blended $/hour if you mix on-demand, Savings Plans, or RIs.</li>
+      <li><strong>Schedule</strong>: hours/day and days/month should reflect real uptime windows.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using peak instance count as baseline.</li>
+      <li>Applying both utilization and reduced hours/day for the same schedule.</li>
+      <li>Forgetting storage, transfer, and load balancer line items.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare instance-hours and effective $/hour to billing line items.</li>
+      <li>Check average instance count in metrics or inventory data.</li>
     </ul>
 
     <h2>Next steps</h2>

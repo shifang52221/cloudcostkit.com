@@ -8,18 +8,21 @@ export function ReservedBreakEvenCalculator() {
   const [onDemandHourlyUsd, setOnDemandHourlyUsd] = useNumberParamState("ReservedBreakEven.onDemandHourlyUsd", 0.12);
   const [reservedHourlyUsd, setReservedHourlyUsd] = useNumberParamState("ReservedBreakEven.reservedHourlyUsd", 0.075);
   const [upfrontUsd, setUpfrontUsd] = useNumberParamState("ReservedBreakEven.upfrontUsd", 300);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("ReservedBreakEven.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("ReservedBreakEven.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("ReservedBreakEven.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ReservedBreakEven.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ReservedBreakEven.peakMultiplierPct", 200);
+
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
 
   const result = useMemo(() => {
     return estimateReservedBreakEven({
       onDemandHourlyUsd: clamp(onDemandHourlyUsd, 0, 1e6),
       reservedHourlyUsd: clamp(reservedHourlyUsd, 0, 1e6),
       upfrontUsd: clamp(upfrontUsd, 0, 1e12),
-      hoursPerMonth: clamp(hoursPerMonth, 1, 10000),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 1, 10000),
     });
-  }, [onDemandHourlyUsd, reservedHourlyUsd, upfrontUsd, hoursPerMonth]);
+  }, [onDemandHourlyUsd, reservedHourlyUsd, upfrontUsd, normalizedHoursPerMonth]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -28,12 +31,16 @@ export function ReservedBreakEvenCalculator() {
       onDemandHourlyUsd: clamp(onDemandHourlyUsd, 0, 1e6),
       reservedHourlyUsd: clamp(reservedHourlyUsd, 0, 1e6),
       upfrontUsd: clamp(upfrontUsd, 0, 1e12),
-      hoursPerMonth: clamp(hoursPerMonth, 1, 10000) * multiplier,
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 1, 10000) * multiplier,
     });
-  }, [hoursPerMonth, onDemandHourlyUsd, peakMultiplierPct, reservedHourlyUsd, showPeakScenario, upfrontUsd]);
+  }, [normalizedHoursPerMonth, onDemandHourlyUsd, peakMultiplierPct, reservedHourlyUsd, showPeakScenario, upfrontUsd]);
 
   const paybackMonths = result.monthlySavingsUsd > 0 ? upfrontUsd / result.monthlySavingsUsd : null;
   const peakPaybackMonths = peakResult && peakResult.monthlySavingsUsd > 0 ? upfrontUsd / peakResult.monthlySavingsUsd : null;
+  const breakEvenMonthsAtSchedule =
+    result.breakEvenHours === null || normalizedHoursPerMonth <= 0
+      ? null
+      : result.breakEvenHours / normalizedHoursPerMonth;
 
   return (
     <div className="calc-grid">
@@ -74,15 +81,32 @@ export function ReservedBreakEvenCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Hours per month</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
-              min={1}
+              value={hoursPerDay}
+              min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
@@ -108,7 +132,7 @@ export function ReservedBreakEvenCalculator() {
                 step={5}
                 onChange={(e) => setPeakMultiplierPct(+e.target.value)}
               />
-              <div className="hint">Applies to hours per month.</div>
+              <div className="hint">Applies to hours/day x days/month.</div>
             </div>
           ) : null}
 
@@ -122,7 +146,8 @@ export function ReservedBreakEvenCalculator() {
                   setOnDemandHourlyUsd(0.12);
                   setReservedHourlyUsd(0.075);
                   setUpfrontUsd(300);
-                  setHoursPerMonth(300);
+                  setHoursPerDay(10);
+                  setDaysPerMonth(30);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(180);
                 }}
@@ -136,7 +161,8 @@ export function ReservedBreakEvenCalculator() {
                   setOnDemandHourlyUsd(0.12);
                   setReservedHourlyUsd(0.075);
                   setUpfrontUsd(300);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(220);
                 }}
@@ -150,12 +176,28 @@ export function ReservedBreakEvenCalculator() {
                   setOnDemandHourlyUsd(0.22);
                   setReservedHourlyUsd(0.14);
                   setUpfrontUsd(1200);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(160);
                 }}
               >
                 High spend
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setOnDemandHourlyUsd(0.12);
+                  setReservedHourlyUsd(0.08);
+                  setUpfrontUsd(200);
+                  setHoursPerDay(10);
+                  setDaysPerMonth(22);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(150);
+                }}
+              >
+                Weekday only
               </button>
             </div>
           </div>
@@ -169,7 +211,8 @@ export function ReservedBreakEvenCalculator() {
                   setOnDemandHourlyUsd(0.12);
                   setReservedHourlyUsd(0.075);
                   setUpfrontUsd(300);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(false);
                   setPeakMultiplierPct(200);
                 }}
@@ -193,6 +236,11 @@ export function ReservedBreakEvenCalculator() {
             <div className="v">
               {result.breakEvenHours === null ? "No break-even (commitment not cheaper)" : `${formatNumber(result.breakEvenHours, 0)} hours`}
             </div>
+            {breakEvenMonthsAtSchedule !== null ? (
+              <div className="muted" style={{ marginTop: 4 }}>
+                At current schedule: {formatNumber(breakEvenMonthsAtSchedule, 2)} months
+              </div>
+            ) : null}
           </div>
           <div className="kpi">
             <div className="k">Monthly on-demand</div>
@@ -243,6 +291,9 @@ export function ReservedBreakEvenCalculator() {
                 ) : null}
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

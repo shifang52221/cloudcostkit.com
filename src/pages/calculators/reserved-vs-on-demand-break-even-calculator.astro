@@ -4,7 +4,7 @@ import { ReservedBreakEvenCalculator } from "../../components/calculators/Reserv
 
 const title = "Reserved vs On-demand Break-even Calculator";
 const description =
-  "Estimate the break-even usage where a committed rate beats on-demand, given hourly pricing and upfront costs, with baseline vs peak scenarios. Educational use only.";
+  "Estimate the break-even usage where a committed rate beats on-demand, given hourly pricing and upfront costs using hours/day and days/month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -27,7 +27,7 @@ const description =
   how={[
     "Hourly savings = on-demand hourly - committed hourly.",
     "Break-even hours = upfront / hourly savings (if savings > 0).",
-    "Monthly savings = hourly savings x hours per month (excluding upfront)."
+    "Monthly savings = hourly savings x (hours/day x days/month) (excluding upfront)."
   ]}
   faqs={[
     {
@@ -39,8 +39,8 @@ const description =
       a: "No. This is a simplified break-even estimate. For a full ROI model, incorporate the term, discount rate, and flexibility risk."
     },
     {
-      q: "What should I use for hours per month?",
-      a: "730 is a common approximation. If you have non-24/7 workloads, use your expected billable hours."
+      q: "What should I use for hours/day and days/month?",
+      a: "Use hours/day and days/month (24 x 30.4 is a common always-on baseline). For non-24/7 workloads, set hours/day to your expected billable time."
     }
   ]}
   lastUpdated="2026-01-28"

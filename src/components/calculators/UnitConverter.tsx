@@ -17,6 +17,7 @@ export function UnitConverterCalculator() {
   const [mBps, setMBps] = useNumberParamState("UnitConverter.mBps", 12.5);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("UnitConverter.utilizationPct", 30);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("UnitConverter.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("UnitConverter.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("UnitConverter.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("UnitConverter.peakMultiplierPct", 200);
 
@@ -27,10 +28,12 @@ export function UnitConverterCalculator() {
     const mBpsVal = clamp(mBps, 0, 1e12);
     const utilization = clamp(utilizationPct, 0, 100);
     const hours = clamp(hoursPerDay, 0, 24);
+    const days = clamp(daysPerMonth, 1, 31);
     const monthly = throughputToMonthlyTransferGb({
       mbps: mbpsVal,
       utilizationPct: utilization,
       hoursPerDay: hours,
+      daysPerMonth: days,
     });
     return {
       gbVal,
@@ -42,8 +45,9 @@ export function UnitConverterCalculator() {
       mBpsVal,
       mbpsFromMBps: MBpsToMbps(mBpsVal),
       monthlyGb: monthly.gbTransferred,
+      daysPerMonth: days,
     };
-  }, [gb, gib, mbps, mBps, utilizationPct, hoursPerDay]);
+  }, [gb, gib, mbps, mBps, utilizationPct, hoursPerDay, daysPerMonth]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -53,12 +57,13 @@ export function UnitConverterCalculator() {
       mbps: peakMbps,
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
     return {
       mbps: peakMbps,
       monthlyGb: monthly.gbTransferred,
     };
-  }, [hoursPerDay, mbps, peakMultiplierPct, showPeakScenario, utilizationPct]);
+  }, [daysPerMonth, hoursPerDay, mbps, peakMultiplierPct, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -131,6 +136,19 @@ export function UnitConverterCalculator() {
               onChange={(e) => setHoursPerDay(+e.target.value)}
             />
           </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+          </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -172,6 +190,7 @@ export function UnitConverterCalculator() {
                   setMBps(6.25);
                   setUtilizationPct(20);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(180);
                 }}
@@ -188,6 +207,7 @@ export function UnitConverterCalculator() {
                   setMBps(25);
                   setUtilizationPct(35);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(230);
                 }}
@@ -204,6 +224,7 @@ export function UnitConverterCalculator() {
                   setMBps(75);
                   setUtilizationPct(45);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(200);
                 }}
@@ -225,6 +246,7 @@ export function UnitConverterCalculator() {
                   setMBps(12.5);
                   setUtilizationPct(30);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(false);
                   setPeakMultiplierPct(200);
                 }}
@@ -290,6 +312,9 @@ export function UnitConverterCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(conv.daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

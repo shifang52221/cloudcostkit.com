@@ -198,6 +198,22 @@ export function AwsLambdaCostCalculator() {
                 className="btn"
                 type="button"
                 onClick={() => {
+                  setInvocationsPerMonth(2_000_000_000);
+                  setAvgDurationMs(40);
+                  setMemoryMb(128);
+                  setPricePerMillionRequestsUsd(0.2);
+                  setPricePerGbSecondUsd(0.0000166667);
+                  setIncludeFreeTier(false);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(200);
+                }}
+              >
+                IoT telemetry
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
                   setInvocationsPerMonth(900_000_000);
                   setAvgDurationMs(240);
                   setMemoryMb(1024);

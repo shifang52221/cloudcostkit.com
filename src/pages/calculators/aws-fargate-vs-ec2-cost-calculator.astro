@@ -4,21 +4,21 @@ import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent
 
 const title = "AWS Fargate vs EC2 Cost Calculator";
 const description =
-  "Compare Fargate vs EC2 compute cost with consistent assumptions, with baseline vs peak scenarios. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs. Educational use only.";
+  "Compare Fargate vs EC2 compute cost with consistent assumptions, with baseline vs peak scenarios. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs with hours/day and days/month. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-fargate-vs-ec2-cost-calculator"
-  intro="Compare Fargate (vCPU-hours + memory GB-hours) vs EC2 (instances x $/hour) using average running capacity, then see baseline vs peak differences. This is compute-only."
+  intro="Compare Fargate (vCPU-hours + memory GB-hours) vs EC2 (instances x $/hour) using average running capacity and hours/day x days/month, then see baseline vs peak differences. This is compute-only."
   examples={[
-    "6 tasks at 0.5 vCPU and 1 GB running 730 hours/month vs 3 instances at $0.18/hr.",
+    "6 tasks at 0.5 vCPU and 1 GB running 24 hours/day for 30 days vs 3 instances at $0.18/hr.",
     "If EC2 is underutilized, Fargate can be cheaper; if EC2 is packed efficiently with commitments, EC2 often wins.",
     "Peak 180% scenario validates scaling bursts."
   ]}
   includes={[
-    "Fargate compute estimate (vCPU-hours + GB-hours) from average running tasks.",
-    "EC2 compute estimate (instance-hours) from average instances and $/instance-hour.",
+    "Fargate compute estimate (vCPU-hours + GB-hours) from average running tasks and hours/day x days/month.",
+    "EC2 compute estimate (instance-hours) from average instances and hours/day x days/month.",
     "Side-by-side monthly totals and differences.",
     "Baseline vs peak scenario table for capacity spikes.",
   ]}
@@ -28,8 +28,8 @@ const description =
     "Tiering, discounts, and rounding rules unless you reflect them in inputs.",
   ]}
   how={[
-    "Fargate: tasks x vCPU x hours x $/vCPU-hour + tasks x memory(GB) x hours x $/GB-hour.",
-    "EC2: instances x hours x $/instance-hour (use a blended effective rate if you mix commitments).",
+    "Fargate: tasks x vCPU x (hours/day x days/month) x $/vCPU-hour + tasks x memory(GB) x (hours/day x days/month) x $/GB-hour.",
+    "EC2: instances x (hours/day x days/month) x $/instance-hour (use a blended effective rate if you mix commitments).",
     "Compare the compute-only totals, then add other line items in your overall model.",
   ]}
   faqs={[
@@ -62,21 +62,22 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Fargate</strong>: use average running tasks and task size from ECS metrics and definitions.</li>
+      <li><strong>EC2</strong>: use average instance count and a blended $/hour if you mix commitments.</li>
+      <li><strong>Schedule</strong>: apply the same hours/day and days/month to both sides.</li>
+      <li><strong>Scope</strong>: this is compute-only; add logs, transfer, and load balancers separately.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Comparing peak Fargate usage to average EC2 usage (or vice versa).</li>
+      <li>Ignoring EC2 packing efficiency and idle capacity.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare EC2 instance-hours and Fargate vCPU/GB hours from billing.</li>
+      <li>Use a real month of metrics to calibrate the averages.</li>
     </ul>
 
     <h2>Next steps</h2>

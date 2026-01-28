@@ -6,7 +6,8 @@ import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsFargateVsEc2CostCalculator() {
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsFargateVsEc2Cost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsFargateVsEc2Cost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsFargateVsEc2Cost.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsFargateVsEc2Cost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsFargateVsEc2Cost.peakMultiplierPct", 180);
 
@@ -19,8 +20,8 @@ export function AwsFargateVsEc2CostCalculator() {
   const [instances, setInstances] = useNumberParamState("AwsFargateVsEc2Cost.instances", 3);
   const [pricePerInstanceHourUsd, setPricePerInstanceHourUsd] = useNumberParamState("AwsFargateVsEc2Cost.pricePerInstanceHourUsd", 0.18);
 
-  const normalizedHoursPerMonth = clamp(hoursPerMonth, 0, 1e6);
-  const normalizedDaysPerMonth = normalizedHoursPerMonth / 24;
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const normalizedDaysPerMonth = clamp(daysPerMonth, 1, 31);
 
   const fargate = useMemo(() => {
     return estimateFargateCost({
@@ -94,15 +95,32 @@ export function AwsFargateVsEc2CostCalculator() {
         <h3>Shared assumptions</h3>
         <div className="form">
           <div className="field field-3">
-            <div className="label">Hours per month</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -130,7 +148,7 @@ export function AwsFargateVsEc2CostCalculator() {
             </div>
           ) : null}
           <div className="field field-9 muted" style={{ alignSelf: "end" }}>
-            Use average running tasks/instances over the month. If you schedule down environments, reduce hours/month.
+            Use average running tasks/instances over the month. If you schedule down environments, reduce hours/day or days/month.
           </div>
         </div>
       </div>
@@ -290,6 +308,9 @@ export function AwsFargateVsEc2CostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(normalizedDaysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>
@@ -313,13 +334,83 @@ export function AwsFargateVsEc2CostCalculator() {
       </div>
 
       <div className="panel">
+        <h3>Scenario presets</h3>
+        <div className="btn-row">
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setHoursPerDay(24);
+              setDaysPerMonth(30.4);
+              setShowPeakScenario(true);
+              setPeakMultiplierPct(160);
+
+              setTasks(8);
+              setVcpuPerTask(0.5);
+              setMemoryGbPerTask(1);
+              setPricePerVcpuHourUsd(0.04048);
+              setPricePerGbHourUsd(0.004445);
+
+              setInstances(3);
+              setPricePerInstanceHourUsd(0.17);
+            }}
+          >
+            Steady web app
+          </button>
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setHoursPerDay(24);
+              setDaysPerMonth(30.4);
+              setShowPeakScenario(true);
+              setPeakMultiplierPct(240);
+
+              setTasks(14);
+              setVcpuPerTask(1);
+              setMemoryGbPerTask(2);
+              setPricePerVcpuHourUsd(0.04048);
+              setPricePerGbHourUsd(0.004445);
+
+              setInstances(6);
+              setPricePerInstanceHourUsd(0.2);
+            }}
+          >
+            Spiky API
+          </button>
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setHoursPerDay(6);
+              setDaysPerMonth(22);
+              setShowPeakScenario(true);
+              setPeakMultiplierPct(200);
+
+              setTasks(10);
+              setVcpuPerTask(2);
+              setMemoryGbPerTask(4);
+              setPricePerVcpuHourUsd(0.04048);
+              setPricePerGbHourUsd(0.004445);
+
+              setInstances(4);
+              setPricePerInstanceHourUsd(0.24);
+            }}
+          >
+            Batch windows
+          </button>
+        </div>
+      </div>
+
+      <div className="panel">
         <h3>Reset</h3>
         <div className="btn-row">
           <button
             className="btn"
             type="button"
             onClick={() => {
-              setHoursPerMonth(730);
+              setHoursPerDay(24);
+              setDaysPerMonth(30.4);
               setShowPeakScenario(false);
               setPeakMultiplierPct(180);
 

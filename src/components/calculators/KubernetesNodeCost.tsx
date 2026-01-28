@@ -9,8 +9,11 @@ export function KubernetesNodeCostCalculator() {
   const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("KubernetesNodeCost.pricePerHourUsd", 0.32);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("KubernetesNodeCost.utilizationPct", 100);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("KubernetesNodeCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("KubernetesNodeCost.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("KubernetesNodeCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("KubernetesNodeCost.peakMultiplierPct", 180);
+
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
 
   const result = useMemo(() => {
     return estimateComputeCost({
@@ -18,8 +21,9 @@ export function KubernetesNodeCostCalculator() {
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
-  }, [nodes, pricePerHourUsd, utilizationPct, hoursPerDay]);
+  }, [nodes, pricePerHourUsd, utilizationPct, hoursPerDay, daysPerMonth]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -29,8 +33,9 @@ export function KubernetesNodeCostCalculator() {
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
-  }, [hoursPerDay, nodes, peakMultiplierPct, pricePerHourUsd, showPeakScenario, utilizationPct]);
+  }, [daysPerMonth, hoursPerDay, nodes, peakMultiplierPct, pricePerHourUsd, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -84,6 +89,22 @@ export function KubernetesNodeCostCalculator() {
               onChange={(e) => setHoursPerDay(+e.target.value)}
             />
           </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
+          </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -123,6 +144,7 @@ export function KubernetesNodeCostCalculator() {
                   setPricePerHourUsd(0.28);
                   setUtilizationPct(100);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(160);
                 }}
@@ -137,6 +159,7 @@ export function KubernetesNodeCostCalculator() {
                   setPricePerHourUsd(0.32);
                   setUtilizationPct(95);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(210);
                 }}
@@ -151,11 +174,27 @@ export function KubernetesNodeCostCalculator() {
                   setPricePerHourUsd(0.36);
                   setUtilizationPct(90);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(240);
                 }}
               >
                 Platform scale
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setNodes(10);
+                  setPricePerHourUsd(0.28);
+                  setUtilizationPct(75);
+                  setHoursPerDay(10);
+                  setDaysPerMonth(22);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                Weekday staging
               </button>
             </div>
           </div>
@@ -170,6 +209,7 @@ export function KubernetesNodeCostCalculator() {
                   setPricePerHourUsd(0.32);
                   setUtilizationPct(100);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(false);
                   setPeakMultiplierPct(180);
                 }}
@@ -225,6 +265,9 @@ export function KubernetesNodeCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(result.daysPerMonth, 1)} days/month and {formatNumber(result.hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

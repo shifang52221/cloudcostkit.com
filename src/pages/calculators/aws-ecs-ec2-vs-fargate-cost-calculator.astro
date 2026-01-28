@@ -4,15 +4,15 @@ import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent
 
 const title = "ECS on EC2 vs ECS on Fargate Cost Calculator";
 const description =
-  "Compare ECS on EC2 vs ECS on Fargate compute costs with consistent assumptions. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs. Educational use only.";
+  "Compare ECS on EC2 vs ECS on Fargate compute costs with consistent assumptions. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using hours/day and days/month. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator"
-  intro="Compare ECS on EC2 (instances x $/hour) vs ECS on Fargate (vCPU-hours + GB-hours) using average running capacity. This is compute-only; add load balancers, logs, and data transfer for a full ECS model."
+  intro="Compare ECS on EC2 (instances x $/hour) vs ECS on Fargate (vCPU-hours + GB-hours) using average running capacity and hours/day x days/month. This is compute-only; add load balancers, logs, and data transfer for a full ECS model."
   examples={[
-    "ECS service: average 6 tasks at 0.5 vCPU and 1 GB running 730 hours/month vs 3 EC2 instances at $0.18/hr.",
+    "ECS service: average 6 tasks at 0.5 vCPU and 1 GB running 24 hours/day for 30 days vs 3 EC2 instances at $0.18/hr.",
     "ECS on EC2 often wins when instances are packed and covered by commitments; Fargate can win when idle capacity dominates.",
   ]}
   includes={[
@@ -25,8 +25,8 @@ const description =
     "EBS storage and snapshots (often relevant for ECS on EC2).",
   ]}
   how={[
-    "Fargate compute = tasks x vCPU x hours x $/vCPU-hour + tasks x memory(GB) x hours x $/GB-hour.",
-    "EC2 compute = instances x hours x $/instance-hour.",
+    "Fargate compute = tasks x vCPU x (hours/day x days/month) x $/vCPU-hour + tasks x memory(GB) x (hours/day x days/month) x $/GB-hour.",
+    "EC2 compute = instances x (hours/day x days/month) x $/instance-hour.",
     "Compare compute-only totals, then add networking + logs + load balancers for full ECS TCO.",
   ]}
   faqs={[
@@ -59,21 +59,22 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Fargate</strong>: use average running tasks and task size from ECS metrics.</li>
+      <li><strong>EC2</strong>: use average instance count and a blended $/hour if you use commitments.</li>
+      <li><strong>Schedule</strong>: apply the same hours/day and days/month to both sides.</li>
+      <li><strong>Scope</strong>: compute-only; add load balancers, logs, and transfer separately.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Comparing peak tasks to average instances (or vice versa).</li>
+      <li>Ignoring EC2 packing efficiency and idle capacity.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare EC2 instance-hours and Fargate vCPU/GB hours in billing.</li>
+      <li>Use a real month of metrics to calibrate averages.</li>
     </ul>
 
     <h2>Next steps</h2>
@@ -87,4 +88,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

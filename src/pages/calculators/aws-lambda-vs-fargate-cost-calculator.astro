@@ -4,7 +4,7 @@ import { AwsLambdaVsFargateCostCalculator as AwsLambdaVsFargateCostCalculatorCom
 
 const title = "AWS Lambda vs Fargate Cost Calculator";
 const description =
-  "Compare Lambda vs Fargate compute cost using the same workload assumptions, with baseline vs peak scenarios. Estimate monthly Lambda request + GB-seconds and Fargate vCPU-hours + GB-hours. Educational use only.";
+  "Compare Lambda vs Fargate compute cost using the same workload assumptions, with baseline vs peak scenarios. Estimate monthly Lambda request + GB-seconds and Fargate vCPU-hours + GB-hours with days per month. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -19,6 +19,7 @@ const description =
   includes={[
     "Lambda request cost and compute cost (GB-seconds) with optional free tier.",
     "Fargate vCPU-hour and memory GB-hour compute costs from average running tasks.",
+    "Days/month input to align with billing cycles for Fargate.",
     "Side-by-side monthly totals and differences.",
     "Baseline vs peak scenario table for workload spikes.",
   ]}
@@ -30,6 +31,7 @@ const description =
   how={[
     "Lambda: request cost + (duration x memory) GB-seconds x $/GB-second (minus free tier if enabled).",
     "Fargate: tasks x vCPU x hours x $/vCPU-hour + tasks x memory(GB) x hours x $/GB-hour.",
+    "Hours = days per month x hours per day.",
     "Compare the compute-only monthly totals, then add other line items in your overall model.",
   ]}
   faqs={[
@@ -61,21 +63,23 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Lambda</strong>: use monthly request count, avg duration (p50/p95), and memory size from metrics.</li>
+      <li><strong>Fargate</strong>: use average running tasks, vCPU, and memory from the task definition.</li>
+      <li><strong>Pricing</strong>: apply region-specific rates and toggle free tier if it applies.</li>
+      <li><strong>Schedule</strong>: hours/day and days/month should reflect actual Fargate uptime.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using cold-start duration for all Lambda requests.</li>
+      <li>Ignoring provisioned concurrency or steady background load.</li>
+      <li>Mixing MB and GB when converting memory sizes.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare request count and GB-seconds to billing or CloudWatch metrics.</li>
+      <li>Validate average task count and hours with ECS/Fargate usage reports.</li>
     </ul>
 
     <h2>Next steps</h2>

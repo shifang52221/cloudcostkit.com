@@ -18,9 +18,12 @@ export function AwsLambdaVsFargateCostCalculator() {
   const [tasks, setTasks] = useNumberParamState("AwsLambdaVsFargateCost.tasks", 3);
   const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsLambdaVsFargateCost.vcpuPerTask", 0.5);
   const [memoryGbPerTask, setMemoryGbPerTask] = useNumberParamState("AwsLambdaVsFargateCost.memoryGbPerTask", 1);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsLambdaVsFargateCost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsLambdaVsFargateCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsLambdaVsFargateCost.daysPerMonth", 30.4);
   const [pricePerVcpuHourUsd, setPricePerVcpuHourUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerVcpuHourUsd", 0.04048);
   const [pricePerGbHourUsd, setPricePerGbHourUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerGbHourUsd", 0.004445);
+
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
 
   const lambda = useMemo(() => {
     return estimateLambdaCost({
@@ -69,11 +72,11 @@ export function AwsLambdaVsFargateCostCalculator() {
       tasks: clamp(tasks, 0, 1e9),
       vcpuPerTask: clamp(vcpuPerTask, 0, 1e3),
       memoryGbPerTask: clamp(memoryGbPerTask, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 1e6),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 1e6),
       pricePerVcpuHourUsd: clamp(pricePerVcpuHourUsd, 0, 1e3),
       pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
     });
-  }, [tasks, vcpuPerTask, memoryGbPerTask, hoursPerMonth, pricePerVcpuHourUsd, pricePerGbHourUsd]);
+  }, [tasks, vcpuPerTask, memoryGbPerTask, normalizedHoursPerMonth, pricePerVcpuHourUsd, pricePerGbHourUsd]);
 
   const fargatePeak = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -82,12 +85,12 @@ export function AwsLambdaVsFargateCostCalculator() {
       tasks: clamp(tasks, 0, 1e9) * multiplier,
       vcpuPerTask: clamp(vcpuPerTask, 0, 1e3),
       memoryGbPerTask: clamp(memoryGbPerTask, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 1e6),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 1e6),
       pricePerVcpuHourUsd: clamp(pricePerVcpuHourUsd, 0, 1e3),
       pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
     });
   }, [
-    hoursPerMonth,
+    normalizedHoursPerMonth,
     memoryGbPerTask,
     peakMultiplierPct,
     pricePerGbHourUsd,
@@ -237,15 +240,32 @@ export function AwsLambdaVsFargateCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Hours per month</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / vCPU-hour)</div>
@@ -337,6 +357,9 @@ export function AwsLambdaVsFargateCostCalculator() {
         <div className="muted" style={{ marginTop: 10, fontSize: 12 }}>
           This compares compute-only pricing. Add logs, load balancers, NAT/egress, and retries for a full model.
         </div>
+        <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+          Fargate uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+        </div>
       </div>
 
       <div className="panel">
@@ -362,6 +385,84 @@ export function AwsLambdaVsFargateCostCalculator() {
       </div>
 
       <div className="panel">
+        <h3>Scenario presets</h3>
+        <div className="btn-row">
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setInvocationsPerMonth(80_000_000);
+              setAvgDurationMs(140);
+              setMemoryMb(512);
+              setPricePerMillionRequestsUsd(0.2);
+              setPricePerGbSecondUsd(0.0000166667);
+              setIncludeFreeTier(true);
+              setShowPeakScenario(true);
+              setPeakMultiplierPct(200);
+
+              setTasks(4);
+              setVcpuPerTask(0.5);
+              setMemoryGbPerTask(1);
+              setHoursPerDay(24);
+              setDaysPerMonth(30.4);
+              setPricePerVcpuHourUsd(0.04048);
+              setPricePerGbHourUsd(0.004445);
+            }}
+          >
+            Spiky API
+          </button>
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setInvocationsPerMonth(8_000_000);
+              setAvgDurationMs(300);
+              setMemoryMb(1024);
+              setPricePerMillionRequestsUsd(0.2);
+              setPricePerGbSecondUsd(0.0000166667);
+              setIncludeFreeTier(true);
+              setShowPeakScenario(true);
+              setPeakMultiplierPct(240);
+
+              setTasks(2);
+              setVcpuPerTask(0.5);
+              setMemoryGbPerTask(1);
+              setHoursPerDay(10);
+              setDaysPerMonth(22);
+              setPricePerVcpuHourUsd(0.04048);
+              setPricePerGbHourUsd(0.004445);
+            }}
+          >
+            Weekday jobs
+          </button>
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setInvocationsPerMonth(200_000_000);
+              setAvgDurationMs(80);
+              setMemoryMb(256);
+              setPricePerMillionRequestsUsd(0.2);
+              setPricePerGbSecondUsd(0.0000166667);
+              setIncludeFreeTier(false);
+              setShowPeakScenario(true);
+              setPeakMultiplierPct(180);
+
+              setTasks(12);
+              setVcpuPerTask(1);
+              setMemoryGbPerTask(2);
+              setHoursPerDay(24);
+              setDaysPerMonth(30.4);
+              setPricePerVcpuHourUsd(0.04048);
+              setPricePerGbHourUsd(0.004445);
+            }}
+          >
+            Always-on service
+          </button>
+        </div>
+      </div>
+
+      <div className="panel">
         <h3>Reset</h3>
         <div className="btn-row">
           <button
@@ -380,7 +481,8 @@ export function AwsLambdaVsFargateCostCalculator() {
               setTasks(3);
               setVcpuPerTask(0.5);
               setMemoryGbPerTask(1);
-              setHoursPerMonth(730);
+              setHoursPerDay(24);
+              setDaysPerMonth(30.4);
               setPricePerVcpuHourUsd(0.04048);
               setPricePerGbHourUsd(0.004445);
             }}

@@ -4,7 +4,7 @@ import { RpsToMonthlyRequestsCalculator as RpsToMonthlyRequestsCalculatorCompone
 
 const title = "RPS to Monthly Requests Calculator";
 const description =
-  "Estimate monthly request volume from RPS, utilization, and hours per day, with baseline vs peak scenarios. Educational use only.";
+  "Estimate monthly request volume from RPS, utilization, hours per day, and days per month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -16,7 +16,7 @@ const description =
     "Peak 230% scenario highlights request surges."
   ]}
   includes={[
-    "Monthly request estimate from RPS, utilization, and hours/day.",
+    "Monthly request estimate from RPS, utilization, hours/day, and days/month.",
     "Useful for request-metered services (API gateways, CDNs, serverless).",
     "Baseline vs peak scenario table for volume spikes.",
   ]}
@@ -26,7 +26,7 @@ const description =
   ]}
   how={[
     "Requests per month ~ RPS x utilization x seconds in the period.",
-    "Seconds ~ 30.4 days x hours/day x 3600.",
+    "Seconds ~ days per month x hours/day x 3600.",
     "This is a simplified estimate: real traffic varies by seasonality and peaks."
   ]}
   faqs={[

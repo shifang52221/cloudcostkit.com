@@ -4,19 +4,19 @@ import { AwsVpcInterfaceEndpointCostCalculator as AwsVpcInterfaceEndpointCostCal
 
 const title = "VPC Interface Endpoint Cost Calculator (PrivateLink)";
 const description =
-  "Estimate AWS VPC Interface Endpoint (PrivateLink) monthly cost from endpoint-hours and data processed (GB) using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate AWS VPC Interface Endpoint (PrivateLink) monthly cost from endpoint-hours and data processed (GB) using hours/day and days/month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-vpc-interface-endpoint-cost-calculator"
-  intro="Estimate VPC Interface Endpoint (PrivateLink) cost using a simple model: endpoint-hours (endpoints x AZs x hours) + data processed (GB). Compare baseline vs peak traffic with your pricing."
+  intro="Estimate VPC Interface Endpoint (PrivateLink) cost using a simple model: endpoint-hours (endpoints x AZs x hours/day x days/month) + data processed (GB). Compare baseline vs peak traffic with your pricing."
   examples={[
-    "3 interface endpoints across 2 AZs running 730 hours/month, processing 2,000 GB/month.",
+    "3 interface endpoints across 2 AZs running 24 hours/day for 30 days, processing 2,000 GB/month.",
     "Peak 180% scenario captures migration surges or batch spikes."
   ]}
   includes={[
-    "Endpoint-hours from endpoints x AZs x hours/month x $ per endpoint-hour.",
+    "Endpoint-hours from endpoints x AZs x hours/day x days/month x $ per endpoint-hour.",
     "Data processing from GB/month x $ per GB processed.",
     "Baseline vs peak scenario table for endpoint and data spikes.",
   ]}
@@ -25,7 +25,7 @@ const description =
     "Service-specific pricing differences and tiered steps unless you reflect them in your inputs.",
   ]}
   how={[
-    "Endpoint-hours = endpoints x AZs per endpoint x hours/month.",
+    "Endpoint-hours = endpoints x AZs per endpoint x (hours/day x days/month).",
     "Hourly cost = endpoint-hours x $ per endpoint-hour.",
     "Data processing cost = GB processed/month x $ per GB processed.",
     "Total = hourly cost + data processing cost.",
@@ -69,8 +69,14 @@ const description =
         <strong>AZs per endpoint</strong>: this is the main multiplier (2 vs 3 AZs changes endpoint-hours materially).
       </li>
       <li>
+        <strong>Schedule</strong>: hours/day and days/month should match endpoint uptime.
+      </li>
+      <li>
         <strong>GB processed</strong>: estimate how much NAT traffic to AWS services will shift to endpoints (use flow logs
         or model scenarios).
+      </li>
+      <li>
+        <strong>Pricing</strong>: use region-specific endpoint-hour and data processing rates.
       </li>
     </ul>
 
@@ -79,6 +85,7 @@ const description =
       <li>Forgetting that interface endpoints are per AZ (endpoint-hours scale with AZ count).</li>
       <li>Creating endpoint sprawl across environments without ownership/lifecycle.</li>
       <li>Moving traffic across AZ boundaries and creating transfer charges elsewhere.</li>
+      <li>Counting gateway endpoints (S3/DynamoDB) in PrivateLink endpoint costs.</li>
     </ul>
 
     <h2>Validate after rollout</h2>
@@ -86,6 +93,7 @@ const description =
       <li>Verify NAT GB processed decreases for the targeted destinations.</li>
       <li>Verify endpoint-hours match your endpoint x AZ deployment.</li>
       <li>Check cross-AZ transfer trends after routing changes.</li>
+      <li>Compare endpoint-hours and GB processed line items to billing.</li>
     </ul>
 
     <h2>Next steps</h2>

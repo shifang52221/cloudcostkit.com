@@ -8,6 +8,7 @@ export function RpsToMonthlyRequestsCalculator() {
   const [rps, setRps] = useNumberParamState("RpsToMonthlyRequests.rps", 2500);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("RpsToMonthlyRequests.utilizationPct", 35);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("RpsToMonthlyRequests.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("RpsToMonthlyRequests.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("RpsToMonthlyRequests.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("RpsToMonthlyRequests.peakMultiplierPct", 200);
 
@@ -16,8 +17,9 @@ export function RpsToMonthlyRequestsCalculator() {
       rps: clamp(rps, 0, 1e12),
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
-  }, [rps, utilizationPct, hoursPerDay]);
+  }, [rps, utilizationPct, hoursPerDay, daysPerMonth]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -26,8 +28,9 @@ export function RpsToMonthlyRequestsCalculator() {
       rps: clamp(rps, 0, 1e12) * multiplier,
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
-  }, [hoursPerDay, peakMultiplierPct, rps, showPeakScenario, utilizationPct]);
+  }, [daysPerMonth, hoursPerDay, peakMultiplierPct, rps, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -70,6 +73,19 @@ export function RpsToMonthlyRequestsCalculator() {
               onChange={(e) => setHoursPerDay(+e.target.value)}
             />
           </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+          </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -108,6 +124,7 @@ export function RpsToMonthlyRequestsCalculator() {
                   setRps(400);
                   setUtilizationPct(20);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(180);
                 }}
@@ -121,6 +138,7 @@ export function RpsToMonthlyRequestsCalculator() {
                   setRps(2500);
                   setUtilizationPct(35);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(230);
                 }}
@@ -134,6 +152,7 @@ export function RpsToMonthlyRequestsCalculator() {
                   setRps(12000);
                   setUtilizationPct(45);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(200);
                 }}
@@ -152,6 +171,7 @@ export function RpsToMonthlyRequestsCalculator() {
                   setRps(2500);
                   setUtilizationPct(35);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(false);
                   setPeakMultiplierPct(200);
                 }}
@@ -173,7 +193,7 @@ export function RpsToMonthlyRequestsCalculator() {
           <div className="kpi">
             <div className="k">Assumptions</div>
             <div className="v">
-              {formatNumber(result.rps, 0)} RPS x {formatPercent(result.utilizationPct, 0)} x {formatNumber(result.hoursPerDay, 0)} h/day
+              {formatNumber(result.rps, 0)} RPS x {formatPercent(result.utilizationPct, 0)} x {formatNumber(result.hoursPerDay, 0)} h/day x {formatNumber(result.daysPerMonth, 1)} days
             </div>
           </div>
         </div>
@@ -207,6 +227,9 @@ export function RpsToMonthlyRequestsCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(result.daysPerMonth, 1)} days/month and {formatNumber(result.hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

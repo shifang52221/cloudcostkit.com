@@ -4,7 +4,7 @@ import { KubernetesNodeCostCalculator as KubernetesNodeCostCalculatorComponent }
 
 const title = "Kubernetes Node Cost Calculator";
 const description =
-  "Estimate monthly Kubernetes node cost from node count, $/hour, and expected uptime, with baseline vs peak scenarios. Educational use only.";
+  "Estimate monthly Kubernetes node cost from node count, $/hour, uptime/utilization, and days per month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -17,6 +17,7 @@ const description =
   ]}
   includes={[
     "Monthly compute estimate from node count, $/hour, and billable hours.",
+    "Days/month input to align with billing cycles.",
     "Baseline vs peak scenario table for node scale-out.",
     "Simple utilization model for scheduled/dev environments.",
   ]}
@@ -27,6 +28,7 @@ const description =
   how={[
     "Billable hours per node ~= days per month x hours/day x utilization.",
     "Monthly cost = nodes x billable hours per node x $/hour.",
+    "Use 30.4 days/month for an average month or set the exact billing month.",
     "Optionally add a peak scenario to compare baseline vs peak cost.",
     "This tool estimates node compute only (not load balancers, storage, or data transfer)."
   ]}
@@ -63,21 +65,22 @@ const description =
     </p>
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Nodes</strong>: use average node count after autoscaler changes (exclude drained nodes).</li>
+      <li><strong>Hourly rate</strong>: use the actual node type price, including OS licensing if applicable.</li>
+      <li><strong>Schedule</strong>: hours/day and days/month should reflect cluster uptime, not pod CPU usage.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Mixing pod utilization with node uptime (different concepts).</li>
+      <li>Forgetting system nodes, headroom, or buffer capacity.</li>
+      <li>Ignoring control plane fees and add-ons in total cost.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare node-hours and effective $/hour to billing line items.</li>
+      <li>Check autoscaler metrics for average node count over the month.</li>
     </ul>
 
     <h2>Next steps</h2>

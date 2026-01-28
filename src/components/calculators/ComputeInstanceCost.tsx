@@ -9,8 +9,11 @@ export function ComputeInstanceCostCalculator() {
   const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("ComputeInstanceCost.pricePerHourUsd", 0.18);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("ComputeInstanceCost.utilizationPct", 100);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("ComputeInstanceCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("ComputeInstanceCost.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ComputeInstanceCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ComputeInstanceCost.peakMultiplierPct", 200);
+
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
 
   const result = useMemo(() => {
     return estimateComputeCost({
@@ -18,8 +21,9 @@ export function ComputeInstanceCostCalculator() {
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
-  }, [instances, pricePerHourUsd, utilizationPct, hoursPerDay]);
+  }, [instances, pricePerHourUsd, utilizationPct, hoursPerDay, daysPerMonth]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -29,8 +33,9 @@ export function ComputeInstanceCostCalculator() {
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
+      daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
-  }, [hoursPerDay, instances, peakMultiplierPct, pricePerHourUsd, showPeakScenario, utilizationPct]);
+  }, [daysPerMonth, hoursPerDay, instances, peakMultiplierPct, pricePerHourUsd, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -83,6 +88,22 @@ export function ComputeInstanceCostCalculator() {
               onChange={(e) => setHoursPerDay(+e.target.value)}
             />
           </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
+          </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -122,6 +143,7 @@ export function ComputeInstanceCostCalculator() {
                   setPricePerHourUsd(0.22);
                   setUtilizationPct(100);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(160);
                 }}
@@ -136,6 +158,7 @@ export function ComputeInstanceCostCalculator() {
                   setPricePerHourUsd(0.12);
                   setUtilizationPct(60);
                   setHoursPerDay(10);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(220);
                 }}
@@ -150,11 +173,27 @@ export function ComputeInstanceCostCalculator() {
                   setPricePerHourUsd(0.18);
                   setUtilizationPct(85);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(true);
                   setPeakMultiplierPct(250);
                 }}
               >
                 Autoscale burst
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setInstances(16);
+                  setPricePerHourUsd(0.25);
+                  setUtilizationPct(100);
+                  setHoursPerDay(6);
+                  setDaysPerMonth(30.4);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(300);
+                }}
+              >
+                Nightly batch
               </button>
             </div>
           </div>
@@ -169,6 +208,7 @@ export function ComputeInstanceCostCalculator() {
                   setPricePerHourUsd(0.18);
                   setUtilizationPct(100);
                   setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setShowPeakScenario(false);
                   setPeakMultiplierPct(200);
                 }}
@@ -224,6 +264,9 @@ export function ComputeInstanceCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(result.daysPerMonth, 1)} days/month and {formatNumber(result.hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

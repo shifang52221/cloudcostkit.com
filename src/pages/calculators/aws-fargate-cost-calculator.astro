@@ -4,15 +4,15 @@ import { AwsFargateCostCalculator as AwsFargateCostCalculatorComponent } from ".
 
 const title = "AWS Fargate Cost Calculator";
 const description =
-  "Estimate AWS Fargate-style monthly compute costs from running tasks, vCPU-hours, and memory GB-hours using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate AWS Fargate-style monthly compute costs from running tasks, vCPU-hours, memory GB-hours, and days per month using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-fargate-cost-calculator"
-  intro="Estimate Fargate-style compute cost from average running tasks, vCPU per task, memory per task, and hours per month. Compare baseline vs peak usage with your region pricing."
+  intro="Estimate Fargate-style compute cost from average running tasks, vCPU per task, memory per task, and days per month. Compare baseline vs peak usage with your region pricing."
   examples={[
-    "3 tasks running 730 hours/month at 0.5 vCPU and 1 GB each - estimate vCPU-hours + GB-hours charges.",
+    "3 tasks running 24h/day for 30.4 days at 0.5 vCPU and 1 GB each - estimate vCPU-hours + GB-hours charges.",
     "For autoscaling services, use average running tasks, not peak.",
     "Peak 220% scenario models scaling bursts during launches."
   ]}
@@ -27,14 +27,15 @@ const description =
     "Tiering, discounts, and rounding rules unless you reflect them in inputs.",
   ]}
   how={[
-    "vCPU-hours = tasks x vCPU per task x hours per month.",
-    "GB-hours = tasks x memory (GB) per task x hours per month.",
+    "vCPU-hours = tasks x vCPU per task x (hours/day x days/month).",
+    "GB-hours = tasks x memory (GB) per task x (hours/day x days/month).",
+    "Hours/month = hours/day x days/month.",
     "Total = (vCPU-hours x $/vCPU-hour) + (GB-hours x $/GB-hour).",
   ]}
   faqs={[
     {
-      q: "What should I use for hours per month?",
-      a: "A common planning value is ~730 hours/month for 24/7 services. If you schedule down, use fewer hours or use an average running-tasks value.",
+      q: "What should I use for days per month?",
+      a: "A common planning value is 30.4 days/month for 24/7 services. If you need a specific billing month, use the actual days.",
     },
     {
       q: "How do I model autoscaling?",
@@ -64,21 +65,23 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Tasks</strong>: use average running tasks from ECS metrics, not peak or desired count.</li>
+      <li><strong>Task size</strong>: pull vCPU and memory from the task definition (GB, not MB).</li>
+      <li><strong>Pricing</strong>: use region-specific vCPU-hour and GB-hour rates.</li>
+      <li><strong>Schedule</strong>: hours/day and days/month should reflect real uptime windows.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using peak task count as the average baseline.</li>
+      <li>Mixing MB and GB for memory inputs.</li>
+      <li>Assuming data transfer or logs are included in compute.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare vCPU-hours and GB-hours in billing to your estimate.</li>
+      <li>Check ECS service metrics for average running tasks.</li>
     </ul>
 
     <h2>Next steps</h2>

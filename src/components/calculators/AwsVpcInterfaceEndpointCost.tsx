@@ -7,23 +7,26 @@ import { clamp } from "../../lib/math";
 export function AwsVpcInterfaceEndpointCostCalculator() {
   const [endpoints, setEndpoints] = useNumberParamState("AwsVpcInterfaceEndpointCost.endpoints", 3);
   const [azsPerEndpoint, setAzsPerEndpoint] = useNumberParamState("AwsVpcInterfaceEndpointCost.azsPerEndpoint", 2);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsVpcInterfaceEndpointCost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsVpcInterfaceEndpointCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsVpcInterfaceEndpointCost.daysPerMonth", 30.4);
   const [pricePerEndpointHourUsd, setPricePerEndpointHourUsd] = useNumberParamState("AwsVpcInterfaceEndpointCost.pricePerEndpointHourUsd", 0.01);
   const [dataProcessedGbPerMonth, setDataProcessedGbPerMonth] = useNumberParamState("AwsVpcInterfaceEndpointCost.dataProcessedGbPerMonth", 2000);
   const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useNumberParamState("AwsVpcInterfaceEndpointCost.pricePerGbProcessedUsd", 0.01);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsVpcInterfaceEndpointCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsVpcInterfaceEndpointCost.peakMultiplierPct", 180);
 
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+
   const result = useMemo(() => {
     return estimateVpcInterfaceEndpointCost({
       endpoints: clamp(endpoints, 0, 1e6),
       azsPerEndpoint: clamp(azsPerEndpoint, 1, 100),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       pricePerEndpointHourUsd: clamp(pricePerEndpointHourUsd, 0, 1e6),
       dataProcessedGbPerMonth: clamp(dataProcessedGbPerMonth, 0, 1e12),
       pricePerGbProcessedUsd: clamp(pricePerGbProcessedUsd, 0, 1e3),
     });
-  }, [endpoints, azsPerEndpoint, hoursPerMonth, pricePerEndpointHourUsd, dataProcessedGbPerMonth, pricePerGbProcessedUsd]);
+  }, [endpoints, azsPerEndpoint, normalizedHoursPerMonth, pricePerEndpointHourUsd, dataProcessedGbPerMonth, pricePerGbProcessedUsd]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -31,7 +34,7 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
     return estimateVpcInterfaceEndpointCost({
       endpoints: clamp(endpoints, 0, 1e6) * multiplier,
       azsPerEndpoint: clamp(azsPerEndpoint, 1, 100),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       pricePerEndpointHourUsd: clamp(pricePerEndpointHourUsd, 0, 1e6),
       dataProcessedGbPerMonth: clamp(dataProcessedGbPerMonth, 0, 1e12) * multiplier,
       pricePerGbProcessedUsd: clamp(pricePerGbProcessedUsd, 0, 1e3),
@@ -40,7 +43,7 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
     azsPerEndpoint,
     dataProcessedGbPerMonth,
     endpoints,
-    hoursPerMonth,
+    normalizedHoursPerMonth,
     peakMultiplierPct,
     pricePerEndpointHourUsd,
     pricePerGbProcessedUsd,
@@ -75,15 +78,32 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Hours (per month)</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / endpoint-hour)</div>
@@ -156,7 +176,8 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
                 onClick={() => {
                   setEndpoints(2);
                   setAzsPerEndpoint(2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerEndpointHourUsd(0.01);
                   setDataProcessedGbPerMonth(600);
                   setPricePerGbProcessedUsd(0.01);
@@ -172,7 +193,8 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
                 onClick={() => {
                   setEndpoints(6);
                   setAzsPerEndpoint(3);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerEndpointHourUsd(0.01);
                   setDataProcessedGbPerMonth(6000);
                   setPricePerGbProcessedUsd(0.01);
@@ -188,7 +210,8 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
                 onClick={() => {
                   setEndpoints(12);
                   setAzsPerEndpoint(3);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerEndpointHourUsd(0.01);
                   setDataProcessedGbPerMonth(18_000);
                   setPricePerGbProcessedUsd(0.01);
@@ -209,7 +232,8 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
                 onClick={() => {
                   setEndpoints(3);
                   setAzsPerEndpoint(2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerEndpointHourUsd(0.01);
                   setDataProcessedGbPerMonth(2000);
                   setPricePerGbProcessedUsd(0.01);
@@ -278,6 +302,9 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

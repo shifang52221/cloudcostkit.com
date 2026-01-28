@@ -6,37 +6,40 @@ import { clamp } from "../../lib/math";
 
 export function AwsLoadBalancerCostCalculator() {
   const [loadBalancers, setLoadBalancers] = useNumberParamState("AwsLoadBalancerCost.loadBalancers", 2);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsLoadBalancerCost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsLoadBalancerCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsLoadBalancerCost.daysPerMonth", 30.4);
   const [pricePerLbHourUsd, setPricePerLbHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerLbHourUsd", 0.0225);
   const [capacityUnitsPerHour, setCapacityUnitsPerHour] = useNumberParamState("AwsLoadBalancerCost.capacityUnitsPerHour", 5);
   const [pricePerCapacityUnitHourUsd, setPricePerCapacityUnitHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerCapacityUnitHourUsd", 0.008);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsLoadBalancerCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLoadBalancerCost.peakMultiplierPct", 180);
 
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+
   const result = useMemo(() => {
     return estimateLoadBalancerCost({
       loadBalancers: clamp(loadBalancers, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       pricePerLbHourUsd: clamp(pricePerLbHourUsd, 0, 1e6),
       capacityUnitsPerHour: clamp(capacityUnitsPerHour, 0, 1e12),
       pricePerCapacityUnitHourUsd: clamp(pricePerCapacityUnitHourUsd, 0, 1e6),
     });
-  }, [loadBalancers, hoursPerMonth, pricePerLbHourUsd, capacityUnitsPerHour, pricePerCapacityUnitHourUsd]);
+  }, [loadBalancers, normalizedHoursPerMonth, pricePerLbHourUsd, capacityUnitsPerHour, pricePerCapacityUnitHourUsd]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
     const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
     return estimateLoadBalancerCost({
       loadBalancers: clamp(loadBalancers, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       pricePerLbHourUsd: clamp(pricePerLbHourUsd, 0, 1e6),
       capacityUnitsPerHour: clamp(capacityUnitsPerHour, 0, 1e12) * multiplier,
       pricePerCapacityUnitHourUsd: clamp(pricePerCapacityUnitHourUsd, 0, 1e6),
     });
   }, [
     capacityUnitsPerHour,
-    hoursPerMonth,
     loadBalancers,
+    normalizedHoursPerMonth,
     peakMultiplierPct,
     pricePerCapacityUnitHourUsd,
     pricePerLbHourUsd,
@@ -60,15 +63,32 @@ export function AwsLoadBalancerCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Hours (per month)</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / LB-hour)</div>
@@ -143,7 +163,8 @@ export function AwsLoadBalancerCostCalculator() {
                 type="button"
                 onClick={() => {
                   setLoadBalancers(1);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerLbHourUsd(0.0225);
                   setCapacityUnitsPerHour(2);
                   setPricePerCapacityUnitHourUsd(0.008);
@@ -158,7 +179,8 @@ export function AwsLoadBalancerCostCalculator() {
                 type="button"
                 onClick={() => {
                   setLoadBalancers(3);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerLbHourUsd(0.0225);
                   setCapacityUnitsPerHour(12);
                   setPricePerCapacityUnitHourUsd(0.008);
@@ -173,7 +195,8 @@ export function AwsLoadBalancerCostCalculator() {
                 type="button"
                 onClick={() => {
                   setLoadBalancers(8);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerLbHourUsd(0.0225);
                   setCapacityUnitsPerHour(45);
                   setPricePerCapacityUnitHourUsd(0.008);
@@ -193,7 +216,8 @@ export function AwsLoadBalancerCostCalculator() {
                 type="button"
                 onClick={() => {
                   setLoadBalancers(2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerLbHourUsd(0.0225);
                   setCapacityUnitsPerHour(5);
                   setPricePerCapacityUnitHourUsd(0.008);
@@ -258,6 +282,9 @@ export function AwsLoadBalancerCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

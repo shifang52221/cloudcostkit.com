@@ -8,22 +8,25 @@ export function AwsFargateCostCalculator() {
   const [tasks, setTasks] = useNumberParamState("AwsFargateCost.tasks", 3);
   const [vcpuPerTask, setVcpuPerTask] = useNumberParamState("AwsFargateCost.vcpuPerTask", 0.5);
   const [memoryGbPerTask, setMemoryGbPerTask] = useNumberParamState("AwsFargateCost.memoryGbPerTask", 1);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsFargateCost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsFargateCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsFargateCost.daysPerMonth", 30.4);
   const [pricePerVcpuHourUsd, setPricePerVcpuHourUsd] = useNumberParamState("AwsFargateCost.pricePerVcpuHourUsd", 0.04048);
   const [pricePerGbHourUsd, setPricePerGbHourUsd] = useNumberParamState("AwsFargateCost.pricePerGbHourUsd", 0.004445);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsFargateCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsFargateCost.peakMultiplierPct", 180);
+
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
 
   const result = useMemo(() => {
     return estimateFargateCost({
       tasks: clamp(tasks, 0, 1e9),
       vcpuPerTask: clamp(vcpuPerTask, 0, 1e3),
       memoryGbPerTask: clamp(memoryGbPerTask, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 1e6),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 1e6),
       pricePerVcpuHourUsd: clamp(pricePerVcpuHourUsd, 0, 1e3),
       pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
     });
-  }, [tasks, vcpuPerTask, memoryGbPerTask, hoursPerMonth, pricePerVcpuHourUsd, pricePerGbHourUsd]);
+  }, [tasks, vcpuPerTask, memoryGbPerTask, normalizedHoursPerMonth, pricePerVcpuHourUsd, pricePerGbHourUsd]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -32,12 +35,12 @@ export function AwsFargateCostCalculator() {
       tasks: clamp(tasks, 0, 1e9) * multiplier,
       vcpuPerTask: clamp(vcpuPerTask, 0, 1e3),
       memoryGbPerTask: clamp(memoryGbPerTask, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 1e6),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 1e6),
       pricePerVcpuHourUsd: clamp(pricePerVcpuHourUsd, 0, 1e3),
       pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
     });
   }, [
-    hoursPerMonth,
+    normalizedHoursPerMonth,
     memoryGbPerTask,
     peakMultiplierPct,
     pricePerGbHourUsd,
@@ -86,15 +89,32 @@ export function AwsFargateCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Hours per month</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
 
           <div className="field field-3">
@@ -157,7 +177,8 @@ export function AwsFargateCostCalculator() {
                   setTasks(2);
                   setVcpuPerTask(0.5);
                   setMemoryGbPerTask(1);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerVcpuHourUsd(0.04048);
                   setPricePerGbHourUsd(0.004445);
                   setShowPeakScenario(true);
@@ -173,7 +194,8 @@ export function AwsFargateCostCalculator() {
                   setTasks(10);
                   setVcpuPerTask(1);
                   setMemoryGbPerTask(2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerVcpuHourUsd(0.04048);
                   setPricePerGbHourUsd(0.004445);
                   setShowPeakScenario(true);
@@ -189,7 +211,8 @@ export function AwsFargateCostCalculator() {
                   setTasks(25);
                   setVcpuPerTask(2);
                   setMemoryGbPerTask(4);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerVcpuHourUsd(0.04048);
                   setPricePerGbHourUsd(0.004445);
                   setShowPeakScenario(true);
@@ -197,6 +220,23 @@ export function AwsFargateCostCalculator() {
                 }}
               >
                 Batch heavy
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setTasks(18);
+                  setVcpuPerTask(1);
+                  setMemoryGbPerTask(2);
+                  setHoursPerDay(6);
+                  setDaysPerMonth(22);
+                  setPricePerVcpuHourUsd(0.04048);
+                  setPricePerGbHourUsd(0.004445);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                Nightly batch
               </button>
             </div>
           </div>
@@ -210,7 +250,8 @@ export function AwsFargateCostCalculator() {
                   setTasks(3);
                   setVcpuPerTask(0.5);
                   setMemoryGbPerTask(1);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerVcpuHourUsd(0.04048);
                   setPricePerGbHourUsd(0.004445);
                   setShowPeakScenario(false);
@@ -281,6 +322,9 @@ export function AwsFargateCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

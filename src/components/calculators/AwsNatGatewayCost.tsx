@@ -6,37 +6,40 @@ import { clamp } from "../../lib/math";
 
 export function AwsNatGatewayCostCalculator() {
   const [natGateways, setNatGateways] = useNumberParamState("AwsNatGatewayCost.natGateways", 1);
-  const [hoursPerMonth, setHoursPerMonth] = useNumberParamState("AwsNatGatewayCost.hoursPerMonth", 730);
+  const [hoursPerDay, setHoursPerDay] = useNumberParamState("AwsNatGatewayCost.hoursPerDay", 24);
+  const [daysPerMonth, setDaysPerMonth] = useNumberParamState("AwsNatGatewayCost.daysPerMonth", 30.4);
   const [pricePerNatGatewayHourUsd, setPricePerNatGatewayHourUsd] = useNumberParamState("AwsNatGatewayCost.pricePerNatGatewayHourUsd", 0.045);
   const [dataProcessedGbPerMonth, setDataProcessedGbPerMonth] = useNumberParamState("AwsNatGatewayCost.dataProcessedGbPerMonth", 2000);
   const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useNumberParamState("AwsNatGatewayCost.pricePerGbProcessedUsd", 0.045);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsNatGatewayCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsNatGatewayCost.peakMultiplierPct", 180);
 
+  const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+
   const result = useMemo(() => {
     return estimateNatGatewayCost({
       natGateways: clamp(natGateways, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       pricePerNatGatewayHourUsd: clamp(pricePerNatGatewayHourUsd, 0, 1e6),
       dataProcessedGbPerMonth: clamp(dataProcessedGbPerMonth, 0, 1e12),
       pricePerGbProcessedUsd: clamp(pricePerGbProcessedUsd, 0, 1e3),
     });
-  }, [natGateways, hoursPerMonth, pricePerNatGatewayHourUsd, dataProcessedGbPerMonth, pricePerGbProcessedUsd]);
+  }, [natGateways, normalizedHoursPerMonth, pricePerNatGatewayHourUsd, dataProcessedGbPerMonth, pricePerGbProcessedUsd]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
     const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
     return estimateNatGatewayCost({
       natGateways: clamp(natGateways, 0, 1e6),
-      hoursPerMonth: clamp(hoursPerMonth, 0, 744),
+      hoursPerMonth: clamp(normalizedHoursPerMonth, 0, 744),
       pricePerNatGatewayHourUsd: clamp(pricePerNatGatewayHourUsd, 0, 1e6),
       dataProcessedGbPerMonth: clamp(dataProcessedGbPerMonth, 0, 1e12) * multiplier,
       pricePerGbProcessedUsd: clamp(pricePerGbProcessedUsd, 0, 1e3),
     });
   }, [
     dataProcessedGbPerMonth,
-    hoursPerMonth,
     natGateways,
+    normalizedHoursPerMonth,
     peakMultiplierPct,
     pricePerGbProcessedUsd,
     pricePerNatGatewayHourUsd,
@@ -60,15 +63,32 @@ export function AwsNatGatewayCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Hours (per month)</div>
+            <div className="label">Hours/day</div>
             <input
               type="number"
               inputMode="numeric"
-              value={hoursPerMonth}
+              value={hoursPerDay}
               min={0}
+              max={24}
               step={1}
-              onChange={(e) => setHoursPerMonth(+e.target.value)}
+              onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Days/month</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={daysPerMonth}
+              min={1}
+              max={31}
+              step={0.1}
+              onChange={(e) => setDaysPerMonth(+e.target.value)}
+            />
+            <div className="hint">Use 30.4 for an average month.</div>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Monthly hours: {formatNumber(normalizedHoursPerMonth, 0)}
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / NAT gateway-hour)</div>
@@ -140,7 +160,8 @@ export function AwsNatGatewayCostCalculator() {
                 type="button"
                 onClick={() => {
                   setNatGateways(1);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerNatGatewayHourUsd(0.045);
                   setDataProcessedGbPerMonth(600);
                   setPricePerGbProcessedUsd(0.045);
@@ -155,7 +176,8 @@ export function AwsNatGatewayCostCalculator() {
                 type="button"
                 onClick={() => {
                   setNatGateways(2);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerNatGatewayHourUsd(0.045);
                   setDataProcessedGbPerMonth(5000);
                   setPricePerGbProcessedUsd(0.045);
@@ -170,7 +192,8 @@ export function AwsNatGatewayCostCalculator() {
                 type="button"
                 onClick={() => {
                   setNatGateways(4);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerNatGatewayHourUsd(0.045);
                   setDataProcessedGbPerMonth(15_000);
                   setPricePerGbProcessedUsd(0.043);
@@ -190,7 +213,8 @@ export function AwsNatGatewayCostCalculator() {
                 type="button"
                 onClick={() => {
                   setNatGateways(1);
-                  setHoursPerMonth(730);
+                  setHoursPerDay(24);
+                  setDaysPerMonth(30.4);
                   setPricePerNatGatewayHourUsd(0.045);
                   setDataProcessedGbPerMonth(2000);
                   setPricePerGbProcessedUsd(0.045);
@@ -255,6 +279,9 @@ export function AwsNatGatewayCostCalculator() {
                 </tr>
               </tbody>
             </table>
+            <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+              Uses {formatNumber(daysPerMonth, 1)} days/month and {formatNumber(hoursPerDay, 0)} hours/day.
+            </div>
           </div>
         ) : null}
       </div>

@@ -4,20 +4,20 @@ import { AwsLoadBalancerCostCalculator as AwsLoadBalancerCostCalculatorComponent
 
 const title = "AWS Load Balancer Cost Calculator (ALB/NLB)";
 const description =
-  "Estimate AWS load balancer-style monthly cost from fixed LB-hours and capacity-unit hours (LCU/NLCU) using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate AWS load balancer-style monthly cost from fixed LB-hours and capacity-unit hours (LCU/NLCU) using hours/day and days/month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-load-balancer-cost-calculator"
-  intro="Estimate load balancer cost with a simple model: fixed hourly LB fees + capacity-unit hours (LCU for ALB or NLCU for NLB). Compare baseline vs peak traffic with your effective region pricing."
+  intro="Estimate load balancer cost with a simple model: fixed hourly LB fees + capacity-unit hours (LCU for ALB or NLCU for NLB). Use hours/day x days/month to normalize uptime and compare baseline vs peak traffic."
   examples={[
-    "2 load balancers running 730 hours/month, averaging 5 capacity units/hour - estimate fixed + usage components.",
+    "2 load balancers running 24 hours/day for 30 days, averaging 5 capacity units/hour - estimate fixed + usage components.",
     "Peak 220% scenario helps budget for marketing bursts."
   ]}
   includes={[
-    "Fixed cost from load balancers x hours/month x $/LB-hour.",
-    "Usage cost from capacity unit-hours x $ per unit-hour (LCU/NLCU).",
+    "Fixed cost from load balancers x hours/day x days/month x $/LB-hour.",
+    "Usage cost from capacity unit-hours x $ per unit-hour (LCU/NLCU) using hours/day x days/month.",
     "Baseline vs peak scenario table for capacity spikes.",
   ]}
   excludes={[
@@ -25,8 +25,8 @@ const description =
     "Downstream service costs (instances, NAT, logs, etc).",
   ]}
   how={[
-    "Fixed cost = load balancers x hours per month x $ per LB-hour.",
-    "Capacity unit-hours = avg capacity units per hour x hours per month.",
+    "Fixed cost = load balancers x (hours/day x days/month) x $ per LB-hour.",
+    "Capacity unit-hours = avg capacity units per hour x (hours/day x days/month).",
     "Usage cost = capacity unit-hours x $ per capacity unit-hour.",
     "Total = fixed cost + usage cost.",
   ]}
@@ -59,21 +59,25 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Load balancers</strong>: count active ALBs/NLBs (idle LBs still bill).</li>
+      <li><strong>Capacity units</strong>: use average LCU/NLCU per hour from metrics, not monthly totals.</li>
+      <li><strong>Schedule</strong>: hours/day and days/month should match actual uptime.</li>
+      <li><strong>Pricing</strong>: use region-specific LB-hour and LCU/NLCU-hour rates.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Entering LCU-hours/month as LCU per hour (overstates costs).</li>
+      <li>Ignoring idle LBs that stay billed even with no traffic.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
       <li>Compare your estimate to the first real bill and adjust assumptions.</li>
       <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare LB-hours and LCU/NLCU-hours with billing line items.</li>
     </ul>
 
     <h2>Next steps</h2>

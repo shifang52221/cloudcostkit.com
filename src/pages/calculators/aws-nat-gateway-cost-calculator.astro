@@ -4,19 +4,19 @@ import { AwsNatGatewayCostCalculator as AwsNatGatewayCostCalculatorComponent } f
 
 const title = "AWS NAT Gateway Cost Calculator";
 const description =
-  "Estimate AWS NAT Gateway-style monthly cost from gateway-hours and data processed (GB) using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate AWS NAT Gateway-style monthly cost from gateway-hours and data processed (GB) using hours/day and days/month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-nat-gateway-cost-calculator"
-  intro="Estimate NAT Gateway-style cost using a simple model: hourly gateway fees + per-GB data processing. Compare baseline vs peak traffic with your effective region pricing."
+  intro="Estimate NAT Gateway-style cost using a simple model: hourly gateway fees + per-GB data processing. Use hours/day x days/month to normalize uptime and compare baseline vs peak traffic."
   examples={[
-    "1 NAT gateway running 730 hours/month with 2,000 GB processed - estimate hourly + traffic charges.",
+    "1 NAT gateway running 24 hours/day for 30 days with 2,000 GB processed - estimate hourly + traffic charges.",
     "Peak 220% scenario highlights bursty update or deploy traffic."
   ]}
   includes={[
-    "Hourly component from NAT gateways x hours/month x $/hour.",
+    "Hourly component from NAT gateways x hours/day x days/month x $/hour.",
     "Traffic component from GB processed x $/GB processed.",
     "Baseline vs peak scenario table for traffic spikes.",
   ]}
@@ -25,7 +25,7 @@ const description =
     "Other transfer fees (cross-AZ/cross-region) depending on your architecture.",
   ]}
   how={[
-    "Hourly cost = NAT gateways x hours per month x $ per NAT gateway-hour.",
+    "Hourly cost = NAT gateways x (hours/day x days/month) x $ per NAT gateway-hour.",
     "Traffic cost = GB processed per month x $ per GB processed.",
     "Total = hourly cost + traffic cost.",
   ]}
@@ -62,11 +62,14 @@ const description =
         <strong>NAT gateways</strong>: count NAT gateways per AZ (teams often run 1 per AZ for HA).
       </li>
       <li>
-        <strong>Hours/month</strong>: use ~730 for always-on (or your billing convention).
+        <strong>Hours/day and days/month</strong>: use real uptime windows (24 x 30.4 for always-on).
       </li>
       <li>
         <strong>GB processed</strong>: pull from NAT metrics or VPC Flow Logs, or estimate from throughput charts (Mbps to
         GB/month).
+      </li>
+      <li>
+        <strong>Pricing</strong>: use region-specific NAT hourly and per-GB rates.
       </li>
     </ul>
 
@@ -76,6 +79,7 @@ const description =
       <li>Forgetting that "small" downloads multiply across fleets (node bootstrap, image pulls, package updates).</li>
       <li>Ignoring retries/timeouts that multiply outbound traffic during incidents.</li>
       <li>Assuming endpoints automatically replace NAT without checking the traffic mix.</li>
+      <li>Estimating GB from peak throughput without averaging over the month.</li>
     </ul>
 
     <h2>Validate after changes</h2>
@@ -83,6 +87,7 @@ const description =
       <li>Watch NAT GB processed trend (it should drop if endpoints/caching are working).</li>
       <li>Confirm you did not increase cross-AZ/cross-region transfer elsewhere.</li>
       <li>Re-check during peak/incident windows (that's when hidden multipliers show up).</li>
+      <li>Compare NAT gateway-hours and GB processed with billing line items.</li>
     </ul>
 
     <h2>Next steps</h2>

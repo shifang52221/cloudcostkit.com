@@ -112,6 +112,18 @@ export function ApiRequestCostCalculator() {
                 className="btn"
                 type="button"
                 onClick={() => {
+                  setRequestsPerMonth(3_500_000_000);
+                  setPricePerMillionUsd(0.7);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(260);
+                }}
+              >
+                Mobile spike
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
                   setRequestsPerMonth(2_500_000_000);
                   setPricePerMillionUsd(0.8);
                   setShowPeakScenario(true);

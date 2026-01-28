@@ -4,19 +4,19 @@ import { AwsRdsCostCalculator as AwsRdsCostCalculatorComponent } from "../../com
 
 const title = "AWS RDS Cost Calculator";
 const description =
-  "Estimate AWS RDS-style monthly cost from instance hours, storage, backups, and I/O request pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate AWS RDS-style monthly cost from instance hours, storage, backups, and I/O request pricing assumptions using hours/day and days/month, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-rds-cost-calculator"
-  intro="Estimate RDS-style managed database cost with a simple model: instance hours + storage + backup storage + I/O requests, then compare baseline vs peak I/O."
+  intro="Estimate RDS-style managed database cost with a simple model: instance hours + storage + backup storage + I/O requests using hours/day x days/month, then compare baseline vs peak I/O."
   examples={[
-    "1 instance at $0.20/hour running 730h/month, 200GB storage, 200GB backups, and 5B I/O requests/month.",
+    "1 instance at $0.20/hour running 24 hours/day for 30 days, 200GB storage, 200GB backups, and 5B I/O requests/month.",
     "Peak 220% scenario highlights batch workloads and backfills."
   ]}
   includes={[
-    "Compute from instances x hours/month x $/hour.",
+    "Compute from instances x hours/day x days/month x $/hour.",
     "Storage from GB-month x $/GB-month.",
     "Backup storage from GB-month x $/GB-month.",
     "I/O requests from monthly I/O volume x $ per 1M requests.",
@@ -27,7 +27,7 @@ const description =
     "Free tiers, tiered steps, and per-engine differences unless you reflect them in pricing inputs.",
   ]}
   how={[
-    "Compute cost = instances x hours per month x $ per hour.",
+    "Compute cost = instances x (hours/day x days/month) x $ per hour.",
     "Storage cost = GB-month x $ per GB-month.",
     "Backup cost = backup GB-month x $ per GB-month.",
     "I/O cost = (I/O requests per month / 1,000,000) x $ per 1M I/O requests.",
@@ -62,21 +62,23 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Compute</strong>: instance-hours (or average serverless capacity) and a peak scenario.</li>
-      <li><strong>Storage</strong>: average GB-month plus growth over time.</li>
-      <li><strong>Backups</strong>: retention and churn (daily changed data x retention days) as a separate line item.</li>
+      <li><strong>Compute</strong>: instance-hours from billing (hours/day x days/month) or average serverless capacity.</li>
+      <li><strong>Storage</strong>: average allocated or used GB-month and expected growth.</li>
+      <li><strong>Backups</strong>: retention x daily change rate to estimate backup GB-month.</li>
+      <li><strong>I/O</strong>: use engine metrics or billing for I/O request volume.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Ignoring backup storage and long-term retention growth.</li>
-      <li>Modeling only today's size and missing 3-12 month growth.</li>
+      <li>Ignoring backup storage growth and retention creep.</li>
+      <li>Using allocated storage as a constant without growth assumptions.</li>
+      <li>Forgetting I/O pricing for engines that charge per request.</li>
     </ul>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare forecast vs actual storage/backup GB-month after a few weeks.</li>
-      <li>Re-check during batch jobs or backfills (churn spikes).</li>
+      <li>Compare instance-hours, storage, backups, and I/O to actual RDS line items.</li>
+      <li>Re-check during batch jobs or backfills when churn spikes.</li>
     </ul>
 
     <h2>Next steps</h2>
