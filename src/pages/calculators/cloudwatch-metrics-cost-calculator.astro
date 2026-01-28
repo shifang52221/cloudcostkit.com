@@ -10,14 +10,16 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/cloudwatch-metrics-cost-calculator"
-  intro="Estimate CloudWatch Metrics-style cost with a simple model: custom metrics + alarms + dashboards + API requests. Use your effective region pricing."
+  intro="Estimate CloudWatch Metrics-style cost with a simple model: custom metrics + alarms + dashboards + API requests. Use your effective region pricing and compare baseline vs peak scenarios."
   examples={[
     "2,000 custom metrics, 150 alarms, 5 dashboards, and 10M API requests per month.",
+    "Use a peak multiplier for incident dashboards and heavy API polling.",
   ]}
   includes={[
     "Custom metrics (metric-month) estimate.",
     "Alarm-month and dashboard-month estimates.",
     "API request estimate using $ per 1k requests.",
+    "Baseline vs peak comparison for usage spikes.",
   ]}
   excludes={[
     "Logs, traces, and other observability products billed separately.",
@@ -28,6 +30,7 @@ const description =
     "Alarm cost = alarm-month x $ per alarm-month.",
     "Dashboard cost = dashboard-month x $ per dashboard-month.",
     "API cost = (API requests / 1,000) x $ per 1k requests.",
+    "Model a peak month to capture incidents and dashboard bursts.",
     "Total = sum of the above line items.",
   ]}
   faqs={[
@@ -44,7 +47,7 @@ const description =
       a: "Reduce custom metric count (especially high-cardinality dimensions), delete unused alarms and dashboards, and reduce API polling/query frequency.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-cloudwatch-metrics-pricing", label: "Guide: CloudWatch metrics pricing" },
     { href: "/guides/aws-cloudwatch-metrics-estimate-custom-metrics", label: "Guide: estimate custom metrics" },

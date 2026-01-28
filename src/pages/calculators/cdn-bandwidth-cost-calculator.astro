@@ -10,7 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-bandwidth-cost-calculator"
-  intro="CDN bandwidth charges can dominate costs for media-heavy and global traffic. Use this calculator to estimate monthly CDN bandwidth spend using your own $/GB assumptions."
+  intro="CDN bandwidth charges can dominate costs for media-heavy and global traffic. Use this calculator to estimate monthly CDN bandwidth spend using your own $/GB assumptions and compare baseline vs peak traffic."
   examples={[
     "If your CDN serves 4,000 GB/month at $0.06/GB, estimated bandwidth cost is $240/month.",
     "If you serve 30 TB/month at $0.05/GB, estimated bandwidth cost is about $1,536/month.",
@@ -18,6 +18,7 @@ const description =
   includes={[
     "Bandwidth-only CDN cost estimate from GB/month and $/GB pricing.",
     "Use for planning and comparing pricing tiers/regions.",
+    "Baseline vs peak comparison for traffic spikes.",
   ]}
   excludes={[
     "CDN request fees (use CDN Request Cost Calculator).",
@@ -27,6 +28,7 @@ const description =
     "Monthly cost = CDN egress GB x price per GB.",
     "Enter your provider's effective bandwidth $/GB (consider region/tier).",
     "If pricing is tiered, use a blended $/GB (or run multiple scenarios).",
+    "Model a peak month if launches or incidents spike traffic.",
     "This calculator is bandwidth-only; add request fees and origin egress separately if you pay them."
   ]}
   faqs={[
@@ -55,7 +57,7 @@ const description =
       a: "If your plan includes free allowances, subtract them from GB/month before applying $/GB, or use an effective blended rate."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/estimate-cdn-bandwidth-gb-per-month", label: "Guide: Estimate GB/month" },
@@ -70,7 +72,7 @@ const description =
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
       <li>Large objects (images/video) and global audiences push bandwidth up fast.</li>
       <li>Compression and image optimization can change GB/month materially.</li>
-      <li>Peak events can add a “second month” of bandwidth in a few days.</li>
+      <li>Peak events can add a "second month" of bandwidth in a few days.</li>
     </ul>
   </div>
 
@@ -107,7 +109,7 @@ const description =
     <h2>Validate after changes</h2>
     <ul>
       <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that’s when hidden multipliers show up).</li>
+      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
     </ul>
 
     <h2>Next steps</h2>
