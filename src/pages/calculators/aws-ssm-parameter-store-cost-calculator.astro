@@ -4,19 +4,21 @@ import { AwsSsmParameterStoreCostCalculator as AwsSsmParameterStoreCostCalculato
 
 const title = "AWS SSM Parameter Store Cost Calculator";
 const description =
-  "Estimate Parameter Store-style costs from advanced parameter count plus API call volume. Educational use only.";
+  "Estimate Parameter Store-style costs from advanced parameter count plus API call volume, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ssm-parameter-store-cost-calculator"
-  intro="Estimate Parameter Store-style cost with a simple model: advanced parameter-month charges plus API call charges. Use your effective region pricing and your measured API call volume."
+  intro="Estimate Parameter Store-style cost with a simple model: advanced parameter-month charges plus API call charges. Compare baseline vs peak request volume."
   examples={[
     "200 advanced parameters at $0.05 per parameter-month and 200M API calls/month at $0.05 per 10k calls.",
+    "Peak 240% scenario highlights deploy-driven API call spikes."
   ]}
   includes={[
     "Advanced parameter-month estimate from advanced parameter count and $/parameter-month.",
     "API call estimate from API calls/month and $ per 10k calls.",
+    "Baseline vs peak scenario table for API call spikes.",
   ]}
   excludes={[
     "Free-tier nuances, add-on features, and downstream costs unless modeled separately.",
@@ -37,7 +39,7 @@ const description =
       a: "Reduce API calls: cache parameters in memory, fetch once per process/startup, and avoid chatty polling patterns.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-ssm-parameter-store-pricing", label: "Guide: Parameter Store pricing" },
     { href: "/guides/aws-ssm-parameter-store-estimate-api-calls", label: "Guide: estimate API calls" },
@@ -77,4 +79,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

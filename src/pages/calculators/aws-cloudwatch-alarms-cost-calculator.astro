@@ -4,18 +4,20 @@ import { AwsCloudwatchAlarmsCostCalculator as AwsCloudwatchAlarmsCostCalculatorC
 
 const title = "AWS CloudWatch Alarms Cost Calculator";
 const description =
-  "Estimate CloudWatch Alarms-style costs from alarm counts and alarm-month pricing inputs. Educational use only.";
+  "Estimate CloudWatch Alarms-style costs from alarm counts and alarm-month pricing inputs, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-cloudwatch-alarms-cost-calculator"
-  intro="Estimate CloudWatch Alarms-style costs with a simple alarm-month model. Enter how many standard, high-resolution, and composite alarms you run, and your effective $/alarm-month pricing."
+  intro="Estimate CloudWatch Alarms-style costs with a simple alarm-month model. Compare baseline vs peak alarm inventory with your pricing."
   examples={[
     "500 standard alarms, 50 high-res alarms, and 20 composite alarms with your $/alarm-month prices.",
+    "Peak 200% scenario helps capture incident-driven alarm sprawl."
   ]}
   includes={[
     "Alarm charge estimate from alarm counts x $ per alarm-month inputs.",
+    "Baseline vs peak scenario table for alarm sprawl.",
   ]}
   excludes={[
     "Metric ingestion/retention and high-cardinality metrics costs.",
@@ -35,7 +37,7 @@ const description =
       a: "Alarm sprawl: duplicated alarms across environments, per-tenant/per-pod alarms, and high-resolution alarms enabled broadly.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-cloudwatch-alarms-pricing", label: "Guide: CloudWatch Alarms pricing" },
     { href: "/guides/aws-cloudwatch-alarms-estimate-alarm-count", label: "Guide: estimate alarm count" },
@@ -75,4 +77,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

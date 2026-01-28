@@ -1,36 +1,38 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsApiGatewayAccessLogCostCalculator as AwsApiGatewayAccessLogCostCalculatorComponent } from "../../components/calculators/AwsApiGatewayAccessLogCost";
 
 const title = "API Gateway Access Log Cost Calculator (CloudWatch Logs)";
 const description =
-  "Estimate API Gateway access log ingestion and retention cost from request volume and average log size. Educational use only.";
+  "Estimate API Gateway access log ingestion and retention cost from request volume and average log size, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-api-gateway-access-log-cost-calculator"
-  intro="Estimate API Gateway access log cost by converting requests/month x bytes/log into GB/day, then pricing ingestion and retention."
+  intro="Estimate API Gateway access log cost by converting requests/month x bytes/log into GB/day, then pricing ingestion and retention. Compare baseline vs peak volume."
   examples={[
     "50M requests/month with 1.5 KB average access log line -> estimate GB/day and monthly ingestion + retention cost.",
+    "Peak 220% scenario captures launch or incident spikes in request volume."
   ]}
   includes={[
     "Estimated ingestion volume (GB/day) from request volume and average log bytes.",
     "Ingestion and retention storage cost estimate from your pricing inputs.",
+    "Baseline vs peak scenario table for request spikes.",
   ]}
   excludes={[
     "API Gateway request pricing and response transfer pricing.",
     "Logs Insights query scan/search costs (model separately if needed).",
   ]}
   how={[
-    "GB/day ~ (requests/month ÷ 30.4) x bytes/log ÷ 1e9.",
+    "GB/day ~ (requests/month / 30.4) x bytes/log / 1e9.",
     "Monthly ingestion cost ~ (GB/day x 30.4) x $/GB.",
     "Retention storage cost uses a steady-state GB-month model for the retention window.",
   ]}
   faqs={[
     {
       q: "How do I estimate average log bytes per request?",
-      a: "Sample your access log output (100-1000 lines) and compute average bytes per line. Log format fields and headers can change size materially.",
+      a: "Sample your access log output (100-1,000 lines) and compute average bytes per line. Log format fields and headers can change size materially.",
     },
     {
       q: "Does this include API Gateway request charges?",
@@ -41,7 +43,7 @@ const description =
       a: "Reduce log verbosity/fields, sample logs for high-volume endpoints, and shorten retention for noisy logs.",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-api-gateway-access-logs-cost", label: "Guide: API Gateway access logs cost" },
     { href: "/calculators/aws-api-gateway-cost-calculator", label: "API Gateway cost calculator" },
@@ -54,7 +56,7 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to estimate bytes per log line (quick, reliable)</h2>
     <ol class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Export 100–1,000 log lines from a representative day.</li>
+      <li>Export 100-1,000 log lines from a representative day.</li>
       <li>Compute average bytes/line (and p95 if you want a peak scenario).</li>
       <li>
         Re-check after changing log format: adding headers, user agents, and long paths can materially increase bytes per
@@ -102,3 +104,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

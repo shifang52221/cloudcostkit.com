@@ -4,19 +4,21 @@ import { AwsEcrCostCalculator as AwsEcrCostCalculatorComponent } from "../../com
 
 const title = "AWS ECR Cost Calculator";
 const description =
-  "Estimate ECR-style container registry cost from stored GB-month plus data transfer assumptions. Educational use only.";
+  "Estimate ECR-style container registry cost from stored GB-month plus data transfer assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ecr-cost-calculator"
-  intro="Estimate ECR-style costs with a simplified model: storage (GB-month) plus data transfer out. Use your effective region pricing and your real traffic path assumptions."
+  intro="Estimate ECR-style costs with a simplified model: storage (GB-month) plus data transfer out. Compare baseline vs peak image usage with your pricing."
   examples={[
     "2,000 GB-month stored at $0.10/GB-month and 500 GB/month egress at $0.09/GB.",
+    "Peak 200% scenario captures release-day pull spikes."
   ]}
   includes={[
     "Storage baseline: stored GB-month x $ per GB-month.",
     "Egress estimate: GB/month transfer out x $ per GB.",
+    "Baseline vs peak scenario table for storage and egress spikes.",
   ]}
   excludes={[
     "Replication, scanning, and feature add-ons unless modeled separately.",
@@ -37,7 +39,7 @@ const description =
       a: "Use the average stored size over the month. If you retain many tags and rebuild images frequently, stored GB-month grows quickly. Retention policies are the biggest lever.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-ecr-pricing", label: "Guide: ECR pricing" },
     { href: "/guides/aws-ecr-estimate-storage-gb-month", label: "Guide: estimate image storage" },
@@ -77,4 +79,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-
