@@ -10,7 +10,7 @@ export function KubernetesNodeCostCalculator() {
   const [utilizationPct, setUtilizationPct] = useNumberParamState("KubernetesNodeCost.utilizationPct", 100);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("KubernetesNodeCost.hoursPerDay", 24);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("KubernetesNodeCost.showPeakScenario", false);
-  const [peakNodes, setPeakNodes] = useNumberParamState("KubernetesNodeCost.peakNodes", 18);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("KubernetesNodeCost.peakMultiplierPct", 180);
 
   const result = useMemo(() => {
     return estimateComputeCost({
@@ -23,13 +23,14 @@ export function KubernetesNodeCostCalculator() {
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
     return estimateComputeCost({
-      instances: clamp(peakNodes, 0, 1e9),
+      instances: clamp(nodes, 0, 1e9) * multiplier,
       pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
       utilizationPct: clamp(utilizationPct, 0, 100),
       hoursPerDay: clamp(hoursPerDay, 0, 24),
     });
-  }, [hoursPerDay, peakNodes, pricePerHourUsd, showPeakScenario, utilizationPct]);
+  }, [hoursPerDay, nodes, peakMultiplierPct, pricePerHourUsd, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -97,18 +98,67 @@ export function KubernetesNodeCostCalculator() {
 
           {showPeakScenario ? (
             <div className="field field-3">
-              <div className="label">Peak nodes</div>
+              <div className="label">Peak multiplier (%)</div>
               <input
                 type="number"
                 inputMode="numeric"
-                value={peakNodes}
-                min={0}
-                step={1}
-                onChange={(e) => setPeakNodes(+e.target.value)}
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
               />
-              <div className="hint">Use peak month node count.</div>
+              <div className="hint">Applies to node count.</div>
             </div>
           ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setNodes(6);
+                  setPricePerHourUsd(0.28);
+                  setUtilizationPct(100);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                Small cluster
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setNodes(24);
+                  setPricePerHourUsd(0.32);
+                  setUtilizationPct(95);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(210);
+                }}
+              >
+                Microservices
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setNodes(80);
+                  setPricePerHourUsd(0.36);
+                  setUtilizationPct(90);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(240);
+                }}
+              >
+                Platform scale
+              </button>
+            </div>
+          </div>
 
           <div className="field field-6">
             <div className="btn-row">
@@ -121,7 +171,7 @@ export function KubernetesNodeCostCalculator() {
                   setUtilizationPct(100);
                   setHoursPerDay(24);
                   setShowPeakScenario(false);
-                  setPeakNodes(18);
+                  setPeakMultiplierPct(180);
                 }}
               >
                 Reset example
@@ -144,19 +194,39 @@ export function KubernetesNodeCostCalculator() {
               {formatNumber(result.billableHoursPerInstance, 0)} hr ({formatPercent(result.utilizationPct, 0)})
             </div>
           </div>
-          {peakResult ? (
-            <div className="kpi">
-              <div className="k">Peak monthly node cost</div>
-              <div className="v">{formatCurrency2(peakResult.monthlyCostUsd)}</div>
-            </div>
-          ) : null}
-          {peakResult ? (
-            <div className="kpi">
-              <div className="k">Peak delta</div>
-              <div className="v">{formatCurrency2(peakResult.monthlyCostUsd - result.monthlyCostUsd)}</div>
-            </div>
-          ) : null}
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Nodes</th>
+                  <th className="num">Monthly cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.instances, 0)}</td>
+                  <td className="num">{formatCurrency2(result.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.instances, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.instances - result.instances, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.monthlyCostUsd - result.monthlyCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );

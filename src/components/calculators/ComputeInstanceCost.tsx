@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateComputeCost } from "../../lib/calc/compute";
 import { formatCurrency2, formatNumber, formatPercent } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -9,6 +9,8 @@ export function ComputeInstanceCostCalculator() {
   const [pricePerHourUsd, setPricePerHourUsd] = useNumberParamState("ComputeInstanceCost.pricePerHourUsd", 0.18);
   const [utilizationPct, setUtilizationPct] = useNumberParamState("ComputeInstanceCost.utilizationPct", 100);
   const [hoursPerDay, setHoursPerDay] = useNumberParamState("ComputeInstanceCost.hoursPerDay", 24);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ComputeInstanceCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ComputeInstanceCost.peakMultiplierPct", 200);
 
   const result = useMemo(() => {
     return estimateComputeCost({
@@ -18,6 +20,17 @@ export function ComputeInstanceCostCalculator() {
       hoursPerDay: clamp(hoursPerDay, 0, 24),
     });
   }, [instances, pricePerHourUsd, utilizationPct, hoursPerDay]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    return estimateComputeCost({
+      instances: clamp(instances, 0, 1e9) * multiplier,
+      pricePerHourUsd: clamp(pricePerHourUsd, 0, 1e6),
+      utilizationPct: clamp(utilizationPct, 0, 100),
+      hoursPerDay: clamp(hoursPerDay, 0, 24),
+    });
+  }, [hoursPerDay, instances, peakMultiplierPct, pricePerHourUsd, showPeakScenario, utilizationPct]);
 
   return (
     <div className="calc-grid">
@@ -71,6 +84,81 @@ export function ComputeInstanceCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to instance count.</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setInstances(8);
+                  setPricePerHourUsd(0.22);
+                  setUtilizationPct(100);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                Steady prod
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setInstances(20);
+                  setPricePerHourUsd(0.12);
+                  setUtilizationPct(60);
+                  setHoursPerDay(10);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                Workday fleet
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setInstances(40);
+                  setPricePerHourUsd(0.18);
+                  setUtilizationPct(85);
+                  setHoursPerDay(24);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(250);
+                }}
+              >
+                Autoscale burst
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -81,6 +169,8 @@ export function ComputeInstanceCostCalculator() {
                   setPricePerHourUsd(0.18);
                   setUtilizationPct(100);
                   setHoursPerDay(24);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(200);
                 }}
               >
                 Reset example
@@ -104,8 +194,39 @@ export function ComputeInstanceCostCalculator() {
             </div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Instances</th>
+                  <th className="num">Monthly cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(result.instances, 0)}</td>
+                  <td className="num">{formatCurrency2(result.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(peakResult.instances, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.monthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">{formatNumber(peakResult.instances - result.instances, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.monthlyCostUsd - result.monthlyCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

@@ -4,20 +4,20 @@ import { KubernetesNodeCostCalculator as KubernetesNodeCostCalculatorComponent }
 
 const title = "Kubernetes Node Cost Calculator";
 const description =
-  "Estimate monthly Kubernetes node cost from node count, $/hour, and expected uptime. Educational use only.";
+  "Estimate monthly Kubernetes node cost from node count, $/hour, and expected uptime, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/kubernetes-node-cost-calculator"
-  intro="Once you know your node count and per-node hourly price, you can estimate monthly spend quickly. Use utilization and hours/day to model non-24/7 clusters, and add a peak scenario to stress-test the estimate."
+  intro="Once you know your node count and per-node hourly price, you can estimate monthly spend quickly. Compare baseline vs peak node counts and stress-test autoscaling scenarios."
   examples={[
     "12 nodes at $0.32/hour running 24/7 -> estimate monthly node spend.",
-    "12 baseline nodes, 18 peak nodes -> compare peak vs baseline delta.",
+    "Peak 210% scenario highlights seasonal cluster expansion.",
   ]}
   includes={[
     "Monthly compute estimate from node count, $/hour, and billable hours.",
-    "Optional peak scenario cost and delta.",
+    "Baseline vs peak scenario table for node scale-out.",
     "Simple utilization model for scheduled/dev environments.",
   ]}
   excludes={[
@@ -48,7 +48,7 @@ const description =
       a: "Common add-ons include load balancers, persistent volumes, NAT/egress, logging/metrics, and control plane fees. Use this calculator for node compute, then layer the rest as separate line items."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost calculator" },
     { href: "/calculators/kubernetes-requests-limits-calculator", label: "Requests & limits sizing" },

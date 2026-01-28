@@ -4,19 +4,21 @@ import { AwsVpcInterfaceEndpointCostCalculator as AwsVpcInterfaceEndpointCostCal
 
 const title = "VPC Interface Endpoint Cost Calculator (PrivateLink)";
 const description =
-  "Estimate AWS VPC Interface Endpoint (PrivateLink) monthly cost from endpoint-hours and data processed (GB) using your pricing assumptions. Educational use only.";
+  "Estimate AWS VPC Interface Endpoint (PrivateLink) monthly cost from endpoint-hours and data processed (GB) using your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-vpc-interface-endpoint-cost-calculator"
-  intro="Estimate VPC Interface Endpoint (PrivateLink) cost using a simple model: endpoint-hours (endpoints x AZs x hours) + data processed (GB). Use your effective region pricing."
+  intro="Estimate VPC Interface Endpoint (PrivateLink) cost using a simple model: endpoint-hours (endpoints x AZs x hours) + data processed (GB). Compare baseline vs peak traffic with your pricing."
   examples={[
     "3 interface endpoints across 2 AZs running 730 hours/month, processing 2,000 GB/month.",
+    "Peak 180% scenario captures migration surges or batch spikes."
   ]}
   includes={[
     "Endpoint-hours from endpoints x AZs x hours/month x $ per endpoint-hour.",
     "Data processing from GB/month x $ per GB processed.",
+    "Baseline vs peak scenario table for endpoint and data spikes.",
   ]}
   excludes={[
     "Other VPC data transfer line items (cross-AZ/cross-region) depending on your path.",
@@ -42,7 +44,7 @@ const description =
       a: "Not automatically. Endpoints can reduce NAT GB processed for compatible services, but you should model both before and after to find the break-even point.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-network-costs", label: "AWS network cost hub" },
     { href: "/guides/aws-vpc-endpoints-pricing", label: "Guide: VPC endpoints pricing" },

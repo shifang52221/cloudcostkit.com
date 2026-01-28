@@ -4,20 +4,22 @@ import { AwsLoadBalancerCapacityUnitsCalculator as AwsLoadBalancerCapacityUnitsC
 
 const title = "AWS ALB LCU / NLB NLCU Calculator";
 const description =
-  "Estimate ALB LCU or NLB NLCU capacity units per hour from connection rates, active connections, and bytes processed. Educational use only.";
+  "Estimate ALB LCU or NLB NLCU capacity units per hour from connection rates, active connections, and bytes processed, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-load-balancer-lcu-calculator"
-  intro="Estimate average ALB LCU (or NLB NLCU) from the common billing drivers: new connections, active connections, bytes processed, and (for ALB) rule evaluations."
+  intro="Estimate average ALB LCU (or NLB NLCU) from the common billing drivers: new connections, active connections, bytes processed, and (for ALB) rule evaluations. Compare baseline vs peak driver rates."
   examples={[
     "If you have 40 new connections/sec, 2,000 active connections, and 0.8 GB/hour processed -> estimate average LCU/NLCU.",
     "Use this to convert metrics into \"capacity units per hour\" for the load balancer cost calculator.",
+    "Peak 230% scenario highlights the max-driver jump during traffic spikes."
   ]}
   includes={[
     "LCU/NLCU units estimate from inputs (drivers).",
     "Shows which driver dominates (max of drivers).",
+    "Baseline vs peak scenario table for driver spikes.",
   ]}
   excludes={[
     "Actual pricing (use the load balancer cost calculator after you estimate units/hour).",
@@ -42,7 +44,7 @@ const description =
       a: "Plug \"capacity units (avg per hour)\" into the load balancer cost calculator along with your $/unit-hour pricing.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost calculator" },
     { href: "/guides/aws-load-balancer-lcu-explained", label: "Guide: LCU/NLCU explained" },
@@ -83,4 +85,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

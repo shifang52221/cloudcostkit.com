@@ -1,22 +1,24 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator as ComputeInstanceCostCalculatorComponent } from "../../components/calculators/ComputeInstanceCost";
 
 const title = "Compute Instance Cost Calculator";
 const description =
-  "Estimate monthly compute cost from instance count, $/hour, and expected uptime/utilization. Educational use only.";
+  "Estimate monthly compute cost from instance count, $/hour, and expected uptime/utilization, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/compute-instance-cost-calculator"
-  intro="For back-of-the-napkin budgeting, instance count x hourly price x billable hours gets you most of the way. This calculator estimates monthly compute cost with simple utilization inputs."
+  intro="For back-of-the-napkin budgeting, instance count x hourly price x billable hours gets you most of the way. Compare baseline vs peak instance counts with a simple utilization model."
   examples={[
-    "6 instances at $0.18/hour running 24/7 → estimate monthly compute cost.",
+    "6 instances at $0.18/hour running 24/7 -> estimate monthly compute cost.",
+    "Peak 200% scenario captures seasonal scale-out."
   ]}
   includes={[
     "Monthly compute estimate from instance count, $/hour, and billable hours.",
     "Utilization inputs for schedules and non-24/7 environments.",
+    "Baseline vs peak scenario table for scale-out."
   ]}
   excludes={[
     "Storage, bandwidth, managed service fees, and taxes.",
@@ -37,7 +39,7 @@ const description =
       a: "Use your effective $/hour after discounts (or model break-even using the reserved vs on-demand tool)."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved break-even" },
     { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
@@ -75,3 +77,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+
