@@ -1,21 +1,23 @@
----
+﻿---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DatabaseStorageGrowthCostCalculator as DatabaseStorageGrowthCostCalculatorComponent } from "../../components/calculators/DatabaseStorageGrowth";
 
 const title = "Database Storage Growth Cost Calculator";
 const description =
-  "Estimate database storage growth over time and the average monthly cost from starting size, daily growth, and $/GB-month pricing. Educational use only.";
+  "Estimate database storage growth over time and the average monthly cost from starting size, daily growth, and $/GB-month pricing, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/database-storage-growth-cost-calculator"
-  intro="If your database grows steadily, average GB over a month is often a better cost estimate than the end-of-month number. This tool estimates growth and the implied average monthly storage cost."
+  intro="If your database grows steadily, average GB over a month is often a better cost estimate than the end-of-month number. Compare baseline vs peak growth rates for planning."
   examples={[
-    "Starting 500 GB and growing 5 GB/day over 6 months → estimate ending size and average monthly cost.",
+    "Starting 500 GB and growing 5 GB/day over 6 months -> estimate ending size and average monthly cost.",
+    "Peak 220% scenario helps budget for launch growth."
   ]}
   includes={[
     "Ending size estimate using a linear growth assumption.",
+    "Baseline vs peak scenario table for growth rates.",
     "Average size estimate and implied average monthly storage cost.",
   ]}
   excludes={[
@@ -24,7 +26,7 @@ const description =
   ]}
   how={[
     "Ending GB ~ starting GB + (growth GB/day x days).",
-    "Average GB ~ (starting + ending) ÷ 2 (linear growth assumption).",
+    "Average GB ~ (starting + ending) / 2 (linear growth assumption).",
     "Estimated monthly cost ~ average GB x storage price per GB-month."
   ]}
   faqs={[
@@ -37,7 +39,7 @@ const description =
       a: "Yes, if your provider bills them separately. You can increase the effective storage GB or model components separately."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
@@ -55,7 +57,7 @@ const description =
     <h2>Common mistakes</h2>
     <ul>
       <li>Ignoring backup storage and long-term retention growth.</li>
-      <li>Modeling only today’s size and missing 3–12 month growth.</li>
+      <li>Modeling only today's size and missing 3-12 month growth.</li>
     </ul>
 
     <h2>Validate after changes</h2>
@@ -73,3 +75,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

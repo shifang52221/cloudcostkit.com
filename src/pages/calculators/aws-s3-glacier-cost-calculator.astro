@@ -4,20 +4,22 @@ import { AwsS3GlacierCostCalculator as AwsS3GlacierCostCalculatorComponent } fro
 
 const title = "AWS S3 Glacier / Deep Archive Cost Calculator";
 const description =
-  "Estimate S3 Glacier-style archival storage cost from stored GB-month plus retrieval volume and request assumptions. Educational use only.";
+  "Estimate S3 Glacier-style archival storage cost from stored GB-month plus retrieval volume and request assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-s3-glacier-cost-calculator"
-  intro="Estimate archival storage costs with a simple model: storage (GB-month) plus retrieval (GB and requests). Use your effective prices for your storage class and retrieval tier."
+  intro="Estimate archival storage costs with a simple model: storage (GB-month) plus retrieval (GB and requests). Compare baseline vs peak retrieval with your pricing."
   examples={[
     "10,000 GB-month stored at $0.004/GB-month with 500 GB/month retrieval at $0.01/GB and 2M retrieval requests at $0.05 per 1k.",
+    "Peak 200% scenario highlights restore-heavy months."
   ]}
   includes={[
     "Storage baseline from GB-month and $/GB-month.",
     "Retrieval data volume from GB/month and $/GB.",
     "Retrieval request charges from requests/month and $ per 1,000 requests.",
+    "Baseline vs peak scenario table for retrieval spikes.",
   ]}
   excludes={[
     "Minimum storage duration and early deletion fees (model separately if relevant).",
@@ -43,7 +45,7 @@ const description =
       a: "Frequent restores, large retrieval volume, many small-object retrieval requests, and early deletion fees due to minimum storage duration rules.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-s3-glacier-pricing", label: "Guide: Glacier and Deep Archive pricing" },
     { href: "/guides/aws-s3-glacier-estimate-retrieval", label: "Guide: estimate retrieval volume" },
@@ -83,4 +85,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

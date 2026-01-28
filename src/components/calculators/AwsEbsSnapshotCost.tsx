@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateEbsSnapshotCost } from "../../lib/calc/ebsSnapshot";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -9,6 +9,8 @@ export function AwsEbsSnapshotCostCalculator() {
   const [dailyChangePct, setDailyChangePct] = useNumberParamState("AwsEbsSnapshotCost.dailyChangePct", 2);
   const [retentionDays, setRetentionDays] = useNumberParamState("AwsEbsSnapshotCost.retentionDays", 30);
   const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsEbsSnapshotCost.pricePerGbMonthUsd", 0.05);
+  const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEbsSnapshotCost.showPeakScenario", false);
+  const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEbsSnapshotCost.peakMultiplierPct", 180);
 
   const result = useMemo(() => {
     return estimateEbsSnapshotCost({
@@ -18,6 +20,18 @@ export function AwsEbsSnapshotCostCalculator() {
       pricePerGbMonthUsd: clamp(pricePerGbMonthUsd, 0, 1e6),
     });
   }, [volumeGb, dailyChangePct, retentionDays, pricePerGbMonthUsd]);
+
+  const peakResult = useMemo(() => {
+    if (!showPeakScenario) return null;
+    const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
+    const peakDailyChangePct = clamp(dailyChangePct * multiplier, 0, 100);
+    return estimateEbsSnapshotCost({
+      volumeGb: clamp(volumeGb, 0, 1e12),
+      dailyChangePct: peakDailyChangePct,
+      retentionDays: clamp(retentionDays, 0, 3650),
+      pricePerGbMonthUsd: clamp(pricePerGbMonthUsd, 0, 1e6),
+    });
+  }, [dailyChangePct, peakMultiplierPct, pricePerGbMonthUsd, retentionDays, showPeakScenario, volumeGb]);
 
   return (
     <div className="calc-grid">
@@ -70,6 +84,81 @@ export function AwsEbsSnapshotCostCalculator() {
             />
           </div>
 
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={showPeakScenario}
+                onChange={(e) => setShowPeakScenario(e.target.checked)}
+              />
+              Include peak scenario
+            </label>
+          </div>
+
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak multiplier (%)</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={peakMultiplierPct}
+                min={100}
+                max={1000}
+                step={5}
+                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+              />
+              <div className="hint">Applies to daily change rate.</div>
+            </div>
+          ) : null}
+
+          <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setVolumeGb(500);
+                  setDailyChangePct(1.5);
+                  setRetentionDays(30);
+                  setPricePerGbMonthUsd(0.05);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(160);
+                }}
+              >
+                App server
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setVolumeGb(2000);
+                  setDailyChangePct(3);
+                  setRetentionDays(35);
+                  setPricePerGbMonthUsd(0.05);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                Core database
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setVolumeGb(8000);
+                  setDailyChangePct(4);
+                  setRetentionDays(45);
+                  setPricePerGbMonthUsd(0.05);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                Data platform
+              </button>
+            </div>
+          </div>
+
           <div className="field field-6">
             <div className="btn-row">
               <button
@@ -80,6 +169,8 @@ export function AwsEbsSnapshotCostCalculator() {
                   setDailyChangePct(2);
                   setRetentionDays(30);
                   setPricePerGbMonthUsd(0.05);
+                  setShowPeakScenario(false);
+                  setPeakMultiplierPct(180);
                 }}
               >
                 Reset example
@@ -105,8 +196,49 @@ export function AwsEbsSnapshotCostCalculator() {
             <div className="v">{formatCurrency2(result.estimatedMonthlyCostUsd)}</div>
           </div>
         </div>
+
+        {peakResult ? (
+          <div style={{ marginTop: 12 }}>
+            <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th className="num">Daily change</th>
+                  <th className="num">Stored GB</th>
+                  <th className="num">Monthly cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Baseline</td>
+                  <td className="num">{formatNumber(clamp(dailyChangePct, 0, 100), 2)}%</td>
+                  <td className="num">{formatNumber(result.estimatedStoredGb, 0)}</td>
+                  <td className="num">{formatCurrency2(result.estimatedMonthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Peak</td>
+                  <td className="num">{formatNumber(clamp(dailyChangePct * (clamp(peakMultiplierPct, 100, 1000) / 100), 0, 100), 2)}%</td>
+                  <td className="num">{formatNumber(peakResult.estimatedStoredGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.estimatedMonthlyCostUsd)}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td className="num">
+                    {formatNumber(
+                      clamp(dailyChangePct * (clamp(peakMultiplierPct, 100, 1000) / 100), 0, 100) - clamp(dailyChangePct, 0, 100),
+                      2,
+                    )}
+                    %
+                  </td>
+                  <td className="num">{formatNumber(peakResult.estimatedStoredGb - result.estimatedStoredGb, 0)}</td>
+                  <td className="num">{formatCurrency2(peakResult.estimatedMonthlyCostUsd - result.estimatedMonthlyCostUsd)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
-

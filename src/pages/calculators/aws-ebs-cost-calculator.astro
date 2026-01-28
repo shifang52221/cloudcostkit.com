@@ -4,20 +4,22 @@ import { AwsEbsCostCalculator as AwsEbsCostCalculatorComponent } from "../../com
 
 const title = "AWS EBS Cost Calculator";
 const description =
-  "Estimate AWS EBS-style monthly cost from storage (GB-month), provisioned IOPS, and provisioned throughput pricing assumptions. Educational use only.";
+  "Estimate AWS EBS-style monthly cost from storage (GB-month), provisioned IOPS, and provisioned throughput pricing assumptions, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ebs-cost-calculator"
-  intro="Estimate EBS-style block storage cost with a simple model: storage + provisioned IOPS + provisioned throughput. Use your own effective pricing for the volume type and region."
+  intro="Estimate EBS-style block storage cost with a simple model: storage + provisioned IOPS + provisioned throughput. Compare baseline vs peak capacity with your effective pricing."
   examples={[
     "500GB, 6,000 IOPS, 250 MB/s throughput - estimate monthly storage + performance charges.",
+    "Peak 220% scenario helps budget for scaling bursts."
   ]}
   includes={[
     "Storage cost from GB-month x $/GB-month.",
     "IOPS cost from IOPS-month x $/IOPS-month (if your volume type charges for it).",
     "Throughput cost from MB/s-month x $/MB/s-month (if your volume type charges for it).",
+    "Baseline vs peak scenario table for capacity spikes.",
   ]}
   excludes={[
     "Snapshots/backup storage, data transfer, and EC2 instance costs.",
@@ -43,7 +45,7 @@ const description =
       a: "Use the average allocated storage (or average used, depending on billing). If storage grows over time, model multiple months or scenarios.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/aws-ebs-pricing", label: "Guide: EBS pricing (what to include)" },
     { href: "/guides/aws-ebs-gp3-iops-throughput", label: "Guide: gp3 IOPS and throughput" },

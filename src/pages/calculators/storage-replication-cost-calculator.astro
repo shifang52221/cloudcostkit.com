@@ -4,20 +4,22 @@ import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorCom
 
 const title = "Storage Replication Cost Calculator";
 const description =
-  "Estimate monthly storage replication cost from replicated GB and price per GB. Educational use only.";
+  "Estimate monthly storage replication cost from replicated GB and price per GB, with baseline vs peak scenarios. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/storage-replication-cost-calculator"
-  intro="Replication and multi-region storage can add meaningful transfer or feature charges. Use this tool to estimate monthly replication cost from replicated GB and your pricing assumption."
+  intro="Replication and multi-region storage can add meaningful transfer or feature charges. Estimate monthly replication cost and compare baseline vs peak replication volume."
   examples={[
     "2,500 GB/month replicated at $0.02/GB -> $50/month (transfer/feature fee estimate).",
     "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at $0.01/GB -> about $15/month (replication fee only).",
+    "Peak 180% scenario highlights backfill or migration bursts."
   ]}
   includes={[
     "Replication cost estimate from replicated GB/month and a $/GB pricing assumption.",
     "Works for cross-region replication, backup copy traffic, or sync workloads.",
+    "Baseline vs peak scenario table for replication spikes.",
   ]}
   excludes={[
     "Replica storage costs (model separately).",
@@ -51,7 +53,7 @@ const description =
       a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-28"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -92,4 +94,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-
