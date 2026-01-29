@@ -49,9 +49,9 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
-      <li><strong>Counts</strong>: start from inventory (custom metrics, alarms, dashboards) per account/environment.</li>
-      <li><strong>Cardinality</strong>: model multiplicative dimensions (service x env x cluster x pod).</li>
-      <li><strong>API polling</strong>: add dashboard refresh and automation polling scenarios.</li>
+      <li><strong>Alarm counts</strong>: export alarms per account and environment; split standard, high-res, composite.</li>
+      <li><strong>Scope</strong>: identify per-tenant/per-pod alarms that multiply fast.</li>
+      <li><strong>Resolution</strong>: flag high-res alarms separately; they cost more.</li>
     </ul>
 
     <h2>Result interpretation</h2>
@@ -62,8 +62,15 @@ const description =
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/high-cardinality scenarios.</li>
-      <li>Forgetting API polling and dashboard refresh costs.</li>
+      <li>Counting only production and ignoring staging or dev alarm inventories.</li>
+      <li>Leaving duplicate alarms after migrations or refactors.</li>
+    </ul>
+
+    <h2>Alarm inventory checklist</h2>
+    <ul>
+      <li>Group alarms by team or service to find ownership gaps.</li>
+      <li>Separate composite alarms from standard ones for pricing accuracy.</li>
+      <li>Track high-res alarms created for incidents and never removed.</li>
     </ul>
 
     <h2>Scenario planning</h2>
@@ -94,8 +101,8 @@ const description =
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Measure actual custom metric/series counts and alarm/dashboards after rollout.</li>
-      <li>Watch API request volume trends (dashboards + automation).</li>
+      <li>Compare alarm counts by type before and after changes.</li>
+      <li>Validate high-res alarm usage in a recent billing week.</li>
     </ul>
 
     <h2>Next steps</h2>
