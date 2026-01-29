@@ -13,6 +13,10 @@ export function ObjectStorageCostCalculator() {
   const [putPricePer1kUsd, setPutPricePer1kUsd] = useNumberParamState("ObjectStorageCost.putPricePer1kUsd", 0.005);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ObjectStorageCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ObjectStorageCost.peakMultiplierPct", 180);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const averageStoredTb = averageStoredGb / 1024;
+  const getRps = getRequestsPerMonth / secondsPerMonth;
+  const putRps = putRequestsPerMonth / secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateObjectStorageCost({
@@ -68,6 +72,7 @@ export function ObjectStorageCostCalculator() {
               min={0}
               onChange={(e) => setAverageStoredGb(+e.target.value)}
             />
+            <div className="hint">Approx {formatNumber(averageStoredTb, 2)} TB-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
@@ -91,6 +96,7 @@ export function ObjectStorageCostCalculator() {
               step={1000}
               onChange={(e) => setGetRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Approx {formatNumber(getRps, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">PUT requests (per month)</div>
@@ -102,6 +108,7 @@ export function ObjectStorageCostCalculator() {
               step={1000}
               onChange={(e) => setPutRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Approx {formatNumber(putRps, 2)} req/sec.</div>
           </div>
 
           <div className="field field-3">

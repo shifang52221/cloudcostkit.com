@@ -29,6 +29,9 @@ export function DataEgressCostCalculator({
   const [tier3PricePerGbUsd, setTier3PricePerGbUsd] = useNumberParamState("DataEgressCost.tier3PricePerGbUsd", defaultPricePerGbUsd);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("DataEgressCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("DataEgressCost.peakMultiplierPct", 150);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const avgMbps = (gbPerMonth * 8000) / secondsPerMonth;
+  const tierOrderOk = tier2UpToGb >= tier1UpToGb;
 
   const buildResult = (gbPerMonthValue: number) => {
     if (tieredPricing) {
@@ -85,6 +88,7 @@ export function DataEgressCostCalculator({
               min={0}
               onChange={(e) => setGbPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg throughput: {formatNumber(avgMbps, 2)} Mbps.</div>
           </div>
 
           <div className="field field-3">
@@ -115,6 +119,11 @@ export function DataEgressCostCalculator({
               <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>
                 Tiers are applied sequentially: first up to tier 1, then up to tier 2, then over tier 2.
               </div>
+              {!tierOrderOk ? (
+                <div className="hint" style={{ marginTop: 6 }}>
+                  Tier 2 should be greater than tier 1.
+                </div>
+              ) : null}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 10 }}>
                 <div>
                   <div className="label" style={{ fontSize: 13 }}>Tier 1 up to (GB)</div>

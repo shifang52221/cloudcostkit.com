@@ -16,21 +16,24 @@ const description =
   examples={[
     "Start with storage + requests, then add egress if you download data, and replication if you copy across regions.",
     "Many workloads are storage-dominated until egress or replication is added.",
+    "Use baseline and peak scenarios to avoid underestimating churn or download spikes.",
   ]}
   includes={[
     "Storage + request fee estimate (GET/PUT) using your pricing assumptions.",
     "Optional egress estimate from GB/month and $/GB.",
     "Optional replication estimate from replicated GB/month and $/GB.",
+    "Scenario-based planning (baseline vs peak) in one worksheet.",
   ]}
   excludes={[
     "Retrieval and lifecycle transition fees for archive tiers (model separately).",
     "Provider-specific tiering and region complexity unless you use blended rates or scenarios.",
+    "KMS, inventory, analytics, and additional per-feature charges.",
   ]}
   how={[
     "Step 1: estimate storage cost and request fees.",
     "Step 2: add egress if you transfer data out of storage.",
     "Step 3: add replication/copy line items if you move data across regions.",
-    "Sum line items to get a monthly estimate."
+    "Sum line items to get a monthly estimate.",
   ]}
   faqs={[
     {
@@ -40,6 +43,14 @@ const description =
     {
       q: "What drives replication cost?",
       a: "Replicated GB/month (changed data), not the total stored dataset size. Estimate replication volume from writes and churn.",
+    },
+    {
+      q: "How do I estimate GB-month for storage?",
+      a: "Use average stored GB over the month. If you have daily values, sum them and divide by days in the month.",
+    },
+    {
+      q: "Should I separate storage classes?",
+      a: "Yes. If you use multiple classes, compute each class separately or use a blended rate.",
     },
   ]}
   lastUpdated="2026-01-20"
@@ -88,6 +99,14 @@ const description =
       <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
       <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Sources</strong>: Storage metrics, request logs, and cost exports are the best starting points.</li>
+    </ul>
+
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Identify the dominant driver (storage vs requests vs egress vs replication).</li>
+      <li>If requests dominate, consider caching or batching to reduce per-request costs.</li>
+      <li>If egress dominates, check CDN or data locality options.</li>
     </ul>
 
     <h2>Common mistakes</h2>
@@ -95,6 +114,35 @@ const description =
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Storage GB-month</th>
+          <th>Requests</th>
+          <th>Egress</th>
+          <th>Replication</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Expected</td>
+          <td>Expected</td>
+          <td>Expected</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>High</td>
+          <td>High</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

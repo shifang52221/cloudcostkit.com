@@ -12,19 +12,23 @@ const description =
   canonicalPath="/calculators/ec2-cost-calculator"
   intro="This EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand and commitments."
   examples={[
-    "10 instances at your $/hour with 100% uptime -> estimate monthly compute cost.",
-    "Use lower uptime for dev/test workloads to avoid over-budgeting.",
+    "10 instances at your blended $/hour with 100% uptime -> estimate monthly compute cost.",
+    "Reduce hours/day for dev/test to avoid over-budgeting always-on assumptions.",
+    "Use a weighted $/hour if you mix on-demand, RIs, and Savings Plans.",
   ]}
   includes={[
-    "Compute cost estimate from instance count and $/hour pricing assumption.",
-    "Uptime modeling to reflect environments that aren't 24/7.",
+    "Compute cost estimate from instance count, $/hour pricing, and monthly hours.",
+    "Uptime modeling to reflect environments that are not 24/7.",
+    "Blended rate planning for mixed purchase models.",
   ]}
   excludes={[
     "Storage (EBS), data transfer, and load balancer costs (model separately).",
-    "Spot interruptions and autoscaling dynamics unless you use blended assumptions.",
+    "Spot interruptions, autoscaling bursts, and credit-based instance variability unless you blend them.",
+    "Monitoring and logging charges (CloudWatch, metrics, and logs).",
   ]}
   how={[
     "Monthly cost = instances x $/hour x (hours/day x days/month) x uptime.",
+    "For always-on, 24 x 30.4 (about 730 hours) is a common planning baseline.",
     "If you use commitments (Savings Plans/Reserved), use a blended effective $/hour.",
     "Model storage and transfer as separate line items.",
   ]}
@@ -36,6 +40,14 @@ const description =
     {
       q: "How do I pick a blended $/hour?",
       a: "Use the weighted average you expect to pay across on-demand, commitments, and spot. Validate later with your actual bill.",
+    },
+    {
+      q: "How do I convert instance-hours to instance count?",
+      a: "Average instances = monthly instance-hours / monthly hours. Use the same hour baseline you assume in the calculator.",
+    },
+    {
+      q: "Should I model separate environments?",
+      a: "Yes. Prod, staging, and dev often have different uptime and pricing assumptions, so model them as separate rows.",
     },
   ]}
   lastUpdated="2026-01-20"
@@ -54,6 +66,13 @@ const description =
       <li><strong>Instances</strong>: use average running instances from billing (instance-hours / monthly hours).</li>
       <li><strong>Hourly rate</strong>: use a blended $/hour if you mix on-demand, Savings Plans, or RIs.</li>
       <li><strong>Schedule</strong>: hours/day and days/month should reflect real uptime windows.</li>
+      <li><strong>Sources</strong>: Cost and Usage Report, instance-hours metrics, or inventory snapshots.</li>
+    </ul>
+
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If the estimate is far from your bill, check the blended rate and instance-hours first.</li>
+      <li>Separate baseline vs bursty workloads to avoid mixing average and peak assumptions.</li>
     </ul>
 
     <h2>Common mistakes</h2>
@@ -62,6 +81,38 @@ const description =
       <li>Applying both utilization and reduced hours/day for the same schedule.</li>
       <li>Forgetting storage, transfer, and load balancer line items.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Instances</th>
+          <th>Uptime</th>
+          <th>Blended $/hour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Expected schedule</td>
+          <td>Current mix</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>90th percentile</td>
+          <td>Higher uptime</td>
+          <td>On-demand heavy</td>
+        </tr>
+        <tr>
+          <td>Committed</td>
+          <td>Baseline</td>
+          <td>Expected schedule</td>
+          <td>Target commitment mix</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

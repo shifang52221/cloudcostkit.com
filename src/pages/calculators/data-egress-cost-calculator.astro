@@ -14,21 +14,25 @@ const description =
   examples={[
     "If you send 2,500 GB/month and your effective price is $0.09/GB, estimated cost is $225/month.",
     "If you have tiered pricing, enter the tier thresholds and compare baseline vs peak traffic.",
+    "Separate internet egress from cross-region transfer for more accurate blended rates.",
   ]}
   includes={[
     "Bandwidth-only cost estimate from transferred GB and $/GB pricing.",
     "Optional tiered pricing model with multiple rate steps.",
     "Baseline vs peak comparison for traffic spikes.",
     "Works for internet egress, service egress, or any scenario where you know an effective $/GB.",
+    "Simple scenarios to quantify the impact of architectural changes.",
   ]}
   excludes={[
     "Free allowances, minimums, and provider-specific rounding unless you model them explicitly.",
     "Per-request fees and other service-specific charges.",
+    "CDN request fees and cache miss charges.",
   ]}
   how={[
     "Monthly cost = egress GB x price per GB (or sum of tiers in tiered mode).",
     "Enter your provider's effective $/GB for the region/path/tier you expect.",
     "Compare a baseline month with a peak month to avoid under-budgeting.",
+    "If you have multiple paths, compute them separately and add them.",
   ]}
   faqs={[
     {
@@ -61,6 +65,7 @@ const description =
       <li>Model multiple scenarios: baseline month vs peak month.</li>
       <li>Consider a CDN: it can reduce origin egress and shift cost structure.</li>
       <li>Watch for tiering and minimum charges in provider pricing.</li>
+      <li>Keep internet, cross-region, and cross-AZ traffic as separate line items.</li>
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
@@ -69,13 +74,47 @@ const description =
       <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
       <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
       <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+      <li><strong>Sources</strong>: VPC flow logs, CDN logs, and cost exports provide the cleanest counts.</li>
+    </ul>
+
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If tiered pricing drives cost, locate the tier where you spend the most.</li>
+      <li>Large gaps between baseline and peak suggest caching or throttling opportunities.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
       <li>Mixing boundaries and applying the wrong $/GB rate.</li>
       <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+      <li>Applying internet rates to intra-region or cross-AZ traffic.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB/month</th>
+          <th>Rate</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Blended</td>
+          <td>Typical traffic mix</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Blended</td>
+          <td>Incidents or launches</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

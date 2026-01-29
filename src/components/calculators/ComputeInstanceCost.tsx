@@ -25,6 +25,9 @@ export function ComputeInstanceCostCalculator() {
     });
   }, [instances, pricePerHourUsd, utilizationPct, hoursPerDay, daysPerMonth]);
 
+  const billableHoursTotal = result.billableHoursPerInstance * result.instances;
+  const costPerInstance = result.instances > 0 ? result.monthlyCostUsd / result.instances : 0;
+
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
     const multiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
@@ -75,6 +78,7 @@ export function ComputeInstanceCostCalculator() {
               step={1}
               onChange={(e) => setUtilizationPct(+e.target.value)}
             />
+            <div className="hint">Use 100 if hours/day already models uptime.</div>
           </div>
           <div className="field field-3">
             <div className="label">Hours/day</div>
@@ -87,6 +91,7 @@ export function ComputeInstanceCostCalculator() {
               step={1}
               onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+            <div className="hint">Use 24 for always-on workloads.</div>
           </div>
           <div className="field field-3">
             <div className="label">Days/month</div>
@@ -232,6 +237,14 @@ export function ComputeInstanceCostCalculator() {
             <div className="v">
               {formatNumber(result.billableHoursPerInstance, 0)} hr ({formatPercent(result.utilizationPct, 0)})
             </div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per instance</div>
+            <div className="v">{formatCurrency2(costPerInstance)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Billable hours (fleet)</div>
+            <div className="v">{formatNumber(billableHoursTotal, 0)} hr</div>
           </div>
         </div>
 
