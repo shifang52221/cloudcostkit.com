@@ -12,6 +12,8 @@ export function AwsSecretsManagerCostCalculator() {
   const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useNumberParamState("AwsSecretsManagerCost.pricePer10kApiCallsUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSecretsManagerCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSecretsManagerCost.peakMultiplierPct", 180);
+  const apiCallsPerSecond = apiCallsPerMonth / (30.4 * 24 * 3600);
+  const pricePerMillionApiCallsUsd = pricePer10kApiCallsUsd * 100;
 
   const result = useMemo(() => {
     return estimateSecretsManagerCost({
@@ -72,7 +74,9 @@ export function AwsSecretsManagerCostCalculator() {
               step={1000}
               onChange={(e) => setApiCallsPerMonth(+e.target.value)}
             />
-            <div className="hint">GetSecretValue, PutSecretValue, DescribeSecret, List*, etc.</div>
+            <div className="hint">
+              Avg {formatNumber(apiCallsPerSecond, 2)} req/sec. GetSecretValue, PutSecretValue, DescribeSecret, List*, etc.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / 10k API calls)</div>
@@ -84,7 +88,7 @@ export function AwsSecretsManagerCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer10kApiCallsUsd(+e.target.value)}
             />
-            <div className="hint">Set to 0 if you want a secret-month-only estimate.</div>
+            <div className="hint">~{formatCurrency2(pricePerMillionApiCallsUsd)} per 1M calls. Set to 0 for secret-only estimate.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

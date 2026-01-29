@@ -40,7 +40,7 @@ const description =
       a: "Higher volume than expected (marketing sends), retries/bounces, large templates/attachments increasing payload size, and dedicated IP/add-on usage.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-ses-pricing", label: "Guide: SES pricing" },
     { href: "/guides/aws-ses-estimate-email-volume", label: "Guide: estimate email volume" },
@@ -57,11 +57,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Send volume drives cost; large payloads matter when transfer is billable.</li>
+      <li>Campaign spikes are the common peak case.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Emails</th>
+          <th>Avg size</th>
+          <th>Transfer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Typical</td>
+          <td>Derived</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Higher</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

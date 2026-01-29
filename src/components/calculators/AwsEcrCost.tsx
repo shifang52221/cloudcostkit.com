@@ -11,6 +11,8 @@ export function AwsEcrCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsEcrCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEcrCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEcrCost.peakMultiplierPct", 180);
+  const storedTbMonth = storedGbMonth / 1024;
+  const avgEgressMbps = (egressGbPerMonth * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
     return estimateEcrCost({
@@ -54,7 +56,7 @@ export function AwsEcrCostCalculator() {
               step={1}
               onChange={(e) => setStoredGbMonth(+e.target.value)}
             />
-            <div className="hint">Average stored GB over the month.</div>
+            <div className="hint">Average stored GB over the month (~{formatNumber(storedTbMonth, 2)} TB-month).</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
@@ -77,7 +79,7 @@ export function AwsEcrCostCalculator() {
               step={1}
               onChange={(e) => setEgressGbPerMonth(+e.target.value)}
             />
-            <div className="hint">If your pulls are inside AWS/VPC, egress may be lower.</div>
+            <div className="hint">Avg {formatNumber(avgEgressMbps, 2)} Mbps. If pulls are inside AWS/VPC, egress may be lower.</div>
           </div>
           <div className="field field-3">
             <div className="label">Egress price ($ / GB)</div>

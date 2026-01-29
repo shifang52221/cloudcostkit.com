@@ -15,6 +15,11 @@ export function AwsS3GlacierCostCalculator() {
   const [retrievalPricePer1000RequestsUsd, setRetrievalPricePer1000RequestsUsd] = useNumberParamState("AwsS3GlacierCost.retrievalPricePer1000RequestsUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsS3GlacierCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsS3GlacierCost.peakMultiplierPct", 200);
+  const storedTbMonth = storedGbMonth / 1024;
+  const retrievalGbPerDay = retrievalGbPerMonth / 30.4;
+  const retrievalAvgMbps = (retrievalGbPerMonth * 8000) / (30.4 * 24 * 3600);
+  const retrievalRequestsPerSecond = retrievalRequestsPerMonth / (30.4 * 24 * 3600);
+  const retrievalPricePerMillionUsd = retrievalPricePer1000RequestsUsd * 1000;
 
   const result = useMemo(() => {
     return estimateS3GlacierCost({
@@ -71,7 +76,7 @@ export function AwsS3GlacierCostCalculator() {
               step={1}
               onChange={(e) => setStoredGbMonth(+e.target.value)}
             />
-            <div className="hint">Average stored GB over the month.</div>
+            <div className="hint">Average stored GB over the month (~{formatNumber(storedTbMonth, 2)} TB-month).</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
@@ -96,6 +101,9 @@ export function AwsS3GlacierCostCalculator() {
               step={1}
               onChange={(e) => setRetrievalGbPerMonth(+e.target.value)}
             />
+            <div className="hint">
+              ~{formatNumber(retrievalGbPerDay, 2)} GB/day, {formatNumber(retrievalAvgMbps, 2)} Mbps.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Retrieval price ($ / GB)</div>
@@ -120,6 +128,7 @@ export function AwsS3GlacierCostCalculator() {
               step={1000}
               onChange={(e) => setRetrievalRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(retrievalRequestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Retrieval requests price ($ / 1000)</div>
@@ -131,6 +140,7 @@ export function AwsS3GlacierCostCalculator() {
               step={0.0001}
               onChange={(e) => setRetrievalPricePer1000RequestsUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(retrievalPricePerMillionUsd)} per 1M requests.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

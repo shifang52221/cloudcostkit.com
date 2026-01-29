@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateCloudTrailCost } from "../../lib/calc/cloudTrail";
-import { formatCurrency2 } from "../../lib/format";
+import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
 export function AwsCloudTrailCostCalculator() {
@@ -14,6 +14,13 @@ export function AwsCloudTrailCostCalculator() {
   const [pricePer100kManagementEventsUsd, setPricePer100kManagementEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kManagementEventsUsd", 0.1);
   const [pricePer100kDataEventsUsd, setPricePer100kDataEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kDataEventsUsd", 0.2);
   const [pricePer100kInsightsEventsUsd, setPricePer100kInsightsEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kInsightsEventsUsd", 0.35);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const managementEventsPerSecond = managementEventsPerMonth / secondsPerMonth;
+  const dataEventsPerSecond = dataEventsPerMonth / secondsPerMonth;
+  const insightsEventsPerSecond = insightsEventsPerMonth / secondsPerMonth;
+  const managementPricePerMillionUsd = pricePer100kManagementEventsUsd * 10;
+  const dataPricePerMillionUsd = pricePer100kDataEventsUsd * 10;
+  const insightsPricePerMillionUsd = pricePer100kInsightsEventsUsd * 10;
 
   const result = useMemo(() => {
     return estimateCloudTrailCost({
@@ -70,6 +77,7 @@ export function AwsCloudTrailCostCalculator() {
               step={1000}
               onChange={(e) => setManagementEventsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(managementEventsPerSecond, 2)} events/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Data events (per month)</div>
@@ -81,6 +89,7 @@ export function AwsCloudTrailCostCalculator() {
               step={1000}
               onChange={(e) => setDataEventsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(dataEventsPerSecond, 2)} events/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Insights events (per month)</div>
@@ -92,6 +101,7 @@ export function AwsCloudTrailCostCalculator() {
               step={1000}
               onChange={(e) => setInsightsEventsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(insightsEventsPerSecond, 2)} events/sec.</div>
           </div>
 
           <div className="field field-3">
@@ -104,6 +114,7 @@ export function AwsCloudTrailCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer100kManagementEventsUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(managementPricePerMillionUsd)} per 1M events.</div>
           </div>
           <div className="field field-3">
             <div className="label">Data price ($ / 100k events)</div>
@@ -115,6 +126,7 @@ export function AwsCloudTrailCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer100kDataEventsUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(dataPricePerMillionUsd)} per 1M events.</div>
           </div>
           <div className="field field-3">
             <div className="label">Insights price ($ / 100k events)</div>
@@ -126,6 +138,7 @@ export function AwsCloudTrailCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer100kInsightsEventsUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(insightsPricePerMillionUsd)} per 1M events.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

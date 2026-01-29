@@ -11,6 +11,8 @@ export function AwsSqsCostCalculator() {
   const [freeRequestsPerMonth, setFreeRequestsPerMonth] = useNumberParamState("AwsSqsCost.freeRequestsPerMonth", 0);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSqsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSqsCost.peakMultiplierPct", 180);
+  const messagesPerSecond = messagesPerMonth / (30.4 * 24 * 3600);
+  const requestsPerSecond = (messagesPerMonth * requestsPerMessage) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
     return estimateSqsCost({
@@ -47,6 +49,7 @@ export function AwsSqsCostCalculator() {
               step={1000}
               onChange={(e) => setMessagesPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(messagesPerSecond, 2)} msgs/sec.</div>
           </div>
 
           <div className="field field-3">
@@ -59,6 +62,7 @@ export function AwsSqsCostCalculator() {
               step={1}
               onChange={(e) => setRequestsPerMessage(+e.target.value)}
             />
+            <div className="hint">Total ~{formatNumber(requestsPerSecond, 2)} req/sec at baseline.</div>
             <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
               Common baseline: 3 (Send + Receive + Delete). Add more for retries, visibility timeouts, or extra API calls.
             </div>

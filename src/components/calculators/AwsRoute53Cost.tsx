@@ -14,6 +14,8 @@ export function AwsRoute53CostCalculator() {
   const [pricePerHostedZoneUsdPerMonth, setPricePerHostedZoneUsdPerMonth] = useNumberParamState("AwsRoute53Cost.pricePerHostedZoneUsdPerMonth", 0.5);
   const [pricePerMillionQueriesUsd, setPricePerMillionQueriesUsd] = useNumberParamState("AwsRoute53Cost.pricePerMillionQueriesUsd", 0.4);
   const [pricePerHealthCheckUsdPerMonth, setPricePerHealthCheckUsdPerMonth] = useNumberParamState("AwsRoute53Cost.pricePerHealthCheckUsdPerMonth", 0.5);
+  const queriesPerSecond = standardQueriesPerMonth / (30.4 * 24 * 3600);
+  const pricePerBillionQueriesUsd = pricePerMillionQueriesUsd * 1000;
 
   const result = useMemo(() => {
     return estimateRoute53Cost({
@@ -81,7 +83,7 @@ export function AwsRoute53CostCalculator() {
               step={1000}
               onChange={(e) => setStandardQueriesPerMonth(+e.target.value)}
             />
-            <div className="hint">Enter your estimated total DNS queries.</div>
+            <div className="hint">Avg {formatNumber(queriesPerSecond, 2)} qps. Enter your estimated DNS queries.</div>
           </div>
           <div className="field field-3">
             <div className="label">Health checks</div>
@@ -116,6 +118,7 @@ export function AwsRoute53CostCalculator() {
               step={0.001}
               onChange={(e) => setPricePerMillionQueriesUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(pricePerBillionQueriesUsd)} per 1B queries.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / health check-month)</div>

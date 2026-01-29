@@ -44,7 +44,7 @@ const description =
       a: "No. This is only SQS request cost. Model downstream services separately (Lambda, DynamoDB, logs, etc).",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-sqs-pricing", label: "Guide: SQS pricing (what to include)" },
     { href: "/guides/aws-sqs-estimate-requests", label: "Guide: estimate SQS requests" },
@@ -61,11 +61,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests per message is the biggest lever; retries multiply cost fast.</li>
+      <li>If costs spike, inspect visibility timeout and retry behavior.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Messages</th>
+          <th>Req/msg</th>
+          <th>Total requests</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Typical</td>
+          <td>Derived</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Derived</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

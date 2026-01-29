@@ -41,7 +41,7 @@ const description =
       a: "Use measured query counts from Route 53 metrics or resolver logs over a representative time window, then roll up to monthly.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-route-53-pricing/", label: "Guide: Route 53 pricing" },
     { href: "/guides/aws-route-53-estimate-dns-queries", label: "Guide: estimate DNS queries" },
@@ -58,11 +58,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Queries usually dominate; hosted zones and health checks are steady base costs.</li>
+      <li>Low TTL or retry loops can create steep query spikes.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Zones</th>
+          <th>Queries</th>
+          <th>Health checks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Configured</td>
+          <td>Expected</td>
+          <td>Configured</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Same</td>
+          <td>High</td>
+          <td>Same</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

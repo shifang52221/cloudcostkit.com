@@ -43,7 +43,7 @@ const description =
       a: "EBS volume storage plus performance add-ons (IOPS/throughput on some types), plus snapshot storage and retention policy.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-ebs-snapshot-cost", label: "Guide: EBS snapshot cost" },
     { href: "/guides/aws-ebs-pricing", label: "Guide: EBS pricing" },
@@ -60,11 +60,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Daily change rate drives growth; small increases compound quickly with longer retention.</li>
+      <li>Large one-time churn (rebuilds, reindexing) should be modeled as peak months.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Daily change</th>
+          <th>Retention</th>
+          <th>Stored GB</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Typical</td>
+          <td>Standard</td>
+          <td>Estimated</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Higher</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

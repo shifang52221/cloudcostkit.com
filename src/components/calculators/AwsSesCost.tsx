@@ -11,6 +11,9 @@ export function AwsSesCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsSesCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSesCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSesCost.peakMultiplierPct", 180);
+  const emailsPerSecond = emailsPerMonth / (30.4 * 24 * 3600);
+  const pricePerMillionEmailsUsd = pricePer1000EmailsUsd * 1000;
+  const estimatedTransferGb = (emailsPerMonth * avgEmailKb) / (1024 * 1024);
 
   const result = useMemo(() => {
     return estimateSesCost({
@@ -47,6 +50,7 @@ export function AwsSesCostCalculator() {
               step={1000}
               onChange={(e) => setEmailsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(emailsPerSecond, 2)} emails/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Send price ($ / 1000 emails)</div>
@@ -58,7 +62,7 @@ export function AwsSesCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer1000EmailsUsd(+e.target.value)}
             />
-            <div className="hint">Use your effective region pricing.</div>
+            <div className="hint">~{formatCurrency2(pricePerMillionEmailsUsd)} per 1M emails.</div>
           </div>
           <div className="field field-3">
             <div className="label">Avg email size (KB)</div>
@@ -70,7 +74,7 @@ export function AwsSesCostCalculator() {
               step={0.1}
               onChange={(e) => setAvgEmailKb(+e.target.value)}
             />
-            <div className="hint">Use the approximate on-the-wire payload size.</div>
+            <div className="hint">~{formatNumber(estimatedTransferGb, 2)} GB/month of outbound data.</div>
           </div>
           <div className="field field-3">
             <div className="label">Egress price ($ / GB)</div>

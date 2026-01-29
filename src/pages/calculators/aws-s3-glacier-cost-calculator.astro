@@ -45,7 +45,7 @@ const description =
       a: "Frequent restores, large retrieval volume, many small-object retrieval requests, and early deletion fees due to minimum storage duration rules.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-s3-glacier-pricing", label: "Guide: Glacier and Deep Archive pricing" },
     { href: "/guides/aws-s3-glacier-estimate-retrieval", label: "Guide: estimate retrieval volume" },
@@ -62,11 +62,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Storage is steady; retrieval volume and request counts drive spikes.</li>
+      <li>Many small object restores can make request charges material.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Stored GB</th>
+          <th>Retrieval GB</th>
+          <th>Requests</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Low</td>
+          <td>Low</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Same</td>
+          <td>High</td>
+          <td>High</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

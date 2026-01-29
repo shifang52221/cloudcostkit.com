@@ -11,6 +11,8 @@ export function AwsEbsSnapshotCostCalculator() {
   const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsEbsSnapshotCost.pricePerGbMonthUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEbsSnapshotCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEbsSnapshotCost.peakMultiplierPct", 180);
+  const dailyChangeGb = (volumeGb * dailyChangePct) / 100;
+  const retentionMonths = retentionDays / 30.4;
 
   const result = useMemo(() => {
     return estimateEbsSnapshotCost({
@@ -48,6 +50,7 @@ export function AwsEbsSnapshotCostCalculator() {
               step={1}
               onChange={(e) => setVolumeGb(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(volumeGb / 1024, 2)} TB.</div>
           </div>
           <div className="field field-3">
             <div className="label">Daily change rate (%)</div>
@@ -60,6 +63,7 @@ export function AwsEbsSnapshotCostCalculator() {
               step={0.1}
               onChange={(e) => setDailyChangePct(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(dailyChangeGb, 2)} GB/day of changes.</div>
           </div>
           <div className="field field-3">
             <div className="label">Retention (days)</div>
@@ -71,6 +75,7 @@ export function AwsEbsSnapshotCostCalculator() {
               step={1}
               onChange={(e) => setRetentionDays(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(retentionMonths, 1)} months of snapshots.</div>
           </div>
           <div className="field field-3">
             <div className="label">Snapshot storage price ($ / GB-month)</div>

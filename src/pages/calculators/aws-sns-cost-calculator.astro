@@ -46,7 +46,7 @@ const description =
       a: "If you deliver to internet endpoints or across billable network paths, transfer can matter. If your traffic path has negligible transfer charges, set $/GB to 0 for a request-only estimate.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-sns-pricing", label: "Guide: SNS pricing" },
     { href: "/guides/aws-sns-estimate-deliveries", label: "Guide: estimate SNS deliveries" },
@@ -63,11 +63,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Deliveries usually dominate; fan-out multiplies request cost quickly.</li>
+      <li>Payload size only matters when transfer is billable; set $/GB to zero if not.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Publishes</th>
+          <th>Deliveries</th>
+          <th>Payload</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Expected</td>
+          <td>Typical</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Burst</td>
+          <td>Same</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

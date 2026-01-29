@@ -39,7 +39,7 @@ const description =
       a: "Use the average stored size over the month. If you retain many tags and rebuild images frequently, stored GB-month grows quickly. Retention policies are the biggest lever.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-ecr-pricing", label: "Guide: ECR pricing" },
     { href: "/guides/aws-ecr-estimate-storage-gb-month", label: "Guide: estimate image storage" },
@@ -56,11 +56,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Storage is steady; transfer usually spikes during deploys, CI, or multi-region pulls.</li>
+      <li>If transfer dominates, optimize cache/pull patterns before trimming storage.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Stored GB</th>
+          <th>Egress GB</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Typical</td>
+          <td>Normal pull rate</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Spike</td>
+          <td>Release day / CI surge</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

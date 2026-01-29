@@ -11,6 +11,8 @@ export function AwsKmsCostCalculator() {
   const [pricePer10kRequestsUsd, setPricePer10kRequestsUsd] = useNumberParamState("AwsKmsCost.pricePer10kRequestsUsd", 0.03);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsKmsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsKmsCost.peakMultiplierPct", 180);
+  const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
+  const pricePerMillionRequestsUsd = pricePer10kRequestsUsd * 100;
 
   const result = useMemo(() => {
     return estimateKmsCost({
@@ -58,7 +60,9 @@ export function AwsKmsCostCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
-            <div className="hint">Total Encrypt/Decrypt/GenerateDataKey/etc. across services.</div>
+            <div className="hint">
+              Avg {formatNumber(requestsPerSecond, 2)} req/sec. Total Encrypt/Decrypt/GenerateDataKey/etc. across services.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / key-month)</div>
@@ -81,7 +85,7 @@ export function AwsKmsCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer10kRequestsUsd(+e.target.value)}
             />
-            <div className="hint">Use your effective region pricing and request type mix.</div>
+            <div className="hint">~{formatCurrency2(pricePerMillionRequestsUsd)} per 1M. Use your effective pricing mix.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

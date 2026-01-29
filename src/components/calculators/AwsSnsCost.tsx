@@ -13,6 +13,10 @@ export function AwsSnsCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsSnsCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSnsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSnsCost.peakMultiplierPct", 180);
+  const publishesPerSecond = publishesPerMonth / (30.4 * 24 * 3600);
+  const deliveriesPerSecond = deliveriesPerMonth / (30.4 * 24 * 3600);
+  const estimatedTransferGb = (deliveriesPerMonth * avgPayloadKb) / (1024 * 1024);
+  const estimatedTransferMbps = (estimatedTransferGb * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
     return estimateSnsCost({
@@ -69,7 +73,7 @@ export function AwsSnsCostCalculator() {
               step={1000}
               onChange={(e) => setPublishesPerMonth(+e.target.value)}
             />
-            <div className="hint">Number of Publish API calls (or equivalent).</div>
+            <div className="hint">Avg {formatNumber(publishesPerSecond, 2)} publishes/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Deliveries (per month)</div>
@@ -81,7 +85,7 @@ export function AwsSnsCostCalculator() {
               step={1000}
               onChange={(e) => setDeliveriesPerMonth(+e.target.value)}
             />
-            <div className="hint">Roughly messages x subscribers (after filtering).</div>
+            <div className="hint">Avg {formatNumber(deliveriesPerSecond, 2)} deliveries/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Publish price ($ / 1M)</div>
@@ -117,6 +121,9 @@ export function AwsSnsCostCalculator() {
               step={0.1}
               onChange={(e) => setAvgPayloadKb(+e.target.value)}
             />
+            <div className="hint">
+              ~{formatNumber(estimatedTransferGb, 2)} GB/month, {formatNumber(estimatedTransferMbps, 2)} Mbps.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Egress price ($ / GB)</div>
