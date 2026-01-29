@@ -24,6 +24,7 @@ export function KubernetesNodeCostCalculator() {
       daysPerMonth: clamp(daysPerMonth, 1, 31),
     });
   }, [nodes, pricePerHourUsd, utilizationPct, hoursPerDay, daysPerMonth]);
+  const costPerNode = nodes > 0 ? result.monthlyCostUsd / nodes : 0;
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -52,6 +53,7 @@ export function KubernetesNodeCostCalculator() {
               step={1}
               onChange={(e) => setNodes(+e.target.value)}
             />
+            <div className="hint">Avg {formatCurrency2(costPerNode)} per node-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price per node ($ / hour)</div>
@@ -233,6 +235,10 @@ export function KubernetesNodeCostCalculator() {
             <div className="v">
               {formatNumber(result.billableHoursPerInstance, 0)} hr ({formatPercent(result.utilizationPct, 0)})
             </div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per node</div>
+            <div className="v">{formatCurrency2(costPerNode)}</div>
           </div>
         </div>
 

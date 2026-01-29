@@ -15,6 +15,7 @@ export function AwsLoadBalancerCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLoadBalancerCost.peakMultiplierPct", 180);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const hourlyPerLb = normalizedHoursPerMonth * pricePerLbHourUsd;
 
   const result = useMemo(() => {
     return estimateLoadBalancerCost({
@@ -45,6 +46,7 @@ export function AwsLoadBalancerCostCalculator() {
     pricePerLbHourUsd,
     showPeakScenario,
   ]);
+  const usageSharePct = result.totalCostUsd > 0 ? (result.capacityCostUsd / result.totalCostUsd) * 100 : 0;
 
   return (
     <div className="calc-grid">
@@ -100,6 +102,7 @@ export function AwsLoadBalancerCostCalculator() {
               step={0.0001}
               onChange={(e) => setPricePerLbHourUsd(+e.target.value)}
             />
+            <div className="hint">Approx {formatCurrency2(hourlyPerLb)} per LB-month.</div>
           </div>
 
           <div className="field field-3">
@@ -250,6 +253,10 @@ export function AwsLoadBalancerCostCalculator() {
           <div className="kpi">
             <div className="k">Capacity unit-hours</div>
             <div className="v">{formatNumber(result.capacityUnitHours, 1)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Usage share</div>
+            <div className="v">{formatNumber(usageSharePct, 1)}%</div>
           </div>
         </div>
 

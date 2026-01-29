@@ -22,6 +22,11 @@ export function AwsRdsCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsRdsCost.peakMultiplierPct", 180);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const storageTb = storageGb / 1024;
+  const backupTb = backupGb / 1024;
+  const backupRatio = storageGb > 0 ? backupGb / storageGb : 0;
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const ioPerSecond = ioRequestsPerMonth / secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateRdsCost({
@@ -74,6 +79,7 @@ export function AwsRdsCostCalculator() {
     storageGb,
     normalizedHoursPerMonth,
   ]);
+  const billableHoursFleet = result.instances * normalizedHoursPerMonth;
 
   return (
     <div className="calc-grid">
@@ -113,6 +119,7 @@ export function AwsRdsCostCalculator() {
               step={1}
               onChange={(e) => setHoursPerDay(+e.target.value)}
             />
+            <div className="hint">Use 24 for always-on DBs.</div>
           </div>
           <div className="field field-3">
             <div className="label">Days/month</div>
@@ -141,6 +148,7 @@ export function AwsRdsCostCalculator() {
               step={1}
               onChange={(e) => setStorageGb(+e.target.value)}
             />
+            <div className="hint">Approx {formatNumber(storageTb, 2)} TB-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
@@ -164,6 +172,7 @@ export function AwsRdsCostCalculator() {
               step={1}
               onChange={(e) => setBackupGb(+e.target.value)}
             />
+            <div className="hint">Backup ratio {formatNumber(backupRatio * 100, 0)}%.</div>
           </div>
           <div className="field field-3">
             <div className="label">Backup price ($ / GB-month)</div>
@@ -187,6 +196,7 @@ export function AwsRdsCostCalculator() {
               step={1000}
               onChange={(e) => setIoRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(ioPerSecond, 1)} IOPS.</div>
           </div>
           <div className="field field-3">
             <div className="label">I/O price ($ / 1M requests)</div>
@@ -346,6 +356,10 @@ export function AwsRdsCostCalculator() {
           <div className="kpi">
             <div className="k">I/O requests (per month)</div>
             <div className="v">{formatNumber(result.ioRequestsPerMonth, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Billable hours (fleet)</div>
+            <div className="v">{formatNumber(billableHoursFleet, 0)} hr</div>
           </div>
         </div>
 

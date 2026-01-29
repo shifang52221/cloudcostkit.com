@@ -11,6 +11,8 @@ export function CdnRequestCostCalculator() {
   const [pricingUnit, setPricingUnit] = useStringParamState("CdnRequestCost.pricingUnit", "per10k", ["per10k", "per1m"] as const);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("CdnRequestCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("CdnRequestCost.peakMultiplierPct", 160);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const requestsPerSecond = requestsPerMonth / secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateRequestCostPer10k({
@@ -31,6 +33,7 @@ export function CdnRequestCostCalculator() {
   const priceInputLabel = pricingUnit === "per1m" ? "Price ($ / 1M requests)" : "Price ($ / 10k requests)";
   const priceInputValue = pricingUnit === "per1m" ? pricePer10kUsd * 100 : pricePer10kUsd;
   const effectivePer1m = pricePer10kUsd * 100;
+  const costPerMillion = result.requestsPerMonth > 0 ? (result.costUsd / result.requestsPerMonth) * 1_000_000 : 0;
 
   return (
     <div className="calc-grid">
@@ -47,6 +50,7 @@ export function CdnRequestCostCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Pricing unit</div>
@@ -177,6 +181,10 @@ export function CdnRequestCostCalculator() {
           <div className="kpi">
             <div className="k">Requests</div>
             <div className="v">{formatNumber(result.requestsPerMonth, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per 1M requests</div>
+            <div className="v">{formatCurrency2(costPerMillion)}</div>
           </div>
         </div>
 

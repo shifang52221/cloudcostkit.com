@@ -59,11 +59,43 @@ const description =
       <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If scans dominate, reduce query time ranges and pre-filter noisy fields.</li>
+      <li>If incident spikes dominate, limit dashboard refresh during outages.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
       <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB scanned/day</th>
+          <th>Query frequency</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Normal</td>
+          <td>Daily dashboards</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Incident queries</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

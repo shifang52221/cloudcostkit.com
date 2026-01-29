@@ -65,6 +65,12 @@ const description =
       <li><strong>Pricing</strong>: use region-specific LB-hour and LCU/NLCU-hour rates.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If usage share is high, focus on reducing LCU/NLCU drivers (connections, bytes, rule evals).</li>
+      <li>If fixed costs dominate, review the number of active load balancers.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
@@ -72,6 +78,32 @@ const description =
       <li>Entering LCU-hours/month as LCU per hour (overstates costs).</li>
       <li>Ignoring idle LBs that stay billed even with no traffic.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>LB count</th>
+          <th>Capacity units</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Current</td>
+          <td>Average</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Current</td>
+          <td>High</td>
+          <td>Launch or incident</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

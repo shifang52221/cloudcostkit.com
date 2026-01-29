@@ -12,6 +12,8 @@ export function AwsEcsTaskSizingCalculator() {
   const [targetUtilizationPct, setTargetUtilizationPct] = useNumberParamState("AwsEcsTaskSizing.targetUtilizationPct", 70);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEcsTaskSizing.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEcsTaskSizing.peakMultiplierPct", 180);
+  const totalCpuCapacityPerTask = vcpuPerTask * (targetUtilizationPct / 100);
+  const totalMemCapacityPerTask = memoryGbPerTask * (targetUtilizationPct / 100);
 
   const result = useMemo(() => {
     return estimateEcsTasks({
@@ -80,6 +82,7 @@ export function AwsEcsTaskSizingCalculator() {
               step={0.25}
               onChange={(e) => setVcpuPerTask(+e.target.value)}
             />
+            <div className="hint">Effective vCPU: {formatNumber(totalCpuCapacityPerTask, 2)}</div>
           </div>
           <div className="field field-3">
             <div className="label">Memory per task (GB)</div>
@@ -91,6 +94,7 @@ export function AwsEcsTaskSizingCalculator() {
               step={0.5}
               onChange={(e) => setMemoryGbPerTask(+e.target.value)}
             />
+            <div className="hint">Effective memory: {formatNumber(totalMemCapacityPerTask, 2)} GB</div>
           </div>
           <div className="field field-3">
             <div className="label">Target utilization (%)</div>

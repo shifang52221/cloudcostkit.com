@@ -14,6 +14,7 @@ export function AwsCloudwatchAlarmsCostCalculator() {
   const [pricePerCompositeAlarmUsdPerMonth, setPricePerCompositeAlarmUsdPerMonth] = useNumberParamState("AwsCloudwatchAlarmsCost.pricePerCompositeAlarmUsdPerMonth", 0.5);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsCloudwatchAlarmsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsCloudwatchAlarmsCost.peakMultiplierPct", 180);
+  const totalConfiguredAlarms = standardAlarms + highResAlarms + compositeAlarms;
 
   const result = useMemo(() => {
     return estimateCloudwatchAlarmsCost({
@@ -56,6 +57,8 @@ export function AwsCloudwatchAlarmsCostCalculator() {
   ]);
 
   const totalAlarms = result.standardAlarms + result.highResAlarms + result.compositeAlarms;
+  const highResSharePct = totalAlarms > 0 ? (result.highResAlarms / totalAlarms) * 100 : 0;
+  const compositeSharePct = totalAlarms > 0 ? (result.compositeAlarms / totalAlarms) * 100 : 0;
 
   return (
     <div className="calc-grid">
@@ -96,6 +99,7 @@ export function AwsCloudwatchAlarmsCostCalculator() {
               step={1}
               onChange={(e) => setCompositeAlarms(+e.target.value)}
             />
+            <div className="hint">Total configured: {formatNumber(totalConfiguredAlarms, 0)} alarms.</div>
           </div>
 
           <div className="field field-3">
@@ -259,6 +263,14 @@ export function AwsCloudwatchAlarmsCostCalculator() {
           <div className="kpi">
             <div className="k">Composite alarms</div>
             <div className="v">{formatCurrency2(result.compositeCostUsd)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">High-res share</div>
+            <div className="v">{formatNumber(highResSharePct, 1)}%</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Composite share</div>
+            <div className="v">{formatNumber(compositeSharePct, 1)}%</div>
           </div>
         </div>
 

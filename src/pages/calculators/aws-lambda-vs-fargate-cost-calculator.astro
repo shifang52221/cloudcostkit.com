@@ -69,12 +69,44 @@ const description =
       <li><strong>Schedule</strong>: hours/day and days/month should reflect actual Fargate uptime.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If Lambda is cheaper only at peak, consider hybrid: Lambda for bursts, Fargate for baseline.</li>
+      <li>If Fargate wins at baseline, check whether steady traffic makes always-on capacity more efficient.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using cold-start duration for all Lambda requests.</li>
       <li>Ignoring provisioned concurrency or steady background load.</li>
       <li>Mixing MB and GB when converting memory sizes.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Lambda requests</th>
+          <th>Fargate tasks</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Average</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Launch or incident</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

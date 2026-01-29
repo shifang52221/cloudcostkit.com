@@ -25,6 +25,7 @@ export function MetricsTimeseriesCostCalculator() {
       pricePerSeriesMonthUsd: clamp(pricePerSeriesMonthUsd, 0, 1e6),
     });
   }, [activeSeries, peakMultiplierPct, pricePerSeriesMonthUsd, showPeakScenario]);
+  const costPerThousand = result.activeSeries > 0 ? (result.monthlyCostUsd / result.activeSeries) * 1000 : 0;
 
   return (
     <div className="calc-grid">
@@ -41,6 +42,7 @@ export function MetricsTimeseriesCostCalculator() {
               step={100}
               onChange={(e) => setActiveSeries(+e.target.value)}
             />
+            <div className="hint">Cost per 1k series: {formatCurrency2(costPerThousand)}</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / series-month)</div>

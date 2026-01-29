@@ -15,6 +15,8 @@ export function AwsNatGatewayCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsNatGatewayCost.peakMultiplierPct", 180);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const avgMbps = (dataProcessedGbPerMonth * 8000) / secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateNatGatewayCost({
@@ -45,6 +47,7 @@ export function AwsNatGatewayCostCalculator() {
     pricePerNatGatewayHourUsd,
     showPeakScenario,
   ]);
+  const trafficSharePct = result.totalCostUsd > 0 ? (result.dataProcessingCostUsd / result.totalCostUsd) * 100 : 0;
 
   return (
     <div className="calc-grid">
@@ -112,6 +115,7 @@ export function AwsNatGatewayCostCalculator() {
               step={1}
               onChange={(e) => setDataProcessedGbPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg throughput {formatNumber(avgMbps, 2)} Mbps.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / GB processed)</div>
@@ -247,6 +251,10 @@ export function AwsNatGatewayCostCalculator() {
           <div className="kpi">
             <div className="k">GB processed</div>
             <div className="v">{formatNumber(result.dataProcessedGbPerMonth, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Traffic share</div>
+            <div className="v">{formatNumber(trafficSharePct, 1)}%</div>
           </div>
         </div>
 

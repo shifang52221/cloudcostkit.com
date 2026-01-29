@@ -27,6 +27,7 @@ export function AwsFargateCostCalculator() {
       pricePerGbHourUsd: clamp(pricePerGbHourUsd, 0, 1e3),
     });
   }, [tasks, vcpuPerTask, memoryGbPerTask, normalizedHoursPerMonth, pricePerVcpuHourUsd, pricePerGbHourUsd]);
+  const costPerTask = tasks > 0 ? result.totalCostUsd / tasks : 0;
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
@@ -65,6 +66,7 @@ export function AwsFargateCostCalculator() {
               step={1}
               onChange={(e) => setTasks(+e.target.value)}
             />
+            <div className="hint">Avg {formatCurrency2(costPerTask)} per task-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">vCPU per task</div>
@@ -290,6 +292,10 @@ export function AwsFargateCostCalculator() {
           <div className="kpi">
             <div className="k">Memory cost</div>
             <div className="v">{formatCurrency2(result.memoryCostUsd)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per task</div>
+            <div className="v">{formatCurrency2(costPerTask)}</div>
           </div>
         </div>
 

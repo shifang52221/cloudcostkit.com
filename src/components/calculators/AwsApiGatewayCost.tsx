@@ -11,6 +11,8 @@ export function AwsApiGatewayCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsApiGatewayCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsApiGatewayCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsApiGatewayCost.peakMultiplierPct", 180);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const requestsPerSecond = requestsPerMonth / secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateApiGatewayCost({
@@ -31,6 +33,8 @@ export function AwsApiGatewayCostCalculator() {
       egressPricePerGbUsd: clamp(egressPricePerGbUsd, 0, 1e6),
     });
   }, [avgResponseKb, egressPricePerGbUsd, peakMultiplierPct, pricePerMillionRequestsUsd, requestsPerMonth, showPeakScenario]);
+  const costPerMillionRequests = result.requestsPerMonth > 0 ? (result.totalCostUsd / result.requestsPerMonth) * 1_000_000 : 0;
+  const transferPerRequestKb = result.requestsPerMonth > 0 ? (result.transferGb * 1024 * 1024) / result.requestsPerMonth : 0;
 
   return (
     <div className="calc-grid">
@@ -47,6 +51,7 @@ export function AwsApiGatewayCostCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Request price ($ / 1M requests)</div>
@@ -201,6 +206,14 @@ export function AwsApiGatewayCostCalculator() {
           <div className="kpi">
             <div className="k">Estimated transfer (GB/month)</div>
             <div className="v">{formatNumber(result.transferGb, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per 1M requests</div>
+            <div className="v">{formatCurrency2(costPerMillionRequests)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Transfer per request</div>
+            <div className="v">{formatNumber(transferPerRequestKb, 2)} KB</div>
           </div>
         </div>
 

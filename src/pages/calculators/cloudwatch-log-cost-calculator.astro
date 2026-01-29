@@ -74,6 +74,43 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul>
+      <li>If ingestion dominates, reduce verbose logs or drop noisy sources at ingest.</li>
+      <li>If retention dominates, shorten retention or move cold logs to cheaper storage.</li>
+      <li>If scans dominate, narrow Insights queries and reduce dashboard refresh frequency.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Ingestion</th>
+          <th>Retention</th>
+          <th>Insights scans</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Current policy</td>
+          <td>Typical dashboards</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same policy</td>
+          <td>Incident queries</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Validate after changes</h2>
     <ul>
       <li>Validate ingestion GB/day for your largest log groups (ingress, API, audit).</li>

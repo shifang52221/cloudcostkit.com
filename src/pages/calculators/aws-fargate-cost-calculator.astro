@@ -71,12 +71,44 @@ const description =
       <li><strong>Schedule</strong>: hours/day and days/month should reflect real uptime windows.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If memory cost dominates, right-size memory per task or adjust task count.</li>
+      <li>If vCPU cost dominates, check CPU utilization and consider lower vCPU per task.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using peak task count as the average baseline.</li>
       <li>Mixing MB and GB for memory inputs.</li>
       <li>Assuming data transfer or logs are included in compute.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Tasks</th>
+          <th>vCPU</th>
+          <th>Memory</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Configured</td>
+          <td>Configured</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Configured</td>
+          <td>Configured</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

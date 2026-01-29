@@ -13,6 +13,11 @@ export function AwsLambdaCostCalculator() {
   const [includeFreeTier, setIncludeFreeTier] = useBooleanParamState("AwsLambdaCost.includeFreeTier", true);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsLambdaCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLambdaCost.peakMultiplierPct", 180);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const invocationsPerSecond = invocationsPerMonth / secondsPerMonth;
+  const avgDurationSec = avgDurationMs / 1000;
+  const memoryGb = memoryMb / 1024;
+  const gbSecondsPerInvocation = avgDurationSec * memoryGb;
 
   const result = useMemo(() => {
     return estimateLambdaCost({
@@ -55,6 +60,9 @@ export function AwsLambdaCostCalculator() {
     pricePerMillionRequestsUsd,
     showPeakScenario,
   ]);
+  const costPerMillionInvocations = result.billableInvocations > 0
+    ? (result.totalCostUsd / result.billableInvocations) * 1_000_000
+    : 0;
 
   return (
     <div className="calc-grid">
@@ -71,6 +79,7 @@ export function AwsLambdaCostCalculator() {
               step={1000}
               onChange={(e) => setInvocationsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(invocationsPerSecond, 2)} req/sec.</div>
           </div>
 
           <div className="field field-3">
@@ -83,6 +92,7 @@ export function AwsLambdaCostCalculator() {
               step={1}
               onChange={(e) => setAvgDurationMs(+e.target.value)}
             />
+            <div className="hint">{formatNumber(avgDurationSec, 3)} sec avg runtime.</div>
           </div>
 
           <div className="field field-3">
@@ -95,6 +105,7 @@ export function AwsLambdaCostCalculator() {
               step={64}
               onChange={(e) => setMemoryMb(+e.target.value)}
             />
+            <div className="hint">{formatNumber(memoryGb, 2)} GB billed memory.</div>
           </div>
 
           <div className="field field-3">
@@ -130,6 +141,7 @@ export function AwsLambdaCostCalculator() {
               />
               Include AWS free tier
             </label>
+            <div className="hint">Deducts 1M requests + 400k GB-sec.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
@@ -278,6 +290,14 @@ export function AwsLambdaCostCalculator() {
           <div className="kpi">
             <div className="k">Billable GB-seconds</div>
             <div className="v">{formatNumber(result.billableGbSeconds, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per 1M invocations</div>
+            <div className="v">{formatCurrency2(costPerMillionInvocations)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">GB-sec per invocation</div>
+            <div className="v">{formatNumber(gbSecondsPerInvocation, 6)}</div>
           </div>
         </div>
 

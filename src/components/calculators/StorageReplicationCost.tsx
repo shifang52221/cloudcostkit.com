@@ -9,6 +9,8 @@ export function StorageReplicationCostCalculator() {
   const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("StorageReplicationCost.pricePerGbUsd", 0.02);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("StorageReplicationCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("StorageReplicationCost.peakMultiplierPct", 180);
+  const gbPerDay = replicatedGbPerMonth / 30.4;
+  const avgMbps = (replicatedGbPerMonth * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
     return estimateReplicationCost({
@@ -40,6 +42,9 @@ export function StorageReplicationCostCalculator() {
               min={0}
               onChange={(e) => setReplicatedGbPerMonth(+e.target.value)}
             />
+            <div className="hint">
+              ~{formatNumber(gbPerDay, 2)} GB/day, {formatNumber(avgMbps, 2)} Mbps.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / GB)</div>

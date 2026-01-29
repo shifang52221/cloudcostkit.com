@@ -54,11 +54,43 @@ const description =
       <li><strong>API polling</strong>: add dashboard refresh and automation polling scenarios.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>High-res and composite alarms grow cost quickly; review their share of total alarms.</li>
+      <li>Alarm sprawl is often the real driver, not price changes.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/high-cardinality scenarios.</li>
       <li>Forgetting API polling and dashboard refresh costs.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Standard</th>
+          <th>High-res</th>
+          <th>Composite</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Limited</td>
+          <td>Critical only</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Higher</td>
+          <td>High</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

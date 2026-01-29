@@ -14,6 +14,10 @@ export function AwsDynamoDbCostCalculator() {
 
   const [storageGb, setStorageGb] = useNumberParamState("AwsDynamoDbCost.storageGb", 200);
   const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsDynamoDbCost.pricePerGbMonthUsd", 0.25);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const readsPerSecond = readRequestsPerMonth / secondsPerMonth;
+  const writesPerSecond = writeRequestsPerMonth / secondsPerMonth;
+  const storageTb = storageGb / 1024;
 
   const result = useMemo(() => {
     return estimateDynamoDbCost({
@@ -54,6 +58,9 @@ export function AwsDynamoDbCostCalculator() {
     storageGb,
     writeRequestsPerMonth,
   ]);
+  const costPerMillionRequests = result.totalRequestsPerMonth > 0
+    ? (result.totalCostUsd / result.totalRequestsPerMonth) * 1_000_000
+    : 0;
 
   return (
     <div className="calc-grid">
@@ -70,6 +77,7 @@ export function AwsDynamoDbCostCalculator() {
               step={1000}
               onChange={(e) => setReadRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(readsPerSecond, 2)} RPS.</div>
           </div>
           <div className="field field-3">
             <div className="label">Write requests (per month)</div>
@@ -81,6 +89,7 @@ export function AwsDynamoDbCostCalculator() {
               step={1000}
               onChange={(e) => setWriteRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(writesPerSecond, 2)} RPS.</div>
           </div>
 
           <div className="field field-3">
@@ -116,6 +125,7 @@ export function AwsDynamoDbCostCalculator() {
               step={1}
               onChange={(e) => setStorageGb(+e.target.value)}
             />
+            <div className="hint">Approx {formatNumber(storageTb, 2)} TB-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
@@ -259,6 +269,10 @@ export function AwsDynamoDbCostCalculator() {
           <div className="kpi">
             <div className="k">Write requests</div>
             <div className="v">{formatNumber(result.writeRequestsPerMonth, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per 1M requests</div>
+            <div className="v">{formatCurrency2(costPerMillionRequests)}</div>
           </div>
         </div>
 

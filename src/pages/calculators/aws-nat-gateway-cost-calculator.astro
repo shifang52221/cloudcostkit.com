@@ -73,6 +73,12 @@ const description =
       </li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If traffic share is high, focus on data path changes (endpoints, caching, or egress routing).</li>
+      <li>If hourly share dominates, review gateway count and uptime windows.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Modeling only the hourly fee and ignoring GB processed (usually the bigger driver).</li>
@@ -81,6 +87,32 @@ const description =
       <li>Assuming endpoints automatically replace NAT without checking the traffic mix.</li>
       <li>Estimating GB from peak throughput without averaging over the month.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Gateways</th>
+          <th>GB processed</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Current</td>
+          <td>Expected</td>
+          <td>Normal releases</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Current</td>
+          <td>High</td>
+          <td>Patch/upgrade window</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

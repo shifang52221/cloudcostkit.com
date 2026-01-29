@@ -70,6 +70,8 @@ export function KubernetesRequestsLimitsCalculator() {
 
   const peakPods = Math.ceil(clamp(pods, 0, 1e8) * (clamp(peakPodMultiplierPct, 100, 1000) / 100));
   const peakDeltaNodes = peakResult.nodesNeededForRequests - result.nodesNeededForRequests;
+  const cpuRequestCoresPerPod = cpuRequestMillicores / 1000;
+  const memRequestGiBPerPod = memRequestMiB / 1024;
 
   const bottleneckLabel = (r: typeof result) => {
     const maxNodes = r.nodesNeededForRequests;
@@ -106,6 +108,7 @@ export function KubernetesRequestsLimitsCalculator() {
               step={10}
               onChange={(e) => setCpuRequestMillicores(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(cpuRequestCoresPerPod, 2)} cores per pod.</div>
           </div>
           <div className="field field-3">
             <div className="label">Memory request (MiB / pod)</div>
@@ -117,6 +120,7 @@ export function KubernetesRequestsLimitsCalculator() {
               step={32}
               onChange={(e) => setMemRequestMiB(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(memRequestGiBPerPod, 2)} GiB per pod.</div>
           </div>
           <div className="field field-3">
             <div className="label">CPU limit (mCPU / pod)</div>

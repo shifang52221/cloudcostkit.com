@@ -70,12 +70,44 @@ const description =
       <li><strong>Schedule</strong>: hours/day and days/month should reflect cluster uptime, not pod CPU usage.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If baseline cost is high, check node type and average node count assumptions.</li>
+      <li>Large peak deltas usually indicate aggressive autoscaling or workload seasonality.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Mixing pod utilization with node uptime (different concepts).</li>
       <li>Forgetting system nodes, headroom, or buffer capacity.</li>
       <li>Ignoring control plane fees and add-ons in total cost.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Nodes</th>
+          <th>Hourly rate</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Current</td>
+          <td>Normal autoscaling</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Current</td>
+          <td>Seasonal spike</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

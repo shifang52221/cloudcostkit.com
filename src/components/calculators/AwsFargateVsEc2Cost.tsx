@@ -85,6 +85,9 @@ export function AwsFargateVsEc2CostCalculator() {
     });
   }, [instances, normalizedDaysPerMonth, peakMultiplierPct, pricePerInstanceHourUsd, showPeakScenario]);
 
+  const fargateCostPerTask = tasks > 0 ? fargate.totalCostUsd / tasks : 0;
+  const ec2CostPerInstance = instances > 0 ? ec2.monthlyCostUsd / instances : 0;
+
   const deltaUsd = fargate.totalCostUsd - ec2.monthlyCostUsd;
   const winner = deltaUsd > 0 ? "EC2" : deltaUsd < 0 ? "Fargate" : "Tie";
   const deltaPct = ec2.monthlyCostUsd > 0 ? (Math.abs(deltaUsd) / ec2.monthlyCostUsd) * 100 : 0;
@@ -166,6 +169,7 @@ export function AwsFargateVsEc2CostCalculator() {
               step={1}
               onChange={(e) => setTasks(+e.target.value)}
             />
+            <div className="hint">Avg {formatCurrency2(fargateCostPerTask)} per task-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">vCPU per task</div>
@@ -231,6 +235,7 @@ export function AwsFargateVsEc2CostCalculator() {
               step={1}
               onChange={(e) => setInstances(+e.target.value)}
             />
+            <div className="hint">Avg {formatCurrency2(ec2CostPerInstance)} per instance-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / instance-hour)</div>
@@ -272,6 +277,14 @@ export function AwsFargateVsEc2CostCalculator() {
                 ({formatPercent(deltaPct, 0)} vs EC2)
               </span>
             </div>
+          </div>
+          <div className="kpi">
+            <div className="k">Fargate cost per task</div>
+            <div className="v">{formatCurrency2(fargateCostPerTask)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">EC2 cost per instance</div>
+            <div className="v">{formatCurrency2(ec2CostPerInstance)}</div>
           </div>
         </div>
 

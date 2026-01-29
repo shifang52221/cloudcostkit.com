@@ -15,6 +15,8 @@ export function AwsCloudwatchMetricsCostCalculator() {
   const [pricePerThousandApiRequestsUsd, setPricePerThousandApiRequestsUsd] = useNumberParamState("AwsCloudwatchMetricsCost.pricePerThousandApiRequestsUsd", 0.01);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsCloudwatchMetricsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsCloudwatchMetricsCost.peakMultiplierPct", 160);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const apiRequestsPerSecond = apiRequestsPerMonth / secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateCloudwatchMetricsCost({
@@ -63,6 +65,7 @@ export function AwsCloudwatchMetricsCostCalculator() {
     pricePerThousandApiRequestsUsd,
     showPeakScenario,
   ]);
+  const metricsSharePct = result.totalCostUsd > 0 ? (result.metricsCostUsd / result.totalCostUsd) * 100 : 0;
 
   return (
     <div className="calc-grid">
@@ -148,6 +151,7 @@ export function AwsCloudwatchMetricsCostCalculator() {
               step={1000}
               onChange={(e) => setApiRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(apiRequestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">API price ($ / 1k requests)</div>
@@ -299,6 +303,10 @@ export function AwsCloudwatchMetricsCostCalculator() {
           <div className="kpi">
             <div className="k">API requests (per month)</div>
             <div className="v">{formatNumber(result.apiRequestsPerMonth, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Metrics share</div>
+            <div className="v">{formatNumber(metricsSharePct, 1)}%</div>
           </div>
         </div>
 

@@ -66,11 +66,46 @@ const description =
       <li><strong>API polling</strong>: add dashboard refresh and automation polling scenarios.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If metrics dominate, reduce custom metric count or high-cardinality dimensions.</li>
+      <li>If API polling dominates, reduce dashboard refresh and automation query frequency.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/high-cardinality scenarios.</li>
       <li>Forgetting API polling and dashboard refresh costs.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Metrics</th>
+          <th>Alarms</th>
+          <th>Dashboards</th>
+          <th>API requests</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Expected</td>
+          <td>Current</td>
+          <td>Normal</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Incident polling</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

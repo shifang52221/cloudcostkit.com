@@ -68,12 +68,47 @@ const description =
       <li><strong>I/O</strong>: use engine metrics or billing for I/O request volume.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If backups are a large share, review retention and snapshot lifecycle policies.</li>
+      <li>If I/O is dominant, evaluate storage type and workload patterns before scaling instance size.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Ignoring backup storage growth and retention creep.</li>
       <li>Using allocated storage as a constant without growth assumptions.</li>
       <li>Forgetting I/O pricing for engines that charge per request.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Instances</th>
+          <th>Storage</th>
+          <th>Backups</th>
+          <th>I/O</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Average</td>
+          <td>Retention plan</td>
+          <td>Normal workload</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Same or +1</td>
+          <td>Growth</td>
+          <td>Higher churn</td>
+          <td>Batch/backfill</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

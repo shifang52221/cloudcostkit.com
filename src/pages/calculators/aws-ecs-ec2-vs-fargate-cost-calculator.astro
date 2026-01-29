@@ -65,11 +65,43 @@ const description =
       <li><strong>Scope</strong>: compute-only; add load balancers, logs, and transfer separately.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If Fargate wins only at peak, consider mixed capacity: EC2 baseline + Fargate burst.</li>
+      <li>If EC2 wins, confirm you can keep instances utilized and commitments aligned.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Comparing peak tasks to average instances (or vice versa).</li>
       <li>Ignoring EC2 packing efficiency and idle capacity.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Fargate tasks</th>
+          <th>EC2 instances</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Average</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Launch or incident</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

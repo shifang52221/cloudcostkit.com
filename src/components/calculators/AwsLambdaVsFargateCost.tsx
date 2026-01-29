@@ -24,6 +24,9 @@ export function AwsLambdaVsFargateCostCalculator() {
   const [pricePerGbHourUsd, setPricePerGbHourUsd] = useNumberParamState("AwsLambdaVsFargateCost.pricePerGbHourUsd", 0.004445);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const lambdaRps = invocationsPerMonth / secondsPerMonth;
+  const lambdaGbSecondsPerInvocation = (avgDurationMs / 1000) * (memoryMb / 1024);
 
   const lambda = useMemo(() => {
     return estimateLambdaCost({
@@ -104,6 +107,11 @@ export function AwsLambdaVsFargateCostCalculator() {
   const winner = deltaUsd > 0 ? "Lambda" : deltaUsd < 0 ? "Fargate" : "Tie";
   const deltaPct =
     lambda.totalCostUsd > 0 ? (Math.abs(deltaUsd) / lambda.totalCostUsd) * 100 : deltaUsd !== 0 ? 100 : 0;
+  const lambdaCostPerMillion = lambda.billableInvocations > 0
+    ? (lambda.totalCostUsd / lambda.billableInvocations) * 1_000_000
+    : 0;
+  const fargateCostPerTask = tasks > 0 ? fargate.totalCostUsd / tasks : 0;
+  const hoursPerTask = normalizedHoursPerMonth;
 
   return (
     <div className="calc-grid">
@@ -120,6 +128,7 @@ export function AwsLambdaVsFargateCostCalculator() {
               step={1000}
               onChange={(e) => setInvocationsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(lambdaRps, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Avg duration (ms)</div>
@@ -142,6 +151,7 @@ export function AwsLambdaVsFargateCostCalculator() {
               step={64}
               onChange={(e) => setMemoryMb(+e.target.value)}
             />
+            <div className="hint">{formatNumber(lambdaGbSecondsPerInvocation, 6)} GB-sec per invocation.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / 1M requests)</div>
@@ -174,6 +184,7 @@ export function AwsLambdaVsFargateCostCalculator() {
               />
               Include AWS free tier
             </label>
+            <div className="hint">Deducts 1M requests + 400k GB-sec.</div>
           </div>
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -314,6 +325,17 @@ export function AwsLambdaVsFargateCostCalculator() {
               <span className="muted" style={{ fontSize: 12 }}>
                 ({formatPercent(deltaPct, 0)} vs Lambda)
               </span>
+            </div>
+          </div>
+          <div className="kpi">
+            <div className="k">Lambda cost per 1M</div>
+            <div className="v">{formatCurrency2(lambdaCostPerMillion)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Fargate cost per task</div>
+            <div className="v">
+              {formatCurrency2(fargateCostPerTask)}{" "}
+              <span className="muted" style={{ fontSize: 12 }}>({formatNumber(hoursPerTask, 0)} hr)</span>
             </div>
           </div>
         </div>

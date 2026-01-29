@@ -15,6 +15,7 @@ export function AwsEbsCostCalculator() {
   const [pricePerMbpsMonthUsd, setPricePerMbpsMonthUsd] = useNumberParamState("AwsEbsCost.pricePerMbpsMonthUsd", 0.04);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEbsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEbsCost.peakMultiplierPct", 160);
+  const storageTb = storageGb / 1024;
 
   const result = useMemo(() => {
     return estimateEbsCost({
@@ -55,6 +56,8 @@ export function AwsEbsCostCalculator() {
     showPeakScenario,
     storageGb,
   ]);
+  const perfCostUsd = result.iopsCostUsd + result.throughputCostUsd;
+  const perfSharePct = result.totalCostUsd > 0 ? (perfCostUsd / result.totalCostUsd) * 100 : 0;
 
   return (
     <div className="calc-grid">
@@ -71,6 +74,7 @@ export function AwsEbsCostCalculator() {
               step={1}
               onChange={(e) => setStorageGb(+e.target.value)}
             />
+            <div className="hint">Approx {formatNumber(storageTb, 2)} TB-month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
@@ -260,6 +264,10 @@ export function AwsEbsCostCalculator() {
           <div className="kpi">
             <div className="k">MB/s-month</div>
             <div className="v">{formatNumber(result.provisionedThroughputMbps, 0)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Performance share</div>
+            <div className="v">{formatNumber(perfSharePct, 1)}%</div>
           </div>
         </div>
 

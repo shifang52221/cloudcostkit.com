@@ -65,4 +65,40 @@ const description =
       <li>Validate what the vendor bills for cold tiers (stored bytes vs ingested bytes, plus retrieval charges).</li>
     </ul>
   </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul>
+      <li>If cold storage dominates, review archive fraction and compression assumptions.</li>
+      <li>If hot storage dominates, shorten hot window or reduce ingestion volume.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB/day</th>
+          <th>Hot days</th>
+          <th>Cold days</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Current policy</td>
+          <td>Current archive</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same policy</td>
+          <td>Same archive</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </CalculatorLayout>

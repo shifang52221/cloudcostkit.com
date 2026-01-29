@@ -59,6 +59,7 @@ export function LogIngestionCostCalculator() {
       ingestCostUsd,
     };
   }, [peakMultiplierPct, result, showPeakScenario]);
+  const avgMbps = (result.gbPerDayIngest * 8000) / SECONDS_PER_DAY;
 
   return (
     <div className="calc-grid">
@@ -91,6 +92,7 @@ export function LogIngestionCostCalculator() {
                 ? `Derived from events: ${formatNumber(result.gbPerDayFromEvents, 2)} GB/day.`
                 : "If you have measured ingestion, use it directly."}
             </div>
+            <div className="hint">Avg {formatNumber(avgMbps, 2)} Mbps ingest.</div>
           </div>
 
           <div className="field field-3">

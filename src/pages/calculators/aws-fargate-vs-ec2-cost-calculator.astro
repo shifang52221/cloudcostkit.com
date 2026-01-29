@@ -68,11 +68,43 @@ const description =
       <li><strong>Scope</strong>: this is compute-only; add logs, transfer, and load balancers separately.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>If Fargate wins, verify EC2 packing efficiency and idle capacity assumptions.</li>
+      <li>If EC2 wins, confirm you can sustain steady utilization and use commitments effectively.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Comparing peak Fargate usage to average EC2 usage (or vice versa).</li>
       <li>Ignoring EC2 packing efficiency and idle capacity.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Fargate tasks</th>
+          <th>EC2 instances</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Average</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Launch or incident</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

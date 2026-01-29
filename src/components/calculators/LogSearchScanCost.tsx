@@ -9,6 +9,8 @@ export function LogSearchScanCostCalculator() {
   const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("LogSearchScanCost.pricePerGbUsd", 0.005);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogSearchScanCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogSearchScanCost.peakMultiplierPct", 150);
+  const avgMbps = (gbScannedPerDay * 8000) / (24 * 3600);
+  const scansPerSecondGb = gbScannedPerDay / (24 * 3600);
 
   const result = useMemo(() => {
     return estimateLogScanCost({
@@ -40,6 +42,9 @@ export function LogSearchScanCostCalculator() {
               min={0}
               onChange={(e) => setGbScannedPerDay(+e.target.value)}
             />
+            <div className="hint">
+              Avg {formatNumber(avgMbps, 2)} Mbps scanning, {formatNumber(scansPerSecondGb, 4)} GB/sec.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Scan price ($ / GB)</div>
@@ -109,6 +114,10 @@ export function LogSearchScanCostCalculator() {
           <div className="kpi">
             <div className="k">Estimated monthly scan cost</div>
             <div className="v">{formatCurrency2(result.monthlyCostUsd)}</div>
+          </div>
+          <div className="kpi">
+            <div className="k">Cost per GB scanned</div>
+            <div className="v">{formatCurrency2(result.pricePerGbUsd)} / GB</div>
           </div>
         </div>
 

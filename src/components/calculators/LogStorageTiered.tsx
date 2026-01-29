@@ -16,6 +16,8 @@ export function LogStorageTieredCostCalculator() {
   const [coldCompressionRatio, setColdCompressionRatio] = useNumberParamState("LogStorageTiered.coldCompressionRatio", 1);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogStorageTiered.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogStorageTiered.peakMultiplierPct", 150);
+  const archivePct = clamp(archiveFraction, 0, 1) * 100;
+  const compressionPct = clamp(coldCompressionRatio, 0, 1) * 100;
 
   const result = useMemo(() => {
     const safeGbPerDay = clamp(gbPerDay, 0, 1e12);
@@ -209,7 +211,7 @@ export function LogStorageTieredCostCalculator() {
               onChange={(e) => setArchiveFraction(+e.target.value)}
               disabled={!enableColdTier}
             />
-            <div className="hint">If you only archive a subset (e.g., audit logs), set a fraction.</div>
+            <div className="hint">Archive fraction: {formatNumber(archivePct, 0)}%.</div>
           </div>
 
           <div className="field field-3">
@@ -224,7 +226,7 @@ export function LogStorageTieredCostCalculator() {
               onChange={(e) => setColdCompressionRatio(+e.target.value)}
               disabled={!enableColdTier}
             />
-            <div className="hint">Use 1 if the vendor bills on the same GB for cold storage.</div>
+            <div className="hint">Compression ratio: {formatNumber(compressionPct, 0)}%.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
