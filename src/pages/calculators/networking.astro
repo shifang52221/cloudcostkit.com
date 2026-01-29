@@ -104,6 +104,15 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
     </ul>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validate after changes</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Verify boundary splits (internet, cross-AZ, cross-region) in billing exports.</li>
+      <li>Check cache hit rates and origin egress after CDN changes.</li>
+      <li>Review flow logs or transfer metrics after routing updates.</li>
+    </ul>
+  </section>
+
   <section class="section">
     <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
   </section>

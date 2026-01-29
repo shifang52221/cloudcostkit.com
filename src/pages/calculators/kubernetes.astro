@@ -102,6 +102,15 @@ const tools = TOOLS.filter((t) => t.category === "Kubernetes");
     </ul>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validate after changes</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Check node-hours and pod density after resizing requests/limits.</li>
+      <li>Validate load balancer counts and capacity units after service changes.</li>
+      <li>Confirm log ingestion and metrics series after observability tweaks.</li>
+    </ul>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} Kubernetes tools</div>
     <div class="grid">

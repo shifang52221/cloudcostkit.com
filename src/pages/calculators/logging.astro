@@ -85,6 +85,15 @@ const tools = TOOLS.filter((t) => t.category === "Logging");
     </ul>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validate after changes</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Compare ingestion GB/day to billing usage types after policy changes.</li>
+      <li>Check retention policies for each log group or bucket.</li>
+      <li>Review query scan volume after dashboard or alert updates.</li>
+    </ul>
+  </section>
+
   <section class="section">
     <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
   </section>
