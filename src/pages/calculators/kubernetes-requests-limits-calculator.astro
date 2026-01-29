@@ -56,7 +56,7 @@ const description =
       a: "Use the resulting node count with the Kubernetes Node Cost Calculator, and add control plane, load balancers, storage, and observability costs separately."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost calculator" },
     { href: "/guides/kubernetes-requests-limits", label: "Guide: requests & limits" },
@@ -77,11 +77,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests drive scheduling; limits represent burst risk and OOM risk.</li>
+      <li>Pod caps can exceed CPU/memory as the limiting factor.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Pods</th>
+          <th>Requests</th>
+          <th>Pod cap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Typical</td>
+          <td>110</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>110</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

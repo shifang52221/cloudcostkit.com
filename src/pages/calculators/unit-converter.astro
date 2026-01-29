@@ -42,7 +42,7 @@ const description =
       a: "No. It's a simplified estimate. Real workloads vary by peak/off-peak patterns and protocol overhead."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
@@ -58,11 +58,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>GB vs GiB differences matter for storage bills; Mbps vs MB/s matters for throughput charts.</li>
+      <li>Monthly transfer uses utilization and time windows, not peak Mbps.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Mbps</th>
+          <th>Utilization</th>
+          <th>GB/month</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Typical</td>
+          <td>Derived</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Higher</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

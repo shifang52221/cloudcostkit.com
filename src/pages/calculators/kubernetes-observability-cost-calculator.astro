@@ -39,7 +39,7 @@ const description =
       a: "Reduce noisy logs at source, limit high-cardinality labels, and define retention tiers based on value.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/kubernetes-cost-calculator", label: "Kubernetes cost calculator" },
     { href: "/calculators/cloudwatch-metrics-cost-calculator", label: "CloudWatch Metrics cost" },
@@ -64,11 +64,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Logs and metrics are separate drivers; tune them independently.</li>
+      <li>High-cardinality metrics can outpace logs even at low GB/day.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Log GB/day</th>
+          <th>Active series</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Expected</td>
+          <td>Normal ops</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Incident/debug</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

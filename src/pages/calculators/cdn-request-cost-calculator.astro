@@ -50,7 +50,7 @@ const description =
       a: "Transport protocols can change connection behavior, but billing is usually based on requests rather than connections. Use your CDN's definition of a billable request."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
@@ -89,11 +89,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests scale with cache misses, bot traffic, and chatty clients.</li>
+      <li>If request fees dominate, focus on caching and request consolidation.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Requests</th>
+          <th>Class</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Default</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Bot/incident</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

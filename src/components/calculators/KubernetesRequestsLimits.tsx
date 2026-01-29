@@ -15,6 +15,8 @@ export function KubernetesRequestsLimitsCalculator() {
   const [nodeAllocatablePct, setNodeAllocatablePct] = useNumberParamState("KubernetesRequestsLimits.nodeAllocatablePct", 90);
   const [maxPodsPerNode, setMaxPodsPerNode] = useNumberParamState("KubernetesRequestsLimits.maxPodsPerNode", 110);
   const [peakPodMultiplierPct, setPeakPodMultiplierPct] = useNumberParamState("KubernetesRequestsLimits.peakPodMultiplierPct", 125);
+  const allocatableCpuCores = nodeCpuCores * (nodeAllocatablePct / 100);
+  const allocatableMemGiB = nodeMemGiB * (nodeAllocatablePct / 100);
 
   const result = useMemo(() => {
     return estimateK8sResources({
@@ -179,6 +181,9 @@ export function KubernetesRequestsLimitsCalculator() {
               onChange={(e) => setNodeAllocatablePct(+e.target.value)}
             />
             <div className="hint">Reserve capacity for kubelet/daemonsets/overhead.</div>
+            <div className="hint">
+              ~{formatNumber(allocatableCpuCores, 2)} cores, {formatNumber(allocatableMemGiB, 2)} GiB allocatable.
+            </div>
           </div>
 
           <div className="field field-3">

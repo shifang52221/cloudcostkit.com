@@ -14,6 +14,8 @@ export function ReservedBreakEvenCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ReservedBreakEven.peakMultiplierPct", 200);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const onDemandMonthlyAtSchedule = onDemandHourlyUsd * normalizedHoursPerMonth;
+  const reservedMonthlyAtSchedule = reservedHourlyUsd * normalizedHoursPerMonth;
 
   const result = useMemo(() => {
     return estimateReservedBreakEven({
@@ -57,6 +59,7 @@ export function ReservedBreakEvenCalculator() {
               step={0.001}
               onChange={(e) => setOnDemandHourlyUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(onDemandMonthlyAtSchedule)} / month at current schedule.</div>
           </div>
           <div className="field field-3">
             <div className="label">Committed ($ / hour)</div>
@@ -68,6 +71,7 @@ export function ReservedBreakEvenCalculator() {
               step={0.001}
               onChange={(e) => setReservedHourlyUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(reservedMonthlyAtSchedule)} / month at current schedule.</div>
           </div>
           <div className="field field-3">
             <div className="label">Upfront cost ($)</div>

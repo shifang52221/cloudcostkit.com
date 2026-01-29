@@ -82,6 +82,26 @@ const tools = TOOLS.filter((t) => t.category === "Kubernetes");
     </ul>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If node cost dominates, validate requests sizing and headroom assumptions first.</li>
+      <li>If load balancers dominate, count services and idle exposure patterns carefully.</li>
+      <li>If logging dominates, check retention and sampling before reducing compute.</li>
+      <li>Use a peak scenario to account for deploy spikes and scaling storms.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: average requests, steady replicas, and normal log ingestion.</li>
+      <li>Peak: rollout weeks with higher replicas and more node headroom.</li>
+      <li>Scaling strategy: compare HPA vs fixed replicas on node counts.</li>
+      <li>Observability: model higher log and metrics volume for incidents.</li>
+    </ul>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} Kubernetes tools</div>
     <div class="grid">

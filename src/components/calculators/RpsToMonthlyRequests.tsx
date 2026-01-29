@@ -11,6 +11,7 @@ export function RpsToMonthlyRequestsCalculator() {
   const [daysPerMonth, setDaysPerMonth] = useNumberParamState("RpsToMonthlyRequests.daysPerMonth", 30.4);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("RpsToMonthlyRequests.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("RpsToMonthlyRequests.peakMultiplierPct", 200);
+  const requestsPerDayEstimate = rps * (utilizationPct / 100) * clamp(hoursPerDay, 0, 24) * 3600;
 
   const result = useMemo(() => {
     return estimateMonthlyRequestsFromRps({
@@ -47,6 +48,7 @@ export function RpsToMonthlyRequestsCalculator() {
               step={1}
               onChange={(e) => setRps(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(requestsPerDayEstimate, 0)} requests/day at current utilization.</div>
           </div>
           <div className="field field-3">
             <div className="label">Utilization (%)</div>

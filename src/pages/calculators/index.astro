@@ -68,7 +68,16 @@ const slots = SITE.adsenseSlots;
     </section>
   </section>
 
-  <section class="card section" style="margin-top:18px" id="tools-filter">
+  
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Requests</strong>: API gateway or load balancer metrics (RPS and totals).</li>
+      <li><strong>Transfer</strong>: egress/transfer usage types in billing exports (GB).</li>
+      <li><strong>Storage</strong>: average GB-month from storage metrics, not just end-of-month size.</li>
+      <li><strong>Compute</strong>: instance-hours and uptime schedules from billing data.</li>
+    </ul>
+  </section><section class="card section" style="margin-top:18px" id="tools-filter">
     <div class="form" style="align-items:end">
       <div class="field field-3">
         <div class="label"><label for="tools-q">Search</label></div>
@@ -113,6 +122,26 @@ const slots = SITE.adsenseSlots;
         </div>
       </div>
     ))}
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Use results for directional planning and comparisons, then validate against billing data.</li>
+      <li>Start with an effective rate and tighten assumptions after you confirm the main drivers.</li>
+      <li>Keep baseline and peak scenarios to avoid budget surprises during traffic spikes.</li>
+      <li>Document assumptions so results are easy to update when rates or usage change.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: average usage, standard uptime hours, normal retry rates.</li>
+      <li>Peak: 2x-4x requests and transfer for launches or incidents.</li>
+      <li>Growth: add a monthly growth rate for storage and request volume.</li>
+      <li>Compare: run scenarios side by side before changing architecture.</li>
+    </ul>
   </section>
 
   <section class="section">

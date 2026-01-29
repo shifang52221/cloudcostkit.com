@@ -39,7 +39,7 @@ const description =
       a: "It's how much of the time you're near the given RPS (e.g., 30% if you're at peak only part of the day)."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/api-request-cost-calculator", label: "API request cost" },
     { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
@@ -56,11 +56,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Utilization is the biggest lever; it represents how long you sustain the given RPS.</li>
+      <li>Peak scenarios matter for autoscaling and request-billed services.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>RPS</th>
+          <th>Utilization</th>
+          <th>Hours/day</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Typical</td>
+          <td>Normal</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Same</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

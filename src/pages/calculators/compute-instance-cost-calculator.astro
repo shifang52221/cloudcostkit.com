@@ -41,7 +41,7 @@ const description =
       a: "Use your effective $/hour after discounts (or model break-even using the reserved vs on-demand tool)."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved break-even" },
     { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
@@ -57,12 +57,44 @@ const description =
       <li><strong>Schedule</strong>: set hours/day and days/month from real uptime windows or automation schedules.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Instance count and billable hours are the core drivers.</li>
+      <li>Peak scenarios show autoscale risk; compare baseline vs peak for capacity planning.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using peak instance count as baseline and overestimating spend.</li>
       <li>Applying both utilization and reduced hours/day for the same schedule (double discount).</li>
       <li>Ignoring minimum autoscaling capacity that runs 24/7.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Instances</th>
+          <th>Hours/day</th>
+          <th>Utilization</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Average</td>
+          <td>Normal</td>
+          <td>Typical</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Same</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

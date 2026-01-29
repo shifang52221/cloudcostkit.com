@@ -10,6 +10,8 @@ export function LogRetentionStorageCostCalculator() {
   const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("LogRetentionStorage.storagePricePerGbMonthUsd", 0.03);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogRetentionStorage.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogRetentionStorage.peakMultiplierPct", 150);
+  const retentionMonths = retentionDays / 30.4;
+  const retainedTbEstimate = (gbPerDay * retentionDays) / 1024;
 
   const result = useMemo(() => {
     return estimateLogRetentionStorage({
@@ -43,6 +45,7 @@ export function LogRetentionStorageCostCalculator() {
               min={0}
               onChange={(e) => setGbPerDay(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(retainedTbEstimate, 2)} TB retained at steady state.</div>
           </div>
           <div className="field field-3">
             <div className="label">Retention (days)</div>
@@ -54,6 +57,7 @@ export function LogRetentionStorageCostCalculator() {
               step={1}
               onChange={(e) => setRetentionDays(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(retentionMonths, 1)} months of logs.</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>

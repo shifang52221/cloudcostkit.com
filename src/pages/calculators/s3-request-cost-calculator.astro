@@ -42,7 +42,7 @@ const description =
       a: "Use storage access logs, metrics, or billing exports. If you only have RPS, convert it with the RPS-to-monthly requests calculator, then split by request type using observed proportions.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
@@ -60,11 +60,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests matter most when you have many small objects and high access rates.</li>
+      <li>If request fees are large, evaluate caching and request consolidation.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GET</th>
+          <th>PUT</th>
+          <th>Classes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Expected</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Same</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>
@@ -83,4 +115,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

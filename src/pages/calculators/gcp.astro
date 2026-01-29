@@ -53,6 +53,16 @@ const slots = SITE.adsenseSlots;
     </section>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Requests</strong>: Cloud Monitoring metrics for Load Balancer, API Gateway, or app dashboards.</li>
+      <li><strong>Transfer</strong>: Cloud Billing export usage types and VPC Flow Logs (GB).</li>
+      <li><strong>Storage</strong>: Cloud Storage metrics and billing exports for GB-month and requests.</li>
+      <li><strong>Logs</strong>: Cloud Logging ingestion and retention settings (log buckets).</li>
+    </ul>
+  </section>
+
   <section class="card section">
     <div class="grid">
       <a class="card2 tool col-6" href="/calculators/object-storage-cost-calculator/">
@@ -88,6 +98,28 @@ const slots = SITE.adsenseSlots;
         <div class="tool-desc">Model GB-month growth for managed databases and warehouses.</div>
       </a>
     </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation (GCP)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Separate internet egress from inter-zone and cross-region transfer before tuning rates.</li>
+      <li>For storage, track average GB-month and lifecycle transitions rather than end-of-month size.</li>
+      <li>Log and metric costs scale with ingestion and query scan volume, not just storage size.</li>
+      <li>Request-heavy services usually spike from retries and fan-out; validate request math early.</li>
+      <li>Use the estimate to compare scenarios, then validate against billing exports.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning (GCP)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: typical traffic, average cache hit rate, and stable log volume.</li>
+      <li>Peak: 2x-4x requests and egress for product launches or incidents.</li>
+      <li>Regional split: separate multi-zone and cross-region transfer rates.</li>
+      <li>Storage growth: model a growth curve and lifecycle transitions.</li>
+      <li>Query spikes: increase log scan volume when incidents or audits happen.</li>
+    </ul>
   </section>
 
   <section class="section">

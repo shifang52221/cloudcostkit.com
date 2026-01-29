@@ -43,7 +43,7 @@ const description =
       a: "Use hours/day and days/month (24 x 30.4 is a common always-on baseline). For non-24/7 workloads, set hours/day to your expected billable time."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost" },
     { href: "/calculators/kubernetes-node-cost-calculator", label: "Kubernetes node cost" },
@@ -58,11 +58,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Break-even depends on utilization; lower utilization pushes payback out.</li>
+      <li>If break-even is longer than your expected lifetime, keep on-demand.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Hours/day</th>
+          <th>Days/month</th>
+          <th>Payback</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Normal</td>
+          <td>Months</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Faster</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

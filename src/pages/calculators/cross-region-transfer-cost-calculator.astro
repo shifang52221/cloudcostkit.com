@@ -37,7 +37,7 @@ const description =
       a: "Typically replication traffic is billed on the outbound side. Confirm the billing direction for your service."
     }
   ]}
-  lastUpdated="2026-01-06"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
@@ -60,11 +60,43 @@ const description =
       <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Cross-region traffic is often one-way; confirm the billed direction.</li>
+      <li>Replication, DR, and backfill spikes should be modeled separately from steady-state.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Mixing boundaries and applying the wrong $/GB rate.</li>
       <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB/month</th>
+          <th>Direction</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Primary -> DR</td>
+          <td>Steady replication</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Primary -> DR</td>
+          <td>Backfill/migration</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

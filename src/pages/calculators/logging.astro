@@ -43,6 +43,16 @@ const tools = TOOLS.filter((t) => t.category === "Logging");
     </section>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Ingestion GB/day</strong>: use log platform metrics or billing exports by log group.</li>
+      <li><strong>Retention days</strong>: check policies for each log group or bucket.</li>
+      <li><strong>Scan GB</strong>: query history or dashboards (range length x data scanned).</li>
+      <li><strong>Metrics series</strong>: active series counts and cardinality reports.</li>
+    </ul>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} logging tools</div>
     <div class="grid">
@@ -55,8 +65,27 @@ const tools = TOOLS.filter((t) => t.category === "Logging");
     </div>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If ingestion dominates, focus on log volume controls before tuning pricing tiers.</li>
+      <li>If query costs dominate, add guardrails: shorter ranges, fewer streams, and sampled queries.</li>
+      <li>Retention changes often have a bigger impact than storage class tweaks.</li>
+      <li>Use a peak scenario; incident bursts and retries are the real cost multipliers.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: average GB/day ingested and normal query frequency.</li>
+      <li>Peak: 2x-3x ingestion for incident months and wider query windows.</li>
+      <li>Retention shift: model shorter retention as a separate scenario.</li>
+      <li>Cardinality growth: add a growth rate for metrics series counts.</li>
+    </ul>
+  </section>
+
   <section class="section">
     <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
   </section>
 </BaseLayout>
-

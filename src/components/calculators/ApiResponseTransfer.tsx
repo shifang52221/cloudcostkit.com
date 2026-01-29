@@ -9,6 +9,9 @@ export function ApiResponseTransferCalculator() {
   const [avgResponseKb, setAvgResponseKb] = useNumberParamState("ApiResponseTransfer.avgResponseKb", 15);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ApiResponseTransfer.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ApiResponseTransfer.peakMultiplierPct", 180);
+  const requestsPerSecond = requestsPerDay / (24 * 3600);
+  const estimatedMonthlyGb = (requestsPerDay * 30.4 * avgResponseKb) / (1024 * 1024);
+  const avgMbps = (estimatedMonthlyGb * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
     return estimateApiTransfer({
@@ -41,6 +44,7 @@ export function ApiResponseTransferCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerDay(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Average response size (KB)</div>
@@ -52,7 +56,9 @@ export function ApiResponseTransferCalculator() {
               step={0.1}
               onChange={(e) => setAvgResponseKb(+e.target.value)}
             />
-            <div className="hint">Use your typical compressed payload size over the wire.</div>
+            <div className="hint">
+              ~{formatNumber(estimatedMonthlyGb, 0)} GB/month, {formatNumber(avgMbps, 2)} Mbps average.
+            </div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

@@ -27,6 +27,8 @@ export function AwsLoadBalancerCapacityUnitsCalculator() {
   const [ruleEvaluationsPerSecond, setRuleEvaluationsPerSecond] = useNumberParamState("AwsLoadBalancerCapacityUnits.ruleEvaluationsPerSecond", 300);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsLoadBalancerCapacityUnits.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLoadBalancerCapacityUnits.peakMultiplierPct", 200);
+  const newConnectionsPerMinute = newConnectionsPerSecond * 60;
+  const processedMbps = (processedGbPerHour * 8000) / 3600;
 
   const result = useMemo(() => {
     return estimateLoadBalancerCapacityUnits({
@@ -81,6 +83,7 @@ export function AwsLoadBalancerCapacityUnitsCalculator() {
               step={1}
               onChange={(e) => setNewConnectionsPerSecond(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(newConnectionsPerMinute, 0)} new connections/min.</div>
           </div>
 
           <div className="field field-3">
@@ -105,6 +108,7 @@ export function AwsLoadBalancerCapacityUnitsCalculator() {
               step={0.1}
               onChange={(e) => setProcessedGbPerHour(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(processedMbps, 2)} Mbps.</div>
           </div>
 
           {type === "alb" ? (

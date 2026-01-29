@@ -45,7 +45,7 @@ const description =
       a: "Reduce evaluated requests (CDN caching, rate limiting, blocking early) and keep rule count tight. Also control downstream logging/analysis volume.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-waf-pricing", label: "Guide: WAF pricing" },
     { href: "/guides/aws-waf-estimate-requests", label: "Guide: estimate WAF request volume" },
@@ -64,11 +64,43 @@ const description =
       <li><strong>Downstream</strong>: add logging/storage/analytics volume as a second bill.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>ACL and rule counts are steady; request volume drives spikes.</li>
+      <li>If costs jump, verify bot traffic and retries before changing rules.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Budgeting steady traffic but ignoring attack/bot surge scenarios.</li>
       <li>Forgetting downstream log/scan costs that can exceed the WAF line item.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>ACLs</th>
+          <th>Rules</th>
+          <th>Requests</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Configured</td>
+          <td>Configured</td>
+          <td>Expected</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Same</td>
+          <td>Same</td>
+          <td>Attack/bot spike</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

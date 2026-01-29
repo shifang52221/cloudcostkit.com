@@ -9,6 +9,8 @@ export function ApiRequestCostCalculator() {
   const [pricePerMillionUsd, setPricePerMillionUsd] = useNumberParamState("ApiRequestCost.pricePerMillionUsd", 1.0);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ApiRequestCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ApiRequestCost.peakMultiplierPct", 180);
+  const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
+  const pricePerBillionUsd = pricePerMillionUsd * 1000;
 
   const result = useMemo(() => {
     return estimateRequestCost({
@@ -41,6 +43,7 @@ export function ApiRequestCostCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / 1M requests)</div>
@@ -52,6 +55,7 @@ export function ApiRequestCostCalculator() {
               step={0.01}
               onChange={(e) => setPricePerMillionUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(pricePerBillionUsd)} per 1B requests.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

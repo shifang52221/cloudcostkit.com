@@ -20,6 +20,7 @@ export function AwsApiGatewayAccessLogCostCalculator() {
   const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("AwsApiGatewayAccessLogCost.storagePricePerGbMonthUsd", 0.03);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsApiGatewayAccessLogCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsApiGatewayAccessLogCost.peakMultiplierPct", 200);
+  const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
 
   const gbPerDay = useMemo(() => {
     return estimateGbPerDayFromRequests({
@@ -81,6 +82,7 @@ export function AwsApiGatewayAccessLogCostCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
             <div className="label">Avg log bytes per request</div>

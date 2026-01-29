@@ -13,6 +13,8 @@ export function AwsSsmParameterStoreCostCalculator() {
   const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useNumberParamState("AwsSsmParameterStoreCost.pricePer10kApiCallsUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSsmParameterStoreCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSsmParameterStoreCost.peakMultiplierPct", 200);
+  const apiCallsPerSecond = apiCallsPerMonth / (30.4 * 24 * 3600);
+  const pricePerMillionApiCallsUsd = pricePer10kApiCallsUsd * 100;
 
   const result = useMemo(() => {
     return estimateSsmParameterStoreCost({
@@ -101,7 +103,9 @@ export function AwsSsmParameterStoreCostCalculator() {
               step={1000}
               onChange={(e) => setApiCallsPerMonth(+e.target.value)}
             />
-            <div className="hint">GetParameter(s), PutParameter, List*, etc. Use a measured baseline.</div>
+            <div className="hint">
+              Avg {formatNumber(apiCallsPerSecond, 2)} req/sec. GetParameter(s), PutParameter, List*, etc.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / 10k API calls)</div>
@@ -113,7 +117,7 @@ export function AwsSsmParameterStoreCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePer10kApiCallsUsd(+e.target.value)}
             />
-            <div className="hint">Use your effective region pricing and free-tier assumptions.</div>
+            <div className="hint">~{formatCurrency2(pricePerMillionApiCallsUsd)} per 1M calls.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

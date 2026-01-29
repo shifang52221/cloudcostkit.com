@@ -39,7 +39,7 @@ const description =
       a: "No. This models response payloads. If uploads are significant, model them separately."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
     { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
@@ -78,11 +78,43 @@ const description =
       <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests and response size multiply; one growing while the other stays flat still raises transfer quickly.</li>
+      <li>If transfer dominates, focus on caching and response compression first.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Mixing boundaries and applying the wrong $/GB rate.</li>
       <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Requests/day</th>
+          <th>Avg response</th>
+          <th>Transfer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Typical</td>
+          <td>Derived</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Higher</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

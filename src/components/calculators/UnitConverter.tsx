@@ -100,6 +100,7 @@ export function UnitConverterCalculator() {
               min={0}
               onChange={(e) => setMbps(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(conv.mBpsFromMbps, 2)} MB/s.</div>
           </div>
           <div className="field field-3">
             <div className="label">MB/s (megabytes/sec)</div>

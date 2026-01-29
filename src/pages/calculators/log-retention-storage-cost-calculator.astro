@@ -45,7 +45,7 @@ const description =
       a: "Treat each table/source as its own stream (GB/day + retention days), then add the results.",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-storage-cost-calculator", label: "Tiered log storage (hot + archive)" },
@@ -76,7 +76,56 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to validate</h2>
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/day</strong>: use ingestion metrics per log source; avoid blended averages.</li>
+      <li><strong>Retention days</strong>: confirm settings per log group or table; defaults often drift.</li>
+      <li><strong>Stored GB billing</strong>: check whether your vendor bills on ingested or stored size.</li>
+      <li><strong>Seasonality</strong>: if volume changes by week or month, model separate scenarios.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul>
+      <li>Retention days multiply GB/day; storage grows linearly with retention.</li>
+      <li>High-volume sources should have shorter hot retention.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using blended GB/day and missing the top noisy sources.</li>
+      <li>Applying a single retention policy to all log types.</li>
+      <li>Assuming stored GB equals ingested GB (compression varies).</li>
+    </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB/day</th>
+          <th>Retention</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>30 days</td>
+          <td>Normal logging</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Incident/verbose</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 style="margin-top:0">Validate after changes</h2>
     <ul>
       <li>Validate measured ingestion (GB/day) for your top sources, not a blended average.</li>
       <li>Validate retention settings per table/source (defaults often drift).</li>

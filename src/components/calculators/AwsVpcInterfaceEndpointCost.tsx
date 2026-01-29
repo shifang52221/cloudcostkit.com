@@ -16,6 +16,8 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsVpcInterfaceEndpointCost.peakMultiplierPct", 180);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const dataProcessedGbPerDay = dataProcessedGbPerMonth / 30.4;
+  const avgMbps = (dataProcessedGbPerMonth * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
     return estimateVpcInterfaceEndpointCost({
@@ -127,6 +129,9 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
               step={1}
               onChange={(e) => setDataProcessedGbPerMonth(+e.target.value)}
             />
+            <div className="hint">
+              ~{formatNumber(dataProcessedGbPerDay, 2)} GB/day, {formatNumber(avgMbps, 2)} Mbps.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / GB processed)</div>

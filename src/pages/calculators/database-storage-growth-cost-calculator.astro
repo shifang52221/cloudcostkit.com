@@ -39,7 +39,7 @@ const description =
       a: "Yes, if your provider bills them separately. You can increase the effective storage GB or model components separately."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
@@ -54,11 +54,43 @@ const description =
       <li><strong>Backups</strong>: retention and churn (daily changed data x retention days) as a separate line item.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Average GB is a better budget proxy than end-of-month GB.</li>
+      <li>Daily growth is the key driver; small increases compound over months.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Ignoring backup storage and long-term retention growth.</li>
       <li>Modeling only today's size and missing 3-12 month growth.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Starting GB</th>
+          <th>Growth GB/day</th>
+          <th>Horizon</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Current</td>
+          <td>Expected</td>
+          <td>6-12 months</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Same</td>
+          <td>High</td>
+          <td>6-12 months</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

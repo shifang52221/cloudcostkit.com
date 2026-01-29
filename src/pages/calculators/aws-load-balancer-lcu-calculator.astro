@@ -44,7 +44,7 @@ const description =
       a: "Plug \"capacity units (avg per hour)\" into the load balancer cost calculator along with your $/unit-hour pricing.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost calculator" },
     { href: "/guides/aws-load-balancer-lcu-explained", label: "Guide: LCU/NLCU explained" },
@@ -62,11 +62,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>LCU/NLCU is the max driver; focus on the largest driver first.</li>
+      <li>Processed bytes often dominates during large payload spikes.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Connections</th>
+          <th>Processed GB/hr</th>
+          <th>Rule evals</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Expected</td>
+          <td>Expected</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Burst</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

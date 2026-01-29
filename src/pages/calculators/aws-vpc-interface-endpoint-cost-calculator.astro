@@ -44,7 +44,7 @@ const description =
       a: "Not automatically. Endpoints can reduce NAT GB processed for compatible services, but you should model both before and after to find the break-even point.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-network-costs", label: "AWS network cost hub" },
     { href: "/guides/aws-vpc-endpoints-pricing", label: "Guide: VPC endpoints pricing" },
@@ -80,6 +80,12 @@ const description =
       </li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Endpoint-hours scale with AZ count; that is usually the fixed base cost.</li>
+      <li>Data processed scales with traffic shifts; model a migration spike if moving traffic from NAT.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Forgetting that interface endpoints are per AZ (endpoint-hours scale with AZ count).</li>
@@ -88,7 +94,33 @@ const description =
       <li>Counting gateway endpoints (S3/DynamoDB) in PrivateLink endpoint costs.</li>
     </ul>
 
-    <h2>Validate after rollout</h2>
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Endpoints</th>
+          <th>AZs</th>
+          <th>Processed GB</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Configured</td>
+          <td>2-3</td>
+          <td>Expected</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Same</td>
+          <td>Same</td>
+          <td>Migration spike</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Validate after changes</h2>
     <ul>
       <li>Verify NAT GB processed decreases for the targeted destinations.</li>
       <li>Verify endpoint-hours match your endpoint x AZ deployment.</li>

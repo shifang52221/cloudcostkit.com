@@ -44,7 +44,7 @@ const description =
       a: "Estimate each source (ingress/access, app logs, audit/security) separately, then add the GB/day totals.",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/log-retention-storage-cost-calculator", label: "Log retention storage cost" },
     { href: "/calculators/log-storage-cost-calculator", label: "Tiered log storage (hot + archive)" },
@@ -72,6 +72,60 @@ const description =
           Use <a href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>.
         </span>
       </li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/day</strong>: use measured ingestion where possible (billing export or log platform metrics).</li>
+      <li><strong>Events/s</strong>: if you only have event rate, sample bytes/event and convert to GB/day.</li>
+      <li><strong>Scenarios</strong>: build a baseline and a peak month for incident or deploy bursts.</li>
+    </ul>
+
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Ingestion is the first bill; retention and scan can easily exceed it.</li>
+      <li>Verbose logs and high-cardinality fields drive GB/day faster than traffic growth.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Using a single blended GB/day and hiding noisy sources.</li>
+      <li>Assuming bytes/event is constant during incidents (it usually grows).</li>
+      <li>Forgetting that retries and timeouts multiply event volume.</li>
+    </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB/day</th>
+          <th>Bytes/event</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Typical</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Verbose</td>
+          <td>Incident/launch</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Compare estimated GB/day to the first real bill and adjust assumptions.</li>
+      <li>Track bytes/event and event rate after logging changes.</li>
     </ul>
   </div>
 </CalculatorLayout>

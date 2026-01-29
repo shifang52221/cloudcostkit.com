@@ -67,10 +67,30 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/day</strong>: use ingestion metrics for the top log sources.</li>
+      <li><strong>Hot days</strong>: use the retention window you need for troubleshooting and dashboards.</li>
+      <li><strong>Cold days</strong>: define extra archive days beyond the hot window.</li>
+      <li><strong>Archive fraction</strong>: estimate the percent of logs you actually archive.</li>
+      <li><strong>Compression ratio</strong>: use 1 unless your vendor bills cold storage on stored bytes.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Result interpretation</h2>
     <ul>
       <li>If cold storage dominates, review archive fraction and compression assumptions.</li>
       <li>If hot storage dominates, shorten hot window or reduce ingestion volume.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Common mistakes</h2>
+    <ul>
+      <li>Archiving everything by default instead of a targeted subset.</li>
+      <li>Using hot retention days as the total retention window.</li>
+      <li>Ignoring retrieval or rehydration charges for cold tiers.</li>
     </ul>
   </div>
 
@@ -100,5 +120,14 @@ const description =
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validate after changes</h2>
+    <ul>
+      <li>Confirm hot retention days and archive fraction in policy settings.</li>
+      <li>Validate stored GB billing rules (ingested vs stored bytes, compression).</li>
+      <li>Track retrieval or rehydration charges after access-heavy months.</li>
+    </ul>
   </div>
 </CalculatorLayout>

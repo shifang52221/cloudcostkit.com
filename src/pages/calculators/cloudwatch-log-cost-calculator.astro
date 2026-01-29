@@ -74,11 +74,30 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>GB/day ingested</strong>: use CloudWatch usage metrics or billing exports for the top log groups.</li>
+      <li><strong>Retention days</strong>: read the retention policy for each log group (defaults often drift).</li>
+      <li><strong>Insights scan GB</strong>: estimate from query history (range length x data scanned per query).</li>
+      <li><strong>Billing days</strong>: use 30 or 31 days, or 730 hours if you model monthly hours elsewhere.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Result interpretation</h2>
     <ul>
       <li>If ingestion dominates, reduce verbose logs or drop noisy sources at ingest.</li>
       <li>If retention dominates, shorten retention or move cold logs to cheaper storage.</li>
       <li>If scans dominate, narrow Insights queries and reduce dashboard refresh frequency.</li>
+    </ul>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Common mistakes</h2>
+    <ul>
+      <li>Assuming default retention is set (many groups stay "never expire").</li>
+      <li>Leaving dashboards to scan wide windows at high frequency.</li>
+      <li>Mixing ingestion and scan costs into one blended GB number.</li>
     </ul>
   </div>
 

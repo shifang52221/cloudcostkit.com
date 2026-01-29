@@ -170,6 +170,39 @@ const description =
   </section>
 
   <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Requests</strong>: API Gateway/ALB metrics or application dashboards (RPS and total requests).</li>
+      <li><strong>Transfer</strong>: VPC Flow Logs, CloudFront logs, or Cost Explorer usage types (GB).</li>
+      <li><strong>Storage</strong>: S3 storage metrics and EBS volume size/IOPS from CloudWatch.</li>
+      <li><strong>Compute</strong>: instance-hours from billing exports and uptime schedules.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation (AWS)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Use a baseline month and a peak month; most AWS bills swing with traffic and retries.</li>
+      <li>If transfer dominates, split internet egress, inter-AZ, and inter-region before tuning rates.</li>
+      <li>If requests dominate, validate request counts, retries, and per-request unit size.</li>
+      <li>For compute, check uptime hours and average utilization assumptions before changing instance types.</li>
+      <li>For logs/metrics, retention days and query scan volume usually matter more than storage size.</li>
+      <li>When the estimate is off, adjust the driver inputs, not the math.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning (AWS)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: average traffic, stable cache hit rate, and normal retry levels.</li>
+      <li>Peak: 2x-4x requests and egress for launches or incidents.</li>
+      <li>Region mix: split rates if traffic or storage spans multiple regions.</li>
+      <li>Commitments: compare on-demand vs Savings Plans with realistic utilization.</li>
+      <li>Logging burst: double ingestion for incident months and check retention impact.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
     <h2 style="margin-top:0">Related guides</h2>
     <p class="muted" style="margin:0">
       For step-by-step estimation guidance and pitfalls, browse <a href="/guides/aws/">AWS cost guides</a>.

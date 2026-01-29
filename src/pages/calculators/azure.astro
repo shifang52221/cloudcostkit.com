@@ -53,6 +53,16 @@ const slots = SITE.adsenseSlots;
     </section>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Requests</strong>: Azure Monitor metrics for API Management, Load Balancer, or App Service.</li>
+      <li><strong>Transfer</strong>: Cost Management usage reports or Network Watcher flow logs (GB).</li>
+      <li><strong>Storage</strong>: Azure Storage metrics and billing exports for GB-month and requests.</li>
+      <li><strong>Logs</strong>: Log Analytics ingestion metrics and retention settings.</li>
+    </ul>
+  </section>
+
   <section class="card section">
     <div class="grid">
       <a class="card2 tool col-6" href="/calculators/object-storage-cost-calculator/">
@@ -88,6 +98,28 @@ const slots = SITE.adsenseSlots;
         <div class="tool-desc">GB-month baseline for disks, volumes, and storage tiers.</div>
       </a>
     </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation (Azure)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Transfer costs usually separate internet egress from intra-region traffic; model both.</li>
+      <li>Storage bills often include both GB-month and per-request transactions, so check both drivers.</li>
+      <li>Compute costs are sensitive to uptime hours; scheduled workloads change the baseline fast.</li>
+      <li>Logs and metrics grow quietly; validate retention days and query frequency.</li>
+      <li>If the estimate is high, validate your blended rate before removing drivers.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning (Azure)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: steady request volume, normal retry rates, and average storage growth.</li>
+      <li>Peak: 2x-3x requests and egress for promotions or incidents.</li>
+      <li>Storage growth: model a growth curve, not a single month-end size.</li>
+      <li>Region split: if you use multiple regions, separate rates per region.</li>
+      <li>Observability burst: increase ingestion and query volume for incident months.</li>
+    </ul>
   </section>
 
   <section class="section">

@@ -11,6 +11,9 @@ export function DatabaseStorageGrowthCostCalculator() {
   const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("DatabaseStorageGrowth.storagePricePerGbMonthUsd", 0.12);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("DatabaseStorageGrowth.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("DatabaseStorageGrowth.peakMultiplierPct", 180);
+  const startingTb = startingGb / 1024;
+  const growthGbPerMonth = growthGbPerDay * 30.4;
+  const pricePerTbMonthUsd = storagePricePerGbMonthUsd * 1024;
 
   const result = useMemo(() => {
     return estimateDbStorageGrowth({
@@ -46,6 +49,7 @@ export function DatabaseStorageGrowthCostCalculator() {
               min={0}
               onChange={(e) => setStartingGb(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(startingTb, 2)} TB.</div>
           </div>
           <div className="field field-3">
             <div className="label">Growth (GB / day)</div>
@@ -57,6 +61,7 @@ export function DatabaseStorageGrowthCostCalculator() {
               step={0.1}
               onChange={(e) => setGrowthGbPerDay(+e.target.value)}
             />
+            <div className="hint">~{formatNumber(growthGbPerMonth, 1)} GB/month growth.</div>
           </div>
           <div className="field field-3">
             <div className="label">Horizon (months)</div>
@@ -80,6 +85,7 @@ export function DatabaseStorageGrowthCostCalculator() {
               step={0.01}
               onChange={(e) => setStoragePricePerGbMonthUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(pricePerTbMonthUsd)} per TB-month.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

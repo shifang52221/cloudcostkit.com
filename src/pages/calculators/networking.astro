@@ -62,6 +62,16 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
     </section>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Internet egress</strong>: CDN or load balancer bytes out, or billing usage types.</li>
+      <li><strong>Cross-AZ</strong>: VPC flow logs summaries or provider transfer metrics.</li>
+      <li><strong>Cross-region</strong>: replication/DR logs or billing export usage types.</li>
+      <li><strong>Effective rates</strong>: use blended $/GB for each boundary, not a single rate.</li>
+    </ul>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} networking tools</div>
     <div class="grid">
@@ -72,6 +82,26 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
         </a>
       ))}
     </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If egress dominates, check CDN cache hit rate and origin egress separately.</li>
+      <li>If inter-AZ transfer dominates, review service locality and load balancer routing.</li>
+      <li>If NAT or endpoint costs dominate, validate processed GB and endpoint-hours assumptions.</li>
+      <li>Use a peak scenario for incident months; retries and timeouts change network spend fast.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: typical egress, inter-AZ, and cross-region volumes.</li>
+      <li>Peak: 2x-4x traffic and higher retry rates during incidents.</li>
+      <li>Cache shifts: model a lower cache hit rate for launch weeks.</li>
+      <li>Route changes: re-evaluate when you add regions or new endpoints.</li>
+    </ul>
   </section>
 
   <section class="section">

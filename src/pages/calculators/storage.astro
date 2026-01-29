@@ -43,6 +43,16 @@ const tools = TOOLS.filter((t) => t.category === "Storage");
     </section>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>GB-month</strong>: storage metrics for average used size (not just month-end).</li>
+      <li><strong>Requests</strong>: storage access metrics or billing usage types (GET/PUT/LIST).</li>
+      <li><strong>Replication</strong>: changed GB/month from replication logs or transfer metrics.</li>
+      <li><strong>Egress</strong>: bytes out from CDN/origin metrics or billing exports.</li>
+    </ul>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} storage tools</div>
     <div class="grid">
@@ -55,8 +65,27 @@ const tools = TOOLS.filter((t) => t.category === "Storage");
     </div>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If storage dominates, verify average GB-month and growth assumptions before changing tiers.</li>
+      <li>If request fees dominate, validate object counts and request mix (GET vs PUT vs LIST).</li>
+      <li>If replication dominates, confirm changed GB/month rather than total stored GB.</li>
+      <li>Use a peak scenario if retention policies or backups spike during incidents.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: average GB-month and typical request volume.</li>
+      <li>Peak: higher churn and backup volume during incident months.</li>
+      <li>Growth: add a monthly growth curve for stored data.</li>
+      <li>Lifecycle: compare hot vs cold tier mixes in separate scenarios.</li>
+    </ul>
+  </section>
+
   <section class="section">
     <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
   </section>
 </BaseLayout>
-

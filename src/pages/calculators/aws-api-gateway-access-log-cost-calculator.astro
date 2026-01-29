@@ -43,7 +43,7 @@ const description =
       a: "Reduce log verbosity/fields, sample logs for high-volume endpoints, and shorten retention for noisy logs.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/aws-api-gateway-access-logs-cost", label: "Guide: API Gateway access logs cost" },
     { href: "/calculators/aws-api-gateway-cost-calculator", label: "API Gateway cost calculator" },
@@ -81,11 +81,43 @@ const description =
       <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests and bytes/log drive ingestion; retention multiplies storage.</li>
+      <li>If ingestion dominates, cut log size or sampling before changing retention.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
       <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Requests</th>
+          <th>Bytes/log</th>
+          <th>Retention</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Typical</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Same</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

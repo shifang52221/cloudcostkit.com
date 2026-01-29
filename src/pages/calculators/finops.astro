@@ -42,6 +42,16 @@ const tools = TOOLS.filter((t) => t.category === "FinOps");
     </section>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Requests</strong>: service metrics or API gateway dashboards (RPS and totals).</li>
+      <li><strong>Transfer</strong>: billing exports grouped by usage type (GB by boundary).</li>
+      <li><strong>Compute</strong>: instance-hours from billing data and uptime schedules.</li>
+      <li><strong>Storage</strong>: average GB-month and request counts from storage metrics.</li>
+    </ul>
+  </section>
+
   <section class="card section" style="margin-top:18px">
     <div class="muted" style="font-size:13px; margin-bottom:10px">{tools.length} FinOps tools</div>
     <div class="grid">
@@ -54,8 +64,29 @@ const tools = TOOLS.filter((t) => t.category === "FinOps");
     </div>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Result interpretation (FinOps)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Use a baseline and a peak case so budgets survive load spikes and incidents.</li>
+      <li>Keep compute-only comparisons separate from full-stack costs (logs, storage, transfer).</li>
+      <li>Break-even results are sensitive to uptime hours and utilization, not just list prices.</li>
+      <li>Apply discounts or commitments after the driver model is stable and validated.</li>
+      <li>Track assumptions explicitly so revisions are fast when pricing or usage changes.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning (FinOps)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Baseline: average utilization, standard uptime hours, normal retry rates.</li>
+      <li>Peak: 2x-3x traffic, higher transfer, and more log ingestion.</li>
+      <li>Commitments: compare best-case utilization vs realistic utilization.</li>
+      <li>Growth: add monthly growth assumptions for storage and request volume.</li>
+      <li>Risk: keep a contingency buffer for incident months.</li>
+    </ul>
+  </section>
+
   <section class="section">
     <AdSlot slot={slots.calculatorsListMid} minHeight={280} />
   </section>
 </BaseLayout>
-

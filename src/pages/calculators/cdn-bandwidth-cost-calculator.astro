@@ -57,7 +57,7 @@ const description =
       a: "If your plan includes free allowances, subtract them from GB/month before applying $/GB, or use an effective blended rate."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/estimate-cdn-bandwidth-gb-per-month", label: "Guide: Estimate GB/month" },
@@ -103,11 +103,43 @@ const description =
       <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Bandwidth is the single driver; small % traffic growth scales cost linearly.</li>
+      <li>Compression and image optimization reduce GB/month more than request tuning.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Mixing boundaries and applying the wrong $/GB rate.</li>
       <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>GB/month</th>
+          <th>Rate</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Blended</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Launch/event</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

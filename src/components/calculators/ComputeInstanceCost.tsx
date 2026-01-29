@@ -14,6 +14,7 @@ export function ComputeInstanceCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ComputeInstanceCost.peakMultiplierPct", 200);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const fullTimeMonthlyCost = pricePerHourUsd * 24 * 30.4;
 
   const result = useMemo(() => {
     return estimateComputeCost({
@@ -66,6 +67,7 @@ export function ComputeInstanceCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePerHourUsd(+e.target.value)}
             />
+            <div className="hint">~{formatCurrency2(fullTimeMonthlyCost)} per month at 24x30.4.</div>
           </div>
           <div className="field field-3">
             <div className="label">Utilization (%)</div>

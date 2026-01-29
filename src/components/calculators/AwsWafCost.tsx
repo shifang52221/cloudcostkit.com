@@ -14,6 +14,8 @@ export function AwsWafCostCalculator() {
   const [pricePerWebAclUsdPerMonth, setPricePerWebAclUsdPerMonth] = useNumberParamState("AwsWafCost.pricePerWebAclUsdPerMonth", 5);
   const [pricePerRuleUsdPerMonth, setPricePerRuleUsdPerMonth] = useNumberParamState("AwsWafCost.pricePerRuleUsdPerMonth", 1);
   const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsWafCost.pricePerMillionRequestsUsd", 0.6);
+  const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
+  const pricePerBillionRequestsUsd = pricePerMillionRequestsUsd * 1000;
 
   const result = useMemo(() => {
     return estimateWafCost({
@@ -93,6 +95,7 @@ export function AwsWafCostCalculator() {
               step={1000}
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
+            <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
           </div>
 
           <div className="field field-3">
@@ -127,7 +130,7 @@ export function AwsWafCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePerMillionRequestsUsd(+e.target.value)}
             />
-            <div className="hint">Use your effective region/product pricing.</div>
+            <div className="hint">~{formatCurrency2(pricePerBillionRequestsUsd)} per 1B requests.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

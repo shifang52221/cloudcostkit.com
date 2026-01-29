@@ -38,7 +38,7 @@ const description =
       a: "No. Replication usually means storing data twice. Add destination storage as a separate line item.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -56,11 +56,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Replication fees scale with changed data, not total stored GB.</li>
+      <li>Backfills and migrations should be modeled as separate peak months.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Changed GB</th>
+          <th>Direction</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Primary -> replica</td>
+          <td>Steady writes</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Primary -> replica</td>
+          <td>Backfill/migration</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>
@@ -79,4 +111,3 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
-

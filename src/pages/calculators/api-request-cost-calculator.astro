@@ -39,7 +39,7 @@ const description =
       a: "Convert from RPS using the RPS to Monthly Requests tool, or use your analytics."
     }
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -72,11 +72,43 @@ const description =
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Requests are the only driver; small % increases can become large monthly deltas.</li>
+      <li>If costs spike, inspect retries and cache miss rates first.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
     </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Requests</th>
+          <th>Billable class</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Expected</td>
+          <td>Default</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>High</td>
+          <td>Same</td>
+          <td>Launch/incident</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Validate after changes</h2>
     <ul>

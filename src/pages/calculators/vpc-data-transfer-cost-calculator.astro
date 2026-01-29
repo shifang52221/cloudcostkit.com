@@ -42,7 +42,7 @@ const description =
       a: "Segment by architecture: load balancer paths, service-to-service calls, and replication. Validate AZ locality (client and backend in the same AZ) and model a peak scenario.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-01-29"
   related={[
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost (generic)" },
     { href: "/calculators/aws-nat-gateway-cost-calculator", label: "NAT gateway cost" },
@@ -73,11 +73,50 @@ const description =
       </li>
     </ul>
 
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Boundary mix is the primary driver; split cross-AZ, cross-region, and internet.</li>
+      <li>Small % increases in east-west traffic can outweigh compute savings.</li>
+    </ul>
+
     <h2>Common mistakes</h2>
     <ul>
       <li>Mixing boundaries (cross-AZ vs cross-region vs internet) and using the wrong $/GB rate.</li>
       <li>Ignoring cache fill / origin egress (CDN) that shifts cost to another place.</li>
       <li>Under-modeling retries/timeouts that multiply traffic during incidents.</li>
+    </ul>
+
+    <h2>Scenario planning</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Boundary</th>
+          <th>GB/month</th>
+          <th>Drivers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline</td>
+          <td>Cross-AZ</td>
+          <td>Expected</td>
+          <td>Normal traffic</td>
+        </tr>
+        <tr>
+          <td>Peak</td>
+          <td>Cross-region</td>
+          <td>High</td>
+          <td>Failover/migration</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Validate after changes</h2>
+    <ul>
+      <li>Validate top transfer paths and their boundaries (cross-AZ vs cross-region vs internet).</li>
+      <li>Re-check after routing or AZ locality changes; small shifts can create big costs.</li>
+      <li>Compare measured GB/month to billing usage types and adjust assumptions.</li>
     </ul>
 
     <h2>Next steps</h2>
