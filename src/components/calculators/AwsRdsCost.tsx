@@ -24,6 +24,7 @@ export function AwsRdsCostCalculator() {
   const [monthlyGrowthPct, setMonthlyGrowthPct] = useState(8);
   const [growthMonths, setGrowthMonths] = useState(6);
   const [avgIops, setAvgIops] = useState(2000);
+  const [backupRatioPctInput, setBackupRatioPctInput] = useState(100);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
   const storageTb = storageGb / 1024;
@@ -226,6 +227,33 @@ export function AwsRdsCostCalculator() {
               onChange={(e) => setBackupGb(+e.target.value)}
             />
             <div className="hint">Backup ratio {formatNumber(backupRatio * 100, 0)}%.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Backup ratio (%)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={backupRatioPctInput}
+              min={0}
+              step={1}
+              onChange={(e) => setBackupRatioPctInput(+e.target.value)}
+            />
+            <div className="hint">Current ratio {formatNumber(backupRatio * 100, 1)}% of storage.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const ratio = clamp(backupRatioPctInput, 0, 10_000) / 100;
+                  setBackupGb(Math.round(storageGb * ratio * 10) / 10);
+                }}
+              >
+                Use ratio
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(storageGb * (backupRatioPctInput / 100), 1)} GB backups.</div>
           </div>
           <div className="field field-3">
             <div className="label">Backup price ($ / GB-month)</div>

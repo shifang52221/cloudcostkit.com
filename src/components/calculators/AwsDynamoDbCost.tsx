@@ -21,6 +21,7 @@ export function AwsDynamoDbCostCalculator() {
   const [avgWriteRps, setAvgWriteRps] = useState(200);
   const estimatedReadRequestsPerMonth = clamp(avgReadRps, 0, 1e12) * secondsPerMonth;
   const estimatedWriteRequestsPerMonth = clamp(avgWriteRps, 0, 1e12) * secondsPerMonth;
+  const totalRequestsPerMonth = readRequestsPerMonth + writeRequestsPerMonth;
   const storageTb = storageGb / 1024;
 
   const result = useMemo(() => {
@@ -132,6 +133,44 @@ export function AwsDynamoDbCostCalculator() {
             </div>
             <div className="hint">
               Est {formatNumber(estimatedReadRequestsPerMonth, 0)} reads and {formatNumber(estimatedWriteRequestsPerMonth, 0)} writes/month.
+            </div>
+          </div>
+          <div className="field field-6">
+            <div className="label">Request mix presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const total = Math.max(1, totalRequestsPerMonth);
+                  setReadRequestsPerMonth(Math.round(total * 0.95));
+                  setWriteRequestsPerMonth(Math.round(total * 0.05));
+                }}
+              >
+                Read heavy 95/5
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const total = Math.max(1, totalRequestsPerMonth);
+                  setReadRequestsPerMonth(Math.round(total * 0.8));
+                  setWriteRequestsPerMonth(Math.round(total * 0.2));
+                }}
+              >
+                Balanced 80/20
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const total = Math.max(1, totalRequestsPerMonth);
+                  setReadRequestsPerMonth(Math.round(total * 0.6));
+                  setWriteRequestsPerMonth(Math.round(total * 0.4));
+                }}
+              >
+                Write heavy 60/40
+              </button>
             </div>
           </div>
 
