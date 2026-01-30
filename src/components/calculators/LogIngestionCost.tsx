@@ -175,6 +175,60 @@ export function LogIngestionCostCalculator() {
           ) : null}
 
           <div className="field field-6">
+            <div className="label">Scenario presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setUseEventRateInputs(false);
+                  setGbPerDayIngest(12);
+                  setEventsPerSecond(250);
+                  setAvgBytesPerEvent(700);
+                  setDaysPerMonth(30.4);
+                  setIngestPricePerGbUsd(0.5);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(140);
+                }}
+              >
+                Small app
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setUseEventRateInputs(false);
+                  setGbPerDayIngest(90);
+                  setEventsPerSecond(2400);
+                  setAvgBytesPerEvent(900);
+                  setDaysPerMonth(30.4);
+                  setIngestPricePerGbUsd(0.5);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(180);
+                }}
+              >
+                SaaS ops
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setUseEventRateInputs(false);
+                  setGbPerDayIngest(600);
+                  setEventsPerSecond(12000);
+                  setAvgBytesPerEvent(1000);
+                  setDaysPerMonth(30.4);
+                  setIngestPricePerGbUsd(0.5);
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(220);
+                }}
+              >
+                High volume
+              </button>
+            </div>
+          </div>
+
+          <div className="field field-6">
             <div className="btn-row">
               <button
                 className="btn"

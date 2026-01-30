@@ -21,6 +21,7 @@ const description =
     "Log ingestion estimate from GB/day and $/GB pricing.",
     "Retention storage estimate from GB/day, retention days, and $/GB-month pricing.",
     "Optional scan/search estimate from GB scanned per day and $/GB pricing.",
+    "Optional event-rate estimators for ingestion and retention volume.",
   ]}
   excludes={[
     "Indexing add-ons, alerting, and premium features unless you model them separately.",
@@ -85,6 +86,7 @@ const description =
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
+      <li><strong>Estimator</strong>: use events/sec x bytes/event when you only have log rates.</li>
       <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
       <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
     </ul>
