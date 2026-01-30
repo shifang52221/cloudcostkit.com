@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateEbsSnapshotCost } from "../../lib/calc/ebsSnapshot";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -11,8 +11,12 @@ export function AwsEbsSnapshotCostCalculator() {
   const [pricePerGbMonthUsd, setPricePerGbMonthUsd] = useNumberParamState("AwsEbsSnapshotCost.pricePerGbMonthUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEbsSnapshotCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEbsSnapshotCost.peakMultiplierPct", 180);
+  const [dailyChangeGbInput, setDailyChangeGbInput] = useState(20);
   const dailyChangeGb = (volumeGb * dailyChangePct) / 100;
   const retentionMonths = retentionDays / 30.4;
+  const estimatedDailyChangePct = volumeGb > 0
+    ? (clamp(dailyChangeGbInput, 0, 1e12) / clamp(volumeGb, 1, 1e12)) * 100
+    : 0;
 
   const result = useMemo(() => {
     return estimateEbsSnapshotCost({
@@ -64,6 +68,30 @@ export function AwsEbsSnapshotCostCalculator() {
               onChange={(e) => setDailyChangePct(+e.target.value)}
             />
             <div className="hint">~{formatNumber(dailyChangeGb, 2)} GB/day of changes.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Daily change (GB)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={dailyChangeGbInput}
+              min={0}
+              step={0.1}
+              onChange={(e) => setDailyChangeGbInput(+e.target.value)}
+            />
+            <div className="hint">Use average daily churn.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setDailyChangePct(Math.min(100, Math.round(estimatedDailyChangePct * 100) / 100))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedDailyChangePct, 2)}% change/day.</div>
           </div>
           <div className="field field-3">
             <div className="label">Retention (days)</div>
