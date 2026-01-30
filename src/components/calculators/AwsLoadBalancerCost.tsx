@@ -30,9 +30,11 @@ export function AwsLoadBalancerCostCalculator() {
     "AwsLoadBalancerCost.ruleEvaluationsPerSecond",
     300,
   );
+  const [avgMbpsInput, setAvgMbpsInput] = useNumberParamState("AwsLoadBalancerCost.avgMbpsInput", 120);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
   const hourlyPerLb = normalizedHoursPerMonth * pricePerLbHourUsd;
+  const estimatedProcessedGbPerHour = (clamp(avgMbpsInput, 0, 1e9) * 3600) / 8000;
   const capacityEstimate = useMemo(() => {
     return estimateLoadBalancerCapacityUnits({
       type: capacityType,
@@ -201,6 +203,30 @@ export function AwsLoadBalancerCostCalculator() {
               step={0.01}
               onChange={(e) => setProcessedGbPerHour(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg Mbps</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgMbpsInput}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgMbpsInput(+e.target.value)}
+            />
+            <div className="hint">Use average throughput over the hour.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setProcessedGbPerHour(Math.round(estimatedProcessedGbPerHour * 100) / 100)}
+              >
+                Use Mbps
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedProcessedGbPerHour, 2)} GB/hour.</div>
           </div>
           {capacityType === "alb" ? (
             <div className="field field-3">
