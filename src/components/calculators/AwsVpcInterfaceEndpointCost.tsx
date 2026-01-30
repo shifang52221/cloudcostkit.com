@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateVpcInterfaceEndpointCost } from "../../lib/calc/vpcInterfaceEndpoint";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -14,10 +14,13 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
   const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useNumberParamState("AwsVpcInterfaceEndpointCost.pricePerGbProcessedUsd", 0.01);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsVpcInterfaceEndpointCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsVpcInterfaceEndpointCost.peakMultiplierPct", 180);
+  const [avgMbpsInput, setAvgMbpsInput] = useState(60);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
+  const secondsPerMonth = 30.4 * 24 * 3600;
   const dataProcessedGbPerDay = dataProcessedGbPerMonth / 30.4;
-  const avgMbps = (dataProcessedGbPerMonth * 8000) / (30.4 * 24 * 3600);
+  const avgMbps = (dataProcessedGbPerMonth * 8000) / secondsPerMonth;
+  const estimatedDataProcessedGbPerMonth = (clamp(avgMbpsInput, 0, 1e9) * secondsPerMonth) / 8000;
 
   const result = useMemo(() => {
     return estimateVpcInterfaceEndpointCost({
@@ -132,6 +135,30 @@ export function AwsVpcInterfaceEndpointCostCalculator() {
             <div className="hint">
               ~{formatNumber(dataProcessedGbPerDay, 2)} GB/day, {formatNumber(avgMbps, 2)} Mbps.
             </div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg Mbps</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgMbpsInput}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgMbpsInput(+e.target.value)}
+            />
+            <div className="hint">Use measured throughput from VPC flow logs.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setDataProcessedGbPerMonth(Math.round(estimatedDataProcessedGbPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedDataProcessedGbPerMonth, 0)} GB/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / GB processed)</div>

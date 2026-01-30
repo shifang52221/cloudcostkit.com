@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateApiTransfer } from "../../lib/calc/apiTransfer";
 import { formatNumber } from "../../lib/format";
@@ -9,6 +9,8 @@ export function ApiResponseTransferCalculator() {
   const [avgResponseKb, setAvgResponseKb] = useNumberParamState("ApiResponseTransfer.avgResponseKb", 15);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ApiResponseTransfer.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ApiResponseTransfer.peakMultiplierPct", 180);
+  const [avgRps, setAvgRps] = useState(40);
+  const estimatedRequestsPerDay = clamp(avgRps, 0, 1e9) * 24 * 3600;
   const requestsPerSecond = requestsPerDay / (24 * 3600);
   const estimatedMonthlyGb = (requestsPerDay * 30.4 * avgResponseKb) / (1024 * 1024);
   const avgMbps = (estimatedMonthlyGb * 8000) / (30.4 * 24 * 3600);
@@ -45,6 +47,30 @@ export function ApiResponseTransferCalculator() {
               onChange={(e) => setRequestsPerDay(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgRps(+e.target.value)}
+            />
+            <div className="hint">Use steady-state throughput.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerDay(Math.round(estimatedRequestsPerDay))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerDay, 0)} requests/day.</div>
           </div>
           <div className="field field-3">
             <div className="label">Average response size (KB)</div>

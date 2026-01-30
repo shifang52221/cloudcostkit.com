@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateRequestCost } from "../../lib/calc/requests";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -9,7 +9,10 @@ export function ApiRequestCostCalculator() {
   const [pricePerMillionUsd, setPricePerMillionUsd] = useNumberParamState("ApiRequestCost.pricePerMillionUsd", 1.0);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ApiRequestCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ApiRequestCost.peakMultiplierPct", 180);
-  const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
+  const [avgRps, setAvgRps] = useState(120);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const estimatedRequestsPerMonth = clamp(avgRps, 0, 1e12) * secondsPerMonth;
+  const requestsPerSecond = requestsPerMonth / secondsPerMonth;
   const pricePerBillionUsd = pricePerMillionUsd * 1000;
 
   const result = useMemo(() => {
@@ -44,6 +47,30 @@ export function ApiRequestCostCalculator() {
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgRps(+e.target.value)}
+            />
+            <div className="hint">Use steady-state throughput.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMonth(Math.round(estimatedRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonth, 0)} requests/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / 1M requests)</div>

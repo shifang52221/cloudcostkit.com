@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLogCost } from "../../lib/calc/logs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -20,7 +20,10 @@ export function AwsApiGatewayAccessLogCostCalculator() {
   const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("AwsApiGatewayAccessLogCost.storagePricePerGbMonthUsd", 0.03);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsApiGatewayAccessLogCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsApiGatewayAccessLogCost.peakMultiplierPct", 200);
-  const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
+  const [avgRps, setAvgRps] = useState(40);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const estimatedRequestsPerMonth = clamp(avgRps, 0, 1e12) * secondsPerMonth;
+  const requestsPerSecond = requestsPerMonth / secondsPerMonth;
 
   const gbPerDay = useMemo(() => {
     return estimateGbPerDayFromRequests({
@@ -83,6 +86,30 @@ export function AwsApiGatewayAccessLogCostCalculator() {
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgRps(+e.target.value)}
+            />
+            <div className="hint">Use baseline API traffic.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMonth(Math.round(estimatedRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonth, 0)} requests/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Avg log bytes per request</div>
