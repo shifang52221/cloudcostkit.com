@@ -10,9 +10,12 @@ export function StorageReplicationCostCalculator() {
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("StorageReplicationCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("StorageReplicationCost.peakMultiplierPct", 180);
   const [writeGbPerDay, setWriteGbPerDay] = useState(80);
+  const [eventsPerDay, setEventsPerDay] = useState(1_500_000);
+  const [avgPayloadKb, setAvgPayloadKb] = useState(64);
   const gbPerDay = replicatedGbPerMonth / 30.4;
   const avgMbps = (replicatedGbPerMonth * 8000) / (30.4 * 24 * 3600);
   const estimatedReplicatedGbPerMonth = clamp(writeGbPerDay, 0, 1e12) * 30.4;
+  const estimatedWriteGbPerDayFromEvents = (clamp(eventsPerDay, 0, 1e12) * clamp(avgPayloadKb, 0, 1e6)) / (1024 * 1024);
 
   const result = useMemo(() => {
     return estimateReplicationCost({
@@ -58,6 +61,40 @@ export function StorageReplicationCostCalculator() {
               step={0.1}
               onChange={(e) => setWriteGbPerDay(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Events (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={eventsPerDay}
+              min={0}
+              step={1000}
+              onChange={(e) => setEventsPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg payload (KB)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgPayloadKb}
+              min={0}
+              step={1}
+              onChange={(e) => setAvgPayloadKb(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setWriteGbPerDay(Math.round(estimatedWriteGbPerDayFromEvents * 100) / 100)}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedWriteGbPerDayFromEvents, 2)} GB/day.</div>
           </div>
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <div className="btn-row">
