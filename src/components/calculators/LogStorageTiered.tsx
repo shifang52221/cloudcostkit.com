@@ -3,8 +3,17 @@ import { useBooleanParamState, useNumberParamState } from "./useNumberParamState
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
+const SECONDS_PER_DAY = 86_400;
+const BYTES_PER_GB_DECIMAL = 1_000_000_000;
+
 export function LogStorageTieredCostCalculator() {
+  const [useEventRateInputs, setUseEventRateInputs] = useBooleanParamState(
+    "LogStorageTiered.useEventRateInputs",
+    false,
+  );
   const [gbPerDay, setGbPerDay] = useNumberParamState("LogStorageTiered.gbPerDay", 50);
+  const [eventsPerSecond, setEventsPerSecond] = useNumberParamState("LogStorageTiered.eventsPerSecond", 800);
+  const [avgBytesPerEvent, setAvgBytesPerEvent] = useNumberParamState("LogStorageTiered.avgBytesPerEvent", 700);
 
   const [hotRetentionDays, setHotRetentionDays] = useNumberParamState("LogStorageTiered.hotRetentionDays", 14);
   const [hotPricePerGbMonthUsd, setHotPricePerGbMonthUsd] = useNumberParamState("LogStorageTiered.hotPricePerGbMonthUsd", 0.03);
@@ -20,7 +29,11 @@ export function LogStorageTieredCostCalculator() {
   const compressionPct = clamp(coldCompressionRatio, 0, 1) * 100;
 
   const result = useMemo(() => {
-    const safeGbPerDay = clamp(gbPerDay, 0, 1e12);
+    const safeEventsPerSecond = clamp(eventsPerSecond, 0, 1e12);
+    const safeAvgBytesPerEvent = clamp(avgBytesPerEvent, 0, 1e12);
+    const bytesPerDayFromEvents = safeEventsPerSecond * SECONDS_PER_DAY * safeAvgBytesPerEvent;
+    const gbPerDayFromEvents = bytesPerDayFromEvents / BYTES_PER_GB_DECIMAL;
+    const safeGbPerDay = clamp(useEventRateInputs ? gbPerDayFromEvents : gbPerDay, 0, 1e12);
     const safeHotDays = clamp(hotRetentionDays, 0, 3650);
     const safeHotPrice = clamp(hotPricePerGbMonthUsd, 0, 1e6);
 
@@ -56,22 +69,29 @@ export function LogStorageTieredCostCalculator() {
       totalStoredGb,
       totalMonthlyStorageCostUsd,
       totalRetentionDays,
+      useEventRateInputs,
+      eventsPerSecond: safeEventsPerSecond,
+      avgBytesPerEvent: safeAvgBytesPerEvent,
+      gbPerDayFromEvents,
     };
   }, [
     archiveFraction,
+    avgBytesPerEvent,
     coldAdditionalDays,
     coldCompressionRatio,
     coldPricePerGbMonthUsd,
     enableColdTier,
+    eventsPerSecond,
     gbPerDay,
     hotPricePerGbMonthUsd,
     hotRetentionDays,
+    useEventRateInputs,
   ]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
     const safeMultiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
-    const safeGbPerDay = clamp(gbPerDay, 0, 1e12) * safeMultiplier;
+    const safeGbPerDay = clamp(result.gbPerDay, 0, 1e12) * safeMultiplier;
     const safeHotDays = clamp(hotRetentionDays, 0, 3650);
     const safeHotPrice = clamp(hotPricePerGbMonthUsd, 0, 1e6);
 
@@ -114,10 +134,10 @@ export function LogStorageTieredCostCalculator() {
     coldCompressionRatio,
     coldPricePerGbMonthUsd,
     enableColdTier,
-    gbPerDay,
     hotPricePerGbMonthUsd,
     hotRetentionDays,
     peakMultiplierPct,
+    result.gbPerDay,
     showPeakScenario,
   ]);
 
@@ -126,6 +146,16 @@ export function LogStorageTieredCostCalculator() {
       <div className="panel">
         <h3>Inputs</h3>
         <div className="form">
+          <div className="field field-6">
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={useEventRateInputs}
+                onChange={(e) => setUseEventRateInputs(e.target.checked)}
+              />
+              Estimate GB/day from events/s x bytes/event (decimal GB)
+            </label>
+          </div>
           <div className="field field-3">
             <div className="label">Logs produced (GB / day)</div>
             <input
@@ -134,7 +164,38 @@ export function LogStorageTieredCostCalculator() {
               value={gbPerDay}
               min={0}
               onChange={(e) => setGbPerDay(+e.target.value)}
+              disabled={useEventRateInputs}
             />
+            <div className="hint">
+              {useEventRateInputs
+                ? `Derived from events: ${formatNumber(result.gbPerDayFromEvents, 2)} GB/day.`
+                : "If you have measured ingestion, use it directly."}
+            </div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Events per second</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={eventsPerSecond}
+              min={0}
+              step={1}
+              onChange={(e) => setEventsPerSecond(+e.target.value)}
+              disabled={!useEventRateInputs}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg bytes per event</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgBytesPerEvent}
+              min={0}
+              step={1}
+              onChange={(e) => setAvgBytesPerEvent(+e.target.value)}
+              disabled={!useEventRateInputs}
+            />
+            <div className="hint">Sample real logs for a reliable average.</div>
           </div>
 
           <div className="field field-3">
@@ -262,7 +323,10 @@ export function LogStorageTieredCostCalculator() {
                 className="btn"
                 type="button"
                 onClick={() => {
+                  setUseEventRateInputs(false);
                   setGbPerDay(50);
+                  setEventsPerSecond(800);
+                  setAvgBytesPerEvent(700);
                   setHotRetentionDays(14);
                   setHotPricePerGbMonthUsd(0.03);
                   setEnableColdTier(true);
@@ -312,6 +376,14 @@ export function LogStorageTieredCostCalculator() {
             <div className="k">Total stored volume (steady state)</div>
             <div className="v">{formatNumber(result.totalStoredGb, 0)} GB</div>
           </div>
+          {result.useEventRateInputs ? (
+            <div className="kpi">
+              <div className="k">Derived from events</div>
+              <div className="v">
+                {formatNumber(result.eventsPerSecond, 0)} events/s x {formatNumber(result.avgBytesPerEvent, 0)} bytes/event
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {peakResult ? (

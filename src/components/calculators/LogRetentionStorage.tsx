@@ -4,38 +4,70 @@ import { estimateLogRetentionStorage } from "../../lib/calc/logRetention";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
+const SECONDS_PER_DAY = 86_400;
+const BYTES_PER_GB_DECIMAL = 1_000_000_000;
+
 export function LogRetentionStorageCostCalculator() {
+  const [useEventRateInputs, setUseEventRateInputs] = useBooleanParamState(
+    "LogRetentionStorage.useEventRateInputs",
+    false,
+  );
   const [gbPerDay, setGbPerDay] = useNumberParamState("LogRetentionStorage.gbPerDay", 50);
+  const [eventsPerSecond, setEventsPerSecond] = useNumberParamState("LogRetentionStorage.eventsPerSecond", 800);
+  const [avgBytesPerEvent, setAvgBytesPerEvent] = useNumberParamState("LogRetentionStorage.avgBytesPerEvent", 700);
   const [retentionDays, setRetentionDays] = useNumberParamState("LogRetentionStorage.retentionDays", 30);
   const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("LogRetentionStorage.storagePricePerGbMonthUsd", 0.03);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogRetentionStorage.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogRetentionStorage.peakMultiplierPct", 150);
   const retentionMonths = retentionDays / 30.4;
-  const retainedTbEstimate = (gbPerDay * retentionDays) / 1024;
 
   const result = useMemo(() => {
-    return estimateLogRetentionStorage({
-      gbPerDay: clamp(gbPerDay, 0, 1e12),
+    const safeEventsPerSecond = clamp(eventsPerSecond, 0, 1e12);
+    const safeAvgBytesPerEvent = clamp(avgBytesPerEvent, 0, 1e12);
+    const bytesPerDayFromEvents = safeEventsPerSecond * SECONDS_PER_DAY * safeAvgBytesPerEvent;
+    const gbPerDayFromEvents = bytesPerDayFromEvents / BYTES_PER_GB_DECIMAL;
+    const safeGbPerDay = clamp(useEventRateInputs ? gbPerDayFromEvents : gbPerDay, 0, 1e12);
+    const retentionResult = estimateLogRetentionStorage({
+      gbPerDay: safeGbPerDay,
       retentionDays: clamp(retentionDays, 0, 3650),
       storagePricePerGbMonthUsd: clamp(storagePricePerGbMonthUsd, 0, 1e6),
     });
-  }, [gbPerDay, retentionDays, storagePricePerGbMonthUsd]);
+    return {
+      ...retentionResult,
+      useEventRateInputs,
+      eventsPerSecond: safeEventsPerSecond,
+      avgBytesPerEvent: safeAvgBytesPerEvent,
+      gbPerDayFromEvents,
+    };
+  }, [avgBytesPerEvent, eventsPerSecond, gbPerDay, retentionDays, storagePricePerGbMonthUsd, useEventRateInputs]);
 
   const peakResult = useMemo(() => {
     if (!showPeakScenario) return null;
     const safeMultiplier = clamp(peakMultiplierPct, 100, 1000) / 100;
     return estimateLogRetentionStorage({
-      gbPerDay: clamp(gbPerDay, 0, 1e12) * safeMultiplier,
+      gbPerDay: clamp(result.gbPerDay, 0, 1e12) * safeMultiplier,
       retentionDays: clamp(retentionDays, 0, 3650),
       storagePricePerGbMonthUsd: clamp(storagePricePerGbMonthUsd, 0, 1e6),
     });
-  }, [gbPerDay, peakMultiplierPct, retentionDays, showPeakScenario, storagePricePerGbMonthUsd]);
+  }, [peakMultiplierPct, result.gbPerDay, retentionDays, showPeakScenario, storagePricePerGbMonthUsd]);
+  const retainedTbEstimate = (result.gbPerDay * retentionDays) / 1024;
 
   return (
     <div className="calc-grid">
       <div className="panel">
         <h3>Inputs</h3>
         <div className="form">
+          <div className="field field-6">
+            <label className="muted" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={useEventRateInputs}
+                onChange={(e) => setUseEventRateInputs(e.target.checked)}
+              />
+              Estimate GB/day from events/s x bytes/event (decimal GB)
+            </label>
+          </div>
+
           <div className="field field-3">
             <div className="label">Logs produced (GB / day)</div>
             <input
@@ -44,8 +76,39 @@ export function LogRetentionStorageCostCalculator() {
               value={gbPerDay}
               min={0}
               onChange={(e) => setGbPerDay(+e.target.value)}
+              disabled={useEventRateInputs}
             />
+            <div className="hint">
+              {useEventRateInputs
+                ? `Derived from events: ${formatNumber(result.gbPerDayFromEvents, 2)} GB/day.`
+                : "If you have measured ingestion, use it directly."}
+            </div>
             <div className="hint">~{formatNumber(retainedTbEstimate, 2)} TB retained at steady state.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Events per second</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={eventsPerSecond}
+              min={0}
+              step={1}
+              onChange={(e) => setEventsPerSecond(+e.target.value)}
+              disabled={!useEventRateInputs}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg bytes per event</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgBytesPerEvent}
+              min={0}
+              step={1}
+              onChange={(e) => setAvgBytesPerEvent(+e.target.value)}
+              disabled={!useEventRateInputs}
+            />
+            <div className="hint">Sample real logs for a reliable average.</div>
           </div>
           <div className="field field-3">
             <div className="label">Retention (days)</div>
@@ -104,7 +167,10 @@ export function LogRetentionStorageCostCalculator() {
                 className="btn"
                 type="button"
                 onClick={() => {
+                  setUseEventRateInputs(false);
                   setGbPerDay(50);
+                  setEventsPerSecond(800);
+                  setAvgBytesPerEvent(700);
                   setRetentionDays(30);
                   setStoragePricePerGbMonthUsd(0.03);
                   setShowPeakScenario(false);
@@ -129,6 +195,14 @@ export function LogRetentionStorageCostCalculator() {
             <div className="k">Estimated monthly storage cost</div>
             <div className="v">{formatCurrency2(result.monthlyStorageCostUsd)}</div>
           </div>
+          {result.useEventRateInputs ? (
+            <div className="kpi">
+              <div className="k">Derived from events</div>
+              <div className="v">
+                {formatNumber(result.eventsPerSecond, 0)} events/s x {formatNumber(result.avgBytesPerEvent, 0)} bytes/event
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {peakResult ? (
