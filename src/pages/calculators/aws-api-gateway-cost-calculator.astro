@@ -18,7 +18,7 @@ const description =
   includes={[
     "Request fee estimate from requests/month and $ per 1M requests.",
     "Transfer estimate from requests/month and average response KB (then $/GB).",
-    "Optional RPS to monthly requests estimator.",
+    "Request volume estimator for baseline and peak traffic.",
     "Baseline vs peak scenario table for request spikes.",
   ]}
   excludes={[
@@ -52,6 +52,7 @@ const description =
     { href: "/guides/aws-api-gateway-cost-optimization", label: "Guide: reduce API Gateway costs" },
     { href: "/guides/aws-api-gateway-vs-alb-vs-cloudfront-cost", label: "API Gateway vs ALB vs CloudFront cost" },
     { href: "/guides/aws-api-gateway-access-logs-cost", label: "Guide: API Gateway access logs cost" },
+    { href: "/calculators/aws-api-gateway-request-estimator", label: "API Gateway request volume estimator" },
     { href: "/calculators/aws-api-gateway-access-log-cost-calculator", label: "API Gateway access log cost calculator" },
     { href: "/calculators/api-request-cost-calculator", label: "API request cost (generic)" },
   ]}
@@ -113,6 +114,7 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/aws-api-gateway-request-estimator/">API Gateway request estimator</a>
       <a class="btn" href="/guides/aws-api-gateway-pricing/">Guide: API Gateway pricing</a>
       <a class="btn" href="/guides/aws-api-gateway-estimate-requests/">Guide: estimate API requests</a>
       <a class="btn" href="/guides/aws-api-gateway-cost-optimization/">Guide: reduce API Gateway costs</a>

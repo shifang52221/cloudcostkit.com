@@ -1,0 +1,69 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsApiGatewayRequestEstimator } from "../../components/calculators/AwsApiGatewayRequestEstimator";
+
+const title = "API Gateway Request Volume Estimator";
+const description =
+  "Estimate API Gateway request volume from baseline RPS, peak windows, and retry multipliers to power accurate cost models. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-api-gateway-request-estimator"
+  intro="Model monthly API Gateway request volume from baseline RPS, peak windows, and a retry multiplier so you can feed realistic numbers into cost estimates."
+  examples={[
+    "180 RPS baseline with a 10-hour peak window and 110% retry buffer.",
+    "Mobile app traffic: 900 RPS baseline, 3,200 RPS peaks, and 120% multiplier.",
+  ]}
+  includes={[
+    "Baseline requests from RPS, hours/day, and days/month.",
+    "Peak window requests for launches, incidents, or campaigns.",
+    "Retry multiplier to account for timeouts and bot traffic.",
+  ]}
+  excludes={[
+    "Per-request pricing (use the API Gateway cost calculator).",
+    "Transfer, caching, and downstream service costs.",
+  ]}
+  how={[
+    "Baseline requests = baseline RPS x baseline hours x 3600.",
+    "Peak requests = peak RPS x peak hours x 3600.",
+    "Total requests = (baseline + peak) x retry multiplier.",
+  ]}
+  faqs={[
+    {
+      q: "Should I include retries?",
+      a: "Yes. Any retries that hit the gateway are billable and should be included in request volume.",
+    },
+    {
+      q: "What counts as a peak window?",
+      a: "Launches, batch processing, incident spikes, or seasonal traffic surges.",
+    },
+    {
+      q: "Why not just use average RPS?",
+      a: "Average hides spikes. Modeling a peak window improves accuracy and avoids under-budgeting.",
+    },
+  ]}
+  lastUpdated="2026-01-30"
+  related={[
+    { href: "/calculators/aws-api-gateway-cost-calculator", label: "AWS API Gateway cost calculator" },
+    { href: "/guides/aws-api-gateway-estimate-requests", label: "Guide: estimate API requests" },
+    { href: "/guides/aws-api-gateway-pricing", label: "Guide: API Gateway pricing" },
+  ]}
+>
+  <AwsApiGatewayRequestEstimator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Baseline RPS</strong>: use CloudWatch or access logs for a representative week.</li>
+      <li><strong>Peak windows</strong>: document launches, incidents, or scheduled batch runs.</li>
+      <li><strong>Multiplier</strong>: add retries, timeouts, bots, and automated traffic.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway cost calculator</a>
+      <a class="btn" href="/guides/aws-api-gateway-estimate-requests/">Guide: estimate API requests</a>
+    </div>
+  </div>
+</CalculatorLayout>

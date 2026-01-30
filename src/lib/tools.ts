@@ -57,6 +57,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-api-gateway-request-estimator",
+    title: "API Gateway Request Volume Estimator",
+    description: "Estimate API Gateway request volume from baseline RPS and peak traffic windows.",
+    category: "Networking",
+  },
+  {
     slug: "aws-cloudtrail-cost-calculator",
     title: "AWS CloudTrail Cost Calculator",
     description: "Estimate CloudTrail-style event costs from event volume and per-100k pricing inputs.",
