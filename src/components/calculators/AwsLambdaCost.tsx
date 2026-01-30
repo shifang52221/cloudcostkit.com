@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLambdaCost } from "../../lib/calc/lambda";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -15,6 +15,8 @@ export function AwsLambdaCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLambdaCost.peakMultiplierPct", 180);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const invocationsPerSecond = invocationsPerMonth / secondsPerMonth;
+  const [avgRps, setAvgRps] = useState(20);
+  const estimatedInvocationsPerMonth = clamp(avgRps, 0, 1e12) * secondsPerMonth;
   const avgDurationSec = avgDurationMs / 1000;
   const memoryGb = memoryMb / 1024;
   const gbSecondsPerInvocation = avgDurationSec * memoryGb;
@@ -80,6 +82,30 @@ export function AwsLambdaCostCalculator() {
               onChange={(e) => setInvocationsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(invocationsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgRps(+e.target.value)}
+            />
+            <div className="hint">Use steady-state invocations/sec.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setInvocationsPerMonth(Math.round(estimatedInvocationsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedInvocationsPerMonth, 0)} invocations/month.</div>
           </div>
 
           <div className="field field-3">

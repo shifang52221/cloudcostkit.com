@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateApiGatewayCost } from "../../lib/calc/apiGateway";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -13,6 +13,8 @@ export function AwsApiGatewayCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsApiGatewayCost.peakMultiplierPct", 180);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const requestsPerSecond = requestsPerMonth / secondsPerMonth;
+  const [avgRps, setAvgRps] = useState(120);
+  const estimatedRequestsPerMonth = clamp(avgRps, 0, 1e12) * secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateApiGatewayCost({
@@ -52,6 +54,30 @@ export function AwsApiGatewayCostCalculator() {
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgRps(+e.target.value)}
+            />
+            <div className="hint">Use a realistic baseline RPS.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMonth(Math.round(estimatedRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonth, 0)} requests/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Request price ($ / 1M requests)</div>

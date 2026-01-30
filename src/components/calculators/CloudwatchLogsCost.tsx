@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLogCost } from "../../lib/calc/logs";
 import { estimateLogScanCost } from "../../lib/calc/logScan";
@@ -20,6 +20,9 @@ export function CloudwatchLogsCostCalculator() {
   const [insightsPricePerGbUsd, setInsightsPricePerGbUsd] = useNumberParamState("CloudwatchLogsCost.insightsPricePerGbUsd", 0.005);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("CloudwatchLogsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("CloudwatchLogsCost.peakMultiplierPct", 160);
+  const [queriesPerDay, setQueriesPerDay] = useState(1200);
+  const [avgGbPerQuery, setAvgGbPerQuery] = useState(0.2);
+  const estimatedGbScannedPerDay = clamp(queriesPerDay, 0, 1e12) * clamp(avgGbPerQuery, 0, 1e9);
 
   const result = useMemo(() => {
     const ingest = estimateLogCost({
@@ -184,6 +187,43 @@ export function CloudwatchLogsCostCalculator() {
               onChange={(e) => setInsightsPricePerGbUsd(+e.target.value)}
               disabled={!includeInsights}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Insights queries (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={queriesPerDay}
+              min={0}
+              step={1}
+              onChange={(e) => setQueriesPerDay(+e.target.value)}
+              disabled={!includeInsights}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg GB per query</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgGbPerQuery}
+              min={0}
+              step={0.01}
+              onChange={(e) => setAvgGbPerQuery(+e.target.value)}
+              disabled={!includeInsights}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setGbScannedPerDay(Math.round(estimatedGbScannedPerDay * 100) / 100)}
+                disabled={!includeInsights}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedGbScannedPerDay, 2)} GB/day.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
