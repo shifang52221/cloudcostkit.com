@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateObjectStorageCost } from "../../lib/calc/storage";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -13,10 +13,19 @@ export function ObjectStorageCostCalculator() {
   const [putPricePer1kUsd, setPutPricePer1kUsd] = useNumberParamState("ObjectStorageCost.putPricePer1kUsd", 0.005);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("ObjectStorageCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("ObjectStorageCost.peakMultiplierPct", 180);
+  const [startingStorageGb, setStartingStorageGb] = useState(3500);
+  const [monthlyGrowthPct, setMonthlyGrowthPct] = useState(8);
+  const [growthMonths, setGrowthMonths] = useState(6);
+  const [avgGetRps, setAvgGetRps] = useState(2);
+  const [avgPutRps, setAvgPutRps] = useState(0.2);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const averageStoredTb = averageStoredGb / 1024;
   const getRps = getRequestsPerMonth / secondsPerMonth;
   const putRps = putRequestsPerMonth / secondsPerMonth;
+  const estimatedAverageStoredGb = clamp(startingStorageGb, 0, 1e12)
+    * (1 + (clamp(monthlyGrowthPct, 0, 10_000) / 100) * (clamp(growthMonths, 0, 120) / 2));
+  const estimatedGetRequestsPerMonth = clamp(avgGetRps, 0, 1e9) * secondsPerMonth;
+  const estimatedPutRequestsPerMonth = clamp(avgPutRps, 0, 1e9) * secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateObjectStorageCost({
@@ -75,6 +84,51 @@ export function ObjectStorageCostCalculator() {
             <div className="hint">Approx {formatNumber(averageStoredTb, 2)} TB-month.</div>
           </div>
           <div className="field field-3">
+            <div className="label">Starting storage (GB)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={startingStorageGb}
+              min={0}
+              step={1}
+              onChange={(e) => setStartingStorageGb(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Monthly growth (%)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={monthlyGrowthPct}
+              min={0}
+              step={0.1}
+              onChange={(e) => setMonthlyGrowthPct(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Months in period</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={growthMonths}
+              min={0}
+              step={1}
+              onChange={(e) => setGrowthMonths(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setAverageStoredGb(Math.round(estimatedAverageStoredGb))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedAverageStoredGb, 0)} GB-month avg.</div>
+          </div>
+          <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
             <input
               type="number"
@@ -99,6 +153,17 @@ export function ObjectStorageCostCalculator() {
             <div className="hint">Approx {formatNumber(getRps, 2)} req/sec.</div>
           </div>
           <div className="field field-3">
+            <div className="label">Avg GET RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgGetRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgGetRps(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
             <div className="label">PUT requests (per month)</div>
             <input
               type="number"
@@ -109,6 +174,34 @@ export function ObjectStorageCostCalculator() {
               onChange={(e) => setPutRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Approx {formatNumber(putRps, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg PUT RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgPutRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgPutRps(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setGetRequestsPerMonth(Math.round(estimatedGetRequestsPerMonth));
+                  setPutRequestsPerMonth(Math.round(estimatedPutRequestsPerMonth));
+                }}
+              >
+                Use estimates
+              </button>
+            </div>
+            <div className="hint">
+              Est {formatNumber(estimatedGetRequestsPerMonth, 0)} GETs and {formatNumber(estimatedPutRequestsPerMonth, 0)} PUTs/month.
+            </div>
           </div>
 
           <div className="field field-3">
