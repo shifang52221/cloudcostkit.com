@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateCloudwatchAlarmsCost } from "../../lib/calc/cloudwatchAlarms";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -14,7 +14,15 @@ export function AwsCloudwatchAlarmsCostCalculator() {
   const [pricePerCompositeAlarmUsdPerMonth, setPricePerCompositeAlarmUsdPerMonth] = useNumberParamState("AwsCloudwatchAlarmsCost.pricePerCompositeAlarmUsdPerMonth", 0.5);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsCloudwatchAlarmsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsCloudwatchAlarmsCost.peakMultiplierPct", 180);
+  const [servicesMonitored, setServicesMonitored] = useState(60);
+  const [alarmsPerService, setAlarmsPerService] = useState(6);
+  const [highResPct, setHighResPct] = useState(8);
+  const [compositePct, setCompositePct] = useState(4);
   const totalConfiguredAlarms = standardAlarms + highResAlarms + compositeAlarms;
+  const estimatedTotalAlarms = clamp(servicesMonitored, 0, 1e9) * clamp(alarmsPerService, 0, 1e6);
+  const estimatedHighResAlarms = estimatedTotalAlarms * (clamp(highResPct, 0, 100) / 100);
+  const estimatedCompositeAlarms = estimatedTotalAlarms * (clamp(compositePct, 0, 100) / 100);
+  const estimatedStandardAlarms = Math.max(0, estimatedTotalAlarms - estimatedHighResAlarms - estimatedCompositeAlarms);
 
   const result = useMemo(() => {
     return estimateCloudwatchAlarmsCost({
@@ -100,6 +108,70 @@ export function AwsCloudwatchAlarmsCostCalculator() {
               onChange={(e) => setCompositeAlarms(+e.target.value)}
             />
             <div className="hint">Total configured: {formatNumber(totalConfiguredAlarms, 0)} alarms.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Services monitored</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={servicesMonitored}
+              min={0}
+              step={1}
+              onChange={(e) => setServicesMonitored(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Alarms per service</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={alarmsPerService}
+              min={0}
+              step={1}
+              onChange={(e) => setAlarmsPerService(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">High-res share (%)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={highResPct}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(e) => setHighResPct(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Composite share (%)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={compositePct}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(e) => setCompositePct(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setStandardAlarms(Math.round(estimatedStandardAlarms));
+                  setHighResAlarms(Math.round(estimatedHighResAlarms));
+                  setCompositeAlarms(Math.round(estimatedCompositeAlarms));
+                }}
+              >
+                Use estimates
+              </button>
+            </div>
+            <div className="hint">
+              Est {formatNumber(estimatedStandardAlarms, 0)} / {formatNumber(estimatedHighResAlarms, 0)} / {formatNumber(estimatedCompositeAlarms, 0)} alarms.
+            </div>
           </div>
 
           <div className="field field-3">
