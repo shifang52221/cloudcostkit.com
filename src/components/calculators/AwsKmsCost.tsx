@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateKmsCost } from "../../lib/calc/kms";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -11,6 +11,10 @@ export function AwsKmsCostCalculator() {
   const [pricePer10kRequestsUsd, setPricePer10kRequestsUsd] = useNumberParamState("AwsKmsCost.pricePer10kRequestsUsd", 0.03);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsKmsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsKmsCost.peakMultiplierPct", 180);
+  const [instances, setInstances] = useState(200);
+  const [kmsCallsPerInstancePerSecond, setKmsCallsPerInstancePerSecond] = useState(0.1);
+  const estimatedRequestsPerMonth =
+    clamp(instances, 0, 1e9) * clamp(kmsCallsPerInstancePerSecond, 0, 1e6) * (30.4 * 24 * 3600);
   const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
   const pricePerMillionRequestsUsd = pricePer10kRequestsUsd * 100;
 
@@ -86,6 +90,42 @@ export function AwsKmsCostCalculator() {
               onChange={(e) => setPricePer10kRequestsUsd(+e.target.value)}
             />
             <div className="hint">~{formatCurrency2(pricePerMillionRequestsUsd)} per 1M. Use your effective pricing mix.</div>
+          </div>
+
+          <div className="field field-3">
+            <div className="label">Instances (avg)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={instances}
+              min={0}
+              step={1}
+              onChange={(e) => setInstances(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">KMS calls per instance / sec</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={kmsCallsPerInstancePerSecond}
+              min={0}
+              step={0.01}
+              onChange={(e) => setKmsCallsPerInstancePerSecond(+e.target.value)}
+            />
+            <div className="hint">Average Encrypt/Decrypt/GenerateDataKey calls.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMonth(Math.round(estimatedRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonth, 0)} requests/month.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>

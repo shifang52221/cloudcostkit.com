@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateWafCost } from "../../lib/calc/waf";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -14,6 +14,8 @@ export function AwsWafCostCalculator() {
   const [pricePerWebAclUsdPerMonth, setPricePerWebAclUsdPerMonth] = useNumberParamState("AwsWafCost.pricePerWebAclUsdPerMonth", 5);
   const [pricePerRuleUsdPerMonth, setPricePerRuleUsdPerMonth] = useNumberParamState("AwsWafCost.pricePerRuleUsdPerMonth", 1);
   const [pricePerMillionRequestsUsd, setPricePerMillionRequestsUsd] = useNumberParamState("AwsWafCost.pricePerMillionRequestsUsd", 0.6);
+  const [requestsPerSecondInput, setRequestsPerSecondInput] = useState(75);
+  const estimatedRequestsPerMonth = clamp(requestsPerSecondInput, 0, 1e9) * (30.4 * 24 * 3600);
   const requestsPerSecond = requestsPerMonth / (30.4 * 24 * 3600);
   const pricePerBillionRequestsUsd = pricePerMillionRequestsUsd * 1000;
 
@@ -96,6 +98,29 @@ export function AwsWafCostCalculator() {
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Requests per second (avg)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={requestsPerSecondInput}
+              min={0}
+              step={1}
+              onChange={(e) => setRequestsPerSecondInput(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMonth(Math.round(estimatedRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonth, 0)} requests/month.</div>
           </div>
 
           <div className="field field-3">
@@ -210,6 +235,16 @@ export function AwsWafCostCalculator() {
                 }}
               >
                 Global site
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setShowPeakScenario(true);
+                  setPeakMultiplierPct(350);
+                }}
+              >
+                Attack spike
               </button>
             </div>
           </div>
