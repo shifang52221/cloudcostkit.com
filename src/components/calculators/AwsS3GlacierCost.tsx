@@ -17,9 +17,11 @@ export function AwsS3GlacierCostCalculator() {
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsS3GlacierCost.peakMultiplierPct", 200);
   const [retrievalGbPerDayInput, setRetrievalGbPerDayInput] = useState(15);
   const [retrievalRequestsPerDayInput, setRetrievalRequestsPerDayInput] = useState(60_000);
+  const [requestsPerGb, setRequestsPerGb] = useState(200);
   const storedTbMonth = storedGbMonth / 1024;
   const estimatedRetrievalGbPerMonth = clamp(retrievalGbPerDayInput, 0, 1e12) * 30.4;
   const estimatedRetrievalRequestsPerMonth = clamp(retrievalRequestsPerDayInput, 0, 1e12) * 30.4;
+  const estimatedRequestsPerMonthFromGb = clamp(retrievalGbPerMonth, 0, 1e18) * clamp(requestsPerGb, 0, 1e9);
   const retrievalGbPerDay = retrievalGbPerMonth / 30.4;
   const retrievalAvgMbps = (retrievalGbPerMonth * 8000) / (30.4 * 24 * 3600);
   const retrievalRequestsPerSecond = retrievalRequestsPerMonth / (30.4 * 24 * 3600);
@@ -156,6 +158,30 @@ export function AwsS3GlacierCostCalculator() {
               step={100}
               onChange={(e) => setRetrievalRequestsPerDayInput(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Requests per GB retrieved</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={requestsPerGb}
+              min={0}
+              step={1}
+              onChange={(e) => setRequestsPerGb(+e.target.value)}
+            />
+            <div className="hint">Small objects push this higher.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRetrievalRequestsPerMonth(Math.round(estimatedRequestsPerMonthFromGb))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonthFromGb, 0)} requests/month.</div>
           </div>
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <div className="btn-row">
