@@ -30,9 +30,13 @@ export function DataEgressCostCalculator({
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("DataEgressCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("DataEgressCost.peakMultiplierPct", 150);
   const [avgMbpsInput, setAvgMbpsInput] = useState(75);
+  const [peakMbpsInput, setPeakMbpsInput] = useState(180);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const avgMbps = (gbPerMonth * 8000) / secondsPerMonth;
   const estimatedGbPerMonth = (clamp(avgMbpsInput, 0, 1e9) * secondsPerMonth) / 8000;
+  const peakMultiplierFromMbps = avgMbps > 0
+    ? (clamp(peakMbpsInput, 0, 1e9) / avgMbps) * 100
+    : 0;
   const tierOrderOk = tier2UpToGb >= tier1UpToGb;
 
   const buildResult = (gbPerMonthValue: number) => {
@@ -228,6 +232,38 @@ export function DataEgressCostCalculator({
                 onChange={(e) => setPeakMultiplierPct(+e.target.value)}
               />
               <div className="hint">Model seasonal spikes or incident traffic.</div>
+            </div>
+          ) : null}
+          {showPeakScenario ? (
+            <div className="field field-3">
+              <div className="label">Peak Mbps</div>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={peakMbpsInput}
+                min={0}
+                step={0.1}
+                onChange={(e) => setPeakMbpsInput(+e.target.value)}
+              />
+              <div className="hint">Use observed peak throughput.</div>
+            </div>
+          ) : null}
+          {showPeakScenario ? (
+            <div className="field field-3" style={{ alignSelf: "end" }}>
+              <div className="btn-row">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => {
+                    if (peakMultiplierFromMbps > 0) {
+                      setPeakMultiplierPct(Math.min(1000, Math.max(100, Math.round(peakMultiplierFromMbps))));
+                    }
+                  }}
+                >
+                  Use peak Mbps
+                </button>
+              </div>
+              <div className="hint">Est {formatNumber(peakMultiplierFromMbps, 0)}% multiplier.</div>
             </div>
           ) : null}
 
