@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateEgressCost, estimateTieredEgressCost } from "../../lib/calc/egress";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -29,8 +29,10 @@ export function DataEgressCostCalculator({
   const [tier3PricePerGbUsd, setTier3PricePerGbUsd] = useNumberParamState("DataEgressCost.tier3PricePerGbUsd", defaultPricePerGbUsd);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("DataEgressCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("DataEgressCost.peakMultiplierPct", 150);
+  const [avgMbpsInput, setAvgMbpsInput] = useState(75);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const avgMbps = (gbPerMonth * 8000) / secondsPerMonth;
+  const estimatedGbPerMonth = (clamp(avgMbpsInput, 0, 1e9) * secondsPerMonth) / 8000;
   const tierOrderOk = tier2UpToGb >= tier1UpToGb;
 
   const buildResult = (gbPerMonthValue: number) => {
@@ -89,6 +91,29 @@ export function DataEgressCostCalculator({
               onChange={(e) => setGbPerMonth(+e.target.value)}
             />
             <div className="hint">Avg throughput: {formatNumber(avgMbps, 2)} Mbps.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg throughput (Mbps)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgMbpsInput}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgMbpsInput(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setGbPerMonth(Math.round(estimatedGbPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedGbPerMonth, 0)} GB/month.</div>
           </div>
 
           <div className="field field-3">
