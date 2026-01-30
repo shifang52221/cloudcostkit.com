@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateCloudTrailCost } from "../../lib/calc/cloudTrail";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -14,6 +14,9 @@ export function AwsCloudTrailCostCalculator() {
   const [pricePer100kManagementEventsUsd, setPricePer100kManagementEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kManagementEventsUsd", 0.1);
   const [pricePer100kDataEventsUsd, setPricePer100kDataEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kDataEventsUsd", 0.2);
   const [pricePer100kInsightsEventsUsd, setPricePer100kInsightsEventsUsd] = useNumberParamState("AwsCloudTrailCost.pricePer100kInsightsEventsUsd", 0.35);
+  const [managementEventsPerDay, setManagementEventsPerDay] = useState(1_600_000);
+  const [dataEventsPerDay, setDataEventsPerDay] = useState(300_000);
+  const [insightsEventsPerDay, setInsightsEventsPerDay] = useState(30_000);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const managementEventsPerSecond = managementEventsPerMonth / secondsPerMonth;
   const dataEventsPerSecond = dataEventsPerMonth / secondsPerMonth;
@@ -21,6 +24,9 @@ export function AwsCloudTrailCostCalculator() {
   const managementPricePerMillionUsd = pricePer100kManagementEventsUsd * 10;
   const dataPricePerMillionUsd = pricePer100kDataEventsUsd * 10;
   const insightsPricePerMillionUsd = pricePer100kInsightsEventsUsd * 10;
+  const estimatedManagementEventsPerMonth = clamp(managementEventsPerDay, 0, 1e12) * 30.4;
+  const estimatedDataEventsPerMonth = clamp(dataEventsPerDay, 0, 1e12) * 30.4;
+  const estimatedInsightsEventsPerMonth = clamp(insightsEventsPerDay, 0, 1e12) * 30.4;
 
   const result = useMemo(() => {
     return estimateCloudTrailCost({
@@ -102,6 +108,57 @@ export function AwsCloudTrailCostCalculator() {
               onChange={(e) => setInsightsEventsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(insightsEventsPerSecond, 2)} events/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Mgmt events (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={managementEventsPerDay}
+              min={0}
+              step={1000}
+              onChange={(e) => setManagementEventsPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Data events (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={dataEventsPerDay}
+              min={0}
+              step={1000}
+              onChange={(e) => setDataEventsPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Insights events (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={insightsEventsPerDay}
+              min={0}
+              step={100}
+              onChange={(e) => setInsightsEventsPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setManagementEventsPerMonth(Math.round(estimatedManagementEventsPerMonth));
+                  setDataEventsPerMonth(Math.round(estimatedDataEventsPerMonth));
+                  setInsightsEventsPerMonth(Math.round(estimatedInsightsEventsPerMonth));
+                }}
+              >
+                Use estimates
+              </button>
+            </div>
+            <div className="hint">
+              Est {formatNumber(estimatedManagementEventsPerMonth, 0)} / {formatNumber(estimatedDataEventsPerMonth, 0)} / {formatNumber(estimatedInsightsEventsPerMonth, 0)} events per month.
+            </div>
           </div>
 
           <div className="field field-3">

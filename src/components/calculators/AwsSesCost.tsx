@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateSesCost } from "../../lib/calc/ses";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -11,9 +11,11 @@ export function AwsSesCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsSesCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSesCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSesCost.peakMultiplierPct", 180);
+  const [emailsPerDay, setEmailsPerDay] = useState(160_000);
   const emailsPerSecond = emailsPerMonth / (30.4 * 24 * 3600);
   const pricePerMillionEmailsUsd = pricePer1000EmailsUsd * 1000;
   const estimatedTransferGb = (emailsPerMonth * avgEmailKb) / (1024 * 1024);
+  const estimatedEmailsPerMonth = clamp(emailsPerDay, 0, 1e12) * 30.4;
 
   const result = useMemo(() => {
     return estimateSesCost({
@@ -51,6 +53,29 @@ export function AwsSesCostCalculator() {
               onChange={(e) => setEmailsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(emailsPerSecond, 2)} emails/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Emails sent (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={emailsPerDay}
+              min={0}
+              step={100}
+              onChange={(e) => setEmailsPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setEmailsPerMonth(Math.round(estimatedEmailsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedEmailsPerMonth, 0)} emails/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Send price ($ / 1000 emails)</div>

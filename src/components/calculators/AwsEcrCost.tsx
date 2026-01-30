@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateEcrCost } from "../../lib/calc/ecr";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -11,8 +11,13 @@ export function AwsEcrCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsEcrCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEcrCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEcrCost.peakMultiplierPct", 180);
+  const [startingStorageGb, setStartingStorageGb] = useState(1200);
+  const [monthlyGrowthPct, setMonthlyGrowthPct] = useState(10);
+  const [growthMonths, setGrowthMonths] = useState(6);
   const storedTbMonth = storedGbMonth / 1024;
   const avgEgressMbps = (egressGbPerMonth * 8000) / (30.4 * 24 * 3600);
+  const estimatedStoredGbMonth = clamp(startingStorageGb, 0, 1e12)
+    * (1 + (clamp(monthlyGrowthPct, 0, 10_000) / 100) * (clamp(growthMonths, 0, 120) / 2));
 
   const result = useMemo(() => {
     return estimateEcrCost({
@@ -57,6 +62,51 @@ export function AwsEcrCostCalculator() {
               onChange={(e) => setStoredGbMonth(+e.target.value)}
             />
             <div className="hint">Average stored GB over the month (~{formatNumber(storedTbMonth, 2)} TB-month).</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Starting storage (GB)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={startingStorageGb}
+              min={0}
+              step={1}
+              onChange={(e) => setStartingStorageGb(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Monthly growth (%)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={monthlyGrowthPct}
+              min={0}
+              step={0.1}
+              onChange={(e) => setMonthlyGrowthPct(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Months in period</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={growthMonths}
+              min={0}
+              step={1}
+              onChange={(e) => setGrowthMonths(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setStoredGbMonth(Math.round(estimatedStoredGbMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedStoredGbMonth, 0)} GB-month avg.</div>
           </div>
           <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
