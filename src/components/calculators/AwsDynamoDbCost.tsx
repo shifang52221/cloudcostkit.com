@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateDynamoDbCost } from "../../lib/calc/dynamodb";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -17,6 +17,10 @@ export function AwsDynamoDbCostCalculator() {
   const secondsPerMonth = 30.4 * 24 * 3600;
   const readsPerSecond = readRequestsPerMonth / secondsPerMonth;
   const writesPerSecond = writeRequestsPerMonth / secondsPerMonth;
+  const [avgReadRps, setAvgReadRps] = useState(800);
+  const [avgWriteRps, setAvgWriteRps] = useState(200);
+  const estimatedReadRequestsPerMonth = clamp(avgReadRps, 0, 1e12) * secondsPerMonth;
+  const estimatedWriteRequestsPerMonth = clamp(avgWriteRps, 0, 1e12) * secondsPerMonth;
   const storageTb = storageGb / 1024;
 
   const result = useMemo(() => {
@@ -90,6 +94,45 @@ export function AwsDynamoDbCostCalculator() {
               onChange={(e) => setWriteRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(writesPerSecond, 2)} RPS.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg read RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgReadRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgReadRps(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg write RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgWriteRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgWriteRps(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setReadRequestsPerMonth(Math.round(estimatedReadRequestsPerMonth));
+                  setWriteRequestsPerMonth(Math.round(estimatedWriteRequestsPerMonth));
+                }}
+              >
+                Use estimates
+              </button>
+            </div>
+            <div className="hint">
+              Est {formatNumber(estimatedReadRequestsPerMonth, 0)} reads and {formatNumber(estimatedWriteRequestsPerMonth, 0)} writes/month.
+            </div>
           </div>
 
           <div className="field field-3">

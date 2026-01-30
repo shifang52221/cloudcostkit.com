@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
-import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
+import { useBooleanParamState, useNumberParamState, useStringParamState } from "./useNumberParamState";
 import { estimateLoadBalancerCost } from "../../lib/calc/loadBalancer";
+import { estimateLoadBalancerCapacityUnits, type LoadBalancerType } from "../../lib/calc/loadBalancerCapacityUnits";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
 
@@ -13,9 +14,40 @@ export function AwsLoadBalancerCostCalculator() {
   const [pricePerCapacityUnitHourUsd, setPricePerCapacityUnitHourUsd] = useNumberParamState("AwsLoadBalancerCost.pricePerCapacityUnitHourUsd", 0.008);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsLoadBalancerCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsLoadBalancerCost.peakMultiplierPct", 180);
+  const [capacityTypeRaw, setCapacityTypeRaw] = useStringParamState(
+    "AwsLoadBalancerCost.capacityType",
+    "alb",
+    ["alb", "nlb"],
+  );
+  const capacityType = capacityTypeRaw as LoadBalancerType;
+  const [newConnectionsPerSecond, setNewConnectionsPerSecond] = useNumberParamState(
+    "AwsLoadBalancerCost.newConnectionsPerSecond",
+    40,
+  );
+  const [activeConnections, setActiveConnections] = useNumberParamState("AwsLoadBalancerCost.activeConnections", 2000);
+  const [processedGbPerHour, setProcessedGbPerHour] = useNumberParamState("AwsLoadBalancerCost.processedGbPerHour", 0.8);
+  const [ruleEvaluationsPerSecond, setRuleEvaluationsPerSecond] = useNumberParamState(
+    "AwsLoadBalancerCost.ruleEvaluationsPerSecond",
+    300,
+  );
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
   const hourlyPerLb = normalizedHoursPerMonth * pricePerLbHourUsd;
+  const capacityEstimate = useMemo(() => {
+    return estimateLoadBalancerCapacityUnits({
+      type: capacityType,
+      newConnectionsPerSecond,
+      activeConnections,
+      processedGbPerHour,
+      ruleEvaluationsPerSecond: capacityType === "alb" ? ruleEvaluationsPerSecond : 0,
+    });
+  }, [
+    activeConnections,
+    capacityType,
+    newConnectionsPerSecond,
+    processedGbPerHour,
+    ruleEvaluationsPerSecond,
+  ]);
 
   const result = useMemo(() => {
     return estimateLoadBalancerCost({
@@ -129,6 +161,71 @@ export function AwsLoadBalancerCostCalculator() {
               step={0.0001}
               onChange={(e) => setPricePerCapacityUnitHourUsd(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Capacity unit type</div>
+            <select value={capacityType} onChange={(e) => setCapacityTypeRaw(e.target.value)}>
+              <option value="alb">ALB (LCU)</option>
+              <option value="nlb">NLB (NLCU)</option>
+            </select>
+          </div>
+          <div className="field field-3">
+            <div className="label">New connections / sec</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={newConnectionsPerSecond}
+              min={0}
+              step={1}
+              onChange={(e) => setNewConnectionsPerSecond(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Active connections</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={activeConnections}
+              min={0}
+              step={1}
+              onChange={(e) => setActiveConnections(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Processed GB / hour</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={processedGbPerHour}
+              min={0}
+              step={0.01}
+              onChange={(e) => setProcessedGbPerHour(+e.target.value)}
+            />
+          </div>
+          {capacityType === "alb" ? (
+            <div className="field field-3">
+              <div className="label">Rule evaluations / sec</div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={ruleEvaluationsPerSecond}
+                min={0}
+                step={1}
+                onChange={(e) => setRuleEvaluationsPerSecond(+e.target.value)}
+              />
+            </div>
+          ) : null}
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setCapacityUnitsPerHour(Math.round(capacityEstimate.capacityUnitsPerHour * 100) / 100)}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(capacityEstimate.capacityUnitsPerHour, 2)} units/hour.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
