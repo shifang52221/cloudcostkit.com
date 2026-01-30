@@ -1,0 +1,68 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsSqsRequestEstimator } from "../../components/calculators/AwsSqsRequestEstimator";
+
+const title = "SQS Request Volume Estimator";
+const description =
+  "Estimate AWS SQS request volume from messages, requests per message, retries, and peak multipliers to model request-based charges. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-sqs-request-estimator"
+  intro="Estimate monthly SQS request volume by modeling messages per month, requests per message, retry multipliers, and peak volume."
+  examples={[
+    "200M messages/month with 3 requests/message and a 120% retry multiplier.",
+    "Use a peak scenario for incident or batch spikes.",
+  ]}
+  includes={[
+    "Estimated requests per message from base + retries + extra APIs.",
+    "Total requests per month from message volume.",
+    "Optional peak scenario on message volume.",
+  ]}
+  excludes={[
+    "Per-request pricing (use the SQS cost calculator).",
+    "Downstream compute or storage costs.",
+  ]}
+  how={[
+    "Estimated req/message = base x retry multiplier + extra requests.",
+    "Total requests = messages/month x estimated req/message.",
+  ]}
+  faqs={[
+    {
+      q: "Why is the baseline 3 requests per message?",
+      a: "Send + Receive + Delete are the common baseline. Retries and visibility extensions add more.",
+    },
+    {
+      q: "Do retries matter?",
+      a: "Yes. Retries can multiply request volume during failures or timeouts.",
+    },
+    {
+      q: "What counts as extra requests?",
+      a: "Visibility extensions, change visibility, or additional Receive calls in polling loops.",
+    },
+  ]}
+  lastUpdated="2026-01-30"
+  related={[
+    { href: "/calculators/aws-sqs-cost-calculator", label: "AWS SQS cost calculator" },
+    { href: "/guides/aws-sqs-estimate-requests", label: "Guide: estimate SQS requests" },
+    { href: "/guides/aws-sqs-cost-optimization", label: "Guide: reduce SQS costs" },
+  ]}
+>
+  <AwsSqsRequestEstimator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Messages</strong>: use CloudWatch metrics or queue metrics exports.</li>
+      <li><strong>Requests per message</strong>: count Send + Receive + Delete and any retries.</li>
+      <li><strong>Retries</strong>: add a multiplier for timeouts, retries, and failures.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a>
+      <a class="btn" href="/guides/aws-sqs-estimate-requests/">Guide: estimate SQS requests</a>
+    </div>
+  </div>
+</CalculatorLayout>

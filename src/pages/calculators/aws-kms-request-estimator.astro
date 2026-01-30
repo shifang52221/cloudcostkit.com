@@ -1,0 +1,69 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsKmsRequestEstimator } from "../../components/calculators/AwsKmsRequestEstimator";
+
+const title = "KMS Request Volume Estimator";
+const description =
+  "Estimate AWS KMS request volume from workload units, KMS calls per unit, and retry multipliers to size request-based charges. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-kms-request-estimator"
+  intro="Estimate monthly KMS requests by translating workload units (requests, objects, secret reads) into KMS calls per unit, then applying a retry/burst multiplier."
+  examples={[
+    "500M app requests/month with 0.08 KMS calls per request and a 115% retry multiplier.",
+    "Model a peak month separately to capture incident or batch-job spikes.",
+  ]}
+  includes={[
+    "Baseline KMS requests from units x calls per unit.",
+    "Optional retry/burst multiplier for realistic totals.",
+    "Optional peak scenario for unit spikes.",
+  ]}
+  excludes={[
+    "Key-month charges (use the KMS cost calculator).",
+    "Downstream service costs that are not KMS charges.",
+  ]}
+  how={[
+    "Base requests = units/month x KMS calls per unit.",
+    "Total requests = base requests x retry multiplier.",
+    "Peak scenario scales unit volume only.",
+  ]}
+  faqs={[
+    {
+      q: "What is a \"unit\"?",
+      a: "A unit is the workload driver for KMS calls: app requests, object uploads, secret reads, or message processing events.",
+    },
+    {
+      q: "How do I estimate calls per unit?",
+      a: "Trace one request path and count Encrypt/Decrypt/GenerateDataKey calls. Cache or batch changes this number a lot.",
+    },
+    {
+      q: "Do retries matter?",
+      a: "Yes. Retries and timeouts multiply requests, especially during incidents. Use a multiplier to avoid under-budgeting.",
+    },
+  ]}
+  lastUpdated="2026-01-30"
+  related={[
+    { href: "/calculators/aws-kms-cost-calculator", label: "AWS KMS cost calculator" },
+    { href: "/guides/aws-kms-estimate-requests", label: "Guide: estimate KMS requests" },
+    { href: "/guides/aws-kms-cost-optimization", label: "Guide: reduce KMS costs" },
+  ]}
+>
+  <AwsKmsRequestEstimator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Units</strong>: app requests, secret reads, or object operations per month.</li>
+      <li><strong>Calls per unit</strong>: measure in a staging environment or from tracing.</li>
+      <li><strong>Multiplier</strong>: account for retries and burst windows.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/aws-kms-cost-calculator/">AWS KMS cost calculator</a>
+      <a class="btn" href="/guides/aws-kms-estimate-requests/">Guide: estimate KMS requests</a>
+    </div>
+  </div>
+</CalculatorLayout>

@@ -123,6 +123,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-kms-request-estimator",
+    title: "KMS Request Volume Estimator",
+    description: "Estimate KMS request volume from workload units and call rates.",
+    category: "FinOps",
+  },
+  {
     slug: "aws-ssm-parameter-store-cost-calculator",
     title: "AWS SSM Parameter Store Cost Calculator",
     description: "Estimate Parameter Store costs from advanced parameter count and API call volume.",
@@ -378,6 +384,12 @@ export const TOOLS: Tool[] = [
     slug: "aws-sqs-cost-calculator",
     title: "AWS SQS Cost Calculator",
     description: "Estimate SQS-style request cost from messages and requests per message.",
+    category: "FinOps",
+  },
+  {
+    slug: "aws-sqs-request-estimator",
+    title: "SQS Request Volume Estimator",
+    description: "Estimate SQS request volume from messages, retries, and extra API calls.",
     category: "FinOps",
   },
   {

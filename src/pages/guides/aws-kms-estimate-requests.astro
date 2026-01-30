@@ -57,7 +57,7 @@ const faqs = [
     <li><strong>Jobs</strong>: job runs per month × crypto operations per run</li>
   </ul>
   <p class="muted">
-    Helper: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>
+    Helper: <a href="/calculators/aws-kms-request-estimator/">KMS request volume estimator</a>
   </p>
 
   <h2>Step 3: estimate “KMS calls per unit” (this is where design choices matter)</h2>
@@ -87,7 +87,8 @@ const faqs = [
     </li>
   </ul>
   <p class="muted">
-    Tool: <a href="/calculators/aws-kms-cost-calculator/">KMS cost calculator</a> (convert keys + requests into an estimate)
+    Tools: <a href="/calculators/aws-kms-request-estimator/">KMS request volume estimator</a>,{" "}
+    <a href="/calculators/aws-kms-cost-calculator/">KMS cost calculator</a>
   </p>
 
   <h2>Step 5: validate and attribute (so you can optimize safely)</h2>
@@ -114,6 +115,7 @@ const faqs = [
 
   <h2>Next steps</h2>
   <div class="btn-row">
+    <a class="btn" href="/calculators/aws-kms-request-estimator/">KMS request volume estimator</a>
     <a class="btn" href="/guides/aws-kms-pricing/">KMS pricing checklist</a>
     <a class="btn" href="/guides/aws-kms-cost-optimization/">KMS cost optimization</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>

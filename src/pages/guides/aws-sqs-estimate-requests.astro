@@ -44,7 +44,7 @@ const faqs = [
     <li><strong>From upstream</strong>: if SNS publishes to SQS, publish volume can approximate queue ingress</li>
   </ul>
   <p class="muted">
-    Helper: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a> (for steady producers)
+    Helper: <a href="/calculators/aws-sqs-request-estimator/">SQS request volume estimator</a> (for steady producers)
   </p>
 
   <h2>Step 2: model baseline requests per successful message</h2>
@@ -94,6 +94,12 @@ const faqs = [
   <p class="muted">
     Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a> with your request volume and pricing assumptions.
   </p>
+
+  <h2>Related calculators</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-sqs-request-estimator/">SQS request volume estimator</a>
+    <a class="btn" href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a>
+  </div>
 
   <h2>How to validate with metrics</h2>
   <ul>
