@@ -18,7 +18,9 @@ export function AwsRoute53CostCalculator() {
   const queriesPerSecond = standardQueriesPerMonth / secondsPerMonth;
   const pricePerBillionQueriesUsd = pricePerMillionQueriesUsd * 1000;
   const [avgQps, setAvgQps] = useState(200);
+  const [queriesPerRequest, setQueriesPerRequest] = useState(1.2);
   const estimatedQueriesPerMonth = clamp(avgQps, 0, 1e12) * secondsPerMonth;
+  const estimatedQueriesFromRequests = clamp(queriesPerRequest, 0, 100) * standardQueriesPerMonth;
 
   const result = useMemo(() => {
     return estimateRoute53Cost({
@@ -99,6 +101,30 @@ export function AwsRoute53CostCalculator() {
               onChange={(e) => setAvgQps(+e.target.value)}
             />
             <div className="hint">Use resolver or Route 53 query metrics.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Queries per app request</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={queriesPerRequest}
+              min={0}
+              step={0.1}
+              onChange={(e) => setQueriesPerRequest(+e.target.value)}
+            />
+            <div className="hint">Typical range 1-3 for chatty clients.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setStandardQueriesPerMonth(Math.round(estimatedQueriesFromRequests))}
+              >
+                Use request ratio
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedQueriesFromRequests, 0)} queries/month.</div>
           </div>
           <div className="field field-3" style={{ alignSelf: "end" }}>
             <div className="btn-row">
