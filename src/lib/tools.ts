@@ -75,6 +75,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "aws-waf-request-estimator",
+    title: "WAF Request Volume Estimator",
+    description: "Estimate evaluated WAF requests from baseline traffic and attack spikes.",
+    category: "Networking",
+  },
+  {
     slug: "aws-ecr-cost-calculator",
     title: "AWS ECR Cost Calculator",
     description: "Estimate ECR-style cost from stored GB-month plus data transfer assumptions.",

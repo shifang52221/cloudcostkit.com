@@ -1,0 +1,77 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsWafRequestEstimator } from "../../components/calculators/AwsWafRequestEstimator";
+
+const title = "WAF Request Volume Estimator (Baseline + Attack)";
+const description =
+  "Estimate WAF evaluated request volume from baseline RPS, attack spikes, and monthly duration so you can budget request-based charges. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-waf-request-estimator"
+  intro="Estimate monthly evaluated requests for WAF pricing by combining baseline RPS and attack spikes. Use the output in the AWS WAF cost calculator."
+  examples={[
+    "Baseline 1,200 RPS for 24h/day with 20 attack hours at 12,000 RPS.",
+    "Add a 10-25% multiplier for retries, bots, and blocked traffic.",
+  ]}
+  includes={[
+    "Baseline requests from RPS x hours/day x days/month.",
+    "Attack spike requests from RPS x attack hours/month.",
+    "Optional multiplier to cover retries and blocked traffic.",
+  ]}
+  excludes={[
+    "Web ACL and rule pricing (use the WAF cost calculator).",
+    "Downstream logging and analytics costs.",
+  ]}
+  how={[
+    "Baseline requests = baseline RPS x baseline hours x 3600.",
+    "Attack requests = attack RPS x attack hours x 3600.",
+    "Total evaluated = (baseline + attack) x multiplier.",
+  ]}
+  faqs={[
+    {
+      q: "Should I include blocked requests?",
+      a: "Yes. Evaluated requests include allowed and blocked traffic. Use a multiplier if your baseline excludes blocked traffic.",
+    },
+    {
+      q: "What if I only have CDN or LB request counts?",
+      a: "Use those counts directly as evaluated requests if the WAF is in-line for that traffic.",
+    },
+    {
+      q: "How should I model attacks?",
+      a: "Use a realistic attack RPS and total hours per month based on incident history or a conservative assumption.",
+    },
+  ]}
+  lastUpdated="2026-01-30"
+  related={[
+    { href: "/calculators/aws-waf-cost-calculator", label: "AWS WAF cost calculator" },
+    { href: "/guides/aws-waf-estimate-requests", label: "Guide: estimate WAF request volume" },
+    { href: "/guides/aws-waf-cost-spikes-during-attacks", label: "Guide: WAF cost spikes during attacks" },
+    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+  ]}
+>
+  <AwsWafRequestEstimator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Baseline RPS</strong>: use CDN/LB/WAF metrics for a normal window.</li>
+      <li><strong>Attack RPS</strong>: use incident logs or peak traffic spikes.</li>
+      <li><strong>Attack hours</strong>: total duration per month of spikes.</li>
+    </ul>
+
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Total evaluated requests drive the WAF request charge line item.</li>
+      <li>Even short attack windows can dominate monthly request volume.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/aws-waf-cost-calculator/">AWS WAF cost calculator</a>
+      <a class="btn" href="/guides/aws-waf-estimate-requests/">Guide: estimate WAF request volume</a>
+      <a class="btn" href="/guides/aws-waf-cost-optimization/">Guide: reduce WAF costs</a>
+    </div>
+  </div>
+</CalculatorLayout>

@@ -52,6 +52,7 @@ const description =
     { href: "/guides/aws-waf-cost-optimization", label: "Guide: reduce WAF costs" },
     { href: "/guides/aws-waf-cost-spikes-during-attacks", label: "Guide: WAF cost spikes during attacks" },
     { href: "/guides/aws-waf-vs-cloudflare-waf-cost", label: "Guide: AWS WAF vs Cloudflare WAF cost" },
+    { href: "/calculators/aws-waf-request-estimator", label: "WAF request volume estimator" },
     { href: "/calculators/cloudfront-cost-calculator", label: "CloudFront cost calculator" },
   ]}
 >
@@ -60,7 +61,7 @@ const description =
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Requests</strong>: estimate evaluated requests/month (include blocked traffic).</li>
-      <li><strong>RPS</strong>: if you only have RPS, use the calculator's RPS estimator to convert to monthly.</li>
+      <li><strong>RPS</strong>: if you only have RPS, use the WAF request estimator to model baseline + attack volume.</li>
       <li><strong>Baselines</strong>: count ACLs and rules as billed in your pricing model.</li>
       <li><strong>Downstream</strong>: add logging/storage/analytics volume as a second bill.</li>
     </ul>
@@ -122,6 +123,7 @@ const description =
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/guides/aws-waf-pricing/">Guide: WAF pricing</a>
       <a class="btn" href="/guides/aws-waf-estimate-requests/">Guide: estimate WAF request volume</a>
+      <a class="btn" href="/calculators/aws-waf-request-estimator/">WAF request volume estimator</a>
       <a class="btn" href="/guides/aws-waf-cost-optimization/">Guide: reduce WAF costs</a>
       <a class="btn" href="/guides/aws-waf-cost-spikes-during-attacks/">Guide: WAF cost spikes during attacks</a>
     </div>
