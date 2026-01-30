@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateRdsCost } from "../../lib/calc/rds";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -20,13 +20,21 @@ export function AwsRdsCostCalculator() {
   const [pricePerMillionIoRequestsUsd, setPricePerMillionIoRequestsUsd] = useNumberParamState("AwsRdsCost.pricePerMillionIoRequestsUsd", 0.2);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsRdsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsRdsCost.peakMultiplierPct", 180);
+  const [startingStorageGb, setStartingStorageGb] = useState(150);
+  const [monthlyGrowthPct, setMonthlyGrowthPct] = useState(8);
+  const [growthMonths, setGrowthMonths] = useState(6);
+  const [avgIops, setAvgIops] = useState(2000);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
   const storageTb = storageGb / 1024;
   const backupTb = backupGb / 1024;
   const backupRatio = storageGb > 0 ? backupGb / storageGb : 0;
   const secondsPerMonth = 30.4 * 24 * 3600;
+  const uptimeSecondsPerMonth = normalizedHoursPerMonth * 3600;
   const ioPerSecond = ioRequestsPerMonth / secondsPerMonth;
+  const estimatedStorageGb = clamp(startingStorageGb, 0, 1e12)
+    * (1 + (clamp(monthlyGrowthPct, 0, 10_000) / 100) * (clamp(growthMonths, 0, 120) / 2));
+  const estimatedIoRequestsPerMonth = clamp(avgIops, 0, 1e9) * uptimeSecondsPerMonth;
 
   const result = useMemo(() => {
     return estimateRdsCost({
@@ -151,6 +159,51 @@ export function AwsRdsCostCalculator() {
             <div className="hint">Approx {formatNumber(storageTb, 2)} TB-month.</div>
           </div>
           <div className="field field-3">
+            <div className="label">Starting storage (GB)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={startingStorageGb}
+              min={0}
+              step={1}
+              onChange={(e) => setStartingStorageGb(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Monthly growth (%)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={monthlyGrowthPct}
+              min={0}
+              step={0.1}
+              onChange={(e) => setMonthlyGrowthPct(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Months in period</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={growthMonths}
+              min={0}
+              step={1}
+              onChange={(e) => setGrowthMonths(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setStorageGb(Math.round(estimatedStorageGb * 10) / 10)}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedStorageGb, 1)} GB-month avg.</div>
+          </div>
+          <div className="field field-3">
             <div className="label">Storage price ($ / GB-month)</div>
             <input
               type="number"
@@ -197,6 +250,30 @@ export function AwsRdsCostCalculator() {
               onChange={(e) => setIoRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(ioPerSecond, 1)} IOPS.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg IOPS</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={avgIops}
+              min={0}
+              step={1}
+              onChange={(e) => setAvgIops(+e.target.value)}
+            />
+            <div className="hint">Use average read + write IOPS.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setIoRequestsPerMonth(Math.round(estimatedIoRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedIoRequestsPerMonth, 0)} I/O requests/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">I/O price ($ / 1M requests)</div>

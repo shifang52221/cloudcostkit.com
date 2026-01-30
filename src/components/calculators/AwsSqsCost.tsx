@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateSqsCost } from "../../lib/calc/sqs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -11,8 +11,14 @@ export function AwsSqsCostCalculator() {
   const [freeRequestsPerMonth, setFreeRequestsPerMonth] = useNumberParamState("AwsSqsCost.freeRequestsPerMonth", 0);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSqsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSqsCost.peakMultiplierPct", 180);
+  const [baseRequestsPerMessage, setBaseRequestsPerMessage] = useState(3);
+  const [retryMultiplierPct, setRetryMultiplierPct] = useState(120);
+  const [extraRequestsPerMessage, setExtraRequestsPerMessage] = useState(0);
   const messagesPerSecond = messagesPerMonth / (30.4 * 24 * 3600);
   const requestsPerSecond = (messagesPerMonth * requestsPerMessage) / (30.4 * 24 * 3600);
+  const estimatedRequestsPerMessage =
+    clamp(baseRequestsPerMessage, 0, 1e6) * (clamp(retryMultiplierPct, 0, 10000) / 100)
+    + clamp(extraRequestsPerMessage, 0, 1e6);
 
   const result = useMemo(() => {
     return estimateSqsCost({
@@ -66,6 +72,54 @@ export function AwsSqsCostCalculator() {
             <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
               Common baseline: 3 (Send + Receive + Delete). Add more for retries, visibility timeouts, or extra API calls.
             </div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Base req/msg</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={baseRequestsPerMessage}
+              min={0}
+              step={1}
+              onChange={(e) => setBaseRequestsPerMessage(+e.target.value)}
+            />
+            <div className="hint">Baseline is usually 3.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Retry multiplier (%)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={retryMultiplierPct}
+              min={0}
+              step={5}
+              onChange={(e) => setRetryMultiplierPct(+e.target.value)}
+            />
+            <div className="hint">100% = no retries.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Extra req/msg</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={extraRequestsPerMessage}
+              min={0}
+              step={1}
+              onChange={(e) => setExtraRequestsPerMessage(+e.target.value)}
+            />
+            <div className="hint">Visibility extensions or extra APIs.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMessage(Math.round(estimatedRequestsPerMessage * 100) / 100)}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMessage, 2)} req/msg.</div>
           </div>
 
           <div className="field field-3">

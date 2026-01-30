@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateCloudwatchMetricsCost } from "../../lib/calc/cloudwatchMetrics";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -15,8 +15,18 @@ export function AwsCloudwatchMetricsCostCalculator() {
   const [pricePerThousandApiRequestsUsd, setPricePerThousandApiRequestsUsd] = useNumberParamState("AwsCloudwatchMetricsCost.pricePerThousandApiRequestsUsd", 0.01);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsCloudwatchMetricsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsCloudwatchMetricsCost.peakMultiplierPct", 160);
+  const [widgetsPerDashboard, setWidgetsPerDashboard] = useState(12);
+  const [dashboardRefreshSeconds, setDashboardRefreshSeconds] = useState(60);
+  const [dashboardViewers, setDashboardViewers] = useState(2);
+  const [automationRequestsPerMinute, setAutomationRequestsPerMinute] = useState(40);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const apiRequestsPerSecond = apiRequestsPerMonth / secondsPerMonth;
+  const dashboardRequestsPerMonth = clamp(dashboards, 0, 1e12)
+    * clamp(widgetsPerDashboard, 0, 1e6)
+    * clamp(dashboardViewers, 0, 1e6)
+    * (secondsPerMonth / Math.max(1, clamp(dashboardRefreshSeconds, 1, 3600)));
+  const automationRequestsPerMonth = clamp(automationRequestsPerMinute, 0, 1e9) * 60 * 24 * 30.4;
+  const estimatedApiRequestsPerMonth = dashboardRequestsPerMonth + automationRequestsPerMonth;
 
   const result = useMemo(() => {
     return estimateCloudwatchMetricsCost({
@@ -152,6 +162,62 @@ export function AwsCloudwatchMetricsCostCalculator() {
               onChange={(e) => setApiRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(apiRequestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Widgets per dashboard</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={widgetsPerDashboard}
+              min={0}
+              step={1}
+              onChange={(e) => setWidgetsPerDashboard(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Dashboard refresh (sec)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={dashboardRefreshSeconds}
+              min={1}
+              step={1}
+              onChange={(e) => setDashboardRefreshSeconds(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Dashboard viewers</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={dashboardViewers}
+              min={0}
+              step={1}
+              onChange={(e) => setDashboardViewers(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Automation req/min</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={automationRequestsPerMinute}
+              min={0}
+              step={1}
+              onChange={(e) => setAutomationRequestsPerMinute(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setApiRequestsPerMonth(Math.round(estimatedApiRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedApiRequestsPerMonth, 0)} requests/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">API price ($ / 1k requests)</div>
