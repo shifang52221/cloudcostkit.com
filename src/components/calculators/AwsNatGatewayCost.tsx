@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateNatGatewayCost } from "../../lib/calc/natGateway";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -13,10 +13,12 @@ export function AwsNatGatewayCostCalculator() {
   const [pricePerGbProcessedUsd, setPricePerGbProcessedUsd] = useNumberParamState("AwsNatGatewayCost.pricePerGbProcessedUsd", 0.045);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsNatGatewayCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsNatGatewayCost.peakMultiplierPct", 180);
+  const [avgThroughputMbps, setAvgThroughputMbps] = useState(60);
 
   const normalizedHoursPerMonth = clamp(daysPerMonth, 1, 31) * clamp(hoursPerDay, 0, 24);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const avgMbps = (dataProcessedGbPerMonth * 8000) / secondsPerMonth;
+  const estimatedGbPerMonth = (clamp(avgThroughputMbps, 0, 1e9) * secondsPerMonth) / 8000;
 
   const result = useMemo(() => {
     return estimateNatGatewayCost({
@@ -116,6 +118,30 @@ export function AwsNatGatewayCostCalculator() {
               onChange={(e) => setDataProcessedGbPerMonth(+e.target.value)}
             />
             <div className="hint">Avg throughput {formatNumber(avgMbps, 2)} Mbps.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg throughput (Mbps)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgThroughputMbps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgThroughputMbps(+e.target.value)}
+            />
+            <div className="hint">Use avg egress over the month.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setDataProcessedGbPerMonth(Math.round(estimatedGbPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedGbPerMonth, 0)} GB/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / GB processed)</div>

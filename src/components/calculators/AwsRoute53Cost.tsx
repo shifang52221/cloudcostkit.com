@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateRoute53Cost } from "../../lib/calc/route53";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -14,8 +14,11 @@ export function AwsRoute53CostCalculator() {
   const [pricePerHostedZoneUsdPerMonth, setPricePerHostedZoneUsdPerMonth] = useNumberParamState("AwsRoute53Cost.pricePerHostedZoneUsdPerMonth", 0.5);
   const [pricePerMillionQueriesUsd, setPricePerMillionQueriesUsd] = useNumberParamState("AwsRoute53Cost.pricePerMillionQueriesUsd", 0.4);
   const [pricePerHealthCheckUsdPerMonth, setPricePerHealthCheckUsdPerMonth] = useNumberParamState("AwsRoute53Cost.pricePerHealthCheckUsdPerMonth", 0.5);
-  const queriesPerSecond = standardQueriesPerMonth / (30.4 * 24 * 3600);
+  const secondsPerMonth = 30.4 * 24 * 3600;
+  const queriesPerSecond = standardQueriesPerMonth / secondsPerMonth;
   const pricePerBillionQueriesUsd = pricePerMillionQueriesUsd * 1000;
+  const [avgQps, setAvgQps] = useState(200);
+  const estimatedQueriesPerMonth = clamp(avgQps, 0, 1e12) * secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateRoute53Cost({
@@ -84,6 +87,30 @@ export function AwsRoute53CostCalculator() {
               onChange={(e) => setStandardQueriesPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(queriesPerSecond, 2)} qps. Enter your estimated DNS queries.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg QPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgQps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgQps(+e.target.value)}
+            />
+            <div className="hint">Use resolver or Route 53 query metrics.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setStandardQueriesPerMonth(Math.round(estimatedQueriesPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedQueriesPerMonth, 0)} queries/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Health checks</div>

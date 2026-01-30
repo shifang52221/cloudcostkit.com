@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateEbsCost } from "../../lib/calc/ebs";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -15,7 +15,12 @@ export function AwsEbsCostCalculator() {
   const [pricePerMbpsMonthUsd, setPricePerMbpsMonthUsd] = useNumberParamState("AwsEbsCost.pricePerMbpsMonthUsd", 0.04);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsEbsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsEbsCost.peakMultiplierPct", 160);
+  const [avgIops, setAvgIops] = useState(3500);
+  const [avgThroughputMbps, setAvgThroughputMbps] = useState(120);
+  const [headroomPct, setHeadroomPct] = useState(125);
   const storageTb = storageGb / 1024;
+  const estimatedIops = clamp(avgIops, 0, 1e12) * (clamp(headroomPct, 0, 10_000) / 100);
+  const estimatedThroughputMbps = clamp(avgThroughputMbps, 0, 1e12) * (clamp(headroomPct, 0, 10_000) / 100);
 
   const result = useMemo(() => {
     return estimateEbsCost({
@@ -100,6 +105,17 @@ export function AwsEbsCostCalculator() {
             />
           </div>
           <div className="field field-3">
+            <div className="label">Avg IOPS</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={avgIops}
+              min={0}
+              step={1}
+              onChange={(e) => setAvgIops(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
             <div className="label">IOPS price ($ / IOPS-month)</div>
             <input
               type="number"
@@ -123,6 +139,17 @@ export function AwsEbsCostCalculator() {
             />
           </div>
           <div className="field field-3">
+            <div className="label">Avg throughput (MB/s)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgThroughputMbps}
+              min={0}
+              step={1}
+              onChange={(e) => setAvgThroughputMbps(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
             <div className="label">Throughput price ($ / MB/s-month)</div>
             <input
               type="number"
@@ -132,6 +159,33 @@ export function AwsEbsCostCalculator() {
               step={0.001}
               onChange={(e) => setPricePerMbpsMonthUsd(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Headroom (%)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={headroomPct}
+              min={100}
+              step={5}
+              onChange={(e) => setHeadroomPct(+e.target.value)}
+            />
+            <div className="hint">Use 120-150% for bursty workloads.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setProvisionedIops(Math.round(estimatedIops));
+                  setProvisionedThroughputMbps(Math.round(estimatedThroughputMbps));
+                }}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedIops, 0)} IOPS, {formatNumber(estimatedThroughputMbps, 0)} MB/s.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
