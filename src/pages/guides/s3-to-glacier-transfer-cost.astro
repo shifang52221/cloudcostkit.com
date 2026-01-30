@@ -1,0 +1,69 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 to Glacier transfer cost: what to include in the move";
+const description =
+  "A practical checklist for S3 to Glacier transfer cost: transition requests, minimum storage duration, and any transfer or rewrite overhead.";
+const faqs = [
+  {
+    q: "Do I pay data transfer to move objects into Glacier?",
+    a: "Usually the main cost is transition requests and the ongoing storage price. Transfer charges can apply if you move data across regions or between accounts.",
+  },
+  {
+    q: "What is the biggest hidden cost during migration?",
+    a: "Minimum storage duration rules. If you move objects into Glacier and delete or rewrite them too early, you can pay early deletion fees.",
+  },
+  {
+    q: "How can I reduce migration cost?",
+    a: "Batch transitions, avoid churn, and ensure objects meet minimum duration requirements before moving them.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/s3-to-glacier-transfer-cost"
+  lastUpdated="2026-01-30"
+  faqs={faqs}
+>
+  <p class="muted">
+    Moving data from S3 to Glacier is usually cheap, but the workflow can create extra costs. Use this checklist to
+    model transition requests, minimum duration rules, and any transfer overhead.
+  </p>
+
+  <h2>What to include in the transfer cost</h2>
+  <ul>
+    <li><strong>Transition requests</strong>: lifecycle transitions and batch operations often have per-request fees.</li>
+    <li><strong>Minimum storage duration</strong>: early deletion can create fees that erase savings.</li>
+    <li><strong>Cross-region moves</strong>: transfers across regions can incur data transfer charges.</li>
+    <li><strong>Rewrites or re-uploads</strong>: data repackaging can double-write costs.</li>
+  </ul>
+
+  <h2>Estimate the transition request volume</h2>
+  <ul>
+    <li>Count objects to transition (requests track object count).</li>
+    <li>Batch operations still count as per-object requests for cost.</li>
+    <li>If you have many small objects, request fees can be meaningful.</li>
+  </ul>
+
+  <h2>Check minimum duration rules before migrating</h2>
+  <ul>
+    <li>Archive tiers have minimum storage duration requirements.</li>
+    <li>Short-lived objects can trigger early deletion charges.</li>
+    <li>If your data changes frequently, reconsider moving it to archive tiers.</li>
+  </ul>
+
+  <h2>Plan a migration window</h2>
+  <ul>
+    <li>Stagger transitions to avoid large spikes in retrieval or lifecycle activity.</li>
+    <li>Track restore needs before moving data to a slower tier.</li>
+    <li>Validate a small sample before full migration.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Glacier cost calculator</a>
+    <a class="btn" href="/guides/aws-s3-glacier-pricing/">Glacier pricing</a>
+    <a class="btn" href="/guides/aws-s3-storage-classes/">S3 storage classes</a>
+  </div>
+</GuideLayout>

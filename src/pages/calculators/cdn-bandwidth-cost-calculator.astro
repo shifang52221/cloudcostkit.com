@@ -4,13 +4,13 @@ import { DataEgressCostCalculator } from "../../components/calculators/DataEgres
 
 const title = "CDN Bandwidth Cost Calculator";
 const description =
-  "Estimate monthly CDN bandwidth cost from GB transferred and your provider's $/GB pricing. Educational use only.";
+  "Estimate monthly CDN bandwidth cost (cost per GB) from transferred GB and your provider's $/GB pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-bandwidth-cost-calculator"
-  intro="CDN bandwidth charges can dominate costs for media-heavy and global traffic. Use this calculator to estimate monthly CDN bandwidth spend using your own $/GB assumptions and compare baseline vs peak traffic."
+  intro="CDN bandwidth charges can dominate costs for media-heavy and global traffic. Use this calculator to estimate monthly CDN bandwidth spend (cost per GB) using your own $/GB assumptions and compare baseline vs peak traffic."
   examples={[
     "If your CDN serves 4,000 GB/month at $0.06/GB, estimated bandwidth cost is $240/month.",
     "If you serve 30 TB/month at $0.05/GB, estimated bandwidth cost is about $1,536/month.",
@@ -60,6 +60,7 @@ const description =
   lastUpdated="2026-01-29"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
+    { href: "/guides/cdn-cost-per-gigabyte", label: "Guide: CDN cost per GB" },
     { href: "/guides/estimate-cdn-bandwidth-gb-per-month", label: "Guide: Estimate GB/month" },
     { href: "/guides/cloudfront-vs-cloudflare-cdn-cost", label: "CloudFront vs Cloudflare cost" },
     { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },

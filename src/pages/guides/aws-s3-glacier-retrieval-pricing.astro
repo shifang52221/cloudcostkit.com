@@ -1,0 +1,75 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 Glacier retrieval pricing per GB and per request";
+const description =
+  "A practical breakdown of Glacier retrieval pricing: cost per GB retrieved plus request fees, with guidance for small-object amplification and tier selection.";
+const faqs = [
+  {
+    q: "Why do retrieval costs spike for small objects?",
+    a: "Retrieval pricing usually includes both GB retrieved and request fees. Many small objects can create large request counts even when GB is modest.",
+  },
+  {
+    q: "Do retrieval tiers change pricing?",
+    a: "Yes. Faster tiers are typically more expensive. Choose the slowest tier that meets your workflow latency needs.",
+  },
+  {
+    q: "What inputs should I track?",
+    a: "Track retrieval GB per month and objects retrieved per month. These two inputs explain most retrieval bills.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-glacier-retrieval-pricing"
+  lastUpdated="2026-01-30"
+  faqs={faqs}
+>
+  <p class="muted">
+    Glacier retrieval pricing is a two-part bill: GB retrieved and retrieval requests. Understanding both is essential
+    if you have many small objects or frequent restores.
+  </p>
+
+  <h2>The two retrieval price components</h2>
+  <ul>
+    <li><strong>GB retrieved</strong>: volume of data restored and read.</li>
+    <li><strong>Retrieval requests</strong>: number of objects restored (request-like fees).</li>
+  </ul>
+
+  <h2>Small-object amplification (why requests matter)</h2>
+  <ul>
+    <li>Restoring 1 TB as 1,000,000 objects creates far more request fees than a few large objects.</li>
+    <li>If you archive many small files, request fees can dominate retrieval cost.</li>
+    <li>Packaging or batching into fewer objects can materially reduce request fees.</li>
+  </ul>
+
+  <h2>Tier choice changes cost</h2>
+  <ul>
+    <li><strong>Fast tiers</strong>: higher $/GB and request pricing, but shorter latency.</li>
+    <li><strong>Standard tiers</strong>: balance between cost and latency.</li>
+    <li><strong>Bulk tiers</strong>: lowest cost, but slowest restores.</li>
+  </ul>
+
+  <h2>How to estimate retrieval pricing (quick method)</h2>
+  <ol>
+    <li>Estimate retrieval GB/month (restores per month x avg restore size).</li>
+    <li>Estimate retrieval requests/month (objects restored).</li>
+    <li>Apply your tier pricing to both GB and requests.</li>
+    <li>Run a peak scenario for backfills or audits.</li>
+  </ol>
+
+  <h2>Common mistakes</h2>
+  <ul>
+    <li>Modeling only GB retrieved and ignoring request fees.</li>
+    <li>Using stored GB as a proxy for retrieval GB.</li>
+    <li>Forgetting that retrieval tiers change both latency and price.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Glacier cost calculator</a>
+    <a class="btn" href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate retrieval volume</a>
+    <a class="btn" href="/guides/aws-s3-glacier-retrieval-time/">Retrieval time and tiers</a>
+  </div>
+</GuideLayout>

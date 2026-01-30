@@ -1,0 +1,81 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CDN cost per GB: how to estimate bandwidth pricing";
+const description =
+  "How to estimate CDN cost per GB with a realistic bandwidth model: region mix, tiering, free allowances, and cache fill. Includes a step-by-step checklist.";
+const faqs = [
+  {
+    q: "Is CDN cost per GB the only price that matters?",
+    a: "No. It is the biggest line item for media-heavy workloads, but requests and origin egress can be material depending on traffic shape.",
+  },
+  {
+    q: "Should I use GB or GiB?",
+    a: "Use the unit your provider bills. Many CDNs use decimal GB. If you are unsure, treat GB as decimal and validate against your bill.",
+  },
+  {
+    q: "Why does the effective $/GB vary by month?",
+    a: "Tiered pricing, region mix changes, and free tiers can move the effective $/GB even if total volume is similar.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/cdn-cost-per-gigabyte"
+  lastUpdated="2026-01-30"
+  faqs={faqs}
+>
+  <p class="muted">
+    The fastest way to estimate CDN bandwidth spend is a clean $/GB model, but you must normalize region mix and tiered
+    pricing first. Use this guide to avoid under-estimating.
+  </p>
+
+  <h2>Step 1: Get monthly GB delivered</h2>
+  <ul>
+    <li>Use CDN analytics if available.</li>
+    <li>If you only have throughput, convert Mbps to GB/month before pricing.</li>
+    <li>Model baseline and peak months separately.</li>
+  </ul>
+
+  <h2>Step 2: Apply region mix</h2>
+  <ul>
+    <li>Split traffic by pricing regions (North America, Europe, APAC, etc.).</li>
+    <li>Apply the correct $/GB per region and sum the totals.</li>
+    <li>If you only have a blended rate, validate it against a real bill.</li>
+  </ul>
+
+  <h2>Step 3: Account for tiered pricing</h2>
+  <ul>
+    <li>Some providers lower $/GB after specific volume tiers.</li>
+    <li>Either compute each tier explicitly or use a blended rate for your expected volume.</li>
+    <li>Do not use the lowest tier price for the entire month.</li>
+  </ul>
+
+  <h2>Step 4: Check free allowances and discounts</h2>
+  <ul>
+    <li>Subtract free bandwidth before applying $/GB rates.</li>
+    <li>Apply committed-use or enterprise discounts if you have them.</li>
+  </ul>
+
+  <h2>What this does not include</h2>
+  <ul>
+    <li><strong>Request fees</strong>: often billed per 10k or per 1M requests.</li>
+    <li><strong>Origin egress</strong>: cache fill billed by your origin provider.</li>
+    <li><strong>Log or analytics add-ons</strong>: some providers bill these separately.</li>
+  </ul>
+
+  <h2>Use the calculator</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost calculator</a>
+    <a class="btn" href="/calculators/unit-converter/">Units converter</a>
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN total cost</a>
+  </div>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
+    <a class="btn" href="/guides/cdn-request-pricing/">CDN request pricing</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+  </div>
+</GuideLayout>

@@ -1,0 +1,79 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "S3 Glacier retrieval time: how long restores take by tier";
+const description =
+  "A practical guide to S3 Glacier retrieval time: how restore tiers map to latency, what drives delays, and how to plan workflows without surprises.";
+const faqs = [
+  {
+    q: "What drives Glacier retrieval time the most?",
+    a: "The retrieval tier (expedited/standard/bulk) and the archive class (Glacier vs Deep Archive) are the primary drivers. Job volume and concurrency limits can also slow restores.",
+  },
+  {
+    q: "Should I plan workflows around exact time windows?",
+    a: "Use ranges, not exact minutes. Retrieval time varies by tier, class, and load. Build workflows that tolerate delays.",
+  },
+  {
+    q: "How do I pick a retrieval tier?",
+    a: "Pick the cheapest tier that still meets your workflow needs. If retrieval is time-sensitive, model it as a peak month and budget for faster tiers.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/aws-s3-glacier-retrieval-time"
+  lastUpdated="2026-01-30"
+  faqs={faqs}
+>
+  <p class="muted">
+    Retrieval time is a workflow constraint, not just a pricing detail. Plan restore tiers and job timing so your
+    analytics, audits, or reprocessing pipelines are not blocked by long restore windows.
+  </p>
+
+  <h2>What "retrieval time" means</h2>
+  <ul>
+    <li><strong>Restore request submitted</strong>: you ask for objects to be made readable.</li>
+    <li><strong>Restore completes</strong>: objects become readable for a temporary window.</li>
+    <li><strong>Restore window</strong>: how long the restored copy is kept available.</li>
+  </ul>
+
+  <h2>Tier-driven latency (plan with ranges)</h2>
+  <ul>
+    <li><strong>Expedited tiers</strong>: fastest, but more expensive and sometimes capacity-limited.</li>
+    <li><strong>Standard tiers</strong>: balanced latency and cost for typical restores.</li>
+    <li><strong>Bulk tiers</strong>: cheapest, but slowest; best for large backfills.</li>
+  </ul>
+  <p class="muted">
+    Deep Archive tiers are slower than Glacier tiers. Always plan with a buffer, not a single exact duration.
+  </p>
+
+  <h2>Operational factors that slow restores</h2>
+  <ul>
+    <li><strong>Concurrency limits</strong>: too many parallel restore jobs can queue.</li>
+    <li><strong>Object count</strong>: many small objects create more requests and coordination overhead.</li>
+    <li><strong>Job scheduling</strong>: restore windows that overlap with peak operations can delay downstream processing.</li>
+  </ul>
+
+  <h2>How to choose a tier (quick decision flow)</h2>
+  <ul>
+    <li>If you need same-day access, plan for faster tiers and budget the peak month.</li>
+    <li>If restores are rare and not urgent, use bulk tiers to reduce cost.</li>
+    <li>If you are unsure, model two scenarios and compare cost vs latency impact.</li>
+  </ul>
+
+  <h2>Plan for a restore window</h2>
+  <ul>
+    <li>Restores are temporary; define how long you need the data available.</li>
+    <li>Make sure downstream jobs finish within the restore window.</li>
+    <li>Use prefetch or staged restores for large backfills.</li>
+  </ul>
+
+  <h2>Related tools</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Glacier cost calculator</a>
+    <a class="btn" href="/guides/aws-s3-glacier-pricing/">Glacier pricing</a>
+    <a class="btn" href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate retrieval volume</a>
+    <a class="btn" href="/guides/aws-s3-glacier-retrieval-pricing/">Retrieval pricing per GB/request</a>
+  </div>
+</GuideLayout>

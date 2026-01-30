@@ -1,0 +1,90 @@
+---
+import GuideLayout from "../../layouts/GuideLayout.astro";
+
+const title = "CDN cost comparison: how to compare pricing across providers";
+const description =
+  "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.";
+const faqs = [
+  {
+    q: "Why do CDN pricing comparisons often fail?",
+    a: "Most comparisons ignore request fees, regional mix, and origin egress. Small differences in these inputs can outweigh headline $/GB rates.",
+  },
+  {
+    q: "Is a lower $/GB always cheaper?",
+    a: "Not always. If your traffic is request-heavy or regional mix skews to expensive regions, a lower $/GB can still be more expensive overall.",
+  },
+  {
+    q: "What is the minimum data I need to compare providers?",
+    a: "Monthly bandwidth, monthly requests, region mix, and origin egress volume (cache fill). With those inputs you can run a fair comparison.",
+  },
+];
+---
+<GuideLayout
+  title={title}
+  description={description}
+  canonicalPath="/guides/cdn-cost-comparison"
+  lastUpdated="2026-01-30"
+  faqs={faqs}
+>
+  <p class="muted">
+    A reliable CDN cost comparison is not about a single $/GB number. You need a normalized input set that captures
+    bandwidth, requests, regions, and cache fill. Use this guide as a comparison checklist.
+  </p>
+
+  <h2>Step 1: Normalize your inputs (the comparison worksheet)</h2>
+  <ul>
+    <li><strong>Bandwidth (GB/month)</strong>: edge delivery to end users.</li>
+    <li><strong>Requests (per month)</strong>: total billable requests (per 10k or per 1M units).</li>
+    <li><strong>Region mix</strong>: percent of traffic by region or price tier.</li>
+    <li><strong>Origin egress (cache fill)</strong>: GB pulled from your origin provider.</li>
+    <li><strong>Peak month</strong>: an incident or launch month for stress-testing.</li>
+  </ul>
+
+  <h2>Step 2: Compare the three cost buckets</h2>
+  <ul>
+    <li><strong>Edge bandwidth</strong>: apply $/GB for each region mix and sum.</li>
+    <li><strong>Request fees</strong>: convert request units (per 10k vs per 1M) to a common unit.</li>
+    <li><strong>Origin egress</strong>: model separately because it is billed by your origin provider, not the CDN.</li>
+  </ul>
+
+  <h2>Step 3: Adjust for tiering and discounts</h2>
+  <ul>
+    <li><strong>Tiered pricing</strong>: use a blended rate or compute each tier explicitly.</li>
+    <li><strong>Commit discounts</strong>: apply committed-use discounts to both bandwidth and requests if applicable.</li>
+    <li><strong>Free tiers</strong>: subtract allowances before applying rates.</li>
+  </ul>
+
+  <h2>Step 4: Validate with two scenarios</h2>
+  <ul>
+    <li><strong>Baseline</strong>: typical month with your normal cache hit rate.</li>
+    <li><strong>Peak</strong>: launches, spikes, or incidents (higher requests and cache miss rate).</li>
+  </ul>
+  <p class="muted">
+    A provider that looks cheaper at baseline can become more expensive at peak if request pricing or regional mix is
+    unfavorable.
+  </p>
+
+  <h2>Common comparison mistakes</h2>
+  <ul>
+    <li>Comparing only $/GB and ignoring request fees.</li>
+    <li>Using a single region rate for a global traffic mix.</li>
+    <li>Ignoring origin egress and cache fill.</li>
+    <li>Using peak rates for a baseline comparison (or vice versa).</li>
+  </ul>
+
+  <h2>Use calculators to run the comparison</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
+    <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+  </div>
+
+  <h2>Related guides</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
+    <a class="btn" href="/guides/cdn-request-pricing/">CDN request pricing</a>
+    <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare cost</a>
+    <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+  </div>
+</GuideLayout>

@@ -1152,6 +1152,27 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "S3 Glacier retrieval pricing per GB and per request",
+    "description": "A practical breakdown of Glacier retrieval pricing: cost per GB retrieved plus request fees, with guidance for small-object amplification and tier selection.",
+    "canonicalPath": "/guides/aws-s3-glacier-retrieval-pricing",
+    "category": "AWS",
+    "slug": "aws-s3-glacier-retrieval-pricing",
+    "topics": [
+      "requests",
+      "storage"
+    ]
+  },
+  {
+    "title": "S3 Glacier retrieval time: how long restores take by tier",
+    "description": "A practical guide to S3 Glacier retrieval time: how restore tiers map to latency, what drives delays, and how to plan workflows without surprises.",
+    "canonicalPath": "/guides/aws-s3-glacier-retrieval-time",
+    "category": "AWS",
+    "slug": "aws-s3-glacier-retrieval-time",
+    "topics": [
+      "storage"
+    ]
+  },
+  {
     "title": "S3 pricing: a practical model for storage, requests, egress, and replication",
     "description": "A practical S3 pricing guide: what to include (GB-month, requests, egress, replication) and how to estimate the key inputs without copying price tables.",
     "canonicalPath": "/guides/aws-s3-pricing",
@@ -1563,6 +1584,30 @@ export const GUIDES: GuideLink[] = [
       "database",
       "egress",
       "storage"
+    ]
+  },
+  {
+    "title": "CDN cost comparison: how to compare pricing across providers",
+    "description": "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.",
+    "canonicalPath": "/guides/cdn-cost-comparison",
+    "category": "CDN",
+    "slug": "cdn-cost-comparison",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests",
+      "storage"
+    ]
+  },
+  {
+    "title": "CDN cost per GB: how to estimate bandwidth pricing",
+    "description": "How to estimate CDN cost per GB with a realistic bandwidth model: region mix, tiering, free allowances, and cache fill. Includes a step-by-step checklist.",
+    "canonicalPath": "/guides/cdn-cost-per-gigabyte",
+    "category": "CDN",
+    "slug": "cdn-cost-per-gigabyte",
+    "topics": [
+      "cdn",
+      "egress"
     ]
   },
   {
@@ -2205,6 +2250,18 @@ export const GUIDES: GuideLink[] = [
     "canonicalPath": "/guides/s3-replication-cost",
     "category": "Storage",
     "slug": "s3-replication-cost",
+    "topics": [
+      "egress",
+      "requests",
+      "storage"
+    ]
+  },
+  {
+    "title": "S3 to Glacier transfer cost: what to include in the move",
+    "description": "A practical checklist for S3 to Glacier transfer cost: transition requests, minimum storage duration, and any transfer or rewrite overhead.",
+    "canonicalPath": "/guides/s3-to-glacier-transfer-cost",
+    "category": "Storage",
+    "slug": "s3-to-glacier-transfer-cost",
     "topics": [
       "egress",
       "requests",
