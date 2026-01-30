@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateReplicationCost } from "../../lib/calc/replication";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -9,8 +9,10 @@ export function StorageReplicationCostCalculator() {
   const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("StorageReplicationCost.pricePerGbUsd", 0.02);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("StorageReplicationCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("StorageReplicationCost.peakMultiplierPct", 180);
+  const [writeGbPerDay, setWriteGbPerDay] = useState(80);
   const gbPerDay = replicatedGbPerMonth / 30.4;
   const avgMbps = (replicatedGbPerMonth * 8000) / (30.4 * 24 * 3600);
+  const estimatedReplicatedGbPerMonth = clamp(writeGbPerDay, 0, 1e12) * 30.4;
 
   const result = useMemo(() => {
     return estimateReplicationCost({
@@ -45,6 +47,29 @@ export function StorageReplicationCostCalculator() {
             <div className="hint">
               ~{formatNumber(gbPerDay, 2)} GB/day, {formatNumber(avgMbps, 2)} Mbps.
             </div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Changed data (GB / day)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={writeGbPerDay}
+              min={0}
+              step={0.1}
+              onChange={(e) => setWriteGbPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setReplicatedGbPerMonth(Math.round(estimatedReplicatedGbPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedReplicatedGbPerMonth, 0)} GB/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Price ($ / GB)</div>

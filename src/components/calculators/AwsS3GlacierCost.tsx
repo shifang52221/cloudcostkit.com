@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateS3GlacierCost } from "../../lib/calc/s3Glacier";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -15,7 +15,11 @@ export function AwsS3GlacierCostCalculator() {
   const [retrievalPricePer1000RequestsUsd, setRetrievalPricePer1000RequestsUsd] = useNumberParamState("AwsS3GlacierCost.retrievalPricePer1000RequestsUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsS3GlacierCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsS3GlacierCost.peakMultiplierPct", 200);
+  const [retrievalGbPerDayInput, setRetrievalGbPerDayInput] = useState(15);
+  const [retrievalRequestsPerDayInput, setRetrievalRequestsPerDayInput] = useState(60_000);
   const storedTbMonth = storedGbMonth / 1024;
+  const estimatedRetrievalGbPerMonth = clamp(retrievalGbPerDayInput, 0, 1e12) * 30.4;
+  const estimatedRetrievalRequestsPerMonth = clamp(retrievalRequestsPerDayInput, 0, 1e12) * 30.4;
   const retrievalGbPerDay = retrievalGbPerMonth / 30.4;
   const retrievalAvgMbps = (retrievalGbPerMonth * 8000) / (30.4 * 24 * 3600);
   const retrievalRequestsPerSecond = retrievalRequestsPerMonth / (30.4 * 24 * 3600);
@@ -106,6 +110,18 @@ export function AwsS3GlacierCostCalculator() {
             </div>
           </div>
           <div className="field field-3">
+            <div className="label">Retrieval volume (GB/day)</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={retrievalGbPerDayInput}
+              min={0}
+              step={0.1}
+              onChange={(e) => setRetrievalGbPerDayInput(+e.target.value)}
+            />
+            <div className="hint">Use average daily restores.</div>
+          </div>
+          <div className="field field-3">
             <div className="label">Retrieval price ($ / GB)</div>
             <input
               type="number"
@@ -129,6 +145,34 @@ export function AwsS3GlacierCostCalculator() {
               onChange={(e) => setRetrievalRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(retrievalRequestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Retrieval requests (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={retrievalRequestsPerDayInput}
+              min={0}
+              step={100}
+              onChange={(e) => setRetrievalRequestsPerDayInput(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setRetrievalGbPerMonth(Math.round(estimatedRetrievalGbPerMonth));
+                  setRetrievalRequestsPerMonth(Math.round(estimatedRetrievalRequestsPerMonth));
+                }}
+              >
+                Use estimates
+              </button>
+            </div>
+            <div className="hint">
+              Est {formatNumber(estimatedRetrievalGbPerMonth, 0)} GB and {formatNumber(estimatedRetrievalRequestsPerMonth, 0)} requests/month.
+            </div>
           </div>
           <div className="field field-3">
             <div className="label">Retrieval requests price ($ / 1000)</div>
