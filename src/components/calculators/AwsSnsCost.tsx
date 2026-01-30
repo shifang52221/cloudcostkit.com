@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateSnsCost } from "../../lib/calc/sns";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -13,6 +13,8 @@ export function AwsSnsCostCalculator() {
   const [egressPricePerGbUsd, setEgressPricePerGbUsd] = useNumberParamState("AwsSnsCost.egressPricePerGbUsd", 0.09);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSnsCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSnsCost.peakMultiplierPct", 180);
+  const [fanoutPerPublish, setFanoutPerPublish] = useState(4);
+  const estimatedDeliveriesPerMonth = publishesPerMonth * clamp(fanoutPerPublish, 0, 1e6);
   const publishesPerSecond = publishesPerMonth / (30.4 * 24 * 3600);
   const deliveriesPerSecond = deliveriesPerMonth / (30.4 * 24 * 3600);
   const estimatedTransferGb = (deliveriesPerMonth * avgPayloadKb) / (1024 * 1024);
@@ -86,6 +88,30 @@ export function AwsSnsCostCalculator() {
               onChange={(e) => setDeliveriesPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(deliveriesPerSecond, 2)} deliveries/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Fanout per publish</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={fanoutPerPublish}
+              min={0}
+              step={0.1}
+              onChange={(e) => setFanoutPerPublish(+e.target.value)}
+            />
+            <div className="hint">Approx subscribers per publish after filtering.</div>
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setDeliveriesPerMonth(Math.round(estimatedDeliveriesPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedDeliveriesPerMonth, 0)} deliveries/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Publish price ($ / 1M)</div>

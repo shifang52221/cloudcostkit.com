@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateSsmParameterStoreCost } from "../../lib/calc/ssmParameterStore";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -13,6 +13,11 @@ export function AwsSsmParameterStoreCostCalculator() {
   const [pricePer10kApiCallsUsd, setPricePer10kApiCallsUsd] = useNumberParamState("AwsSsmParameterStoreCost.pricePer10kApiCallsUsd", 0.05);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("AwsSsmParameterStoreCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("AwsSsmParameterStoreCost.peakMultiplierPct", 200);
+  const [instances, setInstances] = useState(300);
+  const [refreshMinutes, setRefreshMinutes] = useState(10);
+  const [callsPerRefresh, setCallsPerRefresh] = useState(1);
+  const safeRefreshMinutes = clamp(refreshMinutes, 1, 1e6);
+  const estimatedApiCallsPerMonth = (instances * (30.4 * 24 * 60)) / safeRefreshMinutes * clamp(callsPerRefresh, 0, 1e6);
   const apiCallsPerSecond = apiCallsPerMonth / (30.4 * 24 * 3600);
   const pricePerMillionApiCallsUsd = pricePer10kApiCallsUsd * 100;
 
@@ -118,6 +123,52 @@ export function AwsSsmParameterStoreCostCalculator() {
               onChange={(e) => setPricePer10kApiCallsUsd(+e.target.value)}
             />
             <div className="hint">~{formatCurrency2(pricePerMillionApiCallsUsd)} per 1M calls.</div>
+          </div>
+
+          <div className="field field-3">
+            <div className="label">Instances (avg)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={instances}
+              min={0}
+              step={1}
+              onChange={(e) => setInstances(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Refresh interval (minutes)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={refreshMinutes}
+              min={1}
+              step={1}
+              onChange={(e) => setRefreshMinutes(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Calls per refresh</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={callsPerRefresh}
+              min={0}
+              step={1}
+              onChange={(e) => setCallsPerRefresh(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setApiCallsPerMonth(Math.round(estimatedApiCallsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedApiCallsPerMonth, 0)} calls/month.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
