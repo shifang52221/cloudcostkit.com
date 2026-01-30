@@ -55,6 +55,56 @@ const faqs = [
     <li><strong>Job scheduling</strong>: restore windows that overlap with peak operations can delay downstream processing.</li>
   </ul>
 
+  <h2>Use-case mapping (pick a tier by workflow)</h2>
+  <ul>
+    <li><strong>Forensics or incident response</strong>: pick faster tiers for time-sensitive investigations.</li>
+    <li><strong>Monthly audit backfills</strong>: use standard or bulk tiers and schedule restores ahead of deadlines.</li>
+    <li><strong>Disaster recovery drills</strong>: model the slowest acceptable tier and verify end-to-end timing.</li>
+  </ul>
+
+  <h2>Latency planning checklist</h2>
+  <ul>
+    <li>Define the deadline for the downstream job, not just the restore.</li>
+    <li>Account for staging time (copy to hot storage, indexing, or ETL).</li>
+    <li>Split large restores into batches so failures do not block the whole job.</li>
+    <li>Track restore completion metrics and alert if a restore window is missed.</li>
+  </ul>
+
+  <h2>Example timeline (how delays accumulate)</h2>
+  <p>
+    A bulk restore might take hours to begin, then additional time to stage and rehydrate. If your pipeline also
+    performs checksum validation or transfers the restored data into another system, the total elapsed time can be
+    significantly longer than the raw restore time. Budget the total pipeline duration, not just the initial restore.
+  </p>
+
+  <h2>Restore window planning (avoid surprises)</h2>
+  <ul>
+    <li>Define a restore window that covers processing time plus a buffer.</li>
+    <li>If you need repeated access, consider keeping a temporary copy in a warmer tier.</li>
+    <li>Document who triggers restores and how long data stays available.</li>
+  </ul>
+
+  <h2>Automation tips</h2>
+  <ul>
+    <li>Queue restore jobs and limit concurrency to avoid throttling.</li>
+    <li>Tag restores with purpose (audit, backfill, incident) for reporting.</li>
+    <li>Alert on stalled restores so downstream jobs do not fail silently.</li>
+  </ul>
+
+  <h2>Signals to monitor during restores</h2>
+  <ul>
+    <li>Restore job status and completion timestamps.</li>
+    <li>Bytes restored per hour to detect slowdowns.</li>
+    <li>Downstream queue backlog (ETL, validation, or export tasks).</li>
+  </ul>
+
+  <h2>Restore workflow playbook</h2>
+  <ol>
+    <li>Submit restore requests in batches and record job metadata.</li>
+    <li>Wait for completion, then copy or process data in a warm tier.</li>
+    <li>Expire temporary copies after validation to avoid long-term storage creep.</li>
+  </ol>
+
   <h2>How to choose a tier (quick decision flow)</h2>
   <ul>
     <li>If you need same-day access, plan for faster tiers and budget the peak month.</li>

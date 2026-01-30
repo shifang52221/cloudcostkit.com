@@ -60,6 +60,59 @@ const faqs = [
     <li>Validate a small sample before full migration.</li>
   </ul>
 
+  <h2>Simple cost model (use before migration)</h2>
+  <ul>
+    <li><strong>Transition requests</strong> = objects transitioned x $ per 1,000 requests.</li>
+    <li><strong>Storage delta</strong> = (current GB-month - archive GB-month) x months retained.</li>
+    <li><strong>Early deletion risk</strong> = objects deleted before minimum duration x remaining months.</li>
+  </ul>
+  <p class="muted">
+    The goal is to ensure the storage savings exceed the transition and early deletion penalties.
+  </p>
+
+  <h2>Example: lifecycle migration for log archives</h2>
+  <p>
+    If you move 50 TB of logs into Glacier and keep them for 12 months, the storage savings are large. But if 20% of
+    those objects are re-written or deleted within the minimum duration window, early deletion fees can offset a big
+    chunk of the expected savings. Validate object churn first.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Measure object count and average object size (requests scale with count).</li>
+    <li>Confirm lifecycle rules do not transition hot or frequently rewritten data.</li>
+    <li>Estimate restore frequency (audit or reprocessing jobs) before moving data.</li>
+    <li>Run a small pilot and compare the first bill to your model.</li>
+  </ul>
+
+  <h2>Migration strategy tips</h2>
+  <ul>
+    <li>Transition by age (for example, only objects older than 90 or 180 days).</li>
+    <li>Keep a short hot window to avoid immediate restore needs.</li>
+    <li>Separate compliance archives from operational logs to reduce restore churn.</li>
+  </ul>
+
+  <h2>What to monitor after the move</h2>
+  <ul>
+    <li>Early deletion fees and unexpected transitions.</li>
+    <li>Restore request volume and average restore size.</li>
+    <li>Origin egress during restores (if restored data is copied elsewhere).</li>
+  </ul>
+
+  <h2>Data classification checklist</h2>
+  <ul>
+    <li>Identify data with legal retention or audit requirements.</li>
+    <li>Separate frequently accessed reports from cold archives.</li>
+    <li>Tag objects with lifecycle intent so rules are predictable.</li>
+  </ul>
+
+  <h2>Restore readiness test</h2>
+  <ul>
+    <li>Pick a sample archive and perform a full restore workflow.</li>
+    <li>Measure total time from restore request to usable data.</li>
+    <li>Document the steps so future restores are repeatable.</li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Glacier cost calculator</a>

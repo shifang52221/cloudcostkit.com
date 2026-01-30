@@ -21,6 +21,12 @@ export const TOOLS: Tool[] = [
     category: "Networking",
   },
   {
+    slug: "cdn-origin-egress-calculator",
+    title: "CDN Origin Egress Calculator",
+    description: "Estimate origin egress and requests from CDN edge volume and cache hit rate.",
+    category: "Networking",
+  },
+  {
     slug: "cloudfront-cost-calculator",
     title: "CloudFront Cost Calculator",
     description: "Estimate CDN cost for CloudFront-style pricing assumptions.",

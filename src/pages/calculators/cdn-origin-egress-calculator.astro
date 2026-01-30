@@ -1,0 +1,86 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { CdnOriginEgressCalculator } from "../../components/calculators/CdnOriginEgress";
+
+const title = "CDN Origin Egress Calculator (Cache Misses)";
+const description =
+  "Estimate origin egress and origin request volume from CDN edge bandwidth, edge requests, cache hit rate, and revalidation overhead. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/cdn-origin-egress-calculator"
+  intro="Estimate how much traffic your origin actually serves. Start with edge bandwidth + edge requests, apply cache hit rate, and add a revalidation overhead to approximate cache fills and multi-POP refreshes."
+  examples={[
+    "Edge 4,000 GB/month with 85% hit rate -> ~600 GB origin egress before revalidation overhead.",
+    "Edge 300M requests with 70% hit rate -> ~90M origin requests (plus overhead).",
+  ]}
+  includes={[
+    "Origin egress estimate from edge GB/month and cache hit rate.",
+    "Origin request estimate from edge requests/month and cache hit rate.",
+    "Optional revalidation overhead and peak hit-rate scenario.",
+  ]}
+  excludes={[
+    "Origin pricing ($/GB, $/request) - use Data Egress or S3 Request calculators.",
+    "CDN edge bandwidth and request fees - model separately.",
+  ]}
+  how={[
+    "Miss rate = 1 - hit rate.",
+    "Origin GB ~= edge GB x miss rate x (1 + revalidation overhead).",
+    "Origin requests ~= edge requests x miss rate x (1 + revalidation overhead).",
+  ]}
+  faqs={[
+    {
+      q: "Why can origin egress be higher than edge bandwidth?",
+      a: "Cache revalidation, multi-POP fills, or low hit rate can create extra origin traffic beyond user delivery.",
+    },
+    {
+      q: "Should I use origin logs or CDN logs?",
+      a: "Use CDN cache metrics for hit rate, and origin logs/metrics for actual egress once live. This calculator is a planning model.",
+    },
+    {
+      q: "Does this include origin request pricing?",
+      a: "No. Use the S3 request or API request calculators with the origin request estimate if your origin charges per request.",
+    },
+  ]}
+  lastUpdated="2026-01-30"
+  related={[
+    { href: "/calculators/cdn-cost-calculator", label: "CDN cost calculator" },
+    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
+    { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Origin egress cost" },
+    { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin egress vs CDN bandwidth" },
+    { href: "/guides/aws-cloudfront-cache-hit-rate", label: "Guide: cache hit rate" },
+  ]}
+>
+  <CdnOriginEgressCalculator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Edge GB/month</strong>: use CDN analytics or billing exports.</li>
+      <li><strong>Edge requests</strong>: use CDN request counts (all responses, hit + miss).</li>
+      <li><strong>Hit rate</strong>: use cache metrics from your CDN dashboard.</li>
+    </ul>
+
+    <h2>Result interpretation</h2>
+    <ul>
+      <li>Origin egress is the input for your origin provider's $/GB pricing.</li>
+      <li>Origin requests can drive S3/ALB/API costs if your origin bills per request.</li>
+    </ul>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Assuming origin egress is zero because the CDN exists.</li>
+      <li>Using cache hit rate from a short window (miss spikes during deploys or incidents).</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
+      <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 request cost</a>
+      <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+      <a class="btn" href="/guides/aws-cloudfront-cache-hit-rate/">Guide: cache hit rate</a>
+    </div>
+  </div>
+</CalculatorLayout>

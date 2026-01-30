@@ -59,6 +59,68 @@ const faqs = [
     <li>Run a peak scenario for backfills or audits.</li>
   </ol>
 
+  <h2>Pricing formula (simple and defensible)</h2>
+  <ul>
+    <li><strong>Retrieval GB cost</strong> = retrieved GB/month x $/GB for the chosen tier.</li>
+    <li><strong>Request cost</strong> = (retrieval requests/month / 1,000) x $ per 1,000 requests.</li>
+    <li><strong>Total retrieval</strong> = GB cost + request cost.</li>
+  </ul>
+  <p class="muted">
+    Keep the two units separate. Even if GB cost is the larger line item, requests can spike during restores of many
+    small objects.
+  </p>
+
+  <h2>Worked example: small objects vs large objects</h2>
+  <p>
+    Suppose you restore 500 GB in a month. If those 500 GB are split into 2 million small objects, request fees can be
+    significant. If the same 500 GB are stored as 5,000 large objects, request fees are tiny by comparison. The data
+    volume is identical, but the request count is not. That is why object packaging and batch size matter.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Confirm retrieval GB from billing exports or restore job summaries (not stored GB).</li>
+    <li>Count objects restored per month (or average objects per restore x restores/month).</li>
+    <li>Separate routine restores from rare backfills or audits and model them as a peak scenario.</li>
+    <li>Track the chosen retrieval tier and latency expectations for each workflow.</li>
+  </ul>
+
+  <h2>Estimate requests from object size (fast method)</h2>
+  <ul>
+    <li><strong>Requests/month</strong> ~= retrieval GB/month / avg object size (GB).</li>
+    <li>Example: 500 GB retrieved with 5 MB objects -> about 102,400 objects.</li>
+    <li>Use inventory reports to get real object size distribution if possible.</li>
+  </ul>
+
+  <h2>Tier selection notes (cost vs urgency)</h2>
+  <ul>
+    <li>Expedited tiers reduce latency but increase both GB and request pricing.</li>
+    <li>Bulk tiers are cheapest for large restores that are not time critical.</li>
+    <li>If you run both routine and emergency restores, model them separately.</li>
+  </ul>
+
+  <h2>Where to get reliable inputs</h2>
+  <ul>
+    <li><strong>Restore jobs</strong>: track how many objects are restored per job and total bytes restored.</li>
+    <li><strong>S3 Inventory</strong>: use inventory reports to see object count and size distribution.</li>
+    <li><strong>Billing exports</strong>: confirm which usage types are driving charges (GB vs requests).</li>
+  </ul>
+
+  <h2>Optimization ideas that reduce request fees</h2>
+  <ul>
+    <li>Bundle small files into larger archives before moving them to Glacier.</li>
+    <li>Keep a manifest so you can restore only the needed subsets.</li>
+    <li>Use a staging bucket to avoid repeated restore requests for the same objects.</li>
+  </ul>
+
+  <h2>Glossary (terms that affect cost)</h2>
+  <ul>
+    <li><strong>Restore request</strong>: the API call that initiates a rehydration job.</li>
+    <li><strong>Rehydration</strong>: the process of making archive objects readable again.</li>
+    <li><strong>Restore window</strong>: the temporary period when restored data stays accessible.</li>
+    <li><strong>Object fan-out</strong>: many small objects creating a large request count.</li>
+  </ul>
+
   <h2>Common mistakes</h2>
   <ul>
     <li>Modeling only GB retrieved and ignoring request fees.</li>

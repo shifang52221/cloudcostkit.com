@@ -64,6 +64,84 @@ const faqs = [
     unfavorable.
   </p>
 
+  <h2>Step 5: Compare add-ons and hidden line items</h2>
+  <ul>
+    <li><strong>WAF or bot protection</strong>: request-based charges can dominate during attacks.</li>
+    <li><strong>Logs and analytics</strong>: log ingestion and query scans can be a second bill.</li>
+    <li><strong>Edge compute</strong>: functions at the edge add per-request compute costs.</li>
+  </ul>
+
+  <h2>Step 6: Verify billing units and measurement windows</h2>
+  <ul>
+    <li>Confirm GB vs GiB and per-10k vs per-1M request units.</li>
+    <li>Check whether pricing uses regional tiers or global blended rates.</li>
+    <li>Note whether free allowances apply per month or per account.</li>
+  </ul>
+
+  <h2>Comparison template (fill with your numbers)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Bandwidth ($)</th>
+        <th>Requests ($)</th>
+        <th>Origin egress ($)</th>
+        <th>Total (baseline)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Provider A</td>
+        <td>Edge GB x rate</td>
+        <td>Req/month x rate</td>
+        <td>Origin GB x rate</td>
+        <td>Sum</td>
+      </tr>
+      <tr>
+        <td>Provider B</td>
+        <td>Edge GB x rate</td>
+        <td>Req/month x rate</td>
+        <td>Origin GB x rate</td>
+        <td>Sum</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Cross-check edge GB and request counts from analytics, not just invoices.</li>
+    <li>Validate cache hit rate by path; dynamic endpoints skew comparisons.</li>
+    <li>Run a peak scenario and confirm the ordering still holds.</li>
+  </ul>
+
+  <h2>Contract and migration considerations</h2>
+  <ul>
+    <li><strong>Minimum commits</strong>: some providers require bandwidth commitments that change effective pricing.</li>
+    <li><strong>Overage rates</strong>: confirm how overages are priced above your commit.</li>
+    <li><strong>Migration cost</strong>: DNS cutover, cache warm-up, and validation can create a short-term spike.</li>
+  </ul>
+
+  <h2>Feature parity (cost is not the only variable)</h2>
+  <ul>
+    <li>Compare caching controls, purge behavior, and header normalization.</li>
+    <li>Check logging options and retention limits.</li>
+    <li>Confirm WAF/bot features and how they are billed.</li>
+  </ul>
+
+  <h2>Performance and reliability checks</h2>
+  <ul>
+    <li>Validate latency and cache hit rate in your top geographies.</li>
+    <li>Review POP coverage and regional capacity for peak events.</li>
+    <li>Confirm SLA credits and support response times for outages.</li>
+  </ul>
+
+  <h2>Data for a fair comparison</h2>
+  <ul>
+    <li>Use 30 to 90 days of traffic to smooth out weekly cycles.</li>
+    <li>Break out bot traffic and synthetic monitoring if possible.</li>
+    <li>Include large downloads and API endpoints separately.</li>
+  </ul>
+
   <h2>Common comparison mistakes</h2>
   <ul>
     <li>Comparing only $/GB and ignoring request fees.</li>

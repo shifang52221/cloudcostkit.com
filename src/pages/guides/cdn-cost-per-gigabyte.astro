@@ -58,6 +58,58 @@ const faqs = [
     <li>Apply committed-use or enterprise discounts if you have them.</li>
   </ul>
 
+  <h2>Effective $/GB formula (fast sanity check)</h2>
+  <ul>
+    <li><strong>Effective $/GB</strong> = total bandwidth charges / total GB delivered.</li>
+    <li>Use this to back-calc a blended rate from a real bill, then reuse it for planning.</li>
+  </ul>
+
+  <h2>Example calculation</h2>
+  <p>
+    If you delivered 8,000 GB with $420 of bandwidth charges, your effective rate is $420 / 8,000 = $0.0525 per GB.
+    Use that blended rate for the next month unless your region mix or tier changes.
+  </p>
+
+  <h2>Validate with a peak scenario</h2>
+  <ul>
+    <li>Peak months often shift region mix and cache hit rate.</li>
+    <li>Use a higher GB/month and re-run the tiered pricing math.</li>
+    <li>Compare effective $/GB for baseline vs peak so you do not under-budget.</li>
+  </ul>
+
+  <h2>Cache behavior still matters</h2>
+  <ul>
+    <li>Edge GB is billed regardless of hit rate, but cache misses can add origin egress costs.</li>
+    <li>If your hit rate drops during deploys or incidents, your total spend can rise even with similar edge GB.</li>
+  </ul>
+
+  <h2>Region mix example</h2>
+  <p>
+    If 60% of your traffic is in North America at $0.05/GB and 40% is in APAC at $0.09/GB, your blended rate is
+    (0.6 x 0.05) + (0.4 x 0.09) = $0.066/GB. That blended rate is what you should use for quick planning.
+  </p>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Compare your blended rate to the last invoice to confirm it is realistic.</li>
+    <li>Check for traffic shifts to higher priced regions.</li>
+    <li>Recalculate after major content changes (video, downloads, or large payloads).</li>
+  </ul>
+
+  <h2>Units and rounding pitfalls</h2>
+  <ul>
+    <li>Some providers bill in decimal GB, others in GiB; confirm before comparing.</li>
+    <li>Billing dashboards may round at the line item level, which shifts the blended rate.</li>
+    <li>Always compare on the same unit basis when benchmarking.</li>
+  </ul>
+
+  <h2>When $/GB is not enough</h2>
+  <ul>
+    <li>High request volume: request fees can exceed bandwidth spend.</li>
+    <li>Low cache hit rate: origin egress can add a second bill.</li>
+    <li>Security add-ons: WAF and bot mitigation are request-driven.</li>
+  </ul>
+
   <h2>What this does not include</h2>
   <ul>
     <li><strong>Request fees</strong>: often billed per 10k or per 1M requests.</li>
