@@ -22,6 +22,7 @@ export function ObjectStorageCostCalculator() {
   const averageStoredTb = averageStoredGb / 1024;
   const getRps = getRequestsPerMonth / secondsPerMonth;
   const putRps = putRequestsPerMonth / secondsPerMonth;
+  const totalRequestsPerMonth = getRequestsPerMonth + putRequestsPerMonth;
   const estimatedAverageStoredGb = clamp(startingStorageGb, 0, 1e12)
     * (1 + (clamp(monthlyGrowthPct, 0, 10_000) / 100) * (clamp(growthMonths, 0, 120) / 2));
   const estimatedGetRequestsPerMonth = clamp(avgGetRps, 0, 1e9) * secondsPerMonth;
@@ -201,6 +202,44 @@ export function ObjectStorageCostCalculator() {
             </div>
             <div className="hint">
               Est {formatNumber(estimatedGetRequestsPerMonth, 0)} GETs and {formatNumber(estimatedPutRequestsPerMonth, 0)} PUTs/month.
+            </div>
+          </div>
+          <div className="field field-6">
+            <div className="label">Request mix presets</div>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const total = Math.max(1, totalRequestsPerMonth);
+                  setGetRequestsPerMonth(Math.round(total * 0.95));
+                  setPutRequestsPerMonth(Math.round(total * 0.05));
+                }}
+              >
+                Read heavy 95/5
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const total = Math.max(1, totalRequestsPerMonth);
+                  setGetRequestsPerMonth(Math.round(total * 0.8));
+                  setPutRequestsPerMonth(Math.round(total * 0.2));
+                }}
+              >
+                Balanced 80/20
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const total = Math.max(1, totalRequestsPerMonth);
+                  setGetRequestsPerMonth(Math.round(total * 0.6));
+                  setPutRequestsPerMonth(Math.round(total * 0.4));
+                }}
+              >
+                Write heavy 60/40
+              </button>
             </div>
           </div>
 
