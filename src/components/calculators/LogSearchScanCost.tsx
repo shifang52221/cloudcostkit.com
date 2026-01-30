@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { estimateLogScanCost } from "../../lib/calc/logScan";
 import { formatCurrency2, formatNumber } from "../../lib/format";
@@ -9,6 +9,9 @@ export function LogSearchScanCostCalculator() {
   const [pricePerGbUsd, setPricePerGbUsd] = useNumberParamState("LogSearchScanCost.pricePerGbUsd", 0.005);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("LogSearchScanCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("LogSearchScanCost.peakMultiplierPct", 150);
+  const [queriesPerDay, setQueriesPerDay] = useState(2500);
+  const [avgGbPerQuery, setAvgGbPerQuery] = useState(0.12);
+  const estimatedGbScannedPerDay = clamp(queriesPerDay, 0, 1e12) * clamp(avgGbPerQuery, 0, 1e9);
   const avgMbps = (gbScannedPerDay * 8000) / (24 * 3600);
   const scansPerSecondGb = gbScannedPerDay / (24 * 3600);
 
@@ -56,6 +59,40 @@ export function LogSearchScanCostCalculator() {
               step={0.0001}
               onChange={(e) => setPricePerGbUsd(+e.target.value)}
             />
+          </div>
+          <div className="field field-3">
+            <div className="label">Queries (per day)</div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={queriesPerDay}
+              min={0}
+              step={1}
+              onChange={(e) => setQueriesPerDay(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg GB per query</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgGbPerQuery}
+              min={0}
+              step={0.01}
+              onChange={(e) => setAvgGbPerQuery(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setGbScannedPerDay(Math.round(estimatedGbScannedPerDay * 100) / 100)}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedGbScannedPerDay, 2)} GB/day.</div>
           </div>
 
           <div className="field field-3" style={{ alignSelf: "end" }}>
