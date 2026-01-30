@@ -1,0 +1,69 @@
+---
+import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
+import { AwsSnsDeliveryEstimator } from "../../components/calculators/AwsSnsDeliveryEstimator";
+
+const title = "SNS Delivery Volume Estimator";
+const description =
+  "Estimate AWS SNS delivery volume from publish counts, matched fan-out, and retry multipliers to model delivery-based charges. Educational use only.";
+---
+<CalculatorLayout
+  title={title}
+  description={description}
+  canonicalPath="/calculators/aws-sns-delivery-estimator"
+  intro="Estimate monthly SNS deliveries by modeling publishes, matched fan-out (after filter policies), and retry multipliers for failure scenarios."
+  examples={[
+    "120M publishes/month, 25 subscriptions, 40% match rate, 110% retry buffer.",
+    "Peak scenario for incident-driven delivery spikes.",
+  ]}
+  includes={[
+    "Matched fan-out from subscriptions per topic and match rate.",
+    "Baseline deliveries from publishes and fan-out.",
+    "Retry multiplier to account for failed deliveries.",
+  ]}
+  excludes={[
+    "Per-request pricing (use the SNS cost calculator).",
+    "Downstream service costs (SQS, Lambda, email).",
+  ]}
+  how={[
+    "Matched fan-out = subscriptions x match rate.",
+    "Baseline deliveries = publishes per month x matched fan-out.",
+    "Total deliveries = baseline deliveries x retry multiplier.",
+  ]}
+  faqs={[
+    {
+      q: "Should I count subscriptions that rarely match?",
+      a: "No. Use matched fan-out after filter policies so you only count subscribers that receive each publish.",
+    },
+    {
+      q: "Do retries affect delivery volume?",
+      a: "Yes. If endpoints fail, retries increase delivery attempts and total request volume.",
+    },
+    {
+      q: "What if I have multiple topics?",
+      a: "Run the estimator per topic or use weighted averages for publishes and fan-out.",
+    },
+  ]}
+  lastUpdated="2026-01-30"
+  related={[
+    { href: "/calculators/aws-sns-cost-calculator", label: "AWS SNS cost calculator" },
+    { href: "/guides/aws-sns-estimate-deliveries", label: "Guide: estimate SNS deliveries" },
+    { href: "/guides/aws-sns-pricing", label: "Guide: SNS pricing" },
+  ]}
+>
+  <AwsSnsDeliveryEstimator client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to get your inputs</h2>
+    <ul>
+      <li><strong>Publishes</strong>: use CloudWatch metrics for NumberOfMessagesPublished.</li>
+      <li><strong>Fan-out</strong>: count subscriptions that match filter policies.</li>
+      <li><strong>Retries</strong>: add a buffer for failed or delayed endpoints.</li>
+    </ul>
+
+    <h2>Next steps</h2>
+    <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/aws-sns-cost-calculator/">AWS SNS cost calculator</a>
+      <a class="btn" href="/guides/aws-sns-estimate-deliveries/">Guide: estimate SNS deliveries</a>
+    </div>
+  </div>
+</CalculatorLayout>

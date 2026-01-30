@@ -6,7 +6,7 @@ const description =
   "A practical workflow to estimate SNS delivery volume: start from publishes, model matched fan-out (after filter policies), add a retry multiplier for failures, and validate with metrics so budgets survive incidents.";
 const faqs = [
   {
-    q: "What’s the fastest way to estimate deliveries?",
+    q: "What's the fastest way to estimate deliveries?",
     a: "Deliveries/month ~ publishes/month x matched subscribers per publish. If filters drop most messages, use the match rate to reduce effective fan-out.",
   },
   {
@@ -41,13 +41,13 @@ const faqs = [
 
   <h2>Step 2: estimate matched fan-out (subscriptions that actually receive messages)</h2>
   <p>
-    Use matched subscribers per publish, not “total subscriptions”. If filter policies exist, only some subscriptions
+    Use matched subscribers per publish, not "total subscriptions". If filter policies exist, only some subscriptions
     match each message.
   </p>
   <ul>
     <li><strong>Matched fan-out</strong> = total subscriptions x match rate</li>
     <li>
-      Example: 100 subscriptions with a 20% match rate → 20 matched deliveries per publish
+      Example: 100 subscriptions with a 20% match rate -> 20 matched deliveries per publish
     </li>
   </ul>
 
@@ -66,7 +66,7 @@ const faqs = [
   <ul>
     <li><strong>Effective deliveries ~ baseline deliveries x (1 + retry factor)</strong></li>
     <li>Retry factor depends on endpoint reliability and your retry behavior.</li>
-    <li>Keep an “incident week” scenario; it can dominate monthly variance.</li>
+    <li>Keep an "incident week" scenario; it can dominate monthly variance.</li>
   </ul>
 
   <h2>Step 5: sanity-check with downstream signals</h2>
@@ -80,9 +80,9 @@ const faqs = [
   <ul>
     <li>Publishes/month: 10M</li>
     <li>Subscriptions: 50</li>
-    <li>Filter match rate: 40% → matched fan-out = 20</li>
+    <li>Filter match rate: 40% -> matched fan-out = 20</li>
     <li>Baseline deliveries/month ~ 10M x 20 = 200M</li>
-    <li>Incident retry factor: +10% → 220M effective deliveries</li>
+    <li>Incident retry factor: +10% -> 220M effective deliveries</li>
   </ul>
 
   <h2>Turn deliveries into cost</h2>
@@ -90,12 +90,15 @@ const faqs = [
     Use <a href="/calculators/aws-sns-cost-calculator/">AWS SNS cost calculator</a> with publishes/month, deliveries/month,
     and your effective per-1M pricing assumptions.
   </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-sns-delivery-estimator/">SNS delivery estimator</a>
+  </div>
 
   <h2>Validation checklist</h2>
   <ul>
     <li>Validate publishes and deliveries from a representative week (and keep a separate incident sample).</li>
     <li>Confirm filter policies are actually reducing matched fan-out as intended.</li>
-    <li>Track failure rate; if it’s non-trivial, include retries in the model.</li>
+    <li>Track failure rate; if it's non-trivial, include retries in the model.</li>
     <li>Re-check after architecture changes (topic splits, new subscribers, new endpoints).</li>
   </ul>
 

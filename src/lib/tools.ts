@@ -117,6 +117,12 @@ export const TOOLS: Tool[] = [
     category: "FinOps",
   },
   {
+    slug: "aws-sns-delivery-estimator",
+    title: "SNS Delivery Volume Estimator",
+    description: "Estimate SNS delivery volume from publishes, fan-out, and retry multipliers.",
+    category: "FinOps",
+  },
+  {
     slug: "aws-ses-cost-calculator",
     title: "AWS SES Cost Calculator",
     description: "Estimate email sending cost from volume and optional payload transfer assumptions.",

@@ -19,6 +19,7 @@ const description =
     "Publish cost from publishes/month and $ per 1M publishes.",
     "Delivery cost from deliveries/month and $ per 1M deliveries (protocol mix).",
     "Optional transfer estimate from deliveries x average payload size (KB) and $/GB.",
+    "Delivery volume estimator for fan-out and retry scenarios.",
     "Baseline vs peak scenario table for delivery spikes.",
   ]}
   excludes={[
@@ -51,6 +52,7 @@ const description =
     { href: "/guides/aws-sns-pricing", label: "Guide: SNS pricing" },
     { href: "/guides/aws-sns-estimate-deliveries", label: "Guide: estimate SNS deliveries" },
     { href: "/guides/aws-sns-cost-optimization", label: "Guide: reduce SNS costs" },
+    { href: "/calculators/aws-sns-delivery-estimator", label: "SNS delivery volume estimator" },
     { href: "/calculators/aws-sqs-cost-calculator", label: "SQS cost calculator" },
   ]}
 >
@@ -118,6 +120,7 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/aws-sns-delivery-estimator/">SNS delivery estimator</a>
       <a class="btn" href="/guides/aws-sns-pricing/">Guide: SNS pricing</a>
       <a class="btn" href="/guides/aws-sns-estimate-deliveries/">Guide: estimate SNS deliveries</a>
       <a class="btn" href="/guides/aws-sns-cost-optimization/">Guide: reduce SNS costs</a>
