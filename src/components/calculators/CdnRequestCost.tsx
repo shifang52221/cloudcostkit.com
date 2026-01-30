@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
 import { useStringParamState } from "./useNumberParamState";
 import { estimateRequestCostPer10k } from "../../lib/calc/requests";
@@ -11,8 +11,10 @@ export function CdnRequestCostCalculator() {
   const [pricingUnit, setPricingUnit] = useStringParamState("CdnRequestCost.pricingUnit", "per10k", ["per10k", "per1m"] as const);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("CdnRequestCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("CdnRequestCost.peakMultiplierPct", 160);
+  const [avgRps, setAvgRps] = useState(120);
   const secondsPerMonth = 30.4 * 24 * 3600;
   const requestsPerSecond = requestsPerMonth / secondsPerMonth;
+  const estimatedRequestsPerMonth = clamp(avgRps, 0, 1e12) * secondsPerMonth;
 
   const result = useMemo(() => {
     return estimateRequestCostPer10k({
@@ -51,6 +53,29 @@ export function CdnRequestCostCalculator() {
               onChange={(e) => setRequestsPerMonth(+e.target.value)}
             />
             <div className="hint">Avg {formatNumber(requestsPerSecond, 2)} req/sec.</div>
+          </div>
+          <div className="field field-3">
+            <div className="label">Avg RPS</div>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={avgRps}
+              min={0}
+              step={0.1}
+              onChange={(e) => setAvgRps(+e.target.value)}
+            />
+          </div>
+          <div className="field field-3" style={{ alignSelf: "end" }}>
+            <div className="btn-row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setRequestsPerMonth(Math.round(estimatedRequestsPerMonth))}
+              >
+                Use estimate
+              </button>
+            </div>
+            <div className="hint">Est {formatNumber(estimatedRequestsPerMonth, 0)} requests/month.</div>
           </div>
           <div className="field field-3">
             <div className="label">Pricing unit</div>
