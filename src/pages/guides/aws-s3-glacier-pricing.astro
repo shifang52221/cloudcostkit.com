@@ -1,19 +1,23 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "S3 Glacier and Deep Archive pricing (storage, retrieval, minimum duration)";
+const title = "Amazon S3 Glacier pricing (storage, retrieval, Deep Archive)";
 const description =
-  "A practical pricing checklist for S3 Glacier/Deep Archive: storage GB-month, retrieval volume and requests, and minimum storage duration/early deletion fees.";
+  "A practical pricing checklist for Amazon S3 Glacier/Deep Archive: storage GB-month, retrieval volume and requests, and minimum storage duration/early deletion fees.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What are the main cost components for archival storage?",
       a: "Storage (GB-month) plus retrieval (GB retrieved and retrieval requests). Some classes also have minimum storage duration and early deletion fees.",
+    },
+    {
+      q: "Is Amazon Glacier the same as S3 Glacier?",
+      a: "Amazon Glacier is now delivered as S3 Glacier storage classes. Pricing is still based on storage, retrieval, and minimum duration rules, but the service is accessed through S3.",
     },
     {
       q: "Why do small objects increase cost?",
@@ -105,6 +109,13 @@ const description =
     <li>
       <strong>Data lifetime</strong>: if you delete or overwrite frequently, minimum duration can erase savings.
     </li>
+  </ul>
+
+  <h2>Glacier vs Deep Archive (quick comparison)</h2>
+  <ul>
+    <li><strong>Deep Archive</strong>: lowest storage price, longest retrieval times, highest penalty for frequent restores.</li>
+    <li><strong>Glacier</strong>: higher storage price, faster retrieval, better fit for occasional restores.</li>
+    <li><strong>Cost trade-off</strong>: frequent restores usually favor Glacier or a warmer tier even if storage is higher.</li>
   </ul>
 
   <h2>Related tools</h2>

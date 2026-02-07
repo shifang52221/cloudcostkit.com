@@ -21,6 +21,17 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "Amazon S3 Glacier pricing (storage, retrieval, Deep Archive)",
+    "description": "A practical pricing checklist for Amazon S3 Glacier/Deep Archive: storage GB-month, retrieval volume and requests, and minimum storage duration/early deletion fees.",
+    "canonicalPath": "/guides/aws-s3-glacier-pricing",
+    "category": "AWS",
+    "slug": "aws-s3-glacier-pricing",
+    "topics": [
+      "requests",
+      "storage"
+    ]
+  },
+  {
     "title": "API Gateway access logs cost: how to estimate ingestion and retention",
     "description": "A practical guide to estimate API Gateway access logs cost: estimate average bytes per request, convert to GB/day, model retention (GB-month), and reduce log spend safely.",
     "canonicalPath": "/guides/aws-api-gateway-access-logs-cost",
@@ -1141,17 +1152,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "S3 Glacier and Deep Archive pricing (storage, retrieval, minimum duration)",
-    "description": "A practical pricing checklist for S3 Glacier/Deep Archive: storage GB-month, retrieval volume and requests, and minimum storage duration/early deletion fees.",
-    "canonicalPath": "/guides/aws-s3-glacier-pricing",
-    "category": "AWS",
-    "slug": "aws-s3-glacier-pricing",
-    "topics": [
-      "requests",
-      "storage"
-    ]
-  },
-  {
     "title": "S3 Glacier retrieval pricing per GB and per request",
     "description": "A practical breakdown of Glacier retrieval pricing: cost per GB retrieved plus request fees, with guidance for small-object amplification and tier selection.",
     "canonicalPath": "/guides/aws-s3-glacier-retrieval-pricing",
@@ -1587,6 +1587,18 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "CDN cost and pricing explained (cost per GB, requests, origin egress)",
+    "description": "A practical CDN cost and pricing breakdown: cost per GB, request fees ($ per 10k/1M), cache fill, and origin egress. Includes estimation steps and common pitfalls.",
+    "canonicalPath": "/guides/cdn-costs",
+    "category": "CDN",
+    "slug": "cdn-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
+  },
+  {
     "title": "CDN cost comparison: how to compare pricing across providers",
     "description": "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.",
     "canonicalPath": "/guides/cdn-cost-comparison",
@@ -1608,18 +1620,6 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "cdn",
       "egress"
-    ]
-  },
-  {
-    "title": "CDN Costs Explained: bandwidth, requests, and origin egress",
-    "description": "A practical CDN cost breakdown: what you pay for bandwidth ($/GB), request fees ($ per 10k/1M), cache fill, and origin egress. Includes estimation steps and common pitfalls.",
-    "canonicalPath": "/guides/cdn-costs",
-    "category": "CDN",
-    "slug": "cdn-costs",
-    "topics": [
-      "cdn",
-      "egress",
-      "requests"
     ]
   },
   {
