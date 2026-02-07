@@ -24,13 +24,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-application-insights-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     Application Insights is a telemetry pipeline. Costs are predictable if you model it as:
     <strong>events * size -> GB ingested -> retention storage -> query scans</strong>.
   </p>
+
+  <h2>Quick Application Insights estimate</h2>
+  <ul>
+    <li><strong>Ingestion GB/day</strong>: trace + exception + dependency payload size.</li>
+    <li><strong>Retention days</strong>: longer retention multiplies storage baseline.</li>
+    <li><strong>Sampling rate</strong>: client/server sampling changes billable GB.</li>
+  </ul>
+
 
   <h2>0) Define what you send</h2>
   <ul>

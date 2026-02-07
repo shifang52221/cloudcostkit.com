@@ -24,13 +24,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-bandwidth-egress-costs"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     Bandwidth is a top source of surprise cloud bills. The core strategy is to split traffic into destinations and validate
     boundaries: <strong>internet egress</strong>, <strong>cross-region transfer</strong>, and <strong>origin egress to CDN</strong>.
   </p>
+
+  <h2>Azure egress inputs</h2>
+  <ul>
+    <li><strong>Destination zone</strong>: Zone 1/2/3 pricing tiers.</li>
+    <li><strong>GB/month</strong>: baseline and peak transfer.</li>
+    <li><strong>Free allowances</strong>: subtract any free tiers first.</li>
+  </ul>
+
 
   <h2>1) Break down traffic by destination (define the boundary)</h2>
   <ul>

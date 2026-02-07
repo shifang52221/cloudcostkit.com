@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What are the core EBS cost components?",
@@ -26,6 +26,14 @@ const description =
     <strong>provisioned performance</strong> (when applicable), and <strong>snapshots</strong>. Most underestimates come
     from treating snapshots as “included” or forgetting performance settings on gp3/io1/io2 style volumes.
   </p>
+
+  <h2>EBS pricing inputs</h2>
+  <ul>
+    <li><strong>GB-month</strong>: average storage per volume class.</li>
+    <li><strong>IOPS/throughput</strong>: gp3/io1/io2 performance add-ons.</li>
+    <li><strong>Snapshots</strong>: GB-month from backup retention.</li>
+  </ul>
+
 
   <h2>1) Volume storage (GB-month)</h2>
   <ul>

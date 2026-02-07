@@ -24,7 +24,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-requests-vs-limits-for-sizing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -33,6 +33,14 @@ const faqs = [
     planning; <strong>limits</strong> are guardrails for bursting and safety. Mixing them up often leads to oversized
     clusters (or unpredictable performance risk).
   </p>
+
+  <h2>Sizing decision rules</h2>
+  <ul>
+    <li><strong>Requests</strong>: use for scheduling and node count.</li>
+    <li><strong>Limits</strong>: use for burst control, not capacity.</li>
+    <li><strong>Overhead</strong>: include daemonsets and system reserve.</li>
+  </ul>
+
 
   <h2>Requests: the scheduling baseline</h2>
   <p>

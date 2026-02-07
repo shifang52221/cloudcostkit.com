@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What usually drives CloudWatch alarm cost?",
@@ -30,6 +30,14 @@ const description =
     accumulate over time: experiments, old environments, and duplicated alarms per resource. The goal is not “fewer
     alarms”, it’s <strong>fewer low-value alarms</strong>.
   </p>
+
+  <h2>Alarm cost reductions</h2>
+  <ul>
+    <li><strong>Consolidate</strong>: reduce duplicate alarms per service.</li>
+    <li><strong>Resolution</strong>: avoid high-res where it is not needed.</li>
+    <li><strong>Retire</strong>: remove stale alarms from old projects.</li>
+  </ul>
+
 
   <h2>Step 0: identify your top cost drivers</h2>
   <ul>

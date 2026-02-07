@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-lambda-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,14 @@ const faqs = [
     accidental multipliers (retries, verbose logs, and expensive networking paths). Use this checklist to find the biggest
     wins first, then validate savings with billing.
   </p>
+
+  <h2>High-leverage Lambda knobs</h2>
+  <ul>
+    <li><strong>Memory vs duration</strong>: right-size to reduce total GB-seconds.</li>
+    <li><strong>Provisioned concurrency</strong>: use only for latency-critical paths.</li>
+    <li><strong>Request volume</strong>: reduce retries and noisy clients first.</li>
+  </ul>
+
 
   <h2>1) Reduce duration (fix the slow parts first)</h2>
   <ul>

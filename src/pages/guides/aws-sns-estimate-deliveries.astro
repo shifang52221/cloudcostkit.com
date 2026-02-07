@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-sns-estimate-deliveries"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,14 @@ const faqs = [
     <strong>publishes x matched subscribers</strong>. The mistake is to use subscriber count without accounting for filter
     policies and retries. This guide shows a workflow that gets you close quickly and stays valid when incidents happen.
   </p>
+
+  <h2>Delivery estimate inputs</h2>
+  <ul>
+    <li><strong>Publishes/month</strong>: per topic baseline volume.</li>
+    <li><strong>Matched fan-out</strong>: subscribers x match rate.</li>
+    <li><strong>Retry factor</strong>: failed deliveries multiply requests.</li>
+  </ul>
+
 
   <h2>Step 1: estimate publishes per month</h2>
   <ul>

@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-gp2-vs-gp3-cost"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "Is gp3 always cheaper than gp2?",
@@ -25,6 +25,14 @@ const description =
     gp2 and gp3 are general-purpose EBS volume types. Cost comparisons often go wrong when you compare only the $/GB
     number and ignore that performance knobs and baselines can force you to over-provision.
   </p>
+
+  <h2>gp2 vs gp3 breakpoints</h2>
+  <ul>
+    <li><strong>IOPS needs</strong>: sustained IOPS requirement.</li>
+    <li><strong>Throughput</strong>: sequential MB/s requirement.</li>
+    <li><strong>Size</strong>: gp2 scales IOPS with size; gp3 does not.</li>
+  </ul>
+
 
   <h2>How the cost model differs</h2>
   <ul>

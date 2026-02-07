@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-load-balancer-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -35,6 +35,14 @@ const faqs = [
     <strong>how busy each LB is</strong> (LCU/NLCU). The best results come from reducing always-on LB count and removing
     traffic amplification patterns that inflate connections and bytes.
   </p>
+
+  <h2>Fast optimization checks</h2>
+  <ul>
+    <li><strong>Consolidate</strong>: reduce one-LB-per-service patterns.</li>
+    <li><strong>Cross-zone</strong>: disable when safe to reduce cross-AZ transfer.</li>
+    <li><strong>Idle LBs</strong>: remove unused listeners and test environments.</li>
+  </ul>
+
 
   <h2>Step 1: reduce the number of load balancers (LB-hours)</h2>
   <ul>

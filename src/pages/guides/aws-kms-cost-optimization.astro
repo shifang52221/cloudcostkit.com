@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-kms-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,14 @@ const faqs = [
     have a hot-path decrypt, a “fetch secret per request” pattern, or too-frequent data key generation, request charges
     can scale linearly with traffic. This checklist focuses on the high-leverage fixes that keep security intact.
   </p>
+
+  <h2>KMS cost levers</h2>
+  <ul>
+    <li><strong>Cache data keys</strong>: reduce Encrypt/Decrypt calls.</li>
+    <li><strong>Batch operations</strong>: avoid per-record encrypt calls.</li>
+    <li><strong>Key count</strong>: retire unused CMKs to cut key-months.</li>
+  </ul>
+
 
   <h2>Step 1: verify what’s driving spend (keys vs requests)</h2>
   <ul>

@@ -31,13 +31,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-estimate-dns-queries"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p class="muted">
     DNS query charges are volume-based, so the key input is queries per month. The best estimates come from measured
     query counts, not guesswork.
   </p>
+
+  <h2>Quick DNS query estimate</h2>
+  <ul>
+    <li><strong>Baseline QPS</strong>: average resolver queries per second.</li>
+    <li><strong>Cache hit rate</strong>: effective queries = total x (1 - hit rate).</li>
+    <li><strong>Health checks</strong>: add query volume from health checks and routing.</li>
+  </ul>
+
 
   <h2>Method 1: From Route 53 hosted zone metrics (fastest)</h2>
   <ul>

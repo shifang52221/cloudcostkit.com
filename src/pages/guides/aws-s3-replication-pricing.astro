@@ -23,13 +23,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-replication-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     The biggest input in S3 replication pricing is <strong>replicated GB/month</strong>. That volume is driven by writes
     and churn, not by total stored data.
   </p>
+
+  <h2>Replication inputs</h2>
+  <ul>
+    <li><strong>Replicated GB</strong>: data copied per month.</li>
+    <li><strong>Request costs</strong>: replication requests and PUTs.</li>
+    <li><strong>Destination storage</strong>: GB-month in target bucket.</li>
+  </ul>
+
 
   <h2>What to model (replication is not one number)</h2>
   <ul>

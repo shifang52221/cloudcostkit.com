@@ -24,11 +24,19 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-vpc-egress-costs" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-vpc-egress-costs" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
     Transfer costs are easiest to control when you split traffic into billable categories and validate boundaries. This guide
     is a practical workflow you can apply before you deploy or when you see an unexpected bill.
   </p>
+
+  <h2>GCP egress inputs</h2>
+  <ul>
+    <li><strong>Destination</strong>: internet vs inter-region vs intra-region.</li>
+    <li><strong>Network tier</strong>: Premium vs Standard pricing.</li>
+    <li><strong>GB/month</strong>: baseline and peak traffic windows.</li>
+  </ul>
+
 
   <h2>0) Why egress bills surprise teams</h2>
   <ul>

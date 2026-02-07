@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What usually drives EBS spend?",
@@ -26,6 +26,14 @@ const description =
     for some volume types, plus <strong>snapshots</strong>. The waste comes from unattached volumes, oversized volumes,
     and default performance settings that are higher than required.
   </p>
+
+  <h2>EBS savings checklist</h2>
+  <ul>
+    <li><strong>Right-size</strong>: remove over-provisioned volumes.</li>
+    <li><strong>gp2 to gp3</strong>: lower cost for the same baseline IOPS.</li>
+    <li><strong>Snapshots</strong>: prune retention and clean unused volumes.</li>
+  </ul>
+
 
   <h2>Step 0: identify your dominant driver</h2>
   <ul>

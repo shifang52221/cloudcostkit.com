@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-metrics-estimate-api-requests"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What usually drives metrics API request volume?",
@@ -25,6 +25,14 @@ const description =
     Metrics API request costs (GetMetricData and similar calls) can become meaningful when dashboards and tools poll
     frequently. A good estimate is based on <strong>refresh behavior</strong>, not on guesswork.
   </p>
+
+  <h2>API request estimate inputs</h2>
+  <ul>
+    <li><strong>Dashboards</strong>: refresh rate x widgets per dashboard.</li>
+    <li><strong>GetMetricData</strong>: queries per page/view or job.</li>
+    <li><strong>Alarms</strong>: evaluation frequency adds API calls.</li>
+  </ul>
+
 
   <h2>Step 1: inventory the callers</h2>
   <ul>

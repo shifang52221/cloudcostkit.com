@@ -19,12 +19,20 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-kms-pricing" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-kms-pricing" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
     KMS pricing is usually a combination of <strong>key-month</strong> charges and <strong>request</strong> charges. The
     hard part is that many services use KMS “under the hood”, and request volume can come from application patterns you
     don’t notice until the bill spikes. This page gives you a checklist for a realistic estimate.
   </p>
+
+  <h2>KMS pricing inputs</h2>
+  <ul>
+    <li><strong>Key-months</strong>: CMKs per month by environment.</li>
+    <li><strong>Requests/month</strong>: Encrypt/Decrypt/GenerateDataKey.</li>
+    <li><strong>Key type</strong>: symmetric vs asymmetric request rates.</li>
+  </ul>
+
 
   <h2>What to model</h2>
   <ul>

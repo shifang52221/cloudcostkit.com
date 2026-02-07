@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-sns-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -35,6 +35,14 @@ const faqs = [
     reduce <strong>retries</strong> (failures and timeouts). This playbook focuses on changes that reduce spend without
     breaking message semantics.
   </p>
+
+  <h2>SNS cost levers</h2>
+  <ul>
+    <li><strong>Reduce fan-out</strong>: tighten subscriptions and filters.</li>
+    <li><strong>Retry control</strong>: fix failing endpoints to cut retries.</li>
+    <li><strong>Message size</strong>: smaller payloads reduce transfer.</li>
+  </ul>
+
 
   <h2>Step 0: baseline the two volumes (publishes vs deliveries)</h2>
   <ul>

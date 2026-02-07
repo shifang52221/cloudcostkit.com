@@ -27,13 +27,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-storage-classes"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p class="muted">
     Storage classes are a common source of confusion. Cheaper per-GB tiers can introduce retrieval, transition, and
     minimum storage duration effects that matter for bursty access patterns.
   </p>
+
+  <h2>Storage class decision inputs</h2>
+  <ul>
+    <li><strong>Access frequency</strong>: how often objects are read.</li>
+    <li><strong>Retrieval latency</strong>: acceptable minutes vs hours.</li>
+    <li><strong>Minimum duration</strong>: avoid early deletion fees.</li>
+  </ul>
+
 
   <h2>When storage classes change total cost</h2>
   <p>

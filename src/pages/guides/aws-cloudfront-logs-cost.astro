@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudfront-logs-cost"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What is the common surprise with CDN logs?",
@@ -30,6 +30,14 @@ const description =
     <strong>analytics scans</strong>, and <strong>SIEM/log platform ingestion</strong>. Estimate them like any other log
     pipeline: ingestion, retention, and query/scan.
   </p>
+
+  <h2>CloudFront log cost inputs</h2>
+  <ul>
+    <li><strong>Log lines</strong>: requests/month x log lines per request.</li>
+    <li><strong>Log size</strong>: avg KB per line to get GB/month ingestion.</li>
+    <li><strong>Retention</strong>: days kept drives storage baseline.</li>
+  </ul>
+
 
   <h2>Step 0: know which log stream you enabled</h2>
   <ul>

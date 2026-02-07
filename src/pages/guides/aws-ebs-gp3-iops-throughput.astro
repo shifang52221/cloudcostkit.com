@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-ebs-gp3-iops-throughput"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What is the common gp3 cost mistake?",
@@ -26,6 +26,14 @@ const description =
     accidentally over-provision IOPS and throughput. The safest sizing workflow starts from measured utilization and
     validates performance under realistic load.
   </p>
+
+  <h2>gp3 sizing cues</h2>
+  <ul>
+    <li><strong>IOPS</strong>: baseline random IOPS from workload metrics.</li>
+    <li><strong>Throughput</strong>: MB/s for sequential scans or backups.</li>
+    <li><strong>Volume size</strong>: GB baseline plus growth buffer.</li>
+  </ul>
+
 
   <h2>Step 1: measure your baseline</h2>
   <ul>

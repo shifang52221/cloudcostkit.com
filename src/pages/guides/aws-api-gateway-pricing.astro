@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What are the two biggest cost drivers for many APIs?",
@@ -25,6 +25,14 @@ const description =
     API Gateway pricing is usually dominated by <strong>request charges</strong> plus <strong>data transfer</strong>.
     Depending on API type and features, you may also see add-ons that matter for production workloads.
   </p>
+
+  <h2>API Gateway pricing inputs</h2>
+  <ul>
+    <li><strong>Requests/month</strong>: from metrics, logs, or RPS conversion.</li>
+    <li><strong>Response size</strong>: average KB to estimate transfer costs.</li>
+    <li><strong>Effective rates</strong>: blend tiers and region pricing.</li>
+  </ul>
+
 
   <h2>Where to get the inputs</h2>
   <ul>

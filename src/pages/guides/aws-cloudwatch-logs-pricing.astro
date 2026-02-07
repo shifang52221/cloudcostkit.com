@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What are the main CloudWatch Logs cost drivers?",
@@ -26,6 +26,14 @@ const description =
     <strong>queries</strong>. Many teams budget only ingestion and forget that retention policies and query scans can be
     meaningful at scale.
   </p>
+
+  <h2>Logs pricing inputs</h2>
+  <ul>
+    <li><strong>Ingestion GB/day</strong>: primary driver of spend.</li>
+    <li><strong>Retention days</strong>: storage GB-month baseline.</li>
+    <li><strong>Insights scans</strong>: GB scanned by queries.</li>
+  </ul>
+
 
   <h2>1) Ingestion (GB): what you write</h2>
   <ul>

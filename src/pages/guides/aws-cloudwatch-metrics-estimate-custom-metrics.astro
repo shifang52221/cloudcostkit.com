@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-metrics-estimate-custom-metrics"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What is the right unit to estimate for custom metrics?",
@@ -26,6 +26,14 @@ const description =
     series is typically one metric name plus one specific set of dimension values. If you add a dimension that has many
     unique values, you multiply your series count quickly.
   </p>
+
+  <h2>Custom metrics count inputs</h2>
+  <ul>
+    <li><strong>Unique dimensions</strong>: each label set is a time series.</li>
+    <li><strong>Metrics per service</strong>: services x metrics x environments.</li>
+    <li><strong>High-cardinality</strong>: avoid exploding labels.</li>
+  </ul>
+
 
   <h2>Step 0: the basic formula</h2>
   <p class="muted">Time series ~= metric names * unique dimension combinations * environments</p>

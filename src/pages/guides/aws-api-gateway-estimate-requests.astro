@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-api-gateway-estimate-requests"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "How do I convert RPS to requests per month?",
@@ -30,6 +30,14 @@ const description =
     estimate from a measured source (metrics or logs) and include <strong>retries</strong> and{" "}
     <strong>automated traffic</strong>.
   </p>
+
+  <h2>Quick request count sources</h2>
+  <ul>
+    <li><strong>Metrics</strong>: CloudWatch request count by stage.</li>
+    <li><strong>Logs</strong>: count log lines for the API stage.</li>
+    <li><strong>RPS</strong>: convert average RPS to monthly volume.</li>
+  </ul>
+
 
   <h2>Method 1: use API metrics (best if available)</h2>
   <ul>

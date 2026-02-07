@@ -27,7 +27,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-ses-cost-optimization"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -35,6 +35,14 @@ const faqs = [
     multipliers: <strong>duplicates</strong>, <strong>retries</strong>, and <strong>alert storms</strong>. This playbook
     focuses on high-leverage changes that cut spend while protecting deliverability.
   </p>
+
+  <h2>SES cost levers</h2>
+  <ul>
+    <li><strong>Reduce volume</strong>: suppress bounces and duplicates.</li>
+    <li><strong>Payload size</strong>: compress content and limit attachments.</li>
+    <li><strong>Retries</strong>: fix auth and reputation to lower retries.</li>
+  </ul>
+
 
   <h2>Step 0: baseline what you’re sending</h2>
   <ul>

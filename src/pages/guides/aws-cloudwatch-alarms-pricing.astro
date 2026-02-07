@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-alarms-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What is the core unit of alarm pricing?",
@@ -26,6 +26,14 @@ const description =
     estimation mistakes come from mixing alarm types or ignoring short-lived environments that still generate billable
     alarm-months.
   </p>
+
+  <h2>Alarm pricing inputs</h2>
+  <ul>
+    <li><strong>Standard alarms</strong>: count per metric and dimension.</li>
+    <li><strong>High-res</strong>: 1-minute or 10-second alarms.</li>
+    <li><strong>Composite</strong>: add-on charges by count.</li>
+  </ul>
+
 
   <h2>What to include in an estimate</h2>
   <ul>

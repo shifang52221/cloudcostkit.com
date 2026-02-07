@@ -27,13 +27,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-request-costs"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     Many teams ignore S3 request costs because storage and egress usually dominate. But requests become meaningful when
     you have millions of small objects, frequent LIST/HEAD calls, or chatty pipelines.
   </p>
+
+  <h2>Request cost drivers to count</h2>
+  <ul>
+    <li><strong>GET/PUT/LIST</strong>: separate high-volume request types.</li>
+    <li><strong>Small objects</strong>: many small files amplify request charges.</li>
+    <li><strong>Lifecycle actions</strong>: transitions and restores add requests.</li>
+  </ul>
+
 
   <h2>What to model (requests are not one bucket)</h2>
   <ul>

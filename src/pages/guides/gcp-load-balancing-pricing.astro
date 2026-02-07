@@ -28,13 +28,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-load-balancing-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     Load balancer estimates get accurate when you treat them as: hours + requests + traffic processed. For public services,
     internet egress is usually a separate (often larger) line item. Splitting these drivers also makes optimization obvious.
   </p>
+
+  <h2>GCP load balancing inputs</h2>
+  <ul>
+    <li><strong>LB hours</strong>: forwarding rules and VIPs.</li>
+    <li><strong>Requests</strong>: some products bill per request.</li>
+    <li><strong>Data processed</strong>: GB/month through the load balancer.</li>
+  </ul>
+
 
   <h2>0) Decide what you are pricing</h2>
   <p>

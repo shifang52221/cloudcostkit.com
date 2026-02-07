@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-lambda-concurrency-and-cold-starts"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,14 @@ const faqs = [
     increase duration, which increases GB-seconds. Provisioned concurrency can reduce cold starts, but it adds a baseline
     “always-on” cost. This page explains how to think about the trade-off and what to measure.
   </p>
+
+  <h2>Concurrency model inputs</h2>
+  <ul>
+    <li><strong>Peak RPS</strong>: highest sustained traffic window.</li>
+    <li><strong>Avg duration</strong>: ms per request drives concurrency.</li>
+    <li><strong>Provisioned window</strong>: hours where cold starts hurt.</li>
+  </ul>
+
 
   <h2>How concurrency relates to cost</h2>
   <ul>

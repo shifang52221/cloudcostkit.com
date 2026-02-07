@@ -24,13 +24,21 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-application-gateway-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     L7 gateway bills usually scale with <strong>time</strong>, <strong>traffic processed</strong>, and sometimes <strong>requests</strong>.
     The main mistake is to budget only "one gateway" without modeling traffic and log volume (or missing peak windows).
   </p>
+
+  <h2>Application Gateway pricing inputs</h2>
+  <ul>
+    <li><strong>Gateway hours</strong>: base hourly charges.</li>
+    <li><strong>Capacity units</strong>: throughput and new connections.</li>
+    <li><strong>Data processed</strong>: GB/month through the gateway.</li>
+  </ul>
+
 
   <h2>0) Define the gateway scope</h2>
   <ul>

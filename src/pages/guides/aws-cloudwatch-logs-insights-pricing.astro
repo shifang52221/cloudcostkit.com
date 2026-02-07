@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-logs-insights-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What is the pricing unit for Logs Insights?",
@@ -25,6 +25,14 @@ const description =
     Logs Insights pricing usually boils down to one number: <strong>GB scanned</strong>. A cost model should separate
     “routine” scanning (dashboards and daily debugging) from “incident” scanning (wide searches and repeated queries).
   </p>
+
+  <h2>Logs Insights pricing inputs</h2>
+  <ul>
+    <li><strong>GB scanned</strong>: per query scan volume.</li>
+    <li><strong>Queries/day</strong>: dashboards and ad hoc usage.</li>
+    <li><strong>Peak scans</strong>: incident searches can dominate.</li>
+  </ul>
+
 
   <h2>What to include in an estimate</h2>
   <ul>

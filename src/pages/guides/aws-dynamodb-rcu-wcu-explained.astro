@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-dynamodb-rcu-wcu-explained"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "Why does item size matter so much for DynamoDB cost?",
@@ -26,6 +26,14 @@ const description =
     equals one unit”. The effective units depend on <strong>item size</strong>, <strong>access pattern</strong>, and
     whether you scan or query targeted keys.
   </p>
+
+  <h2>RCU/WCU quick sizing</h2>
+  <ul>
+    <li><strong>Item size</strong>: larger items consume more units.</li>
+    <li><strong>Read/write rate</strong>: baseline requests per second.</li>
+    <li><strong>Consistency</strong>: strong reads consume more RCUs.</li>
+  </ul>
+
 
   <h2>Step 1: define what you need to size</h2>
   <ul>

@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudtrail-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "What usually drives CloudTrail spend?",
@@ -29,6 +29,14 @@ const description =
     CloudTrail estimates are easiest when you split <strong>event volume</strong> by type and then apply your effective
     per-event pricing. The single most important split is <strong>management vs data events</strong>.
   </p>
+
+  <h2>CloudTrail pricing inputs</h2>
+  <ul>
+    <li><strong>Management events</strong>: baseline event volume.</li>
+    <li><strong>Data events</strong>: S3/Lambda events per resource.</li>
+    <li><strong>Insights</strong>: anomaly detection add-on if enabled.</li>
+  </ul>
+
 
   <h2>What to model</h2>
   <ul>

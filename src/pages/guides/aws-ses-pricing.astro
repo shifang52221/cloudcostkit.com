@@ -19,12 +19,20 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-ses-pricing" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-ses-pricing" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
     SES pricing models are usually linear: <strong>emails sent</strong> × <strong>effective $ per 1,000 emails</strong>.
     The difficult part is getting the volume right (and not ignoring incident multipliers). If you send large templates
     or attachments, add a payload-size assumption as a separate line item so you can reason about trade-offs.
   </p>
+
+  <h2>Quick SES pricing inputs</h2>
+  <ul>
+    <li><strong>Emails sent</strong>: total send volume per month.</li>
+    <li><strong>Payload size</strong>: avg KB per email for transfer costs.</li>
+    <li><strong>Delivery path</strong>: internet egress vs in-region recipients.</li>
+  </ul>
+
 
   <h2>What to include in your estimate</h2>
   <ul>

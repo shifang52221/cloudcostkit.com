@@ -19,12 +19,20 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-nat-gateway-cost" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-nat-gateway-cost" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
     NAT gateway bills are often surprising because they combine a fixed hourly baseline with traffic-based processing
     charges. If you put high-throughput or “chatty outbound” workloads behind NAT, costs can scale faster than compute.
     This page shows a simple model and a workflow to estimate and validate the drivers.
   </p>
+
+  <h2>NAT cost inputs</h2>
+  <ul>
+    <li><strong>Hours</strong>: one NAT per AZ is typical.</li>
+    <li><strong>Processed GB</strong>: API calls and downloads drive this.</li>
+    <li><strong>Endpoints</strong>: VPC endpoints can reduce NAT GB.</li>
+  </ul>
+
 
   <h2>The cost model (what to budget)</h2>
   <ul>

@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-cost-model-beyond-nodes"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,14 @@ const faqs = [
     because compute is usually the biggest line item. But for many real clusters, <strong>everything around nodes</strong>{" "}
     adds up. This guide is a checklist for those missing costs so your budget is closer to reality.
   </p>
+
+  <h2>Beyond-nodes cost inputs</h2>
+  <ul>
+    <li><strong>Control plane</strong>: managed control plane hourly fees if applicable.</li>
+    <li><strong>Ingress/LB</strong>: count load balancers and estimate data processed.</li>
+    <li><strong>Observability</strong>: log GB/day and metrics series growth by workload.</li>
+  </ul>
+
 
   <h2>1) Nodes (compute)</h2>
   <p>
