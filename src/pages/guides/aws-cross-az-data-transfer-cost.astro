@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cross-AZ data transfer cost (AWS): what causes it and how to estimate";
+const title = "AWS cross-AZ data transfer cost: causes and estimate steps";
 const description =
-  "A practical guide to cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.";
+  "A practical guide to AWS cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cross-az-data-transfer-cost"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "Why do teams get surprised by cross-AZ charges?",
@@ -52,10 +52,10 @@ const description =
       <strong>Start from traffic volume</strong>: total GB delivered/processed for the service boundary (API, LB, service mesh).
     </li>
     <li>
-      <strong>Estimate cross-AZ fraction</strong>: what percent of traffic crosses zones (0% if perfectly zone-local, often 5–50% in practice).
+      <strong>Estimate cross-AZ fraction</strong>: what percent of traffic crosses zones (0% if perfectly zone-local, often 5-20% in practice).
     </li>
     <li>
-      <strong>Cross-AZ GB/month</strong> ~= total GB/month × cross-AZ fraction.
+      <strong>Cross-AZ GB/month</strong> ~= total GB/month x cross-AZ fraction.
     </li>
   </ol>
   <div class="btn-row">
@@ -76,7 +76,7 @@ const description =
     </li>
   </ul>
   <p class="muted">
-    If you cannot measure yet, use a conservative range (for example 10–30%) and validate later with flow logs.
+    If you cannot measure yet, use a conservative range (for example 10-30%) and validate later with flow logs.
   </p>
 
   <h2>How to reduce cross-AZ cost safely</h2>
@@ -91,7 +91,7 @@ const description =
       <strong>Validate LB and client behavior</strong>: confirm routing policies actually keep traffic local under load and during scale events.
     </li>
     <li>
-      <strong>Watch failure modes</strong>: some cross-AZ traffic is the “safety cost” during partial AZ failures; optimize without reducing resilience.
+      <strong>Watch failure modes</strong>: some cross-AZ traffic is the "safety cost" during partial AZ failures; optimize without reducing resilience.
     </li>
   </ul>
 
@@ -118,4 +118,3 @@ const description =
     </li>
   </ul>
 </GuideLayout>
-

@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
 
-const title = "Cross-region Transfer Cost Calculator";
+const title = "AWS Cross-Region Data Transfer Cost Calculator";
 const description =
-  "Estimate monthly cross-region transfer cost from GB transferred and your provider's $/GB pricing. Educational use only.";
+  "Estimate AWS cross-region transfer cost from GB transferred and your provider's $/GB pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
@@ -37,7 +37,7 @@ const description =
       a: "Typically replication traffic is billed on the outbound side. Confirm the billing direction for your service."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/storage-replication-cost-calculator", label: "Storage replication" },
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
@@ -108,7 +108,7 @@ const description =
     <h2>Validate after changes</h2>
     <ul>
       <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that’s when hidden multipliers show up).</li>
+      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Understanding cloud egress costs";
+const title = "Cloud egress cost (AWS/Azure/GCP data transfer)";
 const description =
-  "A practical guide to estimating egress: units, where bandwidth shows up, quick estimation formulas, and common billing pitfalls.";
+  "A practical guide to estimating cloud egress costs: units, where bandwidth shows up, quick formulas, and common billing pitfalls.";
 const faqs = [
   {
     q: "What counts as egress?",
@@ -34,12 +34,13 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p class="muted">
-    Egress is the data your cloud sends out. For many products, egress is the "silent" line item that grows with usage.
-    This guide helps you estimate egress quickly, pick the right unit, and avoid common double-counting traps.
+    Egress is the data your cloud sends out (including AWS egress cost). For many products, egress is the "silent" line
+    item that grows with usage. This guide helps you estimate egress quickly, pick the right unit, and avoid common
+    double-counting traps.
   </p>
 
   <h2>1) Identify what kind of transfer you have</h2>

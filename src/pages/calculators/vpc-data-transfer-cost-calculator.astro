@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
 
-const title = "VPC Data Transfer Cost Calculator";
+const title = "AWS VPC Data Transfer Cost Calculator";
 const description =
-  "Estimate VPC-style data transfer costs from GB/month and a $/GB pricing assumption. Educational use only.";
+  "Estimate AWS VPC data transfer costs from GB/month and a $/GB pricing assumption. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/vpc-data-transfer-cost-calculator"
-  intro="Data transfer is often the hardest cloud line item to predict. This VPC data transfer cost calculator helps you estimate monthly spend from GB/month and your $/GB assumptions. Use it for cross-zone, cross-region, and internet egress style modeling."
+  intro="Data transfer is often the hardest cloud line item to predict. This AWS VPC data transfer cost calculator helps you estimate monthly spend from GB/month and your $/GB assumptions. Use it for cross-zone, cross-region, and internet egress style modeling."
   examples={[
     "If you move 2,000 GB/month across boundaries at your $/GB -> estimate monthly transfer spend.",
     "Transfer costs can exceed compute for chatty microservices or data-heavy pipelines.",
@@ -42,7 +42,7 @@ const description =
       a: "Segment by architecture: load balancer paths, service-to-service calls, and replication. Validate AZ locality (client and backend in the same AZ) and model a peak scenario.",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost (generic)" },
     { href: "/calculators/aws-nat-gateway-cost-calculator", label: "NAT gateway cost" },

@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "VPC data transfer: how to estimate cross-zone, cross-region, and egress costs";
+const title = "AWS VPC data transfer cost: estimate cross-AZ, cross-region, and egress";
 const description =
-  "A practical guide to VPC data transfer: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.";
+  "A practical guide to AWS VPC data transfer costs: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.";
 const faqs = [
   {
     q: "What creates VPC data transfer costs?",
@@ -23,7 +23,7 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-vpc-data-transfer" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-vpc-data-transfer" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
     VPC data transfer costs often show up as "small" per-GB rates that become large at scale. The hard part is not the
     math - it is identifying how much traffic crosses pricing boundaries (AZ, region, and internet).

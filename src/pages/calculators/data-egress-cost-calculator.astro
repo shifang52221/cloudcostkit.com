@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from "../../components/calculators/DataEgressCost";
 
-const title = "Data Egress Cost Calculator";
+const title = "Cloud Data Egress Cost Calculator (AWS/Azure/GCP)";
 const description =
-  "Estimate monthly data egress cost from GB transferred and your provider's $/GB pricing. Educational use only.";
+  "Estimate monthly data egress cost (AWS/Azure/GCP) from GB transferred and your provider's $/GB pricing. Educational use only.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/data-egress-cost-calculator"
-  intro="Data egress can be a major driver of cloud spend. Use this calculator to estimate monthly egress cost with flat or tiered pricing, and compare baseline vs peak scenarios."
+  intro="Data egress can be a major driver of cloud spend (including AWS egress cost). Use this calculator to estimate monthly egress cost with flat or tiered pricing, and compare baseline vs peak scenarios."
   examples={[
     "If you send 2,500 GB/month and your effective price is $0.09/GB, estimated cost is $225/month.",
     "If you have tiered pricing, enter the tier thresholds and compare baseline vs peak traffic.",
@@ -50,7 +50,7 @@ const description =
       a: "No. This tool estimates bandwidth-based egress only."
     }
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },

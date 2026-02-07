@@ -121,6 +121,19 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "AWS cross-AZ data transfer cost: causes and estimate steps",
+    "description": "A practical guide to AWS cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.",
+    "canonicalPath": "/guides/aws-cross-az-data-transfer-cost",
+    "category": "AWS",
+    "slug": "aws-cross-az-data-transfer-cost",
+    "topics": [
+      "database",
+      "egress",
+      "kubernetes",
+      "load-balancing"
+    ]
+  },
+  {
     "title": "AWS ECS pricing (EC2 vs Fargate cost model)",
     "description": "A practical ECS pricing guide: how costs differ between EC2 and Fargate launch types, plus the line items you must include (compute, load balancers, logs, transfer, storage, registry behavior).",
     "canonicalPath": "/guides/aws-ecs-pricing",
@@ -240,6 +253,16 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "messaging",
       "requests"
+    ]
+  },
+  {
+    "title": "AWS VPC data transfer cost: estimate cross-AZ, cross-region, and egress",
+    "description": "A practical guide to AWS VPC data transfer costs: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.",
+    "canonicalPath": "/guides/aws-vpc-data-transfer",
+    "category": "AWS",
+    "slug": "aws-vpc-data-transfer",
+    "topics": [
+      "egress"
     ]
   },
   {
@@ -426,19 +449,6 @@ export const GUIDES: GuideLink[] = [
       "logging",
       "metrics",
       "requests"
-    ]
-  },
-  {
-    "title": "Cross-AZ data transfer cost (AWS): what causes it and how to estimate",
-    "description": "A practical guide to cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.",
-    "canonicalPath": "/guides/aws-cross-az-data-transfer-cost",
-    "category": "AWS",
-    "slug": "aws-cross-az-data-transfer-cost",
-    "topics": [
-      "database",
-      "egress",
-      "kubernetes",
-      "load-balancing"
     ]
   },
   {
@@ -1295,16 +1305,6 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-ssm-parameter-store-pricing",
     "topics": [
       "requests"
-    ]
-  },
-  {
-    "title": "VPC data transfer: how to estimate cross-zone, cross-region, and egress costs",
-    "description": "A practical guide to VPC data transfer: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.",
-    "canonicalPath": "/guides/aws-vpc-data-transfer",
-    "category": "AWS",
-    "slug": "aws-vpc-data-transfer",
-    "topics": [
-      "egress"
     ]
   },
   {
@@ -2176,6 +2176,16 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "Cloud egress cost (AWS/Azure/GCP data transfer)",
+    "description": "A practical guide to estimating cloud egress costs: units, where bandwidth shows up, quick formulas, and common billing pitfalls.",
+    "canonicalPath": "/guides/egress-costs",
+    "category": "Networking",
+    "slug": "egress-costs",
+    "topics": [
+      "egress"
+    ]
+  },
+  {
     "title": "Network transfer costs explained (egress, cross-region, cross-AZ)",
     "description": "A practical guide to network transfer costs: how to model internet egress, cross-region transfer, cross-AZ traffic, and CDN cache fill. Includes estimation steps and validation tips.",
     "canonicalPath": "/guides/network-transfer-costs",
@@ -2183,16 +2193,6 @@ export const GUIDES: GuideLink[] = [
     "slug": "network-transfer-costs",
     "topics": [
       "cdn",
-      "egress"
-    ]
-  },
-  {
-    "title": "Understanding cloud egress costs",
-    "description": "A practical guide to estimating egress: units, where bandwidth shows up, quick estimation formulas, and common billing pitfalls.",
-    "canonicalPath": "/guides/egress-costs",
-    "category": "Networking",
-    "slug": "egress-costs",
-    "topics": [
       "egress"
     ]
   },
