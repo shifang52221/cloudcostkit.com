@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Container Registry (ACR) pricing: storage + pulls + egress";
+const title = "Azure Container Registry pricing tiers (Basic, Standard, Premium)";
 const description =
-  "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a workflow to estimate GB-month from retention and validate layer sharing.";
+  "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer, plus how pricing tiers (Basic/Standard/Premium) affect limits and features.";
 
 const faqs = [
   {
@@ -28,13 +28,25 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-container-registry-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
-    Container registries are "storage + transfer". A clean estimate separates what you store from what you pull, and splits
-    transfer by where it goes (same region, cross-region, internet). Most surprises come from retention drift and pull
-    storms (CI peaks, autoscaling, node churn).
+    Container registries are "storage + transfer". A clean estimate separates what you store from what you pull, and
+    splits transfer by where it goes (same region, cross-region, internet). ACR pricing tiers (Basic/Standard/Premium)
+    change limits and features, but the cost model still depends on storage, pulls, and egress. Most surprises come from
+    retention drift and pull storms (CI peaks, autoscaling, node churn).
+  </p>
+
+  <h2>ACR pricing tiers (Basic, Standard, Premium)</h2>
+  <ul>
+    <li><strong>Basic</strong>: entry tier for low traffic and small teams.</li>
+    <li><strong>Standard</strong>: higher throughput and scale for production workloads.</li>
+    <li><strong>Premium</strong>: advanced features (geo-replication, private networking) with the highest limits.</li>
+  </ul>
+  <p class="muted">
+    Tier selection affects limits and features, but your monthly spend still comes from stored GB-month, pull volume, and
+    billed data transfer paths.
   </p>
 
   <h2>0) Define your registry scope</h2>
@@ -121,7 +133,7 @@ const faqs = [
     <li>Retention drift: old tags and layers kept forever.</li>
     <li>Assuming tags * size equals storage (layer sharing changes the math).</li>
     <li>Ignoring CI and scale-out peaks (pull storms are the peak scenario).</li>
-    <li>Cross-region pulls hidden inside "it’s internal" assumptions.</li>
+    <li>Cross-region pulls hidden inside "it's internal" assumptions.</li>
     <li>Missing that egress can dominate if you pull from outside the region.</li>
   </ul>
 

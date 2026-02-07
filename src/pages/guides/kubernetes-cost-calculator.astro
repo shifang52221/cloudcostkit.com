@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Kubernetes Cost Calculator: what to include (nodes, storage, egress, observability)";
+const title = "Kubernetes cost calculator (cluster pricing checklist)";
 const description =
-  "A practical checklist for estimating Kubernetes costs: node compute, control plane, load balancers, storage, egress, and observability. Includes a fast workflow and common pitfalls.";
+  "A practical checklist for estimating Kubernetes costs: node compute, control plane, load balancers, storage, egress, and observability. Includes a fast workflow, calculator links, and common pitfalls.";
 const faqs = [
   {
     q: "What is the biggest driver of Kubernetes cost?",
@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-cost-calculator"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
@@ -31,6 +31,10 @@ const faqs = [
     estimate combines <strong>capacity planning</strong> (how many nodes you need) with <strong>line items</strong> that
     show up on the bill (load balancers, storage, egress, logs).
   </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
+    <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits sizing</a>
+  </div>
 
   <h2>The cost checklist</h2>
   <ul>

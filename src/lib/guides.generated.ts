@@ -121,6 +121,35 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "AWS ECS pricing (EC2 vs Fargate cost model)",
+    "description": "A practical ECS pricing guide: how costs differ between EC2 and Fargate launch types, plus the line items you must include (compute, load balancers, logs, transfer, storage, registry behavior).",
+    "canonicalPath": "/guides/aws-ecs-pricing",
+    "category": "AWS",
+    "slug": "aws-ecs-pricing",
+    "topics": [
+      "compute",
+      "egress",
+      "load-balancing",
+      "logging",
+      "serverless",
+      "storage"
+    ]
+  },
+  {
+    "title": "AWS Fargate pricing (cost model + pricing calculator)",
+    "description": "A practical Fargate pricing guide and calculator companion: what drives compute cost (vCPU-hours + GB-hours), how to estimate average running tasks, and the non-compute line items that usually matter (logs, load balancers, data transfer).",
+    "canonicalPath": "/guides/aws-fargate-pricing",
+    "category": "AWS",
+    "slug": "aws-fargate-pricing",
+    "topics": [
+      "compute",
+      "egress",
+      "load-balancing",
+      "logging",
+      "serverless"
+    ]
+  },
+  {
     "title": "AWS Lambda cost optimization (high-leverage fixes)",
     "description": "A practical Lambda cost optimization checklist: reduce GB-seconds (duration × memory), control retries, right-size concurrency, and avoid hidden logging and networking costs.",
     "canonicalPath": "/guides/aws-lambda-cost-optimization",
@@ -552,21 +581,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "ECS pricing: what to include in a realistic cost model",
-    "description": "A practical ECS pricing guide: how costs differ between EC2 launch type and Fargate launch type, and what line items you must include (compute, load balancers, logs, transfer, storage, registry behavior).",
-    "canonicalPath": "/guides/aws-ecs-pricing",
-    "category": "AWS",
-    "slug": "aws-ecs-pricing",
-    "topics": [
-      "compute",
-      "egress",
-      "load-balancing",
-      "logging",
-      "serverless",
-      "storage"
-    ]
-  },
-  {
     "title": "ECS task sizing: how to pick CPU and memory (and estimate task count)",
     "description": "A practical ECS task sizing guide: choose vCPU/memory from measured usage, pick a utilization target, estimate average task count, and avoid the sizing mistakes that cause cost spikes.",
     "canonicalPath": "/guides/aws-ecs-task-sizing",
@@ -859,20 +873,6 @@ export const GUIDES: GuideLink[] = [
     "slug": "aws-fargate-cost-optimization",
     "topics": [
       "compute",
-      "logging",
-      "serverless"
-    ]
-  },
-  {
-    "title": "Fargate pricing (what to include in your cost model)",
-    "description": "A practical Fargate pricing guide: what drives compute cost (vCPU-hours + GB-hours), how to estimate average running tasks, and the non-compute line items that usually matter (logs, load balancers, data transfer).",
-    "canonicalPath": "/guides/aws-fargate-pricing",
-    "category": "AWS",
-    "slug": "aws-fargate-pricing",
-    "topics": [
-      "compute",
-      "egress",
-      "load-balancing",
       "logging",
       "serverless"
     ]
@@ -1423,13 +1423,12 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Container Registry (ACR) pricing: storage + pulls + egress",
-    "description": "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer. Includes a workflow to estimate GB-month from retention and validate layer sharing.",
+    "title": "Azure Container Registry pricing tiers (Basic, Standard, Premium)",
+    "description": "A practical ACR pricing model: image storage (GB-month), pull volume, and data transfer, plus how pricing tiers (Basic/Standard/Premium) affect limits and features.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
     "slug": "azure-container-registry-pricing",
     "topics": [
-      "backup",
       "compute",
       "egress",
       "storage"
@@ -1447,8 +1446,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Event Hubs pricing: estimate throughput, events, and retention",
-    "description": "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic, consumer lag, and replay/backfill multipliers.",
+    "title": "Azure Event Hubs pricing (event hub cost, throughput, retention)",
+    "description": "A practical Event Hubs pricing workflow: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic, consumer lag, and replay/backfill multipliers.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
@@ -2079,8 +2078,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Kubernetes Cost Calculator: what to include (nodes, storage, egress, observability)",
-    "description": "A practical checklist for estimating Kubernetes costs: node compute, control plane, load balancers, storage, egress, and observability. Includes a fast workflow and common pitfalls.",
+    "title": "Kubernetes cost calculator (cluster pricing checklist)",
+    "description": "A practical checklist for estimating Kubernetes costs: node compute, control plane, load balancers, storage, egress, and observability. Includes a fast workflow, calculator links, and common pitfalls.",
     "canonicalPath": "/guides/kubernetes-cost-calculator",
     "category": "Kubernetes",
     "slug": "kubernetes-cost-calculator",

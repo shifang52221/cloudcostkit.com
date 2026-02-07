@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Event Hubs pricing: estimate throughput, events, and retention";
+const title = "Azure Event Hubs pricing (event hub cost, throughput, retention)";
 const description =
-  "A practical Event Hubs estimate: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic, consumer lag, and replay/backfill multipliers.";
+  "A practical Event Hubs pricing workflow: ingestion throughput, event volume, retention, and downstream egress. Includes validation steps for burst traffic, consumer lag, and replay/backfill multipliers.";
 
 const faqs = [
   {
@@ -28,13 +28,20 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-event-hubs-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={faqs}
 >
   <p>
     Event streaming cost planning works best when you model <strong>bytes</strong> and <strong>replays</strong>. The same
     stream can be read multiple times by consumers, and that replay multiplier is where estimates often break down.
   </p>
+
+  <h2>Event Hub pricing quick model</h2>
+  <ul>
+    <li><strong>Ingest GB/month</strong> = events/sec x bytes/event x seconds/month (then convert to GB).</li>
+    <li><strong>Retention</strong> = ingest GB/day x retention days.</li>
+    <li><strong>Replay multiplier</strong> = reprocessed GB/month from consumer replays/backfills.</li>
+  </ul>
 
   <h2>0) Define the stream scope</h2>
   <ul>

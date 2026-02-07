@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "ECS pricing: what to include in a realistic cost model";
+const title = "AWS ECS pricing (EC2 vs Fargate cost model)";
 const description =
-  "A practical ECS pricing guide: how costs differ between EC2 launch type and Fargate launch type, and what line items you must include (compute, load balancers, logs, transfer, storage, registry behavior).";
+  "A practical ECS pricing guide: how costs differ between EC2 and Fargate launch types, plus the line items you must include (compute, load balancers, logs, transfer, storage, registry behavior).";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ecs-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   faqs={[
     {
       q: "Does ECS itself have a separate charge?",
@@ -26,6 +26,12 @@ const description =
     common models are ECS on <strong>EC2 launch type</strong> (you pay for instances) and ECS on{" "}
     <strong>Fargate</strong> (you pay for vCPU-hours + memory GB-hours per running task).
   </p>
+
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator/">ECS EC2 vs Fargate calculator</a>
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost</a>
+    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost</a>
+  </div>
 
   <h2>1) Compute (baseline)</h2>
   <ul>
@@ -77,7 +83,7 @@ const description =
   <h2>5) Storage (when you run on EC2)</h2>
   <ul>
     <li>EBS volumes (GB-month + optional IOPS/throughput).</li>
-    <li>Snapshots (change rate × retention).</li>
+    <li>Snapshots (change rate x retention).</li>
     <li>Stateful dependencies often dwarf the service compute line item.</li>
   </ul>
   <div class="btn-row">

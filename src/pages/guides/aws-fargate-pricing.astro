@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Fargate pricing (what to include in your cost model)";
+const title = "AWS Fargate pricing (cost model + pricing calculator)";
 const description =
-  "A practical Fargate pricing guide: what drives compute cost (vCPU-hours + GB-hours), how to estimate average running tasks, and the non-compute line items that usually matter (logs, load balancers, data transfer).";
+  "A practical Fargate pricing guide and calculator companion: what drives compute cost (vCPU-hours + GB-hours), how to estimate average running tasks, and the non-compute line items that usually matter (logs, load balancers, data transfer).";
 const faqs = [
   {
     q: "What are the main Fargate cost drivers?",
@@ -19,17 +19,21 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-fargate-pricing" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-fargate-pricing" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
-    Fargate pricing is easiest to model as <strong>capacity × time</strong>: you pay for vCPU-hours and memory GB-hours
+    Fargate pricing is easiest to model as <strong>capacity x time</strong>: you pay for vCPU-hours and memory GB-hours
     for running tasks. The hard part is estimating <strong>average</strong> running tasks over the month and remembering
     the non-compute line items that show up in real bills.
   </p>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate pricing calculator</a>
+    <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost calculator</a>
+  </div>
 
   <h2>What to include (minimum viable cost model)</h2>
   <ul>
     <li>
-      <strong>Compute</strong>: vCPU-hours + memory GB-hours (tasks × vCPU/memory × hours).
+      <strong>Compute</strong>: vCPU-hours + memory GB-hours (tasks x vCPU/memory x hours).
     </li>
     <li>
       <strong>Load balancers</strong>: hourly baseline + capacity units if you front services with ALB/NLB.
@@ -47,12 +51,12 @@ const faqs = [
     Most services have a peak and an average. Monthly cost follows the <em>average</em>.
   </p>
   <ul>
-    <li><strong>Always-on service</strong>: average tasks ≈ your steady desired count.</li>
+    <li><strong>Always-on service</strong>: average tasks ~ your steady desired count.</li>
     <li><strong>Autoscaled service</strong>: estimate average from traffic shape (weekday vs weekend, day vs night).</li>
     <li><strong>Batch/worker</strong>: average tasks comes from queue depth and processing rate (bursts then idle).</li>
   </ul>
   <p class="muted">
-    Helper: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a> (for traffic-based services).
+    Helper: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS -> monthly requests</a> (for traffic-based services).
   </p>
 
   <h2>Step 2: compute vCPU-hours and GB-hours</h2>
@@ -66,7 +70,7 @@ const faqs = [
     Tool: <a href="/calculators/aws-fargate-cost-calculator/">AWS Fargate cost calculator</a>
   </p>
 
-  <h2>Step 3: model the three “hidden” bills</h2>
+  <h2>Step 3: model the three "hidden" bills</h2>
   <ul>
     <li>
       <strong>Load balancers</strong>: count always-on LBs, then add capacity unit assumptions for typical traffic.
@@ -87,13 +91,13 @@ const faqs = [
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
-      <strong>Compute</strong> = avg tasks × (vCPU per task × 730) × $/vCPU-h + avg tasks × (GB per task × 730) × $/GB-h
+      <strong>Compute</strong> = avg tasks x (vCPU per task x 730) x $/vCPU-h + avg tasks x (GB per task x 730) x $/GB-h
     </li>
     <li>
-      <strong>LB</strong> = (count of LBs × hours) + (capacity units × hours)
+      <strong>LB</strong> = (count of LBs x hours) + (capacity units x hours)
     </li>
     <li>
-      <strong>Logs</strong> = ingestion GB/day × days + retention storage baseline
+      <strong>Logs</strong> = ingestion GB/day x days + retention storage baseline
     </li>
     <li>
       <strong>Networking</strong> = NAT processed GB + cross-AZ GB + internet egress GB
@@ -104,7 +108,7 @@ const faqs = [
   <ul>
     <li>Using peak tasks instead of average tasks (overestimates compute, hides the real lever).</li>
     <li>Ignoring LB count and capacity units (one-per-service patterns create baseline spend).</li>
-    <li>Assuming logs are “free” and discovering ingestion + retention as a top driver.</li>
+    <li>Assuming logs are "free" and discovering ingestion + retention as a top driver.</li>
     <li>Routing internal AWS calls through NAT by accident (processed GB grows quietly).</li>
     <li>Forgetting that non-prod rarely needs 730 hours/month.</li>
   </ul>
