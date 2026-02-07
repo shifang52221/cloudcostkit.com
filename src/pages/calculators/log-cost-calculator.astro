@@ -48,7 +48,7 @@ const description =
       a: "The fastest levers are: reduce noisy logs at source, shorten retention for low-value logs, and avoid expensive broad scans (use sampling or narrower filters).",
     },
   ]}
-  lastUpdated="2026-01-16"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost" },
@@ -101,6 +101,16 @@ const description =
     <ul>
       <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
       <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Estimate GB/day from events/sec and bytes per event.</li>
+      <li>Retention days set the storage GB-month baseline.</li>
+      <li>Query and scan volume can dominate during incidents.</li>
+      <li>Sampling and compression change bytes per event.</li>
     </ul>
 
     <h2>Scenario planning</h2>

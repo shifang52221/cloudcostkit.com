@@ -42,7 +42,7 @@ const description =
       a: "No. It's a simplified estimate. Real workloads vary by peak/off-peak patterns and protocol overhead."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
@@ -75,6 +75,16 @@ const description =
       <li>Confirm whether dashboards report GB or GiB before converting.</li>
       <li>Use average throughput, not peak, when estimating monthly transfer.</li>
       <li>Match hours/day to real schedules (not always 24x7).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Confirm billing units first (GB vs GiB) before converting.</li>
+      <li>Use average throughput and utilization, not peak.</li>
+      <li>Match hours per day and days per month to real schedules.</li>
+      <li>Keep bits vs bytes explicit when converting Mbps to MB/s.</li>
     </ul>
 
     <h2>Scenario planning</h2>

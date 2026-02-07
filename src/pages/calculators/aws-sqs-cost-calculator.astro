@@ -45,7 +45,7 @@ const description =
       a: "No. This is only SQS request cost. Model downstream services separately (Lambda, DynamoDB, logs, etc).",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-sqs-pricing", label: "Guide: SQS pricing (what to include)" },
     { href: "/guides/aws-sqs-estimate-requests", label: "Guide: estimate SQS requests" },
@@ -73,6 +73,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Use messages per month and requests per message as the core driver.</li>
+      <li>Batch sizes and long polling reduce receive calls.</li>
+      <li>Retries and visibility timeout extensions add extra requests.</li>
+      <li>Separate FIFO vs standard usage if you mix them.</li>
     </ul>
 
     <h2>Scenario planning</h2>

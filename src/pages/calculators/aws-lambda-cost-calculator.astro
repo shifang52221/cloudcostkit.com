@@ -46,7 +46,7 @@ const description =
       a: "Use p50/p95 duration from your monitoring and the configured memory size. Model a few scenarios if you're unsure.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-lambda-pricing", label: "Guide: Lambda pricing (what to include)" },
     { href: "/guides/aws-lambda-cost-optimization", label: "Guide: Lambda cost optimization" },
@@ -77,6 +77,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Use p50 and p95 duration for baseline and peak scenarios.</li>
+      <li>Memory size drives GB-seconds; model per-function differences.</li>
+      <li>Apply free tier or discounts as separate adjustments.</li>
+      <li>Include async retries or error bursts in invocation counts.</li>
     </ul>
 
     <h2>Scenario planning</h2>

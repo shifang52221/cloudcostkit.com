@@ -57,7 +57,7 @@ const description =
       a: "Use the effective blended $/hour you actually expect to pay. If you mix on-demand + commitments + spot, compute a blended rate and test sensitivity.",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost checklist" },
     { href: "/guides/kubernetes-cost-model-beyond-nodes", label: "Guide: cost model beyond nodes" },
@@ -123,6 +123,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Node hours by instance type and utilization drive baseline.</li>
+      <li>Add headroom for autoscaling and over-provisioning.</li>
+      <li>Persistent volumes and backups add storage costs.</li>
+      <li>Network transfer and load balancers add non-node costs.</li>
     </ul>
 
     <h2>Scenario planning</h2>

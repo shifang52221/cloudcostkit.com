@@ -50,7 +50,7 @@ const description =
       a: "Yes. Prod, staging, and dev often have different uptime and pricing assumptions, so model them as separate rows.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
@@ -80,6 +80,16 @@ const description =
       <li>Using peak instance count as baseline.</li>
       <li>Applying both utilization and reduced hours/day for the same schedule.</li>
       <li>Forgetting storage, transfer, and load balancer line items.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Model instance count by family and uptime schedule.</li>
+      <li>Use a blended $/hour if you mix purchase options.</li>
+      <li>Add EBS volumes and snapshots as separate line items.</li>
+      <li>Include network transfer out or cross-AZ traffic separately.</li>
     </ul>
 
     <h2>Scenario planning</h2>

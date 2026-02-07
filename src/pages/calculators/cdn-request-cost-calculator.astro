@@ -51,7 +51,7 @@ const description =
       a: "Transport protocols can change connection behavior, but billing is usually based on requests rather than connections. Use your CDN's definition of a billable request."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
@@ -83,46 +83,81 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Cache keys and TTL levers</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Query string and header variations can multiply unique cache keys.</li>
+      <li>Short TTLs increase origin fetches and raise request volume.</li>
+      <li>Normalize URLs to reduce cache fragmentation when possible.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Worked request estimate from pages and assets</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Page views/month x assets per page = asset requests.</li>
+      <li>Add API or dynamic calls as a separate request class.</li>
+      <li>Apply a bot or prefetch multiplier if relevant.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">CDN request anatomy</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Image variants (size, format) create new cache keys.</li>
+      <li>HEAD requests and health checks still count as requests.</li>
+      <li>Range requests for media can multiply request counts.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">CDN request data sources</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>CDN analytics</strong>: use edge request counts from CDN dashboards.</li>
+      <li><strong>Cache hit rate</strong>: track hit vs miss to understand origin side effects.</li>
+      <li><strong>Region mix</strong>: split request volume by geography if pricing differs.</li>
     </ul>
 
     <h2>Result interpretation</h2>
     <ul>
-      <li>Requests scale with cache misses, bot traffic, and chatty clients.</li>
-      <li>If request fees dominate, focus on caching and request consolidation.</li>
+      <li>Edge request fees can grow even when bandwidth stays flat.</li>
+      <li>When requests dominate, focus on caching and reducing chatty clients.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using origin request counts instead of edge request counts.</li>
+      <li>Ignoring bot traffic that spikes requests without adding bandwidth.</li>
+      <li>Mixing cache hit and miss classes when pricing differs.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Derive requests/month from RPS and time windows.</li>
+      <li>Normalize per-10k vs per-1M pricing units.</li>
+      <li>Separate bot or attack traffic from normal traffic.</li>
+      <li>Confirm which request types are billable for your provider.</li>
+    </ul>
+
+    <h2>Request scenarios</h2>
     <table>
       <thead>
         <tr>
           <th>Scenario</th>
           <th>Requests</th>
-          <th>Class</th>
+          <th>Cache hit rate</th>
           <th>Drivers</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Baseline</td>
+          <td>Normal</td>
           <td>Expected</td>
-          <td>Default</td>
+          <td>Stable</td>
           <td>Normal traffic</td>
         </tr>
         <tr>
-          <td>Peak</td>
+          <td>Attack</td>
           <td>High</td>
-          <td>Same</td>
+          <td>Lower</td>
           <td>Bot/incident</td>
         </tr>
       </tbody>
@@ -130,8 +165,8 @@ const description =
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare edge request counts to CDN billing request units.</li>
+      <li>Watch cache hit rate during bot spikes and cache busting events.</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -54,7 +54,7 @@ const description =
       a: "Yes. If you use multiple classes, compute each class separately or use a blended rate.",
     },
   ]}
-  lastUpdated="2026-01-20"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/storage-pricing-calculator", label: "Storage pricing calculator (generic)" },
     { href: "/calculators/s3-request-cost-calculator", label: "S3 request cost calculator" },
@@ -114,6 +114,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Break down storage by class and average GB-month.</li>
+      <li>Separate request classes and counts.</li>
+      <li>Include retrieval fees for IA or archive tiers.</li>
+      <li>Model data transfer and replication separately.</li>
     </ul>
 
     <h2>Scenario planning</h2>

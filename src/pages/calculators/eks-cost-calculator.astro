@@ -44,7 +44,7 @@ const description =
       a: "EKS nodes also enforce a pod cap (often 110). That limit can force more nodes even if CPU/memory fits.",
     },
   ]}
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/kubernetes-cost-calculator", label: "Kubernetes cost calculator (generic)" },
     { href: "/guides/aws-eks-pricing", label: "Guide: EKS pricing" },
@@ -90,6 +90,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Control plane fees are fixed per cluster.</li>
+      <li>Node hours by instance type drive most compute cost.</li>
+      <li>Add-ons like ingress and service mesh add overhead.</li>
+      <li>Logs and metrics ingestion can be a hidden second bill.</li>
     </ul>
 
     <h2>Scenario planning</h2>

@@ -48,7 +48,7 @@ const description =
       a: "Use monitoring/engine metrics or estimate from workload. If you don't have I/O pricing in your plan, set it to $0 to exclude.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-rds-pricing", label: "Guide: RDS pricing (what to include)" },
     { href: "/guides/aws-rds-vs-aurora-cost", label: "RDS vs Aurora cost" },
@@ -80,6 +80,16 @@ const description =
       <li>Ignoring backup storage growth and retention creep.</li>
       <li>Using allocated storage as a constant without growth assumptions.</li>
       <li>Forgetting I/O pricing for engines that charge per request.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Model instance hours by size and uptime schedule.</li>
+      <li>Add storage GB-month plus provisioned IOPS if applicable.</li>
+      <li>Include backup and snapshot retention driven by churn.</li>
+      <li>Account for Multi-AZ or read replica overhead.</li>
     </ul>
 
     <h2>Scenario planning</h2>

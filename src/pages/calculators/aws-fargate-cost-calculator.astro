@@ -46,7 +46,7 @@ const description =
       a: "No. Fargate compute is only part of the bill. For many services, transfer (egress/NAT) and logging can be significant separate line items.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-fargate-pricing", label: "Guide: Fargate pricing (what to include)" },
     { href: "/guides/aws-lambda-vs-fargate-cost", label: "Guide: Lambda vs Fargate cost" },
@@ -82,6 +82,16 @@ const description =
       <li>Using peak task count as the average baseline.</li>
       <li>Mixing MB and GB for memory inputs.</li>
       <li>Assuming data transfer or logs are included in compute.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>vCPU and memory per task times running hours is the baseline.</li>
+      <li>Separate always-on services from batch or cron workloads.</li>
+      <li>Include ephemeral storage or platform add-ons if used.</li>
+      <li>Add data transfer and logs as separate line items.</li>
     </ul>
 
     <h2>Scenario planning</h2>

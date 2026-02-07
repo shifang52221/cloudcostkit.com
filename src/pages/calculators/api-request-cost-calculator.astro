@@ -40,7 +40,7 @@ const description =
       a: "Convert from RPS using the RPS to Monthly Requests tool, or use your analytics."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -66,55 +66,92 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">API-specific request accounting</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Split prod vs non-prod environments and sum them explicitly.</li>
+      <li>Include auth, validation, and preflight calls if they are billed.</li>
+      <li>Separate internal service-to-service calls from user traffic.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Worked request estimate from business events</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Monthly active users x sessions per user = sessions/month.</li>
+      <li>Sessions/month x requests per session = requests/month.</li>
+      <li>Add a retry factor (for example, 1.2x) for timeouts.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">API request taxonomy (what to count)</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>REST vs GraphQL: batch queries can hide request volume.</li>
+      <li>Pagination and polling can multiply calls per session.</li>
+      <li>Webhooks and callbacks add non-user traffic.</li>
+      <li>Search and autocomplete endpoints are often the busiest routes.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">API data sources</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Gateway analytics</strong>: request counts by stage/environment.</li>
+      <li><strong>API logs</strong>: per-endpoint volume for hot routes.</li>
+      <li><strong>Client telemetry</strong>: retries and timeout-driven bursts.</li>
+      <li><strong>Internal traffic</strong>: service-to-service requests that never hit the edge.</li>
     </ul>
 
     <h2>Result interpretation</h2>
     <ul>
-      <li>Requests are the only driver; small % increases can become large monthly deltas.</li>
-      <li>If costs spike, inspect retries and cache miss rates first.</li>
+      <li>Small request deltas compound quickly at scale.</li>
+      <li>Spikes usually come from retries, auth failures, or noisy clients.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using a single average and ignoring peak or incident scenarios.</li>
+      <li>Missing internal service-to-service calls in request totals.</li>
+      <li>Ignoring health checks, preflight, or retry traffic that is billable.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Normalize per-10k vs per-1M pricing units before estimating.</li>
+      <li>Separate endpoint or method mixes if rates differ.</li>
+      <li>Add a retry or error multiplier to request volume.</li>
+      <li>Split cache hits from origin requests when applicable.</li>
+    </ul>
+
+    <h2>Traffic scenarios</h2>
     <table>
       <thead>
         <tr>
           <th>Scenario</th>
           <th>Requests</th>
-          <th>Billable class</th>
-          <th>Notes</th>
+          <th>Endpoint mix</th>
+          <th>Retry factor</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Baseline</td>
+          <td>Steady</td>
           <td>Expected</td>
-          <td>Default</td>
-          <td>Normal traffic</td>
+          <td>Normal mix</td>
+          <td>Low</td>
         </tr>
         <tr>
-          <td>Peak</td>
+          <td>Surge</td>
           <td>High</td>
-          <td>Same</td>
-          <td>Launch/incident</td>
+          <td>Auth-heavy</td>
+          <td>High</td>
         </tr>
       </tbody>
     </table>
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare API request counts to the billing usage type for requests.</li>
+      <li>Check per-endpoint dashboards after releases or throttling changes.</li>
     </ul>
 
     <h2>Next steps</h2>

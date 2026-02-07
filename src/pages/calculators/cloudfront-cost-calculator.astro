@@ -40,7 +40,7 @@ const description =
       a: "Monthly GB delivered to users and monthly request volume. If you only have throughput or RPS, convert them using the Units Converter and RPS-to-monthly tool.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/cdn-cost-calculator", label: "CDN cost calculator (generic)" },
     { href: "/guides/aws-cloudfront-pricing", label: "Guide: CloudFront pricing" },
@@ -94,6 +94,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Bandwidth and request counts are separate cost drivers.</li>
+      <li>Use cache hit rate to estimate origin egress.</li>
+      <li>Apply an effective rate for your regional traffic mix.</li>
+      <li>Add log delivery and invalidations if you use them.</li>
     </ul>
 
     <h2>Scenario planning</h2>

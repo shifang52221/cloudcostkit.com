@@ -41,7 +41,7 @@ const description =
       a: "Higher volume than expected (marketing sends), retries/bounces, large templates/attachments increasing payload size, and dedicated IP/add-on usage.",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-ses-pricing", label: "Guide: SES pricing" },
     { href: "/guides/aws-ses-estimate-email-volume", label: "Guide: estimate email volume" },
@@ -75,6 +75,16 @@ const description =
       <li>Split marketing vs transactional volume (different patterns and peaks).</li>
       <li>Estimate average payload size including templates and attachments.</li>
       <li>Confirm whether transfer charges apply for your path.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Split transactional vs marketing volume to capture different patterns.</li>
+      <li>Apply a retry and bounce multiplier to sent volume.</li>
+      <li>Estimate attachment-heavy messages separately if payloads are large.</li>
+      <li>Include dedicated IPs or add-ons if you use them.</li>
     </ul>
 
     <h2>Scenario planning</h2>

@@ -38,6 +38,13 @@ const faqs = [
     <li><strong>Retry factor</strong>: include retries and bot traffic multipliers.</li>
   </ul>
 
+  <h2>When request pricing is not the main driver</h2>
+  <ul>
+    <li><strong>Bandwidth</strong>: CDN or API responses can dwarf request fees.</li>
+    <li><strong>Compute</strong>: per-request compute or serverless GB-seconds can dominate.</li>
+    <li><strong>Logs</strong>: per-request logs and scans add a second bill.</li>
+    <li><strong>Storage</strong>: retention or snapshots can be larger than request costs.</li>
+  </ul>
 
   <h2>1) Get or estimate requests/month</h2>
   <ul>
@@ -47,6 +54,10 @@ const faqs = [
       <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
     </li>
   </ul>
+  <p class="muted">
+    If you do not have request metrics yet, estimate from business events: signups, orders, or jobs per month multiplied
+    by requests per event.
+  </p>
 
   <h2>2) Confirm request units (per 10k vs per 1M)</h2>
   <p>
@@ -63,6 +74,23 @@ const faqs = [
     <li>API: reads vs writes, auth-heavy endpoints, and retry-prone endpoints.</li>
     <li>CDN: cached hits vs origin requests (cache miss rate changes origin cost).</li>
     <li>Messaging: publishes vs deliveries (fan-out and retries multiply deliveries).</li>
+  </ul>
+  <p class="muted">
+    Service-specific notes: API gateways also bill internal service-to-service traffic; CDNs can have request fees even
+    when bandwidth is low; messaging costs scale with deliveries, not just publishes.
+  </p>
+  <h2>Service-specific request drivers</h2>
+  <ul>
+    <li><strong>API</strong>: auth checks, validation, and internal fan-out calls.</li>
+    <li><strong>CDN</strong>: cache key fragmentation and TTL policies that change request volume.</li>
+    <li><strong>Messaging</strong>: delivery fan-out and retries during failures.</li>
+    <li><strong>Security</strong>: bot spikes or attack traffic can multiply requests.</li>
+  </ul>
+  <h2>What counts as a request varies</h2>
+  <ul>
+    <li>SDK batch operations can be billed as multiple requests.</li>
+    <li>WebSocket or streaming messages may count as request units.</li>
+    <li>Health checks and HEAD calls can be billable even with zero payload.</li>
   </ul>
 
   <h2>4) Estimate request cost</h2>
@@ -93,6 +121,12 @@ const faqs = [
       <strong>Cost</strong> = sum(class_requests / unit x price_per_unit)
     </li>
   </ul>
+  <h2>Mini examples by service type</h2>
+  <ul>
+    <li><strong>API</strong>: MAU x sessions/user x requests/session.</li>
+    <li><strong>CDN</strong>: page views x assets per page + API calls.</li>
+    <li><strong>Messaging</strong>: publishes x matched subscribers x retry factor.</li>
+  </ul>
 
   <h2>5) Validate (avoid surprise multipliers)</h2>
   <ul>
@@ -113,6 +147,13 @@ const faqs = [
     <li>Not splitting endpoints: a heavy endpoint can dominate requests and transfer.</li>
     <li>Forgetting internal traffic: service-to-service calls can be larger than user traffic.</li>
     <li>Assuming retries are rare (they often become "normal" under throttling or dependency issues).</li>
+  </ul>
+  <h2>Checklist for a reliable estimate</h2>
+  <ul>
+    <li>Define billable request types in one sentence.</li>
+    <li>List the top three request sources (user, internal, bots).</li>
+    <li>Run baseline, peak, and incident scenarios.</li>
+    <li>Validate against a week of logs or billing data.</li>
   </ul>
 
   <h2>Sources</h2>

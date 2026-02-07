@@ -116,6 +116,30 @@ const description =
       Tip: use the new "Save scenario" button at the top to keep a baseline and peak link you can revisit.
     </p>
   </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">CDN cost driver split</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Edge bandwidth is billed to end users, not to your origin.</li>
+      <li>Origin egress is a separate line item when cache hit rate is low.</li>
+      <li>Request fees can dominate for small payloads or API-like traffic.</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Worked split example</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Edge bandwidth: 6,000 GB/month x $0.05 = $300.</li>
+      <li>Requests: 400M/month x $0.0075 per 10k = $300.</li>
+      <li>Origin egress: 600 GB/month x $0.09 = $54 (modeled separately).</li>
+    </ul>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Traffic mix clues</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Video and large downloads are bandwidth-heavy.</li>
+      <li>APIs and small assets are request-heavy.</li>
+      <li>Image optimization creates many variants and request bursts.</li>
+    </ul>
+  </div>
 
   <div class="prose" style="margin-top:18px">
     <h2>3) Common pitfalls</h2>
@@ -131,26 +155,35 @@ const description =
     </p>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CDN input sources</h2>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Edge bandwidth</strong>: use CDN analytics for GB delivered to end users.</li>
+      <li><strong>Request counts</strong>: use CDN request metrics (not origin requests).</li>
+      <li><strong>Region mix</strong>: split by geography if pricing differs.</li>
     </ul>
 
     <h2>Result interpretation</h2>
     <ul>
-      <li>Bandwidth dominates for large media; requests dominate for small, chatty APIs.</li>
-      <li>If totals spike, check whether bandwidth or request fees is the driver first.</li>
+      <li>Bandwidth dominates large media; requests dominate small or chatty traffic.</li>
+      <li>Identify which line item drives spikes before optimizing.</li>
     </ul>
 
     <h2>Common mistakes</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using origin egress as a proxy for CDN edge bandwidth.</li>
+      <li>Ignoring cache fill and origin egress when hit rates are low.</li>
+      <li>Using one blended rate without accounting for region mix.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Separate edge bandwidth from origin egress and cache fill.</li>
+      <li>Split request classes if pricing differs by cache hit or dynamic content.</li>
+      <li>Model tiered pricing using effective blended rates.</li>
+      <li>Track peak events where request fees and bandwidth spike together.</li>
+    </ul>
+
+    <h2>Budget scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -162,13 +195,13 @@ const description =
       </thead>
       <tbody>
         <tr>
-          <td>Baseline</td>
+          <td>Steady</td>
           <td>Expected</td>
           <td>Expected</td>
           <td>Normal traffic</td>
         </tr>
         <tr>
-          <td>Peak</td>
+          <td>Launch</td>
           <td>High</td>
           <td>Burst</td>
           <td>Launch/incident</td>
@@ -178,8 +211,8 @@ const description =
 
     <h2>Validate after changes</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Match edge bandwidth and request counts to CDN billing usage types.</li>
+      <li>Track origin egress separately when cache hit rate changes.</li>
     </ul>
 
     <h2>Next steps</h2>

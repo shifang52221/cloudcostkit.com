@@ -57,7 +57,7 @@ const description =
       a: "No. If you use infrequent access or archive tiers, retrieval and transition fees can matter; model those separately.",
     },
   ]}
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
@@ -120,6 +120,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Average stored GB and growth rate set the baseline.</li>
+      <li>Request mix matters when you have high request volume.</li>
+      <li>Separate egress from cross-region transfer line items.</li>
+      <li>Include lifecycle transitions and retrievals if used.</li>
     </ul>
 
     <h2>Scenario planning</h2>

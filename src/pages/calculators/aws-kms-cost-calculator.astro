@@ -39,7 +39,7 @@ const description =
       a: "Reduce request volume: avoid per-request encryption in hot paths when not needed, use envelope encryption appropriately, and fix retry loops that amplify KMS calls.",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-kms-pricing", label: "Guide: KMS pricing" },
     { href: "/guides/aws-kms-estimate-requests", label: "Guide: estimate KMS requests" },
@@ -74,6 +74,16 @@ const description =
       <li>Count keys by environment (prod, staging, dev).</li>
       <li>Estimate request volume by service (S3, EBS, RDS, secrets).</li>
       <li>Check for batch re-encryption or rotation jobs.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Count keys and requests as separate drivers.</li>
+      <li>Break out encrypt, decrypt, and data key calls if volumes differ.</li>
+      <li>Model batch jobs or incident spikes as a peak scenario.</li>
+      <li>Account for client-side caching if you use it.</li>
     </ul>
 
     <h2>Scenario planning</h2>

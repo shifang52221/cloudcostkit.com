@@ -57,7 +57,7 @@ const description =
       a: "If your plan includes free allowances, subtract them from GB/month before applying $/GB, or use an effective blended rate."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
     { href: "/guides/cdn-cost-per-gigabyte", label: "Guide: CDN cost per GB" },
@@ -115,6 +115,16 @@ const description =
     <ul>
       <li>Mixing boundaries and applying the wrong $/GB rate.</li>
       <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Average response size and request volume drive GB/month.</li>
+      <li>Cache hit rate determines origin vs edge bandwidth.</li>
+      <li>Compression and image optimization reduce transfer.</li>
+      <li>Model peak events separately from steady traffic.</li>
     </ul>
 
     <h2>Scenario planning</h2>

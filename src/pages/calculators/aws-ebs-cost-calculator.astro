@@ -46,7 +46,7 @@ const description =
       a: "Use the average allocated storage (or average used, depending on billing). If storage grows over time, model multiple months or scenarios.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-ebs-pricing", label: "Guide: EBS pricing (what to include)" },
     { href: "/guides/aws-ebs-gp3-iops-throughput", label: "Guide: gp3 IOPS and throughput" },
@@ -76,6 +76,16 @@ const description =
     <ul>
       <li>Using a single average and ignoring peak/incident scenarios.</li>
       <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Track storage GB-month by volume type.</li>
+      <li>Include provisioned IOPS and throughput where enabled.</li>
+      <li>Model snapshot retention and daily change rate.</li>
+      <li>Use scheduled uptime if volumes are not always attached.</li>
     </ul>
 
     <h2>Scenario planning</h2>

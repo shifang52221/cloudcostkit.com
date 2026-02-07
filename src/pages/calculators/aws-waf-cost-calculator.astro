@@ -45,7 +45,7 @@ const description =
       a: "Reduce evaluated requests (CDN caching, rate limiting, blocking early) and keep rule count tight. Also control downstream logging/analysis volume.",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-waf-pricing", label: "Guide: WAF pricing" },
     { href: "/guides/aws-waf-estimate-requests", label: "Guide: estimate WAF request volume" },
@@ -83,6 +83,16 @@ const description =
       <li>Count Web ACLs per account and region.</li>
       <li>Separate managed rule groups from custom rules if billing differs.</li>
       <li>Estimate evaluated requests for peak traffic and attack weeks.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Count ACLs per region and environment.</li>
+      <li>Include managed rule groups in your rule count.</li>
+      <li>Estimate evaluated requests including blocked or bot traffic.</li>
+      <li>Add logging and analytics volume as a second bill.</li>
     </ul>
 
     <h2>Scenario planning</h2>

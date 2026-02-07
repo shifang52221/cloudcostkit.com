@@ -47,7 +47,7 @@ const description =
       a: "If you deliver to internet endpoints or across billable network paths, transfer can matter. If your traffic path has negligible transfer charges, set $/GB to 0 for a request-only estimate.",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-07"
   related={[
     { href: "/guides/aws-sns-pricing", label: "Guide: SNS pricing" },
     { href: "/guides/aws-sns-estimate-deliveries", label: "Guide: estimate SNS deliveries" },
@@ -82,6 +82,16 @@ const description =
       <li>Count subscriptions per topic to estimate deliveries per publish.</li>
       <li>Separate protocol mix (SQS, HTTP, email) if pricing differs.</li>
       <li>Estimate payload size for the largest topics.</li>
+    </ul>
+
+    
+
+    <h2>Advanced inputs to capture</h2>
+    <ul>
+      <li>Publishes and deliveries are different; fan-out multiplies volume.</li>
+      <li>Protocol mix affects effective cost and retries.</li>
+      <li>Model incident windows where retries spike deliveries.</li>
+      <li>Estimate payload sizes if transfer charges apply.</li>
     </ul>
 
     <h2>Scenario planning</h2>
