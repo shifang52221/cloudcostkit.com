@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
 
-const title = "EC2 Cost Calculator";
+const title = "EC2 Cost Calculator (monthly instance pricing)";
 const description =
-  "Estimate EC2-style compute costs from instance count, $/hour, and expected uptime. Educational use only.";
+  "Estimate monthly EC2 compute cost from instance count, $/hour, and uptime. Use blended rates for on-demand and commitments.";
 ---
 <CalculatorLayout
   title={title}
@@ -50,7 +50,7 @@ const description =
       a: "Yes. Prod, staging, and dev often have different uptime and pricing assumptions, so model them as separate rows.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
@@ -141,3 +141,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "CDN cost and pricing explained (cost per GB, requests, origin egress)";
+const title = "CDN Cost & Pricing Guide (bandwidth, requests, origin egress)";
 const description =
-  "A practical CDN cost and pricing breakdown: cost per GB, request fees ($ per 10k/1M), cache fill, and origin egress. Includes estimation steps and common pitfalls.";
+  "Step-by-step CDN cost breakdown: bandwidth $/GB, request fees, and origin egress. Includes estimation tips and pitfalls.";
 const faqs = [
   {
     q: "What are the main line items on a CDN bill?",
@@ -38,7 +38,7 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   title={title}
   description={description}
   canonicalPath="/guides/cdn-costs"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   faqs={faqs}
 >
   <p>
@@ -168,3 +168,4 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     pricing in your provider documentation.
   </p>
 </GuideLayout>
+

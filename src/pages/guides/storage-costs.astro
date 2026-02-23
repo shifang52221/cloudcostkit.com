@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Storage costs explained: GB-month, requests, and replication";
+const title = "Storage Costs Explained (GB-month, requests, retrieval)";
 const description =
-  "A practical guide to storage cost modeling: GB-month, request fees, retention, replication, and transfer. Includes estimation steps and common pitfalls.";
+  "A practical storage cost model: GB-month, requests, retrieval, and transfer. Includes estimation checklist.";
 const faqs = [
   {
     q: "Why is storage pricing confusing?",
@@ -30,7 +30,7 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
   title={title}
   description={description}
   canonicalPath="/guides/storage-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-02-23"
   faqs={faqs}
 >
   <p class="muted">
@@ -120,3 +120,4 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
     </>
   ) : null}
 </GuideLayout>
+

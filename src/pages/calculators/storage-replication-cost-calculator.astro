@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorComponent } from "../../components/calculators/StorageReplicationCost";
 
-const title = "Storage Replication Cost Calculator";
+const title = "Storage Replication Cost Calculator (GB-month + transfer)";
 const description =
-  "Estimate monthly storage replication cost from replicated GB and price per GB, with baseline vs peak scenarios. Educational use only.";
+  "Estimate replication cost from GB copied, destination storage, and transfer fees. Compare baseline vs peak scenarios.";
 ---
 <CalculatorLayout
   title={title}
@@ -54,7 +54,7 @@ const description =
       a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
     },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -127,3 +127,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

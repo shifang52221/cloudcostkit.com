@@ -4,7 +4,7 @@ import { KubernetesRequestsLimitsCalculator as KubernetesRequestsLimitsCalculato
 
 const title = "Kubernetes Requests & Limits Calculator";
 const description =
-  "Convert per-pod CPU/memory requests and limits into totals and estimate node count from allocatable capacity and pod limits. Educational use only.";
+  "Convert pod requests and limits into cluster totals and node estimates. Identify CPU/memory bottlenecks quickly.";
 ---
 <CalculatorLayout
   title={title}
@@ -56,7 +56,7 @@ const description =
       a: "Use the resulting node count with the Kubernetes Node Cost Calculator, and add control plane, load balancers, storage, and observability costs separately."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost calculator" },
     { href: "/guides/kubernetes-requests-limits", label: "Guide: requests & limits" },
@@ -132,3 +132,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsLambdaCostCalculator as AwsLambdaCostCalculatorComponent } from "../../components/calculators/AwsLambdaCost";
 
-const title = "AWS Lambda Cost Calculator";
+const title = "AWS Lambda Cost Calculator (invocations + GB-seconds)";
 const description =
-  "Estimate AWS Lambda-style monthly cost from invocations, duration, memory, and your pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate Lambda monthly cost from requests, duration, memory, and pricing. Compare baseline vs peak traffic.";
 ---
 <CalculatorLayout
   title={title}
@@ -46,7 +46,7 @@ const description =
       a: "Use p50/p95 duration from your monitoring and the configured memory size. Model a few scenarios if you're unsure.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/aws-lambda-pricing", label: "Guide: Lambda pricing (what to include)" },
     { href: "/guides/aws-lambda-cost-optimization", label: "Guide: Lambda cost optimization" },
@@ -132,3 +132,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

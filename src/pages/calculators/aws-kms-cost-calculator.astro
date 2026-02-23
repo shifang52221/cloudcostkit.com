@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsKmsCostCalculator as AwsKmsCostCalculatorComponent } from "../../components/calculators/AwsKmsCost";
 
-const title = "AWS KMS Cost Calculator";
+const title = "AWS KMS Cost Calculator (keys + API requests)";
 const description =
-  "Estimate AWS KMS-style costs from key-months and monthly request volume, with baseline vs peak scenarios. Educational use only.";
+  "Estimate KMS cost from keys per month and API request volume using your pricing assumptions.";
 ---
 <CalculatorLayout
   title={title}
@@ -39,7 +39,7 @@ const description =
       a: "Reduce request volume: avoid per-request encryption in hot paths when not needed, use envelope encryption appropriately, and fix retry loops that amplify KMS calls.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/aws-kms-pricing", label: "Guide: KMS pricing" },
     { href: "/guides/aws-kms-estimate-requests", label: "Guide: estimate KMS requests" },
@@ -130,3 +130,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

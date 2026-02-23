@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from "../../components/calculators/DataEgressCost";
 
-const title = "Cloud Data Egress Cost Calculator (AWS/Azure/GCP)";
+const title = "Data Egress Cost Calculator (AWS, Azure, GCP)";
 const description =
-  "Estimate monthly data egress cost (AWS/Azure/GCP) from GB transferred and your provider's $/GB pricing. Educational use only.";
+  "Estimate monthly data egress cost from GB transferred and $/GB pricing. Supports tiered rates and peak scenarios.";
 ---
 <CalculatorLayout
   title={title}
@@ -50,7 +50,7 @@ const description =
       a: "No. This tool estimates bandwidth-based egress only."
     }
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -145,3 +145,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

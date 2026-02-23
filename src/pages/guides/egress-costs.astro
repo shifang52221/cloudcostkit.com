@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Cloud egress cost (AWS/Azure/GCP data transfer)";
+const title = "Egress Cost Guide (cloud data transfer pricing)";
 const description =
-  "A practical guide to estimating cloud egress costs: units, where bandwidth shows up, quick formulas, and common billing pitfalls.";
+  "How to estimate cloud egress cost: GB transferred, tiered pricing, and pitfalls for internet and inter-region transfer.";
 const faqs = [
   {
     q: "What counts as egress?",
@@ -34,7 +34,7 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   faqs={faqs}
 >
   <p class="muted">
@@ -119,3 +119,4 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     </>
   ) : null}
 </GuideLayout>
+

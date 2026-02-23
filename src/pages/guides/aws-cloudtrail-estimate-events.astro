@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Estimate CloudTrail events per month (practical methods)";
+const title = "Estimate CloudTrail Events per Month (cost planning)";
 const description =
-  "How to estimate CloudTrail event volume for cost models: count from CloudTrail Lake or S3-delivered logs, split management vs data events, and include retries and automation.";
+  "Methods to estimate CloudTrail event volume: Lake queries, S3 logs, and workload-driven approximations.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudtrail-estimate-events"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-23"
   faqs={[
     {
       q: "Why should I separate management and data events?",
@@ -125,4 +125,5 @@ ORDER BY 1, 2;`}</code></pre>
     </li>
   </ul>
 </GuideLayout>
+
 

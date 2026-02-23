@@ -4,9 +4,9 @@ import { SITE } from "../config/site";
 import { TOOLS } from "../lib/tools";
 import AdSlot from "../components/AdSlot.astro";
 
-const title = `${SITE.name} | Cloud cost & capacity calculators`;
+const title = "CloudCostKit | Cloud cost calculators and pricing guides";
 const description =
-  "Fast, free cloud calculators for egress, logs, object storage, Kubernetes requests, and commitment break-even. Transparent assumptions. No signup.";
+  "Cloud cost calculators and pricing guides for AWS, Azure, and GCP. Estimate egress, logs, storage, and compute with clear assumptions.";
 
 const featuredSlugs = [
   "cdn-cost-calculator",
@@ -23,7 +23,7 @@ const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/">
   <section class="card hero">
-    <span class="pill">Cloud • FinOps • DevOps</span>
+    <span class="pill">Cloud / FinOps / DevOps</span>
     <h1>Cloud cost & capacity calculators</h1>
     <p>
       Estimate egress, logs, storage, and Kubernetes capacity with clear assumptions. Use this site to compare scenarios
@@ -63,7 +63,7 @@ const [emailUser, emailDomain] = SITE.email.split("@");
       </a>
       <a class="card2 tool col-6" href="/guides/cdn-costs/">
         <div class="tool-title">CDN cost breakdown</div>
-        <div class="tool-desc">Bandwidth, requests, cache fill, and origin egress—explained.</div>
+        <div class="tool-desc">Bandwidth, requests, cache fill, and origin egress explained.</div>
       </a>
       <a class="card2 tool col-6" href="/guides/kubernetes-cost-calculator/">
         <div class="tool-title">Kubernetes cost calculator checklist</div>
@@ -121,3 +121,5 @@ const [emailUser, emailDomain] = SITE.email.split("@");
     <AdSlot slot={slots.homeMid} minHeight={280} />
   </section>
 </BaseLayout>
+
+

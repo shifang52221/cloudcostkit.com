@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ObjectStorageCostCalculator as ObjectStorageCostCalculatorComponent } from "../../components/calculators/ObjectStorageCost";
 
-const title = "Object Storage Cost Calculator";
+const title = "Object Storage Cost Calculator (GB-month + requests)";
 const description =
-  "Estimate monthly object storage cost from stored GB and request volume (GET/PUT) with customizable per-1k pricing, with baseline vs peak scenarios. Educational use only.";
+  "Estimate monthly object storage cost from GB stored and GET/PUT requests using your provider rates.";
 ---
 <CalculatorLayout
   title={title}
@@ -53,7 +53,7 @@ const description =
       a: "Many small objects often increase request volume (PUT/LIST/GET), which can increase request fees. If you store millions of small objects, request costs can become material."
     }
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost" },
@@ -126,3 +126,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

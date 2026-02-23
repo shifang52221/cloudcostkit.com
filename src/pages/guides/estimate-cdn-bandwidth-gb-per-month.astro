@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "How to estimate CDN bandwidth (GB/month): analytics, RPS, or Mbps";
+const title = "Estimate CDN Bandwidth (GB per month) from traffic";
 const description =
-  "A practical guide to estimating CDN bandwidth per month. Includes methods from CDN analytics, from RPS × response size, and from throughput (Mbps), plus unit pitfalls (bits vs bytes, GB vs GiB) and a validation checklist.";
+  "Convert Mbps or RPS traffic into monthly CDN GB for cost models. Includes formulas, examples, and pitfalls.";
 
 const faqs = [
   {
@@ -28,7 +28,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/estimate-cdn-bandwidth-gb-per-month"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-23"
   faqs={faqs}
 >
   <p>
@@ -149,4 +149,5 @@ const faqs = [
     <a class="btn" href="/calculators/cdn-cost-calculator/">CDN total cost</a>
   </div>
 </GuideLayout>
+
 

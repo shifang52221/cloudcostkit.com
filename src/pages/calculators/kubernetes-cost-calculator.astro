@@ -3,9 +3,9 @@ import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { KubernetesNodeCostCalculator } from "../../components/calculators/KubernetesNodeCost";
 import { KubernetesRequestsLimitsCalculator } from "../../components/calculators/KubernetesRequestsLimits";
 
-const title = "Kubernetes Cost Calculator";
+const title = "Kubernetes Cost Calculator (node sizing from requests)";
 const description =
-  "Estimate Kubernetes cluster cost by sizing nodes from pod requests, checking pod limits, and applying per-node pricing. Educational use only.";
+  "Estimate Kubernetes cluster cost by sizing nodes from pod requests and applying per-node pricing. Baseline vs peak scenarios.";
 ---
 <CalculatorLayout
   title={title}
@@ -57,7 +57,7 @@ const description =
       a: "Use the effective blended $/hour you actually expect to pay. If you mix on-demand + commitments + spot, compute a blended rate and test sensitivity.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/kubernetes-cost-calculator", label: "Guide: Kubernetes cost checklist" },
     { href: "/guides/kubernetes-cost-model-beyond-nodes", label: "Guide: cost model beyond nodes" },
@@ -178,3 +178,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

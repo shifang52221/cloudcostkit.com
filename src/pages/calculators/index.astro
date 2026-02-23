@@ -4,9 +4,9 @@ import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
 import AdSlot from "../../components/AdSlot.astro";
 
-const title = `Tools | ${SITE.name}`;
+const title = "Cloud cost calculators | CloudCostKit";
 const description =
-  "Browse fast cloud cost and capacity calculators: egress, logs, object storage, Kubernetes requests, and pricing break-even.";
+  "Browse fast cloud cost calculators for egress, logs, storage, Kubernetes, and pricing break-even. Clear assumptions, no signup.";
 
 const grouped = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
   (acc[t.category] ||= []).push(t);
@@ -60,7 +60,7 @@ const slots = SITE.adsenseSlots;
         <li>Validate against a real week of billing/metrics and adjust.</li>
       </ol>
       <div class="btn-row" style="margin-top:12px">
-        <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>
+        <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
         <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
         <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
         <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
@@ -272,3 +272,5 @@ const slots = SITE.adsenseSlots;
     })();
   </script>
 </BaseLayout>
+
+

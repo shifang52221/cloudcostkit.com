@@ -4,9 +4,9 @@ import { LogIngestionCostCalculator } from "../../components/calculators/LogInge
 import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
 import { LogSearchScanCostCalculator } from "../../components/calculators/LogSearchScanCost";
 
-const title = "Log Cost Calculator";
+const title = "Log Cost Calculator (ingestion + retention)";
 const description =
-  "Estimate total log costs: ingestion, retention storage, and optional scan/search charges. Educational use only.";
+  "Estimate log cost from daily GB ingested, retention period, and storage rates. Add search/scan if needed.";
 ---
 <CalculatorLayout
   title={title}
@@ -48,7 +48,7 @@ const description =
       a: "The fastest levers are: reduce noisy logs at source, shorten retention for low-value logs, and avoid expensive broad scans (use sampling or narrower filters).",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost" },
@@ -156,3 +156,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

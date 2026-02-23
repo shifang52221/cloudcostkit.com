@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsEbsCostCalculator as AwsEbsCostCalculatorComponent } from "../../components/calculators/AwsEbsCost";
 
-const title = "AWS EBS Cost Calculator";
+const title = "AWS EBS Cost Calculator (GB-month + IOPS)";
 const description =
-  "Estimate AWS EBS-style monthly cost from storage (GB-month), provisioned IOPS, and provisioned throughput pricing assumptions, with baseline vs peak scenarios. Educational use only.";
+  "Estimate EBS cost from volume size, type, and IOPS/throughput pricing. Monthly storage and performance fees.";
 ---
 <CalculatorLayout
   title={title}
@@ -46,7 +46,7 @@ const description =
       a: "Use the average allocated storage (or average used, depending on billing). If storage grows over time, model multiple months or scenarios.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/guides/aws-ebs-pricing", label: "Guide: EBS pricing (what to include)" },
     { href: "/guides/aws-ebs-gp3-iops-throughput", label: "Guide: gp3 IOPS and throughput" },
@@ -131,3 +131,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

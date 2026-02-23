@@ -3,9 +3,9 @@ import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
 
-const title = "CloudFront Cost Calculator";
+const title = "CloudFront Cost Calculator (bandwidth + request fees)";
 const description =
-  "Estimate CloudFront-style CDN costs from bandwidth (GB/month) and request fees using your pricing assumptions. Educational use only.";
+  "Estimate CloudFront monthly cost from GB delivered and request pricing. Use blended rates for regions or tiers.";
 ---
 <CalculatorLayout
   title={title}
@@ -40,7 +40,7 @@ const description =
       a: "Monthly GB delivered to users and monthly request volume. If you only have throughput or RPS, convert them using the Units Converter and RPS-to-monthly tool.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-02-23"
   related={[
     { href: "/calculators/cdn-cost-calculator", label: "CDN cost calculator (generic)" },
     { href: "/guides/aws-cloudfront-pricing", label: "Guide: CloudFront pricing" },
@@ -150,3 +150,4 @@ const description =
     </div>
   </div>
 </CalculatorLayout>
+

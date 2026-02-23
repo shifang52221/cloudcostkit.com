@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Run pricing (GCP): requests, CPU/memory time, and egress (practical model)";
+const title = "GCP Cloud Run Pricing & Cost (requests, CPU/memory, egress)";
 const description =
-  "Estimate Cloud Run-style serverless container cost using measurable drivers: request volume, duration, concurrency, outbound transfer, and logs. Includes a validation checklist for retries, cold starts, and heavy-tail response sizes.";
+  "Model Cloud Run cost from requests, duration, CPU/memory time, and egress. Includes validation tips for real workloads.";
 
 const faqs = [
   {
@@ -28,7 +28,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-run-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-02-23"
   faqs={faqs}
 >
   <p>
@@ -164,4 +164,5 @@ const faqs = [
     </li>
   </ul>
 </GuideLayout>
+
 

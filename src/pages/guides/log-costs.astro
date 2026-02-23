@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Estimating log costs: ingestion, retention, and scan/search";
+const title = "Log Cost Guide (ingestion, retention, search)";
 const description =
-  "A practical guide to modeling log bills: ingestion vs retention (GB-month), steady state, scan/search pricing, and the fastest levers to reduce cost.";
+  "Estimate log costs from ingestion volume, retention, and query/scan fees. Includes common pitfalls and sizing tips.";
 const faqs = [
   {
     q: "What are the main drivers of log cost?",
@@ -30,7 +30,7 @@ const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") 
   title={title}
   description={description}
   canonicalPath="/guides/log-costs"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-02-23"
   faqs={faqs}
 >
   <p>
@@ -101,3 +101,4 @@ const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") 
     </>
   ) : null}
 </GuideLayout>
+
