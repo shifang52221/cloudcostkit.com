@@ -1,19 +1,19 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "EC2 cost estimation: a practical model (compute + the hidden line items)";
+const title = "EC2 cost estimation: a practical model (compute + hidden line items)";
 const description =
-  "A practical EC2 cost estimation guide: model instance-hours with uptime and blended rates, then add the hidden line items that often dominate (EBS, snapshots, load balancers, NAT/egress, logs).";
+  "A practical EC2 cost estimation guide: model instance-hours with uptime and blended rates, then add hidden line items such as EBS, snapshots, load balancers, NAT, egress, and logs.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ec2-cost-estimation"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-03-04"
   faqs={[
     {
-      q: "What's the fastest way to estimate EC2 monthly cost?",
-      a: "Compute baseline is instances × $/hour × hours/month × uptime. Use a blended $/hour if you mix purchase options, then add EBS and network transfer as separate line items.",
+      q: "What is the fastest way to estimate EC2 monthly cost?",
+      a: "Compute baseline is instances x $/hour x hours/month x uptime. Use a blended $/hour if you mix purchase options, then add EBS and network transfer as separate line items.",
     },
     {
       q: "Why is my estimate always lower than the real bill?",
@@ -22,39 +22,26 @@ const description =
   ]}
 >
   <p>
-    EC2 cost estimation is easy if you treat it as a <strong>small set of drivers</strong> instead of a long list of
-    services. Start with compute hours, then add the few line items that usually explain the gap between “instance price”
-    and the real bill.
+    EC2 cost estimation works best when you model a small set of measurable drivers. Start with compute hours, then add
+    the line items that usually explain the gap between instance pricing and the real bill.
   </p>
 
-  <h2>Step 1: compute baseline (instances × hours × blended rate)</h2>
+  <h2>Step 1: Compute baseline (instances x hours x blended rate)</h2>
   <ul>
-    <li>
-      <strong>Hours/month</strong>: use 730 (or 24 × 30.4) as a planning constant.
-    </li>
-    <li>
-      <strong>Uptime factor</strong>: dev/test scheduling is the biggest lever (8h/day weekdays is ~23% uptime).
-    </li>
-    <li>
-      <strong>Blended $/hour</strong>: one effective rate across on-demand, spot, and commitments.
-    </li>
+    <li><strong>Hours/month</strong>: use 730 (or 24 x 30.4) as a planning baseline.</li>
+    <li><strong>Uptime factor</strong>: separate prod from non-prod schedules.</li>
+    <li><strong>Blended $/hour</strong>: one effective rate across on-demand, spot, and commitments.</li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
     <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>
   </div>
 
-  <h2>Step 2: model EBS (often second biggest)</h2>
+  <h2>Step 2: Model EBS (often the second-largest line item)</h2>
   <ul>
-    <li>
-      <strong>Volumes</strong>: GB-month plus IOPS/throughput when applicable.
-    </li>
-    <li>
-      <strong>Snapshots</strong>: change rate × retention dominates, not just volume size.
-    </li>
-    <li>
-      Common trap: orphaned volumes after instance replacement or auto scaling events.
-    </li>
+    <li><strong>Volumes</strong>: GB-month plus IOPS and throughput where applicable.</li>
+    <li><strong>Snapshots</strong>: change rate x retention, not only raw volume size.</li>
+    <li>Watch for orphaned volumes after replacements or autoscaling events.</li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost</a>
@@ -62,11 +49,11 @@ const description =
     <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
   </div>
 
-  <h2>Step 3: add networking (the common underestimate)</h2>
+  <h2>Step 3: Add networking (the common underestimate)</h2>
   <ul>
-    <li><strong>Internet egress</strong>: bytes leaving AWS to users/external systems.</li>
-    <li><strong>NAT gateways</strong>: hourly + GB processed can dominate private subnet workloads.</li>
-    <li><strong>Cross-AZ</strong>: traffic patterns that cross zones add internal transfer.</li>
+    <li><strong>Internet egress</strong>: bytes leaving AWS to users or external systems.</li>
+    <li><strong>NAT gateways</strong>: hourly plus processed GB can dominate private subnet workloads.</li>
+    <li><strong>Cross-AZ transfer</strong>: service chatter and routing patterns can create steady internal transfer.</li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
@@ -74,17 +61,11 @@ const description =
     <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ cost</a>
   </div>
 
-  <h2>Step 4: add “around EC2” services</h2>
+  <h2>Step 4: Add surrounding service costs</h2>
   <ul>
-    <li>
-      <strong>Load balancers</strong>: baseline hourly + capacity units (LCU/NLCU).
-    </li>
-    <li>
-      <strong>Logs</strong>: ingestion + retention, and query scans during incidents.
-    </li>
-    <li>
-      <strong>Metrics</strong>: custom metrics and dashboard polling can be meaningful at scale.
-    </li>
+    <li><strong>Load balancers</strong>: hourly baseline plus LCU/NLCU usage.</li>
+    <li><strong>Logs</strong>: ingestion plus retention and optional scan costs.</li>
+    <li><strong>Metrics</strong>: custom metric cardinality can grow unexpectedly.</li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">Load balancer cost</a>
@@ -92,31 +73,36 @@ const description =
     <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">Metrics cost</a>
   </div>
 
-  <h2>Blended rate: how to avoid over-precision</h2>
-  <p class="muted">
-    If you do not have perfect allocation data yet, a blended rate is a useful planning tool. You can make it more
-    accurate by splitting into two buckets: baseline capacity (committed) and burst capacity (on-demand/spot).
-  </p>
+  <h2>Purchase strategy matrix</h2>
   <ul>
-    <li>Baseline: instances you expect to run all month</li>
-    <li>Burst: instances that appear only during peaks or batch windows</li>
-    <li>Non-prod: schedule down and model separately</li>
+    <li><strong>Steady baseline</strong>: test RI or Savings Plan coverage for predictable capacity.</li>
+    <li><strong>Burst capacity</strong>: keep as on-demand or spot with interruption-aware assumptions.</li>
+    <li><strong>Dev and test</strong>: schedule down and model separately from production.</li>
+    <li><strong>Migration period</strong>: keep temporary dual-run costs in a separate scenario.</li>
   </ul>
+
+  <h2>Estimate mismatch diagnosis</h2>
+  <ol>
+    <li>Compare modeled instance-hours to billed instance-hours first.</li>
+    <li>Validate effective blended $/hour against billing exports.</li>
+    <li>Check EBS, NAT, and transfer line items before tweaking compute assumptions.</li>
+    <li>Review incident windows for retry-driven spikes and temporary scale-outs.</li>
+  </ol>
 
   <h2>Common pitfalls</h2>
   <ul>
-    <li>Using peak instance count as the monthly baseline.</li>
-    <li>Ignoring EBS snapshots and thinking “EBS is just GB-month”.</li>
-    <li>Forgetting NAT processed GB for private workloads and container fleets.</li>
-    <li>Ignoring cross-AZ patterns (load balancer routing and service chatter).</li>
+    <li>Using peak instance count as monthly baseline.</li>
+    <li>Ignoring snapshot retention and assuming EBS is storage only.</li>
+    <li>Missing NAT processed GB for private workloads and image pull traffic.</li>
+    <li>Ignoring cross-AZ routing patterns in multi-AZ deployments.</li>
   </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate uptime assumptions (prod vs non-prod scheduling).</li>
-    <li>Validate EBS: volume classes and snapshot retention behavior.</li>
-    <li>Validate top data transfer paths (egress + NAT + cross-AZ) for a real week.</li>
-    <li>After your first month, reconcile estimate vs bill and update blended rates.</li>
+    <li>Validate uptime assumptions for prod and non-prod separately.</li>
+    <li>Validate EBS classes and snapshot retention policies.</li>
+    <li>Validate top transfer paths (egress, NAT, cross-AZ) using a real week.</li>
+    <li>Reconcile estimate vs bill monthly and update blended rates.</li>
   </ul>
 
   <h2>Sources</h2>
@@ -135,4 +121,3 @@ const description =
     </li>
   </ul>
 </GuideLayout>
-

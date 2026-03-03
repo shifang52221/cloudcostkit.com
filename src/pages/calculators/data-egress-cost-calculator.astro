@@ -147,6 +147,22 @@ const description =
       <li><strong>Path D</strong>: origin to CDN cache fill (separate from edge delivery).</li>
     </ul>
 
+    <h2>Priority levers by dominant path</h2>
+    <ul>
+      <li><strong>Internet egress dominates</strong>: compression, caching, and payload reduction usually win first.</li>
+      <li><strong>Cross-region dominates</strong>: reduce replication fan-out and narrow replicated datasets.</li>
+      <li><strong>Cross-AZ dominates</strong>: improve service locality and reduce chatty dependencies.</li>
+      <li><strong>Origin-to-CDN dominates</strong>: increase cache hit rate and review cache key strategy.</li>
+    </ul>
+
+    <h2>Sanity checks before sign-off</h2>
+    <ul>
+      <li>Peak scenario should be materially higher than baseline for internet-facing systems.</li>
+      <li>Each path must map to a billable usage type in your billing export.</li>
+      <li>Effective $/GB should be stable month over month for the same boundary.</li>
+      <li>If model and bill differ by more than 15%, isolate unit conversion and destination mix first.</li>
+    </ul>
+
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>

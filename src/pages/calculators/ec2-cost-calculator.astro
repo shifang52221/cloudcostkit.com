@@ -143,6 +143,22 @@ const description =
       <li>Recheck assumptions after instance family or commitment changes.</li>
     </ul>
 
+    <h2>Purchase mix worksheet</h2>
+    <ul>
+      <li><strong>Baseline steady capacity</strong>: map to RI or Savings Plans candidates.</li>
+      <li><strong>Burst capacity</strong>: keep as on-demand unless burst is predictable.</li>
+      <li><strong>Interruptible workloads</strong>: model spot separately with interruption risk.</li>
+      <li>Recalculate blended $/hour whenever commitment coverage changes.</li>
+    </ul>
+
+    <h2>Failure patterns</h2>
+    <ul>
+      <li>Using list prices while finance tracks effective blended cost.</li>
+      <li>Applying the same uptime schedule to prod and dev/test environments.</li>
+      <li>Hiding autoscaling peaks inside monthly averages.</li>
+      <li>Treating compute estimate as total stack cost without EBS or transfer.</li>
+    </ul>
+
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>

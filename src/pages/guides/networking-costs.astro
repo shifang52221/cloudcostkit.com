@@ -55,6 +55,15 @@ const networkingGuides = GUIDES.filter((g) => (g.topics || []).includes("egress"
     <li>From requests/day x average response size.</li>
   </ul>
 
+  <h2>Network boundary worksheet</h2>
+  <ul>
+    <li><strong>Path A</strong>: internet to end users (public API, downloads, media).</li>
+    <li><strong>Path B</strong>: cross-zone east-west service traffic.</li>
+    <li><strong>Path C</strong>: cross-region replication and disaster recovery sync.</li>
+    <li><strong>Path D</strong>: origin-to-CDN cache fill transfer.</li>
+    <li><strong>Path E</strong>: NAT or private endpoint processed GB and endpoint hours.</li>
+  </ul>
+
   <h2>3) Price each boundary separately</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/egress-costs/">Egress costs</a>
@@ -70,6 +79,14 @@ const networkingGuides = GUIDES.filter((g) => (g.topics || []).includes("egress"
     <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure egress</a>
     <a class="btn" href="/guides/gcp-vpc-egress-costs/">GCP VPC egress</a>
   </div>
+
+  <h2>Spike triage checklist</h2>
+  <ol>
+    <li>Find which boundary moved first: internet, zone, region, or endpoint processing.</li>
+    <li>Check deploy and incident windows for retry amplification.</li>
+    <li>Verify cache hit rate and origin fetch behavior for CDN-backed services.</li>
+    <li>Re-run baseline and peak scenarios with corrected boundary inputs.</li>
+  </ol>
 
   {networkingGuides.length ? (
     <>

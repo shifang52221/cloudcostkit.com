@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
@@ -71,7 +71,7 @@ const slots = SITE.adsenseSlots;
       </a>
       <a class="card2 tool col-6" href="/calculators/data-egress-cost-calculator/">
         <div class="tool-title">Data egress cost</div>
-        <div class="tool-desc">Outbound GB/month × $/GB for planning scenarios.</div>
+        <div class="tool-desc">Outbound GB/month x $/GB for planning scenarios.</div>
       </a>
       <a class="card2 tool col-6" href="/calculators/api-request-cost-calculator/">
         <div class="tool-title">API request cost</div>
@@ -91,7 +91,7 @@ const slots = SITE.adsenseSlots;
       </a>
       <a class="card2 tool col-6" href="/calculators/compute-instance-cost-calculator/">
         <div class="tool-title">Compute instance cost</div>
-        <div class="tool-desc">Instance count × $/hour × uptime.</div>
+        <div class="tool-desc">Instance count x $/hour x uptime.</div>
       </a>
       <a class="card2 tool col-6" href="/calculators/storage-pricing-calculator/">
         <div class="tool-title">Storage pricing (generic)</div>
@@ -119,6 +119,16 @@ const slots = SITE.adsenseSlots;
       <li>Storage growth: model a growth curve, not a single month-end size.</li>
       <li>Region split: if you use multiple regions, separate rates per region.</li>
       <li>Observability burst: increase ingestion and query volume for incident months.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Azure-specific checks before trusting numbers</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Confirm whether outbound traffic is internet egress or stays inside Azure backbone.</li>
+      <li>Separate AKS, data platform, and app platform logs because retention policies often differ.</li>
+      <li>Validate premium tier assumptions (API Management, Front Door, gateways) against real SKU usage.</li>
+      <li>Check cross-region replication paths for storage and database backups explicitly.</li>
     </ul>
   </section>
 

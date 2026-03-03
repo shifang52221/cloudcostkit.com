@@ -78,6 +78,22 @@ const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") 
     <li><strong>Query smarter</strong>: narrow time ranges and filter early to reduce scanned GB.</li>
   </ul>
 
+  <h2>Retention policy by log class</h2>
+  <ul>
+    <li><strong>Security and audit</strong>: longer retention with strict ingestion controls.</li>
+    <li><strong>Application debugging</strong>: shorter hot retention and aggressive sampling.</li>
+    <li><strong>Platform health</strong>: aggregate noisy events before ingestion.</li>
+    <li><strong>Incident diagnostics</strong>: keep peak-month assumptions separate from steady-state storage.</li>
+  </ul>
+
+  <h2>Validation loop</h2>
+  <ol>
+    <li>Measure ingestion GB/day by log class, not only total volume.</li>
+    <li>Confirm retained GB-month after retention policy changes.</li>
+    <li>Review query scan GB during incident windows separately.</li>
+    <li>Recalculate cost per GB ingested every month and track drift.</li>
+  </ol>
+
   <h2>Tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>

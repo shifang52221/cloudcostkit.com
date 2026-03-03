@@ -509,8 +509,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "EC2 cost estimation: a practical model (compute + the hidden line items)",
-    "description": "A practical EC2 cost estimation guide: model instance-hours with uptime and blended rates, then add the hidden line items that often dominate (EBS, snapshots, load balancers, NAT/egress, logs).",
+    "title": "EC2 cost estimation: a practical model (compute + hidden line items)",
+    "description": "A practical EC2 cost estimation guide: model instance-hours with uptime and blended rates, then add hidden line items such as EBS, snapshots, load balancers, NAT, egress, and logs.",
     "canonicalPath": "/guides/aws-ec2-cost-estimation",
     "category": "AWS",
     "slug": "aws-ec2-cost-estimation",

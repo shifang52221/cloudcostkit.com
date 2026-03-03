@@ -104,6 +104,30 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>Cross-AZ traffic: load balancers and multi-AZ clients can create steady east-west transfer.</li>
   </ul>
 
+  <h2>Boundary map template (do this before modeling rates)</h2>
+  <ul>
+    <li><strong>Path A</strong>: internet delivery to end users.</li>
+    <li><strong>Path B</strong>: cross-region replication and failover sync.</li>
+    <li><strong>Path C</strong>: cross-AZ service-to-service traffic.</li>
+    <li><strong>Path D</strong>: origin-to-CDN cache fill traffic.</li>
+  </ul>
+
+  <h2>Failure patterns that create 2x to 10x errors</h2>
+  <ul>
+    <li>Using a single $/GB for internet and private transfer paths.</li>
+    <li>Counting CDN edge bandwidth and origin egress as the same stream.</li>
+    <li>Ignoring retry storms and timeout loops during incidents.</li>
+    <li>Estimating with daily averages only and missing burst windows.</li>
+  </ul>
+
+  <h2>Validation checklist for monthly planning</h2>
+  <ol>
+    <li>Match each transfer path to a specific billing usage type.</li>
+    <li>Verify units (GB vs GiB) and conversion assumptions.</li>
+    <li>Compare baseline and peak windows separately.</li>
+    <li>Recalculate effective $/GB for each boundary every month.</li>
+  </ol>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>

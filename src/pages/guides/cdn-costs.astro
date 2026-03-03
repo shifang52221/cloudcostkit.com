@@ -148,6 +148,30 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     priced at your origin provider's rate.
   </p>
 
+  <h2>Decision matrix: what to optimize first</h2>
+  <ul>
+    <li><strong>Bandwidth-heavy workload</strong>: optimize image/video size and long-tail cacheability before request tuning.</li>
+    <li><strong>Request-heavy workload</strong>: reduce dynamic misses, collapse duplicate calls, and tune cache keys.</li>
+    <li><strong>Origin egress-heavy workload</strong>: improve cache hit rate and origin shield strategy first.</li>
+    <li><strong>Incident-prone workload</strong>: model peak retries and failover traffic as a separate budget line.</li>
+  </ul>
+
+  <h2>Failure patterns to check before procurement</h2>
+  <ul>
+    <li>One blended rate hides regional price spread and overstates savings.</li>
+    <li>Edge bandwidth and origin egress are merged into one number.</li>
+    <li>Cache miss ratio is copied from a normal day and not from launch or incident windows.</li>
+    <li>Request pricing units (per 10k vs per 1M) are mixed in the same sheet.</li>
+  </ul>
+
+  <h2>Validation workflow (7-day sample)</h2>
+  <ol>
+    <li>Collect edge bandwidth, requests, and cache hit metrics for 7 days.</li>
+    <li>Split traffic into baseline and top 2 peak windows.</li>
+    <li>Recompute effective rates from bill line items for each window.</li>
+    <li>Update calculator assumptions only where variance is repeatable.</li>
+  </ol>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>

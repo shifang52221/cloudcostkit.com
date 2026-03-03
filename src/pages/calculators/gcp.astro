@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
@@ -44,11 +44,11 @@ const slots = SITE.adsenseSlots;
       <ul class="muted" style="margin:10px 0 0; padding-left:18px">
         <li>Under-modeling inter-zone transfer (it can be frequent in multi-zone architectures).</li>
         <li>Confusing CDN bandwidth with origin egress (cache fill vs edge delivery).</li>
-        <li>High-cardinality metrics labels creating “quietly growing” bills.</li>
-        <li>Ignoring storage growth and lifecycle transitions (hot → cold → archive).</li>
+        <li>High-cardinality metrics labels creating quietly growing bills.</li>
+        <li>Ignoring storage growth and lifecycle transitions (hot -> cold -> archive).</li>
       </ul>
       <p class="muted" style="margin:12px 0 0">
-        Start with <a href="/guides/cloud-cost-estimation-checklist/">estimation checklist</a> if you’re missing major line items.
+        Start with <a href="/guides/cloud-cost-estimation-checklist/">estimation checklist</a> if you are missing major line items.
       </p>
     </section>
   </section>
@@ -71,7 +71,7 @@ const slots = SITE.adsenseSlots;
       </a>
       <a class="card2 tool col-6" href="/calculators/data-egress-cost-calculator/">
         <div class="tool-title">Data egress cost</div>
-        <div class="tool-desc">Outbound GB/month × $/GB for planning scenarios.</div>
+        <div class="tool-desc">Outbound GB/month x $/GB for planning scenarios.</div>
       </a>
       <a class="card2 tool col-6" href="/calculators/log-cost-calculator/">
         <div class="tool-title">Log cost</div>
@@ -91,7 +91,7 @@ const slots = SITE.adsenseSlots;
       </a>
       <a class="card2 tool col-6" href="/calculators/compute-instance-cost-calculator/">
         <div class="tool-title">Compute instance cost</div>
-        <div class="tool-desc">Instance count × $/hour × uptime.</div>
+        <div class="tool-desc">Instance count x $/hour x uptime.</div>
       </a>
       <a class="card2 tool col-6" href="/calculators/database-storage-growth-cost-calculator/">
         <div class="tool-title">Database storage growth</div>
@@ -119,6 +119,16 @@ const slots = SITE.adsenseSlots;
       <li>Regional split: separate multi-zone and cross-region transfer rates.</li>
       <li>Storage growth: model a growth curve and lifecycle transitions.</li>
       <li>Query spikes: increase log scan volume when incidents or audits happen.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">GCP-specific checks before trusting numbers</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Separate inter-zone transfer from internet egress in multi-zone architectures.</li>
+      <li>Confirm Cloud Storage request classes (read/write/list) when request fees are material.</li>
+      <li>Validate Cloud Logging bucket retention and query scan behavior by environment.</li>
+      <li>For Cloud Run and serverless paths, re-check retries and timeout-driven request inflation.</li>
     </ul>
   </section>
 

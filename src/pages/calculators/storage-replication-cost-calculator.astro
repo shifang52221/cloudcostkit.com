@@ -125,6 +125,22 @@ const description =
       <li><strong>Compliance archive</strong>: low change rate but long retention and storage growth.</li>
     </ul>
 
+    <h2>Billing boundary checklist</h2>
+    <ul>
+      <li>Replication transfer fee and replica storage fee are modeled separately.</li>
+      <li>One-time backfill is not merged into steady monthly change volume.</li>
+      <li>Request amplification from replication is captured for high-write workloads.</li>
+      <li>Directionality (source to destination) matches provider billing rules.</li>
+    </ul>
+
+    <h2>Common failure patterns</h2>
+    <ul>
+      <li>Using total dataset size instead of changed data volume.</li>
+      <li>Missing replica-region storage growth after policy changes.</li>
+      <li>Treating DR drill traffic as a normal-month baseline.</li>
+      <li>Ignoring write amplification from retries or small object churn.</li>
+    </ul>
+
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>

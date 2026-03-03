@@ -151,6 +151,22 @@ const faqs = [
     <li>Validate where transfer is billed (same-region vs cross-region vs internet).</li>
   </ul>
 
+  <h2>Tier decision framework</h2>
+  <ul>
+    <li><strong>Stay Basic</strong>: low pull concurrency, single-region, and no repeated CI queue delays.</li>
+    <li><strong>Move to Standard</strong>: CI pull throughput is a reliability bottleneck in normal weeks.</li>
+    <li><strong>Move to Premium</strong>: multi-region workloads need geo-replication and stable pull latency.</li>
+    <li><strong>Do not upgrade blindly</strong>: if egress dominates, architecture changes may beat tier upgrades.</li>
+  </ul>
+
+  <h2>Failure patterns</h2>
+  <ul>
+    <li>Counting tags instead of unique layer storage.</li>
+    <li>Ignoring pull storms during node churn and incident recovery.</li>
+    <li>Using one transfer rate across same-region and cross-region pulls.</li>
+    <li>Treating CI cache miss weeks as normal pull baselines.</li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/object-storage-cost-calculator/">GB-month</a>

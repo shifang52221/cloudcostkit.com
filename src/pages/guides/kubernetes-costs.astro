@@ -78,6 +78,22 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
     </li>
   </ul>
 
+  <h2>Role-based optimization path</h2>
+  <ul>
+    <li><strong>Platform team</strong>: improve requests/limits hygiene and node packing first.</li>
+    <li><strong>SRE</strong>: reduce retry storms, cross-zone chatter, and NAT-heavy pull patterns.</li>
+    <li><strong>Application teams</strong>: fix high-cardinality labels and noisy logs at source.</li>
+    <li><strong>FinOps</strong>: maintain baseline and incident scenarios for each cluster class.</li>
+  </ul>
+
+  <h2>Failure patterns</h2>
+  <ul>
+    <li>Cluster budgets built from node cost only.</li>
+    <li>One shared assumption set used for both steady and incident periods.</li>
+    <li>Cross-zone network patterns ignored after topology changes.</li>
+    <li>Observability growth unmanaged after service count increases.</li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost</a>

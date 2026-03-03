@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
@@ -83,6 +83,16 @@ const tools = TOOLS.filter((t) => t.category === "Logging");
       <li>Retention shift: model shorter retention as a separate scenario.</li>
       <li>Cardinality growth: add a growth rate for metrics series counts.</li>
     </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Fastest logging cost-reduction order</h2>
+    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Cut noisy sources first (debug duplicates, repetitive success logs).</li>
+      <li>Apply retention tiers by value instead of one global retention setting.</li>
+      <li>Narrow query windows and enforce filtered dashboards for high-volume streams.</li>
+      <li>Control metrics cardinality before scaling collectors or storage tiers.</li>
+    </ol>
   </section>
 
   <section class="card section prose" style="margin-top:18px">

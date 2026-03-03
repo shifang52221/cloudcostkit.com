@@ -98,6 +98,22 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
     <li>Double counting replication: both replica storage and copy traffic can be billed.</li>
   </ul>
 
+  <h2>Lifecycle decision matrix</h2>
+  <ul>
+    <li><strong>Hot data with frequent reads</strong>: prioritize latency tier and optimize request behavior.</li>
+    <li><strong>Warm operational data</strong>: move to lower-cost class with defined access windows.</li>
+    <li><strong>Archive and compliance data</strong>: model retrieval fees before deep archive transitions.</li>
+    <li><strong>Replication-heavy workloads</strong>: split steady writes from one-time migrations.</li>
+  </ul>
+
+  <h2>Storage validation checklist</h2>
+  <ol>
+    <li>Confirm average GB-month, not only end-of-month snapshots.</li>
+    <li>Track top request classes and their billing units.</li>
+    <li>Separate replica storage and replication transfer line items.</li>
+    <li>Reconcile retrieval and egress after lifecycle policy changes.</li>
+  </ol>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage</a>

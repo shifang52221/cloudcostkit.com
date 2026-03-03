@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
@@ -30,7 +30,7 @@ const tools = TOOLS.filter((t) => t.category === "Kubernetes");
       <h2 style="margin-top:0">A sizing workflow that survives reality</h2>
       <ol class="muted" style="margin:10px 0 0; padding-left:18px">
         <li>Start from per-pod requests (CPU/memory) and replicas, not limits.</li>
-        <li>Reserve headroom for deploys and imperfect packing (don’t target 100%).</li>
+        <li>Reserve headroom for deploys and imperfect packing (do not target 100%).</li>
         <li>Convert to nodes using allocatable resources and max-pods limits.</li>
         <li>Add DaemonSet overhead, storage, and load balancers.</li>
         <li>Validate against a representative week of scheduling and billing data.</li>
@@ -99,6 +99,16 @@ const tools = TOOLS.filter((t) => t.category === "Kubernetes");
       <li>Peak: rollout weeks with higher replicas and more node headroom.</li>
       <li>Scaling strategy: compare HPA vs fixed replicas on node counts.</li>
       <li>Observability: model higher log and metrics volume for incidents.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Kubernetes role-based review checklist</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Platform team</strong>: node density, autoscaler behavior, and upgrade surge headroom.</li>
+      <li><strong>Application team</strong>: request right-sizing, retry behavior, and traffic fan-out.</li>
+      <li><strong>FinOps team</strong>: separate node, network, storage, and observability trend lines.</li>
+      <li><strong>SRE team</strong>: incident-month multipliers for replicas, logs, and transfer costs.</li>
     </ul>
   </section>
 

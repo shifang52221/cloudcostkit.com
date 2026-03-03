@@ -199,6 +199,22 @@ const faqs = [
     Use <a href="/calculators/unit-converter/">Unit converter</a> to sanity-check GB vs GiB and Mbps vs MB/s conversions.
   </p>
 
+  <h2>7) Release gate before sign-off</h2>
+  <ul>
+    <li><strong>Gate A</strong>: every line item has a measurable driver and owner.</li>
+    <li><strong>Gate B</strong>: baseline and peak scenarios are both documented.</li>
+    <li><strong>Gate C</strong>: top 3 cost risks have mitigation actions.</li>
+    <li><strong>Gate D</strong>: unit and boundary checks are completed.</li>
+  </ul>
+
+  <h2>8) Ownership model</h2>
+  <ul>
+    <li><strong>App team</strong>: requests, retries, payload size, and logging verbosity.</li>
+    <li><strong>Platform team</strong>: compute schedules, cluster/network topology, and storage lifecycle.</li>
+    <li><strong>FinOps</strong>: price assumptions, scenario governance, and bill reconciliation.</li>
+    <li><strong>Security/compliance</strong>: retention requirements and audit log constraints.</li>
+  </ul>
+
   <h2>Related reading</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
@@ -207,4 +223,3 @@ const faqs = [
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
 </GuideLayout>
-

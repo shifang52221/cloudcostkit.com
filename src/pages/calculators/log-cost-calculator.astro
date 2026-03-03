@@ -158,6 +158,22 @@ const description =
       <li><strong>Step 4</strong>: revisit dashboard refresh intervals and ad-hoc query habits.</li>
     </ul>
 
+    <h2>Log class policy matrix</h2>
+    <ul>
+      <li><strong>Security and audit logs</strong>: longer retention, strict sampling controls.</li>
+      <li><strong>Application debug logs</strong>: short retention and aggressive volume filtering.</li>
+      <li><strong>Infrastructure metrics-like logs</strong>: summarize or aggregate before ingestion.</li>
+      <li><strong>Incident burst logs</strong>: keep separate peak assumptions from baseline policy.</li>
+    </ul>
+
+    <h2>Failure patterns</h2>
+    <ul>
+      <li>One retention policy applied to all log classes.</li>
+      <li>High-cardinality attributes indexed by default.</li>
+      <li>Dashboard auto-refresh intervals driving hidden scan charges.</li>
+      <li>Incident months blended into normal months without separate scenario tracking.</li>
+    </ul>
+
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>

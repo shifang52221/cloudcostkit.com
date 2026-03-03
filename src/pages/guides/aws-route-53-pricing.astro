@@ -142,6 +142,22 @@ const description =
     <li>Audit the top record names from query logs and look for noisy internal service discovery patterns.</li>
   </ul>
 
+  <h2>TTL and query-volume decision guide</h2>
+  <ul>
+    <li><strong>Need fast failover</strong>: lower TTL only for critical records; keep default TTL higher elsewhere.</li>
+    <li><strong>Stable services</strong>: raise TTL to reduce resolver refresh frequency and query cost.</li>
+    <li><strong>Frequent deploys</strong>: use staged TTL changes during rollout windows, then restore normal values.</li>
+    <li><strong>Incident response</strong>: capture retry multipliers and include them in the peak scenario.</li>
+  </ul>
+
+  <h2>Failure patterns</h2>
+  <ul>
+    <li>Applying one low TTL policy to every record type.</li>
+    <li>Using traffic RPS as DNS query volume without resolver behavior checks.</li>
+    <li>Ignoring health-check sprawl across environments.</li>
+    <li>Estimating only baseline and skipping retry-storm budgets.</li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-route-53-cost-calculator/">Route 53 cost</a>

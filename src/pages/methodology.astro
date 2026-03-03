@@ -5,14 +5,14 @@ import { withTrailingSlash } from "../lib/url";
 
 const title = `Methodology | ${SITE.name}`;
 const description =
-  "How CloudCostKit calculators work: what inputs mean, what’s included/excluded, how to validate estimates, and how to avoid common unit and boundary mistakes.";
+  "How CloudCostKit calculators work: what inputs mean, what is included or excluded, how to validate estimates, and how to avoid unit and boundary mistakes.";
 ---
 <BaseLayout title={title} description={description} canonicalPath="/methodology">
   <section class="card hero">
     <h1>Methodology</h1>
     <p>
-      CloudCostKit tools are built for planning: quick, transparent estimates you can validate against billing and
-      metrics. This page explains how to use the calculators so your numbers survive real production traffic.
+      CloudCostKit tools are built for planning: fast, transparent estimates you can validate against billing and
+      metrics. This page explains how to use the calculators so results stay reliable under real traffic.
     </p>
     <div class="btn-row" style="margin-top:12px">
       <a class="btn" href="/calculators/">All calculators</a>
@@ -23,87 +23,68 @@ const description =
   </section>
 
   <section class="card section prose" style="margin-top:18px">
-    <h2 style="margin-top:0">What these calculators are (and are not)</h2>
+    <h2 style="margin-top:0">What these calculators are and are not</h2>
     <ul>
       <li>
-        <strong>Planning models</strong>: back-of-the-napkin estimates that highlight the primary cost drivers (requests,
-        GB transferred, GB-month stored, instance-hours, vCPU/RAM hours).
+        <strong>Planning models</strong>: directional estimates focused on main drivers (requests, GB transferred,
+        GB-month stored, instance-hours, and vCPU or memory hours).
       </li>
       <li>
-        <strong>Not official quotes</strong>: providers charge by region, tiering, free allowances, minimums, rounding,
-        and product-specific rules. Always verify against official docs before committing spend.
+        <strong>Not official quotes</strong>: providers bill by region, tiering, free allowances, rounding, and
+        product-specific rules.
       </li>
       <li>
-        <strong>Bounded on purpose</strong>: each calculator page tells you what it includes/excludes so you can build a
-        complete model without double-counting.
+        <strong>Bounded intentionally</strong>: each calculator states included and excluded items to reduce double
+        counting.
       </li>
     </ul>
 
     <h2>How to get a useful estimate in 10 minutes</h2>
     <ol>
-      <li>
-        Pick <strong>one workload</strong> and one environment (prod, region, tier). Mixing environments is the fastest
-        path to nonsense.
-      </li>
-      <li>
-        Start with <strong>measurable drivers</strong>: requests/month, GB/month (egress/transfer), instance-hours, and
-        GB-month stored.
-      </li>
-      <li>
-        Use <strong>effective rates</strong> first (blended $/GB, $/1M requests) to get directionally correct. Add tiering
-        later if you need it.
-      </li>
-      <li>
-        Add the common multipliers: <strong>retries</strong>, <strong>fan-out</strong> (deliveries per message), and
-        <strong>cache hit rate</strong> (origin egress vs edge bandwidth).
-      </li>
-      <li>
-        Validate with a real week of data. If directionality is wrong, fix boundaries and units before “optimizing”.
-      </li>
+      <li>Pick one workload and one environment (mixing environments usually breaks assumptions).</li>
+      <li>Start with measurable drivers: requests/month, GB/month, instance-hours, and GB-month stored.</li>
+      <li>Use effective blended rates first, then refine with tier and region detail.</li>
+      <li>Add multipliers: retries, fan-out, cache hit rate, and incident windows.</li>
+      <li>Validate against a real week of metrics and billing before optimization work.</li>
     </ol>
 
-    <h2>Boundaries & units: the two most common indexing-killer mistakes</h2>
-    <p class="muted">
-      Most “bad estimates” come from a unit mismatch or the wrong billing boundary (internet vs cross-region vs intra-AZ).
-      If your site is thin, these sections are also where you can add genuine, unique help users can’t get from generic
-      AI summaries.
-    </p>
+    <h2>Boundary and unit quality checks</h2>
     <ul>
       <li>
-        <strong>GB vs GiB</strong>: cloud billing often uses decimal GB. Many dashboards show GiB. Convert explicitly using{" "}
-        <a href="/calculators/unit-converter/">Units converter</a>.
+        <strong>GB vs GiB</strong>: billing usually uses decimal GB while tooling may show binary GiB. Convert
+        explicitly with the <a href="/calculators/unit-converter/">Units converter</a>.
       </li>
       <li>
-        <strong>Requests units</strong>: some services price per 10k, per 100k, or per 1M. A single unit slip becomes a
-        10× or 100× error.
+        <strong>Request units</strong>: pricing units differ (per 10k, 100k, or 1M). Unit mismatch creates large errors.
       </li>
       <li>
-        <strong>Origin egress vs CDN bandwidth</strong>: CDN edge bandwidth is not the same as origin egress. Treat cache
-        fill and edge delivery as separate line items. Guide:{" "}
-        <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+        <strong>Origin egress vs CDN bandwidth</strong>: cache fill and edge delivery are separate line items.
+      </li>
+      <li>
+        <strong>Ingestion vs retention vs scan</strong>: observability often has three distinct billing drivers.
       </li>
     </ul>
 
-    <h2>Validation workflow (what to check after changes)</h2>
+    <h2>Validation workflow</h2>
     <ol>
-      <li>
-        Identify the <strong>primary driver metric</strong> for the cost: requests, GB processed, GB-month, or
-        instance-hours.
-      </li>
-      <li>
-        Compare the estimate to the first real bill (or a representative week) and adjust the effective rate or the
-        driver.
-      </li>
-      <li>
-        Re-check incident windows: timeouts and retries can multiply requests and bytes even when success traffic is flat.
-      </li>
-      <li>Keep a baseline and a peak scenario so your budget survives traffic spikes.</li>
+      <li>Define primary driver metrics for each line item.</li>
+      <li>Compare estimates to the first real bill and adjust drivers before rates.</li>
+      <li>Audit incident windows separately to capture retry-driven spikes.</li>
+      <li>Maintain baseline and peak scenarios for each workload.</li>
     </ol>
 
-    <h2>Where pricing comes from</h2>
+    <h2>Editorial and update standards</h2>
+    <ul>
+      <li>Every page must include unique decision guidance, failure patterns, and validation steps.</li>
+      <li>Similar slugs must keep distinct intent and user outcomes.</li>
+      <li>Calculator pages and guide pages are maintained as pairs for explanation plus execution.</li>
+      <li>High-impression pages are reviewed first during monthly refresh cycles.</li>
+    </ul>
+
+    <h2>Data and pricing source policy</h2>
     <p class="muted">
-      Most calculators accept your own pricing inputs because pricing varies by region and discount. If you need official
-      sources, start with provider pricing pages and then validate in billing exports.
+      Most calculators accept user-provided pricing because rates vary by region and discount model. Official pricing
+      pages and billing exports are the source of truth.
     </p>
     <ul>
       <li>
@@ -136,21 +117,20 @@ const description =
     <div class="grid" style="margin-top:10px">
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/data-egress-cost-calculator")}>
         <div class="tool-title">Data egress cost</div>
-        <div class="tool-desc">Start with GB/month and an effective $/GB to get a baseline.</div>
+        <div class="tool-desc">Start with GB/month and an effective $/GB baseline.</div>
       </a>
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/log-cost-calculator")}>
         <div class="tool-title">Log cost</div>
-        <div class="tool-desc">Ingestion + retention model; then add scan/query if relevant.</div>
+        <div class="tool-desc">Model ingestion and retention, then add scan if needed.</div>
       </a>
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/object-storage-cost-calculator")}>
         <div class="tool-title">Object storage cost</div>
-        <div class="tool-desc">GB-month + requests + egress + replication patterns.</div>
+        <div class="tool-desc">Cover GB-month, requests, replication, and transfer.</div>
       </a>
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/rps-to-monthly-requests-calculator")}>
         <div class="tool-title">RPS to monthly requests</div>
-        <div class="tool-desc">Convert traffic rates into billing units; keep peak separate from average.</div>
+        <div class="tool-desc">Convert traffic rates into billing units with clear assumptions.</div>
       </a>
     </div>
   </section>
 </BaseLayout>
-

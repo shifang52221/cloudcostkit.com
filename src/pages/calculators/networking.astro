@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
@@ -101,6 +101,16 @@ const tools = TOOLS.filter((t) => t.category === "Networking");
       <li>Peak: 2x-4x traffic and higher retry rates during incidents.</li>
       <li>Cache shifts: model a lower cache hit rate for launch weeks.</li>
       <li>Route changes: re-evaluate when you add regions or new endpoints.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Architecture patterns that change network cost shape</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Single-region + CDN</strong>: edge bandwidth and origin cache-fill are the primary drivers.</li>
+      <li><strong>Multi-region active-active</strong>: cross-region sync and failover paths become first-class line items.</li>
+      <li><strong>Service mesh across AZs</strong>: east-west traffic can dominate before internet egress does.</li>
+      <li><strong>NAT-heavy private workloads</strong>: processed GB through NAT can exceed compute optimization gains.</li>
     </ul>
   </section>
 

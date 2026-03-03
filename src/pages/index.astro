@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../config/site";
 import { TOOLS } from "../lib/tools";
@@ -115,6 +115,39 @@ const [emailUser, emailDomain] = SITE.email.split("@");
         .
       </p>
     </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Pick a starting path (by your cost problem)</h2>
+    <div class="grid" style="margin-top:10px">
+      <a class="card2 tool col-6" href="/calculators/data-egress-cost-calculator/">
+        <div class="tool-title">Network bill spikes</div>
+        <div class="tool-desc">Start with egress boundary split: internet, cross-region, cross-AZ, and origin-to-CDN.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/log-cost-calculator/">
+        <div class="tool-title">Observability cost growth</div>
+        <div class="tool-desc">Model ingestion, retention, and scan/query separately before tuning dashboards.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/storage-pricing-calculator/">
+        <div class="tool-title">Storage keeps growing</div>
+        <div class="tool-desc">Use GB-month growth and lifecycle scenarios instead of month-end snapshots.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/kubernetes-cost-calculator/">
+        <div class="tool-title">Kubernetes budget drift</div>
+        <div class="tool-desc">Start from requests and node sizing, then add networking, logs, and load balancers.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">What makes these estimates more reliable</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Driver-first modeling</strong>: requests, GB, GB-month, and hours before pricing detail.</li>
+      <li><strong>Boundary-first networking</strong>: we split traffic paths to avoid hidden transfer mistakes.</li>
+      <li><strong>Baseline + peak</strong>: each core workflow encourages incident and launch scenarios.</li>
+      <li><strong>Calculator + guide pairing</strong>: each estimate has a matching explanation page for validation.</li>
+      <li><strong>No black-box formulas</strong>: assumptions are explicit so teams can challenge and update them.</li>
+    </ul>
   </section>
 
   <section class="section">

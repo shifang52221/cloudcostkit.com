@@ -92,6 +92,26 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
     </ul>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Choose a guide path by role</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>FinOps or finance</strong>: start with egress, logs, storage, then use checklist and methodology pages.</li>
+      <li><strong>Platform or SRE</strong>: focus on networking, Kubernetes, and observability guides first.</li>
+      <li><strong>App team</strong>: start with request-based, CDN, and serverless guides tied to your runtime model.</li>
+      <li><strong>Security and compliance</strong>: review logging, retention, and backup guides before policy changes.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Validation loop for any guide</h2>
+    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Write down your top 3 cost drivers and where each metric comes from.</li>
+      <li>Run the matching calculator with baseline and peak assumptions.</li>
+      <li>Compare output with a real week of billing and usage metrics.</li>
+      <li>Keep only assumption changes that improve bill alignment.</li>
+    </ol>
+  </section>
+
   <section class="card section" style="margin-top:18px" id="guides-filter">
     <div class="form" style="align-items:end">
       <div class="field field-3">

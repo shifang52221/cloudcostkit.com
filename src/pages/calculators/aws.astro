@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 
@@ -176,6 +176,17 @@ const description =
       <li><strong>Transfer</strong>: VPC Flow Logs, CloudFront logs, or Cost Explorer usage types (GB).</li>
       <li><strong>Storage</strong>: S3 storage metrics and EBS volume size/IOPS from CloudWatch.</li>
       <li><strong>Compute</strong>: instance-hours from billing exports and uptime schedules.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Which AWS calculator should you run first?</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Top bill line is DataTransfer</strong>: start with VPC transfer + egress + CDN origin modeling.</li>
+      <li><strong>Top bill line is EC2/Fargate/Lambda</strong>: run compute first, then add logs and transfer.</li>
+      <li><strong>Top bill line is S3/EBS/RDS storage</strong>: model GB-month growth and request amplification.</li>
+      <li><strong>Top bill line is CloudWatch/CloudTrail</strong>: split ingestion, retention, alarms/metrics, and query scan.</li>
+      <li><strong>Top bill line is API or messaging</strong>: start with request estimators, then convert to billable units.</li>
     </ul>
   </section>
 

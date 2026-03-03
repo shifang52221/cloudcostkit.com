@@ -225,6 +225,22 @@ const description =
       <li>Track cost per GB and cost per 1M requests month-over-month to detect mix shifts early.</li>
     </ul>
 
+    <h2>Input quality scorecard</h2>
+    <ul>
+      <li><strong>High confidence</strong>: billed edge GB and billed request units from provider invoices.</li>
+      <li><strong>Medium confidence</strong>: analytics exports sampled for at least 7 days.</li>
+      <li><strong>Low confidence</strong>: guessed cache hit rate or guessed regional mix.</li>
+      <li>Do not compare providers until all critical inputs are at medium confidence or above.</li>
+    </ul>
+
+    <h2>Failure modes and fixes</h2>
+    <ul>
+      <li><strong>Cost swings but traffic is flat</strong>: check request class mix and bot traffic spikes.</li>
+      <li><strong>CDN estimate looks cheap but bill is high</strong>: add origin egress and cache-fill transfer.</li>
+      <li><strong>Optimization changed little</strong>: verify whether bandwidth or requests is the dominant line item.</li>
+      <li><strong>Provider comparison is noisy</strong>: normalize region mix and free-tier handling first.</li>
+    </ul>
+
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>

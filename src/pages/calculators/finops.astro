@@ -29,15 +29,15 @@ const tools = TOOLS.filter((t) => t.category === "FinOps");
       <ul class="muted" style="margin:10px 0 0; padding-left:18px">
         <li>Start with effective rates and real drivers (requests, GB, hours) before optimizing pricing tiers.</li>
         <li>Keep baseline and peak scenarios so budgets survive incidents.</li>
-        <li>Separate “compute-only” comparisons from full-stack costs (logs, transfer, storage, retries).</li>
+        <li>Separate compute-only comparisons from full-stack costs (logs, transfer, storage, retries).</li>
       </ul>
     </section>
     <section class="card section prose col-6">
       <h2 style="margin-top:0">Common pitfalls</h2>
       <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-        <li>Unit errors (per 10k vs per 1M, GB vs GiB) causing 10× mistakes.</li>
+        <li>Unit errors (per 10k vs per 1M, GB vs GiB) causing 10x mistakes.</li>
         <li>Retry storms and fan-out multiplying request volume.</li>
-        <li>Ignoring storage growth and retention in “compute-only” models.</li>
+        <li>Ignoring storage growth and retention in compute-only models.</li>
       </ul>
     </section>
   </section>
@@ -62,6 +62,16 @@ const tools = TOOLS.filter((t) => t.category === "FinOps");
         </a>
       ))}
     </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Decision path by objective</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Cut next-month spend</strong>: start with egress, logs, and idle compute before commitment changes.</li>
+      <li><strong>Improve forecast accuracy</strong>: harden driver quality and split baseline vs incident windows.</li>
+      <li><strong>Choose purchase model</strong>: run break-even tools with realistic utilization, not best-case values.</li>
+      <li><strong>Reduce volatility</strong>: track retry multipliers and peak transfer paths as dedicated budget lines.</li>
+    </ul>
   </section>
 
   <section class="card section prose" style="margin-top:18px">
@@ -94,6 +104,16 @@ const tools = TOOLS.filter((t) => t.category === "FinOps");
       <li>Track top 3 line items weekly to confirm the model stays aligned.</li>
       <li>Adjust inputs when architecture or retention policies change.</li>
     </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Weekly FinOps operating rhythm</h2>
+    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Review top 3 cost drivers and their metric quality.</li>
+      <li>Reconcile model vs bill for one representative workload.</li>
+      <li>Assign one owner and one action per major variance.</li>
+      <li>Update baseline and peak assumptions before next budget cycle.</li>
+    </ol>
   </section>
 
   <section class="section">

@@ -148,6 +148,22 @@ const faqs = [
     <li>Validate log bytes per request and retention settings.</li>
   </ul>
 
+  <h2>Concurrency tuning decision matrix</h2>
+  <ul>
+    <li><strong>CPU-bound handlers</strong>: keep lower concurrency and scale out earlier.</li>
+    <li><strong>I/O-bound handlers</strong>: higher concurrency can improve cost efficiency.</li>
+    <li><strong>Latency-sensitive APIs</strong>: protect p95 first, then optimize concurrency.</li>
+    <li><strong>Batch-like endpoints</strong>: isolate them from interactive traffic in separate services.</li>
+  </ul>
+
+  <h2>Failure patterns</h2>
+  <ul>
+    <li>One average duration used for all endpoints and all traffic windows.</li>
+    <li>Retry traffic counted in infra dashboards but excluded from cost models.</li>
+    <li>Large response endpoints hidden inside blended average response size.</li>
+    <li>Verbose request logging left unchanged after traffic growth.</li>
+  </ul>
+
   <h2>Related tools</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>

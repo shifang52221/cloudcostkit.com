@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
@@ -36,7 +36,7 @@ const tools = TOOLS.filter((t) => t.category === "Storage");
     <section class="card section prose col-6">
       <h2 style="margin-top:0">Validation checklist</h2>
       <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-        <li>Validate storage class mix and lifecycle transitions (hot → cold → archive).</li>
+        <li>Validate storage class mix and lifecycle transitions (hot -> cold -> archive).</li>
         <li>Validate whether pricing uses GB vs GiB and per-1k vs per-10k request units.</li>
         <li>Separate CDN bandwidth from origin egress to avoid double-counting.</li>
       </ul>
@@ -82,6 +82,16 @@ const tools = TOOLS.filter((t) => t.category === "Storage");
       <li>Peak: higher churn and backup volume during incident months.</li>
       <li>Growth: add a monthly growth curve for stored data.</li>
       <li>Lifecycle: compare hot vs cold tier mixes in separate scenarios.</li>
+    </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Storage intent matrix</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Hot app storage</strong>: focus on request amplification and frequent reads.</li>
+      <li><strong>Archive/compliance</strong>: focus on retrieval frequency and minimum duration penalties.</li>
+      <li><strong>Backup-heavy workloads</strong>: focus on churn rate, retention, and snapshot copy behavior.</li>
+      <li><strong>Replication for DR</strong>: focus on changed GB/month, not total stored volume.</li>
     </ul>
   </section>
 

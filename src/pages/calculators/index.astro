@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
@@ -86,6 +86,28 @@ const slots = SITE.adsenseSlots;
       <li>Run baseline and peak scenarios before you optimize.</li>
       <li>Validate with a real week of billing and update your model.</li>
     </ul>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Choose calculators by investigation goal</h2>
+    <div class="grid" style="margin-top:10px">
+      <a class="card2 tool col-6" href="/calculators/networking/">
+        <div class="tool-title">Why did network spend jump?</div>
+        <div class="tool-desc">Trace internet egress, cross-region, cross-AZ, NAT, and CDN origin traffic separately.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/logging/">
+        <div class="tool-title">Why did observability cost drift?</div>
+        <div class="tool-desc">Separate ingestion, retention, scan/query, and metric cardinality before tuning retention.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/storage/">
+        <div class="tool-title">Why is storage rising every month?</div>
+        <div class="tool-desc">Model GB-month growth, request fees, replication churn, and archive/retrieval behavior.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/kubernetes/">
+        <div class="tool-title">Why did cluster cost exceed plan?</div>
+        <div class="tool-desc">Re-check requests/limits assumptions, node density, and non-node line items.</div>
+      </a>
+    </div>
   </section>
   <section class="card section" style="margin-top:18px" id="tools-filter">
     <div class="form" style="align-items:end">
