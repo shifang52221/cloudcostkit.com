@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Egress Cost Guide (cloud data transfer pricing)";
+const title = "Cloud Egress Cost Guide (AWS, Azure, GCP Data Transfer Pricing)";
 const description =
-  "How to estimate cloud egress cost: GB transferred, tiered pricing, and pitfalls for internet and inter-region transfer.";
+  "Estimate egress cost with clear formulas for internet, cross-region, and cross-AZ traffic. Includes AWS/Azure/GCP modeling pitfalls and validation steps.";
 const faqs = [
   {
     q: "What counts as egress?",
@@ -34,7 +34,7 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   faqs={faqs}
 >
   <p class="muted">
@@ -56,6 +56,13 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     Billing is often in decimal GB/TB, while OS tools might show GiB/TiB. Convert before estimating costs. Use the{" "}
     <a href="/calculators/unit-converter/">Units Converter</a> if you're unsure.
   </p>
+
+  <h2>Quick egress formula</h2>
+  <ul>
+    <li><strong>Monthly egress cost</strong> = sum(each transfer path GB x path-specific $/GB).</li>
+    <li><strong>Path examples</strong>: internet egress, cross-region replication, cross-AZ east-west traffic, origin-to-CDN transfer.</li>
+    <li><strong>Rule</strong>: do not blend all traffic into one rate unless your billing data proves it.</li>
+  </ul>
 
   <h2>3) Estimate GB per month (quick methods)</h2>
   <ul>
@@ -102,7 +109,9 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
-    <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>
+    <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure bandwidth egress</a>
+    <a class="btn" href="/guides/gcp-vpc-egress-costs/">GCP VPC egress</a>
   </div>
 
   {egressGuides.length ? (

@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from "../../components/calculators/DataEgressCost";
 
-const title = "Data Egress Cost Calculator (AWS, Azure, GCP)";
+const title = "AWS Egress Cost Calculator (AWS, Azure, GCP Data Transfer)";
 const description =
-  "Estimate monthly data egress cost from GB transferred and $/GB pricing. Supports tiered rates and peak scenarios.";
+  "Estimate monthly egress cost from GB transferred, tiered $/GB pricing, and peak scenarios. Useful for AWS egress budgeting and transfer planning.";
 ---
 <CalculatorLayout
   title={title}
@@ -48,9 +48,13 @@ const description =
     {
       q: "Does this include request fees or CDN costs?",
       a: "No. This tool estimates bandwidth-based egress only."
+    },
+    {
+      q: "Should I model internet and cross-region together?",
+      a: "No. Keep boundaries separate because rates and billing units often differ by destination path."
     }
   ]}
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -132,6 +136,15 @@ const description =
     <ul>
       <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
       <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
+      <li>Compare effective $/GB by path (internet, cross-region, cross-AZ) to catch wrong rate assumptions.</li>
+    </ul>
+
+    <h2>Boundary mapping template</h2>
+    <ul>
+      <li><strong>Path A</strong>: internet egress from app/API endpoints.</li>
+      <li><strong>Path B</strong>: cross-region replication and failover traffic.</li>
+      <li><strong>Path C</strong>: cross-AZ east-west service chatter.</li>
+      <li><strong>Path D</strong>: origin to CDN cache fill (separate from edge delivery).</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS Route 53 Pricing & Cost Guide";
+const title = "AWS Route 53 Pricing Guide: Hosted Zones, DNS Queries, Health Checks";
 const description =
-  "Estimate Route 53 cost from hosted zones, DNS queries, health checks, and routing features.";
+  "Estimate Route 53 cost from hosted zones, DNS query volume, and health checks. Includes baseline vs peak DNS cost modeling steps.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   faqs={[
     {
       q: "What usually drives Route 53 cost?",
@@ -84,6 +84,13 @@ const description =
     <li>Enable Route 53 query logging and sample at least 7 days.</li>
     <li>Compute: queries/day by hosted zone and top record names.</li>
     <li>Use the peak day as a sanity check for incident windows.</li>
+  </ul>
+
+  <h2>Fast DNS cost formula</h2>
+  <ul>
+    <li><strong>Total monthly Route 53 cost</strong> = hosted zone fees + DNS query charges + health checks.</li>
+    <li><strong>DNS query charges</strong> = queries/month x effective query unit rate.</li>
+    <li><strong>Peak protection</strong>: budget with both baseline and incident retry scenarios.</li>
   </ul>
   <h3>Method B: From request rate (good first pass)</h3>
   <ul>

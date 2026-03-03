@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "GCP Cloud Run Pricing & Cost (requests, CPU/memory, egress)";
+const title = "GCP Cloud Run Pricing Guide (2026): Requests, CPU, Memory, Egress";
 const description =
-  "Model Cloud Run cost from requests, duration, CPU/memory time, and egress. Includes validation tips for real workloads.";
+  "Estimate Cloud Run cost from requests, duration, concurrency, transfer, and logs. Includes practical formulas and validation steps for production workloads.";
 
 const faqs = [
   {
@@ -28,7 +28,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-run-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   faqs={faqs}
 >
   <p>
@@ -52,7 +52,7 @@ const faqs = [
       <strong>Egress</strong>: response bytes and external calls create transfer costs.
     </li>
     <li>
-      <strong>Logs</strong>: per-request bytes logged × request volume (often overlooked).
+      <strong>Logs</strong>: per-request bytes logged x request volume (often overlooked).
     </li>
   </ul>
 
@@ -107,6 +107,13 @@ const faqs = [
     <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>,{" "}
     <a href="/calculators/log-search-scan-cost-calculator/">Log scan</a>.
   </p>
+  <h2>Cloud Run quick cost model</h2>
+  <ul>
+    <li><strong>Compute driver</strong>: requests x average compute time per request.</li>
+    <li><strong>Transfer driver</strong>: requests x average response bytes.</li>
+    <li><strong>Observability driver</strong>: requests x log bytes per request x retention policy.</li>
+    <li><strong>Peak factor</strong>: retries and timeouts can increase all three drivers at the same time.</li>
+  </ul>
 
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
@@ -117,10 +124,10 @@ const faqs = [
       <strong>Duration</strong> = p50 + p95 scenario (seconds)
     </li>
     <li>
-      <strong>Egress GB/month</strong> = requests/month × avg response size (GB) (split heavy endpoints)
+      <strong>Egress GB/month</strong> = requests/month x avg response size (GB) (split heavy endpoints)
     </li>
     <li>
-      <strong>Log GB/month</strong> = requests/month × avg log bytes/request (baseline + peak)
+      <strong>Log GB/month</strong> = requests/month x avg log bytes/request (baseline + peak)
     </li>
   </ul>
 

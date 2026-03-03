@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorComponent } from "../../components/calculators/StorageReplicationCost";
 
-const title = "Storage Replication Cost Calculator (GB-month + transfer)";
+const title = "Storage Replication Cost Calculator (Cross-Region Copy Pricing)";
 const description =
-  "Estimate replication cost from GB copied, destination storage, and transfer fees. Compare baseline vs peak scenarios.";
+  "Estimate storage replication cost from changed GB, replication $/GB, and peak backfill scenarios. Designed for cross-region and DR planning.";
 ---
 <CalculatorLayout
   title={title}
@@ -54,7 +54,7 @@ const description =
       a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
     },
   ]}
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -114,6 +114,15 @@ const description =
     <ul>
       <li>Compare your estimate to the first real bill and adjust assumptions.</li>
       <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Separate one-time backfill costs from ongoing replication to avoid distorted monthly baselines.</li>
+    </ul>
+
+    <h2>Replication intent matrix</h2>
+    <ul>
+      <li><strong>DR readiness</strong>: steady changed GB with occasional test-failover spikes.</li>
+      <li><strong>Migration</strong>: short-lived, very high replicated GB and transfer bursts.</li>
+      <li><strong>Multi-region reads</strong>: steady replication plus possible egress from secondary reads.</li>
+      <li><strong>Compliance archive</strong>: low change rate but long retention and storage growth.</li>
     </ul>
 
     <h2>Next steps</h2>

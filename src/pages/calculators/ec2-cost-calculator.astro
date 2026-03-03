@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
 
-const title = "EC2 Cost Calculator (monthly instance pricing)";
+const title = "AWS EC2 Cost Calculator (Monthly Pricing Estimator)";
 const description =
-  "Estimate monthly EC2 compute cost from instance count, $/hour, and uptime. Use blended rates for on-demand and commitments.";
+  "Estimate monthly EC2 cost from instance count, blended $/hour, uptime, and peak scenarios. Useful for on-demand, RI, and Savings Plans mixes.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/ec2-cost-calculator"
-  intro="This EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand and commitments."
+  intro="This AWS EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand, Reserved Instances, and Savings Plans, then compare baseline vs peak."
   examples={[
     "10 instances at your blended $/hour with 100% uptime -> estimate monthly compute cost.",
     "Reduce hours/day for dev/test to avoid over-budgeting always-on assumptions.",
@@ -49,8 +49,12 @@ const description =
       q: "Should I model separate environments?",
       a: "Yes. Prod, staging, and dev often have different uptime and pricing assumptions, so model them as separate rows.",
     },
+    {
+      q: "Is this the same as the AWS Pricing Calculator?",
+      a: "This page is a fast EC2 estimator for planning and scenario analysis. For final procurement-level budgets, confirm assumptions in AWS Pricing Calculator and compare against CUR usage history.",
+    },
   ]}
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
@@ -128,6 +132,15 @@ const description =
     <ul>
       <li>Compare instance-hours and effective $/hour to billing line items.</li>
       <li>Check average instance count in metrics or inventory data.</li>
+      <li>Review baseline vs peak deltas so autoscaling risk is visible in budget reviews.</li>
+    </ul>
+
+    <h2>Accuracy checklist</h2>
+    <ul>
+      <li>Use measured instance-hours, not provisioned capacity.</li>
+      <li>Use blended $/hour that matches your purchase mix in billing.</li>
+      <li>Keep compute, EBS, transfer, and load balancer as separate line items.</li>
+      <li>Recheck assumptions after instance family or commitment changes.</li>
     </ul>
 
     <h2>Next steps</h2>

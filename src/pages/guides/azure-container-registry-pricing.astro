@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Container Registry Pricing & Cost (Basic, Standard, Premium)";
+const title = "Azure Container Registry Pricing (2026): ACR Cost by Tier";
 const description =
-  "ACR cost model for storage GB-month, pulls, and transfer. Understand how pricing tiers affect limits and spend.";
+  "Model Azure Container Registry cost from storage, pull volume, and egress. Compare Basic/Standard/Premium impacts with practical ACR budgeting steps.";
 
 const faqs = [
   {
@@ -28,7 +28,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-container-registry-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   faqs={faqs}
 >
   <p>
@@ -115,6 +115,13 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>When tier upgrades usually pay off</h2>
+  <ul>
+    <li><strong>Basic to Standard</strong>: pull throughput or concurrency limits affect CI/CD reliability.</li>
+    <li><strong>Standard to Premium</strong>: multi-region traffic and geo-replication reduce pull latency risk.</li>
+    <li><strong>Check before upgrading</strong>: if spend is mostly egress from architecture, tier change alone may not reduce total cost.</li>
+  </ul>
+
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
@@ -150,6 +157,7 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
     <a class="btn" href="/guides/azure-aks-pricing/">AKS pricing</a>
+    <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure egress guide</a>
   </div>
 
   <h2>Sources</h2>

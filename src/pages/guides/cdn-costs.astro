@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "CDN Cost & Pricing Guide (bandwidth, requests, origin egress)";
+const title = "CDN Cost Guide & Calculator Inputs (Bandwidth, Requests, Origin Egress)";
 const description =
-  "Step-by-step CDN cost breakdown: bandwidth $/GB, request fees, and origin egress. Includes estimation tips and pitfalls.";
+  "Step-by-step CDN pricing guide with formulas for bandwidth, request fees, and origin egress. Built to support accurate CDN cost calculator inputs.";
 const faqs = [
   {
     q: "What are the main line items on a CDN bill?",
@@ -38,7 +38,7 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   title={title}
   description={description}
   canonicalPath="/guides/cdn-costs"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   faqs={faqs}
 >
   <p>
@@ -49,6 +49,14 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     <li><strong>Edge bandwidth</strong>: GB delivered from the CDN edge to end users.</li>
     <li><strong>Request fees</strong>: request-based charges (common on some plans).</li>
     <li><strong>Origin egress (cache fill)</strong>: bytes pulled from your origin to the CDN (billed by your origin provider).</li>
+  </ul>
+
+  <h2>Quick formula snapshot</h2>
+  <ul>
+    <li><strong>Total CDN edge cost</strong> = bandwidth cost + request fees.</li>
+    <li><strong>Bandwidth cost</strong> = edge GB/month x $/GB.</li>
+    <li><strong>Request fees</strong> = requests/month x request unit rate.</li>
+    <li><strong>Complete delivery cost view</strong> = CDN edge cost + origin egress cost.</li>
   </ul>
 
   <h2>CDN pricing shortcuts (fast sanity checks)</h2>

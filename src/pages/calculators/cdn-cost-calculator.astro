@@ -3,9 +3,9 @@ import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
 
-const title = "CDN Cost Calculator (bandwidth + request pricing)";
+const title = "CDN Cost Calculator & CDN Pricing Estimator";
 const description =
-  "Estimate monthly CDN cost from GB delivered and request fees using your provider rates. Compare baseline vs peak scenarios.";
+  "Estimate CDN cost from bandwidth (GB), request fees, and peak traffic scenarios. Built for CDN pricing comparisons and monthly planning.";
 ---
 <CalculatorLayout
   title={title}
@@ -57,7 +57,7 @@ const description =
       a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
     },
   ]}
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-03"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
     { href: "/guides/cdn-cost-comparison", label: "Guide: CDN cost comparison" },
@@ -115,6 +115,15 @@ const description =
     <p class="muted" style="margin-top:10px">
       Tip: use the new "Save scenario" button at the top to keep a baseline and peak link you can revisit.
     </p>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Quick formula you can audit</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Total CDN cost</strong> = edge bandwidth cost + request fees.</li>
+      <li><strong>Edge bandwidth cost</strong> = GB/month x $/GB.</li>
+      <li><strong>Request fees</strong> = requests/month x ($ per 10k or $ per 1M converted to same unit).</li>
+      <li><strong>Complete cloud edge view</strong> = total CDN cost + origin egress (modeled separately).</li>
+    </ul>
   </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">CDN cost driver split</h2>
@@ -213,6 +222,7 @@ const description =
     <ul>
       <li>Match edge bandwidth and request counts to CDN billing usage types.</li>
       <li>Track origin egress separately when cache hit rate changes.</li>
+      <li>Track cost per GB and cost per 1M requests month-over-month to detect mix shifts early.</li>
     </ul>
 
     <h2>Next steps</h2>
