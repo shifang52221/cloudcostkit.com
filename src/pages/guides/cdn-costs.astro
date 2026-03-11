@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "CDN Cost Guide & Calculator Inputs (Bandwidth, Requests, Origin Egress)";
+const title = "CDN Cost Comparison Guide: Pricing, Requests, and Origin Egress Inputs";
 const description =
-  "Step-by-step CDN pricing guide with formulas for bandwidth, request fees, and origin egress. Built to support accurate CDN cost calculator inputs.";
+  "Compare CDN cost models with practical formulas for bandwidth, request pricing, and origin egress. Built for accurate CDN cost calculator inputs.";
 const faqs = [
   {
     q: "What are the main line items on a CDN bill?",
@@ -38,9 +38,16 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   title={title}
   description={description}
   canonicalPath="/guides/cdn-costs"
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-11"
   faqs={faqs}
 >
+  <h2>Short answer: what decides CDN cost first?</h2>
+  <ul>
+    <li>If responses are large, bandwidth usually dominates.</li>
+    <li>If responses are small and request volume is high, request fees often dominate.</li>
+    <li>If cache hit rate is low, origin egress can erase expected CDN savings.</li>
+  </ul>
+
   <p>
     If you search for <em>CDN cost</em> or <em>CDN pricing</em>, you will usually see "$/GB" tables. In practice, a
     complete estimate often needs three buckets:
@@ -171,6 +178,17 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     <li>Recompute effective rates from bill line items for each window.</li>
     <li>Update calculator assumptions only where variance is repeatable.</li>
   </ol>
+
+  <h2>Cloud CDN comparison worksheet</h2>
+  <ul>
+    <li><strong>Step 1</strong>: keep identical traffic inputs across providers (GB, requests, region split, hit rate).</li>
+    <li><strong>Step 2</strong>: separate edge delivery and origin egress assumptions.</li>
+    <li><strong>Step 3</strong>: compare baseline and peak windows, not only monthly averages.</li>
+    <li><strong>Step 4</strong>: include adjacent costs (WAF, logs, invalidations) before final selection.</li>
+  </ul>
+  <p class="muted">
+    Direct comparison starter: <a href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare CDN cost</a>.
+  </p>
 
   <h2>Related tools</h2>
   <div class="btn-row">

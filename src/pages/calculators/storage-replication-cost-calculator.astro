@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorComponent } from "../../components/calculators/StorageReplicationCost";
 
-const title = "Storage Replication Cost Calculator (Cross-Region Copy Pricing)";
+const title = "Storage Replication Cost Calculator (CRR/SRR and Cross-Region Copy)";
 const description =
-  "Estimate storage replication cost from changed GB, replication $/GB, and peak backfill scenarios. Designed for cross-region and DR planning.";
+  "Estimate storage replication cost from changed GB, replication $/GB, and backfill scenarios. Built for CRR/SRR, cross-region, and DR planning.";
 ---
 <CalculatorLayout
   title={title}
@@ -54,7 +54,7 @@ const description =
       a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
     },
   ]}
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-11"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },

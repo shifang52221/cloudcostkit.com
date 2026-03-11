@@ -244,8 +244,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS Route 53 Pricing Guide: Hosted Zones, DNS Queries, Health Checks",
-    "description": "Estimate Route 53 cost from hosted zones, DNS query volume, and health checks. Includes baseline vs peak DNS cost modeling steps.",
+    "title": "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling",
+    "description": "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks. Includes baseline and peak DNS modeling steps.",
     "canonicalPath": "/guides/aws-route-53-pricing",
     "category": "AWS",
     "slug": "aws-route-53-pricing",
@@ -1421,8 +1421,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Container Registry Pricing (2026): ACR Cost by Tier",
-    "description": "Model Azure Container Registry cost from storage, pull volume, and egress. Compare Basic/Standard/Premium impacts with practical ACR budgeting steps.",
+    "title": "Azure Container Registry Pricing Guide: ACR Cost by Tier and Usage",
+    "description": "Model Azure Container Registry cost from storage, pull volume, and egress. Compare Basic, Standard, and Premium with practical calculator-ready inputs.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
     "slug": "azure-container-registry-pricing",
@@ -1444,16 +1444,15 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Event Hubs Pricing & Cost Guide (throughput, retention, egress)",
-    "description": "Estimate Event Hubs cost from throughput units, ingress, capture/storage, and egress. Includes a planning checklist.",
+    "title": "Azure Event Hubs Pricing Guide: Throughput, Retention, Replay, and Egress",
+    "description": "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress with a practical planning checklist.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
     "topics": [
       "backup",
       "egress",
-      "messaging",
-      "storage"
+      "messaging"
     ]
   },
   {
@@ -1585,6 +1584,18 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "CDN Cost Comparison Guide: Pricing, Requests, and Origin Egress Inputs",
+    "description": "Compare CDN cost models with practical formulas for bandwidth, request pricing, and origin egress. Built for accurate CDN cost calculator inputs.",
+    "canonicalPath": "/guides/cdn-costs",
+    "category": "CDN",
+    "slug": "cdn-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
+  },
+  {
     "title": "CDN cost comparison: how to compare pricing across providers",
     "description": "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.",
     "canonicalPath": "/guides/cdn-cost-comparison",
@@ -1595,18 +1606,6 @@ export const GUIDES: GuideLink[] = [
       "egress",
       "requests",
       "storage"
-    ]
-  },
-  {
-    "title": "CDN Cost Guide & Calculator Inputs (Bandwidth, Requests, Origin Egress)",
-    "description": "Step-by-step CDN pricing guide with formulas for bandwidth, request fees, and origin egress. Built to support accurate CDN cost calculator inputs.",
-    "canonicalPath": "/guides/cdn-costs",
-    "category": "CDN",
-    "slug": "cdn-costs",
-    "topics": [
-      "cdn",
-      "egress",
-      "requests"
     ]
   },
   {
@@ -1809,8 +1808,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "GCP Cloud Run Pricing Guide (2026): Requests, CPU, Memory, Egress",
-    "description": "Estimate Cloud Run cost from requests, duration, concurrency, transfer, and logs. Includes practical formulas and validation steps for production workloads.",
+    "title": "GCP Cloud Run Pricing Guide: Cost Calculator Inputs for Requests, CPU, and Egress",
+    "description": "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs. Includes practical calculator inputs and validation steps.",
     "canonicalPath": "/guides/gcp-cloud-run-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-run-pricing",
@@ -2174,8 +2173,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud Egress Cost Guide (AWS, Azure, GCP Data Transfer Pricing)",
-    "description": "Estimate egress cost with clear formulas for internet, cross-region, and cross-AZ traffic. Includes AWS/Azure/GCP modeling pitfalls and validation steps.",
+    "title": "AWS/Azure/GCP Egress Cost Guide: Internet, Region, and AZ Transfer",
+    "description": "Estimate cloud egress cost with formulas for internet, cross-region, and cross-AZ transfer. Includes practical validation steps for AWS, Azure, and GCP.",
     "canonicalPath": "/guides/egress-costs",
     "category": "Networking",
     "slug": "egress-costs",
@@ -2218,8 +2217,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "S3 CRR vs SRR cost: what changes (transfer, storage, requests)",
-    "description": "A practical cost comparison of S3 cross-region replication (CRR) vs same-region replication (SRR). Compare transfer/feature fees, extra replica storage, and request costs - with calculators.",
+    "title": "S3 CRR vs SRR Cost Comparison: Transfer, Storage, and Request Fees",
+    "description": "Practical S3 CRR vs SRR cost comparison with transfer fees, replica storage, and request costs. Includes calculator-ready inputs.",
     "canonicalPath": "/guides/s3-crr-vs-srr-cost",
     "category": "Storage",
     "slug": "s3-crr-vs-srr-cost",

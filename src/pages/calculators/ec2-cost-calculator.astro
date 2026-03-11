@@ -2,9 +2,9 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
 
-const title = "AWS EC2 Cost Calculator (Monthly Pricing Estimator)";
+const title = "EC2 Pricing Calculator (Monthly AWS EC2 Cost Estimator)";
 const description =
-  "Estimate monthly EC2 cost from instance count, blended $/hour, uptime, and peak scenarios. Useful for on-demand, RI, and Savings Plans mixes.";
+  "Estimate monthly AWS EC2 cost from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 pricing and budget planning.";
 ---
 <CalculatorLayout
   title={title}
@@ -54,7 +54,7 @@ const description =
       a: "This page is a fast EC2 estimator for planning and scenario analysis. For final procurement-level budgets, confirm assumptions in AWS Pricing Calculator and compare against CUR usage history.",
     },
   ]}
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-11"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
@@ -63,6 +63,14 @@ const description =
     { href: "/guides/aws-ec2-cost-estimation/", label: "Guide: EC2 cost estimation" },
   ]}
 >
+  <div class="prose">
+    <h2 style="margin-top:0">When to use this EC2 pricing calculator</h2>
+    <ul style="margin:10px 0 0; padding-left:18px">
+      <li>Compare current blended hourly cost with a target purchase mix.</li>
+      <li>Plan baseline vs peak compute budget before scaling changes.</li>
+      <li>Create a compute-only baseline before adding EBS and transfer lines.</li>
+    </ul>
+  </div>
   <ComputeInstanceCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
@@ -158,6 +166,14 @@ const description =
       <li>Hiding autoscaling peaks inside monthly averages.</li>
       <li>Treating compute estimate as total stack cost without EBS or transfer.</li>
     </ul>
+
+    <h2>EC2 estimate reconciliation order</h2>
+    <ol>
+      <li>Align monthly instance-hours with bill exports.</li>
+      <li>Align effective blended $/hour with finance numbers.</li>
+      <li>Add EBS and snapshot lines before changing compute assumptions.</li>
+      <li>Recheck transfer and load balancer costs during peak windows.</li>
+    </ol>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

@@ -3,9 +3,9 @@ import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
 
-const title = "CDN Cost Calculator & CDN Pricing Estimator";
+const title = "CDN Cost Calculator (Bandwidth + Request Pricing Estimator)";
 const description =
-  "Estimate CDN cost from bandwidth (GB), request fees, and peak traffic scenarios. Built for CDN pricing comparisons and monthly planning.";
+  "Estimate CDN monthly cost from bandwidth, request pricing, and peak traffic scenarios. Built for CDN pricing comparison and planning.";
 ---
 <CalculatorLayout
   title={title}
@@ -57,7 +57,7 @@ const description =
       a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
     },
   ]}
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-11"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
     { href: "/guides/cdn-cost-comparison", label: "Guide: CDN cost comparison" },
@@ -71,6 +71,15 @@ const description =
     { href: "/calculators/unit-converter", label: "Units converter" },
   ]}
 >
+  <div class="prose">
+    <h2 style="margin-top:0">Use this calculator when...</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>You need a fast CDN pricing estimate before procurement.</li>
+      <li>You are comparing two CDN providers using the same traffic inputs.</li>
+      <li>You need baseline and peak numbers for budget reviews.</li>
+    </ul>
+  </div>
+
   <div class="prose">
     <h2 style="margin-top:0">1) Bandwidth</h2>
     <p class="muted" style="margin-top:8px">
@@ -239,6 +248,14 @@ const description =
       <li><strong>CDN estimate looks cheap but bill is high</strong>: add origin egress and cache-fill transfer.</li>
       <li><strong>Optimization changed little</strong>: verify whether bandwidth or requests is the dominant line item.</li>
       <li><strong>Provider comparison is noisy</strong>: normalize region mix and free-tier handling first.</li>
+    </ul>
+
+    <h2>Comparison-ready checklist</h2>
+    <ul>
+      <li>Lock one traffic profile before swapping provider rates.</li>
+      <li>Verify request unit conversion (per 10k vs per 1M).</li>
+      <li>Keep origin egress assumptions explicit and separate.</li>
+      <li>Run both normal month and incident month scenarios.</li>
     </ul>
 
     <h2>Next steps</h2>

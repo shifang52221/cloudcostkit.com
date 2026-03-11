@@ -134,6 +134,21 @@ const breadcrumbSchema = {
     { "@type": "ListItem", position: 3, name: title, item: canonical },
   ],
 };
+
+const calculatorSchema = {
+  "@type": "WebApplication",
+  name: title,
+  description,
+  url: canonical,
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+
 const faqSchema =
   faqs && faqs.length
     ? {
@@ -146,7 +161,22 @@ const faqSchema =
         })),
       }
     : null;
-const schemas = [breadcrumbSchema, faqSchema].filter(Boolean);
+const howToSchema =
+  how && how.length
+    ? {
+        "@type": "HowTo",
+        name: `${title} workflow`,
+        description: intro,
+        step: how.map((line, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: `Step ${i + 1}`,
+          text: line,
+        })),
+      }
+    : null;
+
+const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].filter(Boolean);
 ---
 <BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath}>
   {schemas.length ? (

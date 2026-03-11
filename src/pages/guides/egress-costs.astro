@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Cloud Egress Cost Guide (AWS, Azure, GCP Data Transfer Pricing)";
+const title = "AWS/Azure/GCP Egress Cost Guide: Internet, Region, and AZ Transfer";
 const description =
-  "Estimate egress cost with clear formulas for internet, cross-region, and cross-AZ traffic. Includes AWS/Azure/GCP modeling pitfalls and validation steps.";
+  "Estimate cloud egress cost with formulas for internet, cross-region, and cross-AZ transfer. Includes practical validation steps for AWS, Azure, and GCP.";
 const faqs = [
   {
     q: "What counts as egress?",
@@ -34,9 +34,16 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-11"
   faqs={faqs}
 >
+  <h2>Short answer: why egress estimates fail</h2>
+  <ul>
+    <li>Traffic boundaries are mixed into one blended rate.</li>
+    <li>CDN edge bandwidth and origin egress are treated as the same path.</li>
+    <li>Retry and incident traffic is excluded from peak scenarios.</li>
+  </ul>
+
   <p class="muted">
     Egress is the data your cloud sends out (including AWS egress cost). For many products, egress is the "silent" line
     item that grows with usage. This guide helps you estimate egress quickly, pick the right unit, and avoid common
@@ -127,6 +134,14 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>Compare baseline and peak windows separately.</li>
     <li>Recalculate effective $/GB for each boundary every month.</li>
   </ol>
+
+  <h2>Optimization order by boundary</h2>
+  <ul>
+    <li><strong>Internet egress first</strong>: compress payloads, improve cache strategy, trim large responses.</li>
+    <li><strong>Cross-region second</strong>: reduce replication fan-out and move chatty services closer.</li>
+    <li><strong>Cross-AZ third</strong>: reduce east-west traffic and improve service locality.</li>
+    <li><strong>Origin-to-CDN path</strong>: focus on cache hit rate and invalidation discipline.</li>
+  </ul>
 
   <h2>Related tools</h2>
   <div class="btn-row">

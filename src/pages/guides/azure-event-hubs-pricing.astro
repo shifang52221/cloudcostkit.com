@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Event Hubs Pricing & Cost Guide (throughput, retention, egress)";
+const title = "Azure Event Hubs Pricing Guide: Throughput, Retention, Replay, and Egress";
 const description =
-  "Estimate Event Hubs cost from throughput units, ingress, capture/storage, and egress. Includes a planning checklist.";
+  "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress with a practical planning checklist.";
 
 const faqs = [
   {
@@ -28,9 +28,16 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-event-hubs-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-03-11"
   faqs={faqs}
 >
+  <h2>Short answer for Event Hubs budgeting</h2>
+  <ul>
+    <li>Model bytes first, not only events per second.</li>
+    <li>Always add replay/backfill multipliers for consumers.</li>
+    <li>Keep baseline and incident ingestion scenarios separate.</li>
+  </ul>
+
   <p>
     Event streaming cost planning works best when you model <strong>bytes</strong> and <strong>replays</strong>. The same
     stream can be read multiple times by consumers, and that replay multiplier is where estimates often break down.

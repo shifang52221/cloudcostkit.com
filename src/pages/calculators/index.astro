@@ -6,7 +6,7 @@ import AdSlot from "../../components/AdSlot.astro";
 
 const title = "Cloud cost calculators | CloudCostKit";
 const description =
-  "Browse fast cloud cost calculators for egress, logs, storage, Kubernetes, and pricing break-even. Clear assumptions, no signup.";
+  "Cloud cost calculator hub for CDN, egress, EC2, logs, storage, and Kubernetes planning. Fast tools with clear assumptions and no signup.";
 
 const grouped = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
   (acc[t.category] ||= []).push(t);
@@ -34,6 +34,20 @@ const slots = SITE.adsenseSlots;
       <a class="btn" href="/guides/azure/">Azure cost guides</a>
       <a class="btn" href="/guides/gcp/">GCP cost guides</a>
     </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Most used calculators this week</h2>
+    <div class="btn-row" style="margin-top:10px">
+      <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+      <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress calculator</a>
+      <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 pricing calculator</a>
+      <a class="btn" href="/calculators/storage-replication-cost-calculator/">Storage replication calculator</a>
+      <a class="btn" href="/calculators/log-cost-calculator/">Log cost calculator</a>
+    </div>
+    <p class="muted" style="margin:10px 0 0">
+      If you are comparing providers, use one traffic profile and only change pricing assumptions between runs.
+    </p>
   </section>
 
   <section class="grid" style="margin-top:18px">

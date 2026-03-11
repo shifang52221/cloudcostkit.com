@@ -4,9 +4,9 @@ import { LogIngestionCostCalculator } from "../../components/calculators/LogInge
 import { LogRetentionStorageCostCalculator } from "../../components/calculators/LogRetentionStorage";
 import { LogSearchScanCostCalculator } from "../../components/calculators/LogSearchScanCost";
 
-const title = "Log Cost Calculator (Ingestion, Retention, Search Scan)";
+const title = "Log Cost Calculator (Ingestion, Retention, and Scan Pricing)";
 const description =
-  "Estimate log cost from ingestion GB/day, retention GB-month, and scan/query volume. Compare baseline and incident months with one calculator.";
+  "Estimate log pricing from ingestion GB/day, retention GB-month, and scan volume. Compare baseline and incident months in one calculator.";
 ---
 <CalculatorLayout
   title={title}
@@ -52,7 +52,7 @@ const description =
       a: "Use events/sec x bytes/event to estimate GB/day, then apply ingestion pricing and retention policy to model monthly cost.",
     },
   ]}
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-11"
   related={[
     { href: "/calculators/log-ingestion-cost-calculator", label: "Log ingestion cost" },
     { href: "/calculators/log-storage-cost-calculator", label: "Log storage cost" },

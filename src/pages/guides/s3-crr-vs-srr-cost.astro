@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "S3 CRR vs SRR cost: what changes (transfer, storage, requests)";
+const title = "S3 CRR vs SRR Cost Comparison: Transfer, Storage, and Request Fees";
 const description =
-  "A practical cost comparison of S3 cross-region replication (CRR) vs same-region replication (SRR). Compare transfer/feature fees, extra replica storage, and request costs - with calculators.";
+  "Practical S3 CRR vs SRR cost comparison with transfer fees, replica storage, and request costs. Includes calculator-ready inputs.";
 const faqs = [
   {
     q: "Is CRR always more expensive than SRR?",
@@ -23,9 +23,16 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-crr-vs-srr-cost"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-03-11"
   faqs={faqs}
 >
+  <h2>Quick decision rule</h2>
+  <ul>
+    <li>Choose SRR when regional durability is enough and cross-region transfer is not required.</li>
+    <li>Choose CRR when disaster recovery or cross-region access is a hard requirement.</li>
+    <li>Model changed data volume first, then compare CRR and SRR with the same baseline inputs.</li>
+  </ul>
+
   <p>
     If you're choosing between <strong>cross-region replication (CRR)</strong> and <strong>same-region replication (SRR)</strong>,
     the cost difference usually comes down to one thing: whether replicated bytes are billed like cross-region transfer.

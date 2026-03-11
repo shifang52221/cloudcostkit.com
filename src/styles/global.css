@@ -31,6 +31,19 @@ body{
     var(--bg);
   color:var(--text);
 }
+.skip-link{
+  position:absolute;
+  left:16px;
+  top:-40px;
+  z-index:100;
+  padding:8px 12px;
+  border-radius:10px;
+  background:rgba(163,255,18,.95);
+  color:#081018;
+  font-weight:800;
+  text-decoration:none;
+}
+.skip-link:focus{top:12px}
 a{color:inherit}
 .chrome{
   background: var(--chrome);
@@ -136,7 +149,7 @@ main.container{flex:1}
   display: block;
 }
 .nav{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
-.nav a{color:var(--muted); text-decoration:none; font-weight:650; font-size:14px}
+.nav a{color:var(--muted); text-decoration:none; font-weight:650; font-size:14px; white-space:nowrap}
 .nav a:hover{color:var(--text)}
 .hero{
   padding:34px 22px;
@@ -158,7 +171,14 @@ main.container{flex:1}
 }
 @media (max-width: 720px){
   .topbar{flex-direction:column; align-items:flex-start}
-  .nav{width:100%}
+  .nav{
+    width:100%;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    padding-bottom:4px;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+  }
 }
 .tool{
   padding:16px;
@@ -254,6 +274,7 @@ input:focus, select:focus, textarea:focus{
   padding:10px 12px;
   font-weight:800;
   cursor:pointer;
+  min-height:42px;
 }
 .btn-primary{
   border:1px solid rgba(163,255,18,.35);
