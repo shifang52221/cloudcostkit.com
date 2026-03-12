@@ -509,8 +509,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "EC2 cost estimation: a practical model (compute + hidden line items)",
-    "description": "A practical EC2 cost estimation guide: model instance-hours with uptime and blended rates, then add hidden line items such as EBS, snapshots, load balancers, NAT, egress, and logs.",
+    "title": "EC2 Cost Estimation Guide: AWS EC2 Pricing Calculator Inputs and Hidden Costs",
+    "description": "A practical EC2 cost estimation guide for AWS EC2 pricing calculator workflows: model instance-hours with uptime and blended rates, then add EBS, snapshots, load balancers, NAT, egress, and logs.",
     "canonicalPath": "/guides/aws-ec2-cost-estimation",
     "category": "AWS",
     "slug": "aws-ec2-cost-estimation",
@@ -1584,18 +1584,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CDN Cost Comparison Guide: Pricing, Requests, and Origin Egress Inputs",
-    "description": "Compare CDN cost models with practical formulas for bandwidth, request pricing, and origin egress. Built for accurate CDN cost calculator inputs.",
-    "canonicalPath": "/guides/cdn-costs",
-    "category": "CDN",
-    "slug": "cdn-costs",
-    "topics": [
-      "cdn",
-      "egress",
-      "requests"
-    ]
-  },
-  {
     "title": "CDN cost comparison: how to compare pricing across providers",
     "description": "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.",
     "canonicalPath": "/guides/cdn-cost-comparison",
@@ -1617,6 +1605,18 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "cdn",
       "egress"
+    ]
+  },
+  {
+    "title": "CDN Cost, Pricing, and Comparison Guide: Per-GB, Requests, and Origin Egress",
+    "description": "Understand CDN cost, CDN pricing, and CDN cost comparison with practical formulas for bandwidth, requests, and origin egress. Built to support better calculator inputs and faster provider comparisons.",
+    "canonicalPath": "/guides/cdn-costs",
+    "category": "CDN",
+    "slug": "cdn-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
     ]
   },
   {
@@ -2173,12 +2173,13 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS/Azure/GCP Egress Cost Guide: Internet, Region, and AZ Transfer",
-    "description": "Estimate cloud egress cost with formulas for internet, cross-region, and cross-AZ transfer. Includes practical validation steps for AWS, Azure, and GCP.",
+    "title": "AWS Egress Cost Guide: Pricing, Charges, and Cross-Cloud Transfer Boundaries",
+    "description": "Estimate AWS egress cost and broader cloud egress pricing with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical validation steps for AWS, Azure, and GCP.",
     "canonicalPath": "/guides/egress-costs",
     "category": "Networking",
     "slug": "egress-costs",
     "topics": [
+      "cdn",
       "egress"
     ]
   },

@@ -3,13 +3,17 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "CDN Cost Comparison Guide: Pricing, Requests, and Origin Egress Inputs";
+const title = "CDN Cost, Pricing, and Comparison Guide: Per-GB, Requests, and Origin Egress";
 const description =
-  "Compare CDN cost models with practical formulas for bandwidth, request pricing, and origin egress. Built for accurate CDN cost calculator inputs.";
+  "Understand CDN cost, CDN pricing, and CDN cost comparison with practical formulas for bandwidth, requests, and origin egress. Built to support better calculator inputs and faster provider comparisons.";
 const faqs = [
   {
     q: "What are the main line items on a CDN bill?",
     a: "Most CDNs bill primarily for bandwidth delivered to end users (GB/month). Some plans also charge request fees (per 10k or per 1M). Many teams also need to model origin egress (cache fill) billed by the origin provider.",
+  },
+  {
+    q: "Should I use a CDN cost calculator or a CDN pricing guide first?",
+    a: "Use the guide first if you still need to identify which line items matter: bandwidth, request fees, and origin egress. Use the calculator once you already have traffic assumptions and want a fast monthly estimate.",
   },
   {
     q: "Do cache hits reduce CDN bandwidth cost?",
@@ -38,7 +42,7 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   title={title}
   description={description}
   canonicalPath="/guides/cdn-costs"
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <h2>Short answer: what decides CDN cost first?</h2>
@@ -49,14 +53,27 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   </ul>
 
   <p>
-    If you search for <em>CDN cost</em> or <em>CDN pricing</em>, you will usually see "$/GB" tables. In practice, a
-    complete estimate often needs three buckets:
+    If you searched for <em>CDN cost</em>, <em>CDN pricing</em>, <em>CDN cost comparison</em>, or <em>CDN cost
+    calculator</em>, you will usually find "$/GB" tables first. In practice, a decision-ready estimate needs three
+    buckets:
   </p>
   <ul>
     <li><strong>Edge bandwidth</strong>: GB delivered from the CDN edge to end users.</li>
     <li><strong>Request fees</strong>: request-based charges (common on some plans).</li>
     <li><strong>Origin egress (cache fill)</strong>: bytes pulled from your origin to the CDN (billed by your origin provider).</li>
   </ul>
+
+  <h2>CDN pricing guide vs CDN cost calculator</h2>
+  <ul>
+    <li><strong>Use this guide</strong> if you still need to separate bandwidth, request, and origin-egress assumptions.</li>
+    <li><strong>Use the calculator</strong> once you already know your monthly GB, requests, and effective rates.</li>
+    <li><strong>Use both</strong> when you are comparing providers and need the same traffic profile across each option.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/guides/cdn-cost-comparison/">CDN cost comparison</a>
+    <a class="btn" href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a>
+  </div>
 
   <h2>Quick formula snapshot</h2>
   <ul>
@@ -74,6 +91,31 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
       If you only have RPS or Mbps, convert to monthly units before pricing (see the tools linked below).
     </li>
   </ul>
+
+  <h2>CDN cost comparison: the fastest useful framework</h2>
+  <ul>
+    <li><strong>Keep one workload profile</strong>: same GB, requests, region mix, and hit rate across providers.</li>
+    <li><strong>Separate edge from origin</strong>: CDN edge pricing and origin egress are different cost paths.</li>
+    <li><strong>Compare baseline and peak windows</strong>: not only one blended monthly average.</li>
+    <li><strong>Include adjacent charges</strong>: WAF, logs, invalidations, image optimization, and edge functions.</li>
+  </ul>
+  <p>
+    If your main question is "which CDN is cheaper for the same traffic profile?", start with{" "}
+    <a href="/guides/cdn-cost-comparison/">CDN cost comparison</a>, then come back here to validate the pricing inputs
+    that matter most.
+  </p>
+
+  <h2>CDN pricing per GB vs per request</h2>
+  <ul>
+    <li><strong>Bandwidth-heavy traffic</strong>: $/GB usually dominates.</li>
+    <li><strong>Small-object, request-heavy traffic</strong>: request pricing can become the bigger line item.</li>
+    <li><strong>Low cache hit rate</strong>: origin egress can erase apparent edge-side savings.</li>
+  </ul>
+  <p>
+    If you are specifically comparing <em>CDN prices</em>, <em>CDN cost per gigabyte</em>, or <em>CDN costs per GB</em>,
+    use this page with <a href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a> so your per-GB assumptions stay
+    separate from request and cache-fill costs.
+  </p>
 
   <h2>Step 1: Estimate bandwidth (GB/month)</h2>
   <p>
@@ -170,6 +212,14 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     <li>Cache miss ratio is copied from a normal day and not from launch or incident windows.</li>
     <li>Request pricing units (per 10k vs per 1M) are mixed in the same sheet.</li>
   </ul>
+
+  <h2>Provider shortcuts for CDN pricing research</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/azure-cdn-pricing/">Azure CDN pricing</a>
+    <a class="btn" href="/guides/gcp-cloud-cdn-pricing/">Cloud CDN pricing</a>
+    <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare</a>
+    <a class="btn" href="/guides/cdn-request-pricing/">CDN request pricing</a>
+  </div>
 
   <h2>Validation workflow (7-day sample)</h2>
   <ol>

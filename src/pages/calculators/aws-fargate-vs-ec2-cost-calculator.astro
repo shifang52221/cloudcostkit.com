@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent } from "../../components/calculators/AwsFargateVsEc2Cost";
 
-const title = "AWS Fargate vs EC2 Cost Calculator";
+const title = "Fargate vs EC2 Pricing Calculator and Cost Comparison";
 const description =
-  "Compare Fargate vs EC2 compute cost with consistent assumptions, with baseline vs peak scenarios. Estimate Fargate vCPU-hours + GB-hours versus EC2 instance-hours using your pricing inputs with hours/day and days/month. Educational use only.";
+  "Compare Fargate vs EC2 pricing with consistent assumptions and baseline vs peak scenarios. Estimate Fargate vCPU-hours plus GB-hours versus EC2 instance-hours using your pricing inputs, hours/day, and days/month.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-fargate-vs-ec2-cost-calculator"
-  intro="Compare Fargate (vCPU-hours + memory GB-hours) vs EC2 (instances x $/hour) using average running capacity and hours/day x days/month, then see baseline vs peak differences. This is compute-only."
+  intro="If you are comparing Fargate vs EC2 pricing, this calculator keeps the workload shape consistent on both sides. Model Fargate as vCPU-hours plus memory GB-hours, model EC2 as instance-hours at your blended $/hour, then compare baseline vs peak without hiding idle-capacity risk. This is compute-only."
   examples={[
     "6 tasks at 0.5 vCPU and 1 GB running 24 hours/day for 30 days vs 3 instances at $0.18/hr.",
     "If EC2 is underutilized, Fargate can be cheaper; if EC2 is packed efficiently with commitments, EC2 often wins.",
@@ -45,8 +45,12 @@ const description =
       q: "How do commitments change the EC2 comparison?",
       a: "If you use Savings Plans/Reserved Instances, your effective EC2 $/hour can be lower. Use a blended rate that matches your expected coverage.",
     },
+    {
+      q: "When should I use the EC2-only calculator instead?",
+      a: "Use the EC2-only calculator when you already know you are staying on EC2 and only need a compute estimate. Use this comparison page when the real decision is EC2 vs Fargate for the same service capacity.",
+    },
   ]}
-  lastUpdated="2026-01-28"
+  lastUpdated="2026-03-12"
   related={[
     { href: "/guides/aws-fargate-vs-ec2-cost", label: "Guide: Fargate vs EC2 cost" },
     { href: "/guides/aws-fargate-pricing", label: "Guide: Fargate pricing" },
@@ -60,6 +64,13 @@ const description =
 >
   <AwsFargateVsEc2CostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Use this when your search is really "EC2 vs Fargate pricing"</h2>
+    <ul>
+      <li><strong>Use this calculator</strong> when you want the same workload shape on Fargate and EC2.</li>
+      <li><strong>Use the EC2-only calculator</strong> when the platform choice is already settled.</li>
+      <li><strong>Keep non-compute lines separate</strong> so the runtime comparison does not hide transfer, load balancer, and log costs.</li>
+    </ul>
+
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Fargate</strong>: use average running tasks and task size from ECS metrics and definitions.</li>
@@ -112,6 +123,14 @@ const description =
       <li>Use a real month of metrics to calibrate the averages.</li>
     </ul>
 
+    <h2>Non-compute checklist before you make the final call</h2>
+    <ul>
+      <li>Load balancers and service discovery can change the outcome for small workloads.</li>
+      <li>Logs and metrics can rise with task churn or high-cardinality observability patterns.</li>
+      <li>NAT and egress often stay invisible in compute-only comparisons.</li>
+      <li>Idle headroom on EC2 and burst-driven overage on Fargate should be modeled as separate scenarios.</li>
+    </ul>
+
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
@@ -119,6 +138,7 @@ const description =
       <a class="btn" href="/guides/aws-fargate-vs-ec2-cost/">Guide: Fargate vs EC2 cost</a>
       <a class="btn" href="/guides/aws-fargate-pricing/">Guide: Fargate pricing</a>
       <a class="btn" href="/guides/aws-ec2-cost-estimation/">Guide: EC2 cost estimation</a>
+      <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
       <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
     </div>
   </div>

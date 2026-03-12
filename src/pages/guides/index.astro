@@ -50,6 +50,36 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
     </div>
   </section>
 
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Most-searched guide clusters right now</h2>
+    <div class="grid" style="margin-top:10px">
+      <div class="card2 col-4">
+        <div class="tool-title">CDN pricing and comparison</div>
+        <div class="tool-desc">Start with pricing and comparison framing, then move into bandwidth, requests, and origin egress.</div>
+        <div class="btn-row" style="margin-top:12px">
+          <a class="btn" href="/guides/cdn-costs/">Guide</a>
+          <a class="btn" href="/calculators/cdn-cost-calculator/">Calculator</a>
+        </div>
+      </div>
+      <div class="card2 col-4">
+        <div class="tool-title">AWS egress pricing</div>
+        <div class="tool-desc">Start with the transfer boundary, then estimate internet, cross-region, cross-AZ, and CDN-origin traffic.</div>
+        <div class="btn-row" style="margin-top:12px">
+          <a class="btn" href="/guides/egress-costs/">Guide</a>
+          <a class="btn" href="/calculators/data-egress-cost-calculator/">Calculator</a>
+        </div>
+      </div>
+      <div class="card2 col-4">
+        <div class="tool-title">EC2 pricing and runtime choice</div>
+        <div class="tool-desc">Start with EC2 estimation, then switch to EC2 vs Fargate when the real decision is runtime model.</div>
+        <div class="btn-row" style="margin-top:12px">
+          <a class="btn" href="/guides/aws-ec2-cost-estimation/">Guide</a>
+          <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Compare</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="grid" style="margin-top:18px">
     <section class="card section prose col-6">
       <h2 style="margin-top:0">How to use these guides</h2>

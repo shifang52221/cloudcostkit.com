@@ -3,13 +3,17 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "AWS/Azure/GCP Egress Cost Guide: Internet, Region, and AZ Transfer";
+const title = "AWS Egress Cost Guide: Pricing, Charges, and Cross-Cloud Transfer Boundaries";
 const description =
-  "Estimate cloud egress cost with formulas for internet, cross-region, and cross-AZ transfer. Includes practical validation steps for AWS, Azure, and GCP.";
+  "Estimate AWS egress cost and broader cloud egress pricing with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical validation steps for AWS, Azure, and GCP.";
 const faqs = [
   {
     q: "What counts as egress?",
     a: "Any data leaving a billing boundary: internet egress to users, cross-region transfers, and sometimes cross-AZ traffic depending on the service and architecture.",
+  },
+  {
+    q: "What do people usually mean by AWS egress charges?",
+    a: "Usually one of four things: internet data transfer out, cross-region replication or reads, cross-AZ traffic between services, or origin-to-CDN traffic that is billed by AWS as outbound transfer.",
   },
   {
     q: "Why do egress bills spike?",
@@ -34,7 +38,7 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <h2>Short answer: why egress estimates fail</h2>
@@ -45,9 +49,23 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   </ul>
 
   <p class="muted">
-    Egress is the data your cloud sends out (including AWS egress cost). For many products, egress is the "silent" line
-    item that grows with usage. This guide helps you estimate egress quickly, pick the right unit, and avoid common
-    double-counting traps.
+    If you searched for <em>AWS egress cost</em>, <em>AWS egress pricing</em>, <em>AWS egress charges</em>, or{" "}
+    <em>AWS egress cost calculator</em>, the first job is to identify the transfer boundary before you touch rates.
+    Egress is the data your cloud sends out. For many products, it is the "silent" line item that grows with usage.
+    This guide helps you estimate it quickly, pick the right unit, and avoid common double-counting traps.
+  </p>
+
+  <h2>AWS egress pricing: what users usually mean</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: data leaving AWS to users or third-party systems.</li>
+    <li><strong>Cross-region transfer</strong>: replication, DR traffic, or multi-region reads.</li>
+    <li><strong>Cross-AZ transfer</strong>: east-west traffic between services in different Availability Zones.</li>
+    <li><strong>Origin-to-CDN transfer</strong>: AWS-origin traffic sent to a CDN during cache fill.</li>
+  </ul>
+  <p>
+    If you already know which one you are modeling, jump straight to the{" "}
+    <a href="/calculators/data-egress-cost-calculator/">egress cost calculator</a>. If not, keep reading and map the
+    boundary first.
   </p>
 
   <h2>1) Identify what kind of transfer you have</h2>
@@ -70,6 +88,19 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li><strong>Path examples</strong>: internet egress, cross-region replication, cross-AZ east-west traffic, origin-to-CDN transfer.</li>
     <li><strong>Rule</strong>: do not blend all traffic into one rate unless your billing data proves it.</li>
   </ul>
+
+  <h2>Guide first or calculator first?</h2>
+  <ul>
+    <li><strong>Use this guide first</strong> when "AWS egress" still means several possible transfer paths.</li>
+    <li><strong>Use the calculator first</strong> when you already know the GB/month and effective $/GB for a specific path.</li>
+    <li><strong>Use provider guides next</strong> when the path is known but the provider-specific billing rule is still unclear.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">AWS egress cost calculator</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>
+    <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure egress</a>
+    <a class="btn" href="/guides/gcp-vpc-egress-costs/">GCP egress</a>
+  </div>
 
   <h2>3) Estimate GB per month (quick methods)</h2>
   <ul>
@@ -109,6 +140,14 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>Double counting: CDN bandwidth may not equal origin egress.</li>
     <li>Replication direction: some services bill only outbound, others have nuances.</li>
     <li>Cross-AZ traffic: load balancers and multi-AZ clients can create steady east-west transfer.</li>
+  </ul>
+
+  <h2>AWS egress charges checklist before you trust the number</h2>
+  <ul>
+    <li>Match each transfer path to an AWS billing usage type or service-level pricing rule.</li>
+    <li>Keep internet, cross-region, cross-AZ, and CDN-origin traffic in separate rows.</li>
+    <li>Test a baseline week and a peak week before using one blended monthly rate.</li>
+    <li>Re-check after architecture changes, CDN changes, or failover drills.</li>
   </ul>
 
   <h2>Boundary map template (do this before modeling rates)</h2>

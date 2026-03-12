@@ -1,30 +1,52 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "EC2 cost estimation: a practical model (compute + hidden line items)";
+const title = "EC2 Cost Estimation Guide: AWS EC2 Pricing Calculator Inputs and Hidden Costs";
 const description =
-  "A practical EC2 cost estimation guide: model instance-hours with uptime and blended rates, then add hidden line items such as EBS, snapshots, load balancers, NAT, egress, and logs.";
+  "A practical EC2 cost estimation guide for AWS EC2 pricing calculator workflows: model instance-hours with uptime and blended rates, then add EBS, snapshots, load balancers, NAT, egress, and logs.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-ec2-cost-estimation"
-  lastUpdated="2026-03-04"
+  lastUpdated="2026-03-12"
   faqs={[
     {
       q: "What is the fastest way to estimate EC2 monthly cost?",
       a: "Compute baseline is instances x $/hour x hours/month x uptime. Use a blended $/hour if you mix purchase options, then add EBS and network transfer as separate line items.",
     },
     {
+      q: "Is this the same as an EC2 pricing calculator?",
+      a: "This guide explains which inputs belong in an EC2 calculator and which hidden line items should stay outside the compute-only model. Use the EC2 calculator when you already know your average instances, uptime, and blended rate.",
+    },
+    {
       q: "Why is my estimate always lower than the real bill?",
       a: "Because EC2 rarely exists alone: EBS volumes, snapshots, load balancers, NAT gateways, egress, and logs/metrics can exceed compute for some architectures.",
+    },
+    {
+      q: "When should I compare EC2 vs Fargate instead?",
+      a: "Use an EC2-only estimate when your decision is mainly about compute spend for an existing EC2 workload. Switch to an EC2 vs Fargate comparison when you are deciding between runtime models for the same service shape.",
     },
   ]}
 >
   <p>
-    EC2 cost estimation works best when you model a small set of measurable drivers. Start with compute hours, then add
-    the line items that usually explain the gap between instance pricing and the real bill.
+    If you searched for <em>EC2 calculator</em>, <em>EC2 cost calculator</em>, <em>EC2 pricing calculator</em>, or{" "}
+    <em>EC2 cost estimator</em>, start with compute hours first. EC2 cost estimation works best when you model a small
+    set of measurable drivers, then add the line items that usually explain the gap between instance pricing and the
+    real bill.
   </p>
+
+  <h2>Start here if you need an EC2 pricing calculator</h2>
+  <ul>
+    <li><strong>Use the EC2 calculator</strong> when you already know average instances, uptime, and a blended $/hour.</li>
+    <li><strong>Use this guide</strong> when the estimate still misses EBS, transfer, NAT, load balancers, or logs.</li>
+    <li><strong>Use EC2 vs Fargate comparison</strong> when your real question is runtime choice, not EC2-only pricing.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
+    <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 calculator</a>
+    <a class="btn" href="/guides/aws-fargate-vs-ec2-cost/">Fargate vs EC2 guide</a>
+  </div>
 
   <h2>Step 1: Compute baseline (instances x hours x blended rate)</h2>
   <ul>
@@ -81,6 +103,16 @@ const description =
     <li><strong>Migration period</strong>: keep temporary dual-run costs in a separate scenario.</li>
   </ul>
 
+  <h2>When to switch from EC2-only estimation to EC2 vs Fargate pricing</h2>
+  <ul>
+    <li><strong>Stay on EC2-only</strong> if the fleet shape is known and you are reconciling your current AWS bill.</li>
+    <li><strong>Switch to comparison mode</strong> if you are choosing a runtime for the same service capacity.</li>
+    <li><strong>Keep non-compute lines visible</strong> because logs, load balancers, NAT, and transfer can change the decision.</li>
+  </ul>
+  <p>
+    Comparison starter: <a href="/calculators/aws-fargate-vs-ec2-cost-calculator/">AWS Fargate vs EC2 cost calculator</a>.
+  </p>
+
   <h2>Estimate mismatch diagnosis</h2>
   <ol>
     <li>Compare modeled instance-hours to billed instance-hours first.</li>
@@ -104,6 +136,14 @@ const description =
     <li>Validate top transfer paths (egress, NAT, cross-AZ) using a real week.</li>
     <li>Reconcile estimate vs bill monthly and update blended rates.</li>
   </ul>
+
+  <h2>Next calculation path</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
+    <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Fargate vs EC2 calculator</a>
+    <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress calculator</a>
+  </div>
 
   <h2>Sources</h2>
   <ul>
