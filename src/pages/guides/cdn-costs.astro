@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "CDN Cost, Pricing, and Comparison Guide: Per-GB, Requests, and Origin Egress";
+const title = "CDN Cost Guide: Pricing, Calculator Inputs, and Provider Comparison";
 const description =
-  "Understand CDN cost, CDN pricing, and CDN cost comparison with practical formulas for bandwidth, requests, and origin egress. Built to support better calculator inputs and faster provider comparisons.";
+  "Understand CDN cost fast with practical formulas for pricing, calculator inputs, provider comparison, bandwidth, requests, and origin egress.";
 const faqs = [
   {
     q: "What are the main line items on a CDN bill?",
@@ -74,6 +74,13 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     <a class="btn" href="/guides/cdn-cost-comparison/">CDN cost comparison</a>
     <a class="btn" href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a>
   </div>
+
+  <h2>Fast answer: what this page helps you decide</h2>
+  <ul>
+    <li><strong>Use this page</strong> if you need to understand the bill before you touch a calculator.</li>
+    <li><strong>Use the calculator next</strong> if you already know your traffic assumptions and want a monthly estimate.</li>
+    <li><strong>Use comparison pages next</strong> if your real question is which provider is cheaper for the same workload.</li>
+  </ul>
 
   <h2>Quick formula snapshot</h2>
   <ul>

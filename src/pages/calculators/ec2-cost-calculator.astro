@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
 
-const title = "EC2 Pricing Calculator and Monthly AWS EC2 Cost Estimator";
+const title = "EC2 Cost Calculator: Estimate Monthly AWS EC2 Pricing Fast";
 const description =
-  "Estimate monthly AWS EC2 cost from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 pricing, budget planning, and quick cost checks.";
+  "Estimate monthly AWS EC2 cost fast from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 calculator, EC2 cost estimator, and EC2 pricing workflow searches.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/ec2-cost-calculator"
-  intro="This AWS EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand, Reserved Instances, and Savings Plans, then compare baseline vs peak without hiding autoscaling risk."
+  intro="Use this EC2 cost calculator when you need a quick monthly AWS EC2 estimate from instance count, uptime, and a blended $/hour. It is built for fast planning, baseline vs peak comparisons, and finance-ready compute checks before you add EBS, transfer, or load balancers."
   examples={[
     "10 instances at your blended $/hour with 100% uptime -> estimate monthly compute cost.",
     "Reduce hours/day for dev/test to avoid over-budgeting always-on assumptions.",
@@ -70,10 +70,15 @@ const description =
       <li>Plan baseline vs peak compute budget before scaling changes.</li>
       <li>Create a compute-only baseline before adding EBS and transfer lines.</li>
     </ul>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/guides/aws-ec2-cost-estimation/">Guide: EC2 estimate inputs</a>
+      <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Compare: Fargate vs EC2</a>
+      <a class="btn" href="/calculators/aws-ebs-cost-calculator/">Next: EBS cost</a>
+    </div>
   </div>
 
   <div class="prose">
-    <h2 style="margin-top:0">Short answer: what an EC2 calculator should cover</h2>
+    <h2 style="margin-top:0">Fast answer: what an EC2 calculator should cover</h2>
     <ul style="margin:10px 0 0; padding-left:18px">
       <li><strong>Average instance-hours</strong>, not just provisioned instance count.</li>
       <li><strong>Effective blended $/hour</strong>, not list price if finance tracks commitments.</li>

@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from "../../components/calculators/DataEgressCost";
 
-const title = "AWS Egress Cost Calculator and Data Transfer Pricing Estimator";
+const title = "AWS Egress Cost Calculator: Estimate Data Transfer Charges Fast";
 const description =
-  "Estimate monthly egress cost from GB transferred, tiered $/GB pricing, and peak scenarios. Useful for AWS egress budgeting, data transfer pricing, and charge planning.";
+  "Estimate monthly AWS egress cost fast from transferred GB, $/GB pricing, and peak scenarios. Useful for AWS egress cost calculator, data transfer pricing, and charge-planning workflows.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/data-egress-cost-calculator"
-  intro="Data egress can be a major driver of cloud spend, especially when teams search for AWS egress cost, egress pricing, or data transfer charges without separating traffic boundaries. Use this calculator to estimate monthly egress cost with flat or tiered pricing, then compare baseline vs peak scenarios."
+  intro="Use this AWS egress cost calculator when you already know which transfer path you are modeling: internet, cross-region, cross-AZ, or origin-to-CDN. Enter GB and the right $/GB for that boundary, then compare baseline vs peak without blending unrelated transfer paths together."
   examples={[
     "If you send 2,500 GB/month and your effective price is $0.09/GB, estimated cost is $225/month.",
     "If you have tiered pricing, enter the tier thresholds and compare baseline vs peak traffic.",
@@ -66,12 +66,17 @@ const description =
   <DataEgressCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:16px">
-    <h2 style="margin:0 0 10px">What this egress calculator answers</h2>
+    <h2 style="margin:0 0 10px">Fast answer: what this egress calculator answers</h2>
     <ul class="muted" style="margin:0 0 14px; padding-left:18px">
       <li>How much will monthly internet egress cost at my effective $/GB?</li>
       <li>How different is a normal month from a launch or incident month?</li>
       <li>Which path should I model separately: internet, cross-region, cross-AZ, or origin-to-CDN?</li>
     </ul>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn" href="/guides/egress-costs/">Guide: AWS egress explained</a>
+      <a class="btn" href="/guides/aws-network-costs/">Guide: AWS network costs</a>
+      <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Next: cross-region transfer</a>
+    </div>
 
     <h2 style="margin:0 0 10px">Tips</h2>
     <ul class="muted" style="margin:0; padding-left:18px">
@@ -183,7 +188,7 @@ const description =
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
-      <a class="btn" href="/guides/networking-costs/">Guide: networking costs</a>
+      <a class="btn" href="/guides/aws-network-costs/">Guide: AWS network costs</a>
       <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
       <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
       <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>

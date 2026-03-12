@@ -4,9 +4,9 @@ import { SITE } from "../../config/site";
 import { TOOLS } from "../../lib/tools";
 import AdSlot from "../../components/AdSlot.astro";
 
-const title = "Cloud cost calculators | CloudCostKit";
+const title = "Cloud Cost Calculators: Find the Right CDN, Egress, EC2, and Storage Estimator";
 const description =
-  "Cloud cost calculator hub for CDN, egress, EC2, logs, storage, and Kubernetes planning. Fast tools with clear assumptions and no signup.";
+  "Find the right cloud cost calculator fast for CDN, egress, EC2, logs, storage, and Kubernetes planning. Clear assumptions, fast estimates, no signup.";
 
 const grouped = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
   (acc[t.category] ||= []).push(t);
@@ -18,14 +18,13 @@ const slots = SITE.adsenseSlots;
 <BaseLayout title={title} description={description} canonicalPath="/calculators">
   <section class="card hero">
     <span class="pill">Fast / Free / No signup</span>
-    <h1>Cloud cost & capacity tools</h1>
-    <p>Estimate spend and sizing with transparent assumptions. Start from the cost problem you are trying to explain, then
-      validate with guides and billing data.</p>
+    <h1>Cloud cost calculators that get you to an estimate fast</h1>
+    <p>Start with the cost question you are trying to answer, pick the matching calculator, then validate with the related guide and billing data.</p>
     <div class="hero-actions" style="margin-top:12px">
-      <a class="btn btn-primary" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
-      <a class="btn" href="/calculators/cdn-cost-calculator/">CDN pricing</a>
-      <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 pricing</a>
-      <a class="btn" href="/calculators/storage-replication-cost-calculator/">Replication cost</a>
+      <a class="btn btn-primary" href="/calculators/data-egress-cost-calculator/">AWS egress calculator</a>
+      <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+      <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
+      <a class="btn" href="/calculators/storage-replication-cost-calculator/">Replication calculator</a>
     </div>
   </section>
 

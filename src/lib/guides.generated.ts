@@ -1596,6 +1596,18 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
+    "title": "CDN Cost Guide: Pricing, Calculator Inputs, and Provider Comparison",
+    "description": "Understand CDN cost fast with practical formulas for pricing, calculator inputs, provider comparison, bandwidth, requests, and origin egress.",
+    "canonicalPath": "/guides/cdn-costs",
+    "category": "CDN",
+    "slug": "cdn-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
+  },
+  {
     "title": "CDN Cost Per GB and Per Gigabyte Guide",
     "description": "Estimate CDN cost per GB with a realistic bandwidth model for region mix, tiering, free allowances, and cache fill. Built for CDN costs per GB and CDN cost per gigabyte queries.",
     "canonicalPath": "/guides/cdn-cost-per-gigabyte",
@@ -1604,18 +1616,6 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "cdn",
       "egress"
-    ]
-  },
-  {
-    "title": "CDN Cost, Pricing, and Comparison Guide: Per-GB, Requests, and Origin Egress",
-    "description": "Understand CDN cost, CDN pricing, and CDN cost comparison with practical formulas for bandwidth, requests, and origin egress. Built to support better calculator inputs and faster provider comparisons.",
-    "canonicalPath": "/guides/cdn-costs",
-    "category": "CDN",
-    "slug": "cdn-costs",
-    "topics": [
-      "cdn",
-      "egress",
-      "requests"
     ]
   },
   {
@@ -2172,8 +2172,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS Egress Cost Guide: Pricing, Charges, and Cross-Cloud Transfer Boundaries",
-    "description": "Estimate AWS egress cost and broader cloud egress pricing with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical validation steps for AWS, Azure, and GCP.",
+    "title": "AWS Egress Cost Guide: Internet, Cross-Region, Cross-AZ, and CDN-Origin Charges",
+    "description": "Estimate AWS egress cost fast with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical next steps for AWS egress calculator, pricing, and charge-planning workflows.",
     "canonicalPath": "/guides/egress-costs",
     "category": "Networking",
     "slug": "egress-costs",

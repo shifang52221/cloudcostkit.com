@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "AWS Egress Cost Guide: Pricing, Charges, and Cross-Cloud Transfer Boundaries";
+const title = "AWS Egress Cost Guide: Internet, Cross-Region, Cross-AZ, and CDN-Origin Charges";
 const description =
-  "Estimate AWS egress cost and broader cloud egress pricing with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical validation steps for AWS, Azure, and GCP.";
+  "Estimate AWS egress cost fast with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical next steps for AWS egress calculator, pricing, and charge-planning workflows.";
 const faqs = [
   {
     q: "What counts as egress?",
@@ -54,6 +54,19 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     Egress is the data your cloud sends out. For many products, it is the "silent" line item that grows with usage.
     This guide helps you estimate it quickly, pick the right unit, and avoid common double-counting traps.
   </p>
+  <div class="btn-row" style="margin-top:12px">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">AWS egress calculator</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+  </div>
+
+  <h2>Fast answer: which egress bill are you trying to explain?</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: data leaving AWS to users or external systems.</li>
+    <li><strong>Cross-region transfer</strong>: replication, DR, and multi-region reads.</li>
+    <li><strong>Cross-AZ transfer</strong>: east-west traffic between Availability Zones.</li>
+    <li><strong>Origin-to-CDN</strong>: cache-fill traffic from AWS origin to CDN.</li>
+  </ul>
 
   <h2>AWS egress pricing: what users usually mean</h2>
   <ul>
