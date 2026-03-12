@@ -20,27 +20,33 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
   <section class="card hero">
     <h1>Guides</h1>
     <p>Estimation workflows, unit pitfalls, and checklists to avoid surprise cloud bills.</p>
-    <div class="btn-row" style="margin-top:12px">
-      <a class="btn" href="/calculators/">Tools</a>
-      <a class="btn" href="/guides/aws/">AWS</a>
-      <a class="btn" href="/guides/azure/">Azure</a>
-      <a class="btn" href="/guides/gcp/">GCP</a>
-      <a class="btn" href="/guides/egress-costs/">Egress</a>
-      <a class="btn" href="/guides/log-costs/">Logs</a>
-      <a class="btn" href="/guides/cdn-costs/">CDN</a>
-      <a class="btn" href="/guides/metrics-costs/">Metrics</a>
-      <a class="btn" href="/guides/database-costs/">Databases</a>
-      <a class="btn" href="/guides/messaging-costs/">Messaging</a>
-      <a class="btn" href="/guides/kubernetes-costs/">Kubernetes</a>
-      <a class="btn" href="/guides/networking-costs/">Networking</a>
-      <a class="btn" href="/guides/security-costs/">Security</a>
-      <a class="btn" href="/guides/load-balancing-costs/">Load balancing</a>
-      <a class="btn" href="/guides/requests-costs/">Requests</a>
-      <a class="btn" href="/guides/serverless-costs/">Serverless</a>
-      <a class="btn" href="/guides/compute-costs/">Compute</a>
-      <a class="btn" href="/guides/observability-costs/">Observability</a>
-      <a class="btn" href="/guides/backups-and-snapshots-costs/">Backups</a>
-      <a class="btn" href="/sitemap/">Sitemap</a>
+    <div class="hero-actions" style="margin-top:12px">
+      <a class="btn btn-primary" href="/guides/gcp-cloud-run-pricing/">Cloud Run pricing</a>
+      <a class="btn" href="/guides/azure-container-registry-pricing/">ACR pricing</a>
+      <a class="btn" href="/guides/azure-event-hubs-pricing/">Event Hubs pricing</a>
+      <a class="btn" href="/guides/cdn-costs/">CDN cost guide</a>
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Current high-interest guide paths</h2>
+    <div class="grid" style="margin-top:10px">
+      <a class="card2 tool col-6" href="/guides/gcp-cloud-run-pricing/">
+        <div class="tool-title">Cloud Run pricing</div>
+        <div class="tool-desc">Strong fit for requests, CPU, memory, and egress budgeting questions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-container-registry-pricing/">
+        <div class="tool-title">Azure Container Registry pricing</div>
+        <div class="tool-desc">Useful when teams compare Basic, Standard, Premium, pull storms, and geo-replication.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-event-hubs-pricing/">
+        <div class="tool-title">Azure Event Hubs pricing</div>
+        <div class="tool-desc">Useful for bytes, retention, replays, and consumer-side multiplier thinking.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/egress-costs/">
+        <div class="tool-title">Egress costs</div>
+        <div class="tool-desc">Useful when transfer charges are showing up but the boundary is still unclear.</div>
+      </a>
     </div>
   </section>
 

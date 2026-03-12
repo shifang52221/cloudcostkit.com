@@ -20,20 +20,59 @@ const featuredSlugs = [
 const featured = TOOLS.filter((t) => featuredSlugs.includes(t.slug));
 const slots = SITE.adsenseSlots;
 const [emailUser, emailDomain] = SITE.email.split("@");
+
+const demandPaths = [
+  {
+    href: "/calculators/cdn-cost-calculator/",
+    title: "CDN cost and pricing",
+    desc: "High search demand topic: compare bandwidth, requests, and origin-side spillover.",
+  },
+  {
+    href: "/calculators/ec2-cost-calculator/",
+    title: "EC2 monthly cost",
+    desc: "Turn instance-hours and blended hourly rates into a fast baseline vs peak estimate.",
+  },
+  {
+    href: "/calculators/data-egress-cost-calculator/",
+    title: "Egress and transfer charges",
+    desc: "Separate internet, cross-region, cross-AZ, and origin-to-CDN before you trust the number.",
+  },
+  {
+    href: "/guides/gcp-cloud-run-pricing/",
+    title: "Cloud Run pricing inputs",
+    desc: "Requests, CPU, memory, egress, and logs in one calculator-ready checklist.",
+  },
+];
 ---
 <BaseLayout title={title} description={description} canonicalPath="/">
   <section class="card hero">
     <span class="pill">Cloud / FinOps / DevOps</span>
     <h1>Cloud cost & capacity calculators</h1>
     <p>
-      Estimate egress, logs, storage, and Kubernetes capacity with clear assumptions. Use this site to compare scenarios
-      and plan budgets.
+      Estimate egress, logs, storage, EC2, CDN, and Kubernetes capacity with clear assumptions. Use the same workload
+      profile to compare scenarios, validate pricing, and plan budgets faster.
     </p>
-    <div class="btn-row">
+    <div class="hero-actions">
       <a class="btn btn-primary" href="/calculators/">Browse tools</a>
-      <a class="btn" href="/guides/">Read guides</a>
-      <a class="btn" href="/about/">About</a>
-      <a class="btn" href="/cookie-notice/">Cookie preferences</a>
+      <a class="btn" href="/guides/">Start with guides</a>
+      <a class="btn" href="/calculators/data-egress-cost-calculator/">Estimate egress</a>
+      <a class="btn" href="/calculators/cdn-cost-calculator/">Compare CDN cost</a>
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Best places to start right now</h2>
+    <p class="muted" style="margin:10px 0 0">
+      These are the workflows already showing live search demand, so they are strong entry points whether you are
+      budgeting, comparing providers, or investigating a spike.
+    </p>
+    <div class="grid" style="margin-top:12px">
+      {demandPaths.map((item) => (
+        <a class="card2 tool col-6" href={item.href}>
+          <div class="tool-title">{item.title}</div>
+          <div class="tool-desc">{item.desc}</div>
+        </a>
+      ))}
     </div>
   </section>
 

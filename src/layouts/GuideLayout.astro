@@ -163,6 +163,22 @@ const relatedTools = desiredToolSlugs
   />
   <article class="card section prose">
     <h1 style="margin-top:0">{title}</h1>
+    {relatedTools.length ? (
+      <>
+        <p class="muted" style="margin:8px 0 12px">
+          Start with a calculator if you need a first-pass estimate, then use this guide to validate the assumptions and
+          catch the billing traps.
+        </p>
+        <div class="btn-row" style="margin-top:0">
+          {relatedTools.slice(0, 4).map((t) => (
+            <a class="btn" href={withTrailingSlash(`/calculators/${t.slug}`)}>
+              {t.title}
+            </a>
+          ))}
+        </div>
+        <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
+      </>
+    ) : null}
     <slot />
 
     {relatedGuides.length ? (

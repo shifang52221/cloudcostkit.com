@@ -149,7 +149,7 @@ main.container{flex:1}
   display: block;
 }
 .nav{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
-.nav a{color:var(--muted); text-decoration:none; font-weight:650; font-size:14px; white-space:nowrap}
+.nav a{color:var(--muted); text-decoration:none; font-weight:650; font-size:14px; white-space:nowrap; padding:4px 0}
 .nav a:hover{color:var(--text)}
 .hero{
   padding:34px 22px;
@@ -158,6 +158,16 @@ main.container{flex:1}
 }
 .hero h1{margin:0; font-size:34px; letter-spacing:-.02em}
 .hero p{margin:0; color:var(--muted); max-width:70ch; line-height:1.55}
+.hero-actions{
+  display:grid;
+  gap:10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.hero-actions .btn{
+  width:100%;
+  justify-content:center;
+  text-align:center;
+}
 .grid{
   display:grid;
   gap:14px;
@@ -259,6 +269,7 @@ input, select, textarea{
   background: rgba(5,10,20,.35);
   color: var(--text);
   outline: none;
+  font-size:16px;
 }
 input:focus, select:focus, textarea:focus{
   border-color: rgba(163,255,18,.45);
@@ -274,7 +285,11 @@ input:focus, select:focus, textarea:focus{
   padding:10px 12px;
   font-weight:800;
   cursor:pointer;
-  min-height:42px;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 .btn-primary{
   border:1px solid rgba(163,255,18,.35);
@@ -285,6 +300,13 @@ input:focus, select:focus, textarea:focus{
   background: rgba(163,255,18,.18);
 }
 .btn:hover{border-color: rgba(255,255,255,.22)}
+.btn:focus-visible,
+.nav a:focus-visible,
+.tool:focus-visible,
+summary:focus-visible{
+  outline: 3px solid rgba(163,255,18,.35);
+  outline-offset: 2px;
+}
 .kpis{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -295,6 +317,7 @@ input:focus, select:focus, textarea:focus{
   .topbar{padding:12px 14px}
   .hero{padding:28px 16px}
   .hero h1{font-size:24px}
+  .hero-actions{grid-template-columns:1fr}
   .section{margin-top:14px; padding:14px}
   .calc-grid{gap:12px}
   .panel{padding:12px}

@@ -203,6 +203,34 @@ const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].fil
     </div>
   </section>
 
+  {(related && related.length) || relatedGuides.length ? (
+    <section class="card section prose">
+      <h2 style="margin-top:0">Best next steps</h2>
+      <p class="muted" style="margin:8px 0 12px">
+        Use this calculator for the first estimate, then validate the answer with the closest guide or companion tool.
+      </p>
+      {related && related.length ? (
+        <div class="btn-row" style="margin-top:0">
+          {related.slice(0, 4).map((r) => (
+            <a class="btn" href={withTrailingSlash(r.href)}>
+              {r.label}
+            </a>
+          ))}
+        </div>
+      ) : null}
+      {!related?.length && relatedGuides.length ? (
+        <div class="grid" style="margin-top:10px">
+          {relatedGuides.slice(0, 2).map((g) => (
+            <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+              <div class="tool-title">{g.title}</div>
+              <div class="tool-desc">{g.description}</div>
+            </a>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  ) : null}
+
   <script is:inline type="text/javascript">
     (function () {
       var btnCopy = document.getElementById("calc-copy-link");
