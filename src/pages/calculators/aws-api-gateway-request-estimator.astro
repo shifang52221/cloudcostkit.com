@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { AwsApiGatewayRequestEstimator } from "../../components/calculators/AwsApiGatewayRequestEstimator";
+import { AwsApiGatewayRequestEstimator as AwsApiGatewayRequestEstimatorComponent } from "../../components/calculators/AwsApiGatewayRequestEstimator";
 
 const title = "API Gateway Request Volume Estimator";
 const description =
@@ -50,7 +50,7 @@ const description =
     { href: "/guides/aws-api-gateway-pricing", label: "Guide: API Gateway pricing" },
   ]}
 >
-  <AwsApiGatewayRequestEstimator client:load />
+  <AwsApiGatewayRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>

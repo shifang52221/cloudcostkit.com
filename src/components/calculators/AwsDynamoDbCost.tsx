@@ -63,8 +63,8 @@ export function AwsDynamoDbCostCalculator() {
     storageGb,
     writeRequestsPerMonth,
   ]);
-  const costPerMillionRequests = result.totalRequestsPerMonth > 0
-    ? (result.totalCostUsd / result.totalRequestsPerMonth) * 1_000_000
+  const costPerMillionRequests = totalRequestsPerMonth > 0
+    ? (result.totalCostUsd / totalRequestsPerMonth) * 1_000_000
     : 0;
 
   return (

@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { AwsWafRequestEstimator } from "../../components/calculators/AwsWafRequestEstimator";
+import { AwsWafRequestEstimator as AwsWafRequestEstimatorComponent } from "../../components/calculators/AwsWafRequestEstimator";
 
 const title = "WAF Request Volume Estimator (Baseline + Attack)";
 const description =
@@ -51,7 +51,7 @@ const description =
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
   ]}
 >
-  <AwsWafRequestEstimator client:load />
+  <AwsWafRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>

@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { AwsSnsDeliveryEstimator } from "../../components/calculators/AwsSnsDeliveryEstimator";
+import { AwsSnsDeliveryEstimator as AwsSnsDeliveryEstimatorComponent } from "../../components/calculators/AwsSnsDeliveryEstimator";
 
 const title = "SNS Delivery Volume Estimator";
 const description =
@@ -50,7 +50,7 @@ const description =
     { href: "/guides/aws-sns-pricing", label: "Guide: SNS pricing" },
   ]}
 >
-  <AwsSnsDeliveryEstimator client:load />
+  <AwsSnsDeliveryEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>

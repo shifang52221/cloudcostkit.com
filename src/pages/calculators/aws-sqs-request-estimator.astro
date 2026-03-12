@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { AwsSqsRequestEstimator } from "../../components/calculators/AwsSqsRequestEstimator";
+import { AwsSqsRequestEstimator as AwsSqsRequestEstimatorComponent } from "../../components/calculators/AwsSqsRequestEstimator";
 
 const title = "SQS Request Volume Estimator";
 const description =
@@ -49,7 +49,7 @@ const description =
     { href: "/guides/aws-sqs-cost-optimization", label: "Guide: reduce SQS costs" },
   ]}
 >
-  <AwsSqsRequestEstimator client:load />
+  <AwsSqsRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>

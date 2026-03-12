@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { CdnOriginEgressCalculator } from "../../components/calculators/CdnOriginEgress";
+import { CdnOriginEgressCalculator as CdnOriginEgressCalculatorComponent } from "../../components/calculators/CdnOriginEgress";
 
 const title = "CDN Origin Egress Calculator (Cache Misses)";
 const description =
@@ -53,7 +53,7 @@ const description =
     { href: "/guides/aws-cloudfront-cache-hit-rate", label: "Guide: cache hit rate" },
   ]}
 >
-  <CdnOriginEgressCalculator client:load />
+  <CdnOriginEgressCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>

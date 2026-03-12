@@ -1,6 +1,6 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { AwsKmsRequestEstimator } from "../../components/calculators/AwsKmsRequestEstimator";
+import { AwsKmsRequestEstimator as AwsKmsRequestEstimatorComponent } from "../../components/calculators/AwsKmsRequestEstimator";
 
 const title = "KMS Request Volume Estimator";
 const description =
@@ -50,7 +50,7 @@ const description =
     { href: "/guides/aws-kms-cost-optimization", label: "Guide: reduce KMS costs" },
   ]}
 >
-  <AwsKmsRequestEstimator client:load />
+  <AwsKmsRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>
