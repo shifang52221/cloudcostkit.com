@@ -11,6 +11,10 @@ const faqs = [
     a: "Image storage (GB-month) is the baseline, but heavy CI/CD or large clusters can make pulls and data transfer meaningful.",
   },
   {
+    q: "How should I think about ACR Basic vs Standard vs Premium?",
+    a: "Use tiers as throughput and capability choices first, and cost choices second. Upgrade when pull concurrency, geo-replication, or private-networking needs justify it, not just because storage grows.",
+  },
+  {
     q: "How do I estimate quickly?",
     a: "Estimate average image size, retention window, and pull volume. Treat cross-region pulls and internet egress separately.",
   },
@@ -28,14 +32,15 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-container-registry-pricing"
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <p>
-    Container registries are "storage + transfer". A clean estimate separates what you store from what you pull, and
-    splits transfer by where it goes (same region, cross-region, internet). ACR pricing tiers (Basic/Standard/Premium)
-    change limits and features, but the cost model still depends on storage, pulls, and egress. Most surprises come from
-    retention drift and pull storms (CI peaks, autoscaling, node churn).
+    If you are searching for "Azure Container Registry pricing", "ACR pricing", or "ACR Basic vs Standard vs Premium",
+    the practical model is still <strong>storage + pull volume + egress</strong>. A clean estimate separates what you
+    store from what you pull, and splits transfer by where it goes (same region, cross-region, internet). ACR pricing
+    tiers change limits and features, but the cost model still depends on storage, pulls, and egress. Most surprises
+    come from retention drift and pull storms (CI peaks, autoscaling, node churn).
   </p>
 
   <h2>ACR pricing tiers (Basic, Standard, Premium)</h2>
@@ -48,6 +53,14 @@ const faqs = [
     Tier selection affects limits and features, but your monthly spend still comes from stored GB-month, pull volume, and
     billed data transfer paths.
   </p>
+
+  <h2>Short answer: what to compare before you change ACR tiers</h2>
+  <ul>
+    <li><strong>Storage pressure</strong>: are old tags and layers actually growing the bill?</li>
+    <li><strong>Pull throughput pressure</strong>: are CI and cluster scale-outs causing delays or pull storms?</li>
+    <li><strong>Regional topology</strong>: are cross-region pulls or replication making architecture more expensive than the tier itself?</li>
+    <li><strong>Feature need</strong>: do you actually need Premium-only capabilities, or is this mostly a traffic-pattern problem?</li>
+  </ul>
 
   <h2>0) Define your registry scope</h2>
   <ul>
@@ -115,6 +128,14 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>ACR pricing calculator inputs that matter most</h2>
+  <ul>
+    <li><strong>Average stored GB</strong>: not just pushed GB this month.</li>
+    <li><strong>Pulls/month</strong>: separate normal deploy volume from peak CI and autoscaling windows.</li>
+    <li><strong>Average image size</strong>: use compressed pull size when possible.</li>
+    <li><strong>Billed transfer paths</strong>: same region, cross-region, internet, and geo-replication should not share one rate.</li>
+  </ul>
+
   <h2>When tier upgrades usually pay off</h2>
   <ul>
     <li><strong>Basic to Standard</strong>: pull throughput or concurrency limits affect CI/CD reliability.</li>
@@ -166,6 +187,14 @@ const faqs = [
     <li>Using one transfer rate across same-region and cross-region pulls.</li>
     <li>Treating CI cache miss weeks as normal pull baselines.</li>
   </ul>
+
+  <h2>Next actions if you are evaluating ACR spend</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/object-storage-cost-calculator/">Estimate registry storage</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Estimate billed egress</a>
+    <a class="btn" href="/guides/azure-aks-pricing/">Check AKS pull drivers</a>
+    <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Review Azure egress paths</a>
+  </div>
 
   <h2>Related tools</h2>
   <div class="btn-row">

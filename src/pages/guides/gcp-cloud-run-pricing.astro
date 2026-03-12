@@ -11,6 +11,10 @@ const faqs = [
     a: "CPU/memory time is the core driver, but request volume, egress, and log ingestion can dominate for high-traffic or large-response services.",
   },
   {
+    q: "Is Cloud Run priced per request or by CPU and memory?",
+    a: "Treat request volume as the entry point, but cost is usually shaped by CPU time, memory time, request duration, and egress. There is not one single blended 'price per request' that stays accurate across workloads.",
+  },
+  {
     q: "How do I estimate quickly?",
     a: "Estimate monthly requests, request duration (p50/p95), and response size. Add separate line items for outbound transfer and logs/retention.",
   },
@@ -28,14 +32,32 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-run-pricing"
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <p>
-    Cloud Run-style platforms are predictable when you model measurable drivers: requests, CPU/memory time (duration), and
-    outbound transfer. The main mistakes are ignoring response size and logging, and ignoring peak periods where retries
-    multiply costs.
+    If you are searching for "Cloud Run pricing per request, CPU, memory", the useful answer is: <strong>model all
+    four together</strong>. Cloud Run-style platforms are predictable when you model measurable drivers: requests,
+    CPU/memory time (duration), and outbound transfer. The main mistakes are ignoring response size and logging, and
+    ignoring peak periods where retries multiply costs.
   </p>
+
+  <h2>Short answer: what most teams actually pay for</h2>
+  <ul>
+    <li><strong>Requests</strong> decide how often work runs.</li>
+    <li><strong>CPU and memory time</strong> decide how expensive each request becomes.</li>
+    <li><strong>Egress</strong> decides whether large responses turn a cheap service into a network-heavy one.</li>
+    <li><strong>Logs</strong> decide whether observability quietly becomes the second bill.</li>
+  </ul>
+
+  <h2>What to put in a Cloud Run pricing calculator first</h2>
+  <ul>
+    <li><strong>Requests/month</strong>: keep baseline and peak as separate numbers.</li>
+    <li><strong>Request duration</strong>: use p50 and p95, not one average.</li>
+    <li><strong>CPU and memory shape</strong>: track what one request really consumes during execution.</li>
+    <li><strong>Average response size</strong>: split normal endpoints from heavy payloads.</li>
+    <li><strong>Log bytes/request</strong>: estimate separately from application payload size.</li>
+  </ul>
 
   <h2>0) Pick the right unit of analysis</h2>
   <ul>
@@ -77,6 +99,14 @@ const faqs = [
     <li>
       Track retries/timeouts: they multiply both request count and total compute time.
     </li>
+  </ul>
+
+  <h2>When Cloud Run gets expensive faster than expected</h2>
+  <ul>
+    <li><strong>High latency + low concurrency</strong>: compute time dominates quickly.</li>
+    <li><strong>Large responses</strong>: egress can outgrow compute, especially for downloads and exports.</li>
+    <li><strong>Retry storms</strong>: requests, CPU/memory time, and logs all rise together.</li>
+    <li><strong>Verbose request logs</strong>: observability can scale linearly with traffic long before infra does.</li>
   </ul>
 
   <h2>3) Response transfer and egress</h2>
@@ -163,6 +193,14 @@ const faqs = [
     <li>Large response endpoints hidden inside blended average response size.</li>
     <li>Verbose request logging left unchanged after traffic growth.</li>
   </ul>
+
+  <h2>Next actions if you are budgeting Cloud Run now</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Convert traffic to requests/month</a>
+    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Estimate response transfer</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Estimate egress spend</a>
+    <a class="btn" href="/calculators/log-cost-calculator/">Model logging cost</a>
+  </div>
 
   <h2>Related tools</h2>
   <div class="btn-row">

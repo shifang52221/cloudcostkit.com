@@ -11,6 +11,10 @@ const faqs = [
     a: "Ingestion throughput and event volume are common drivers, with retention and replays becoming meaningful for long retention windows or heavy consumer backfills.",
   },
   {
+    q: "What should I include in an Event Hubs pricing calculator?",
+    a: "Start with events per second, average bytes per event, retention days, consumer replay frequency, and any egress or downstream processing costs that scale with the same stream.",
+  },
+  {
     q: "How do I estimate quickly?",
     a: "Estimate events/second and average event size to get GB/day, then convert to GB/month. Add retention and replay multipliers if consumers reprocess data.",
   },
@@ -28,7 +32,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-event-hubs-pricing"
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <h2>Short answer for Event Hubs budgeting</h2>
@@ -39,9 +43,19 @@ const faqs = [
   </ul>
 
   <p>
-    Event streaming cost planning works best when you model <strong>bytes</strong> and <strong>replays</strong>. The same
-    stream can be read multiple times by consumers, and that replay multiplier is where estimates often break down.
+    If you are searching for "Azure Event Hubs pricing" or "Event Hubs pricing calculator", start with
+    <strong> bytes</strong> and <strong>replays</strong>. The same stream can be read multiple times by consumers, and
+    that replay multiplier is where estimates often break down.
   </p>
+
+  <h2>What to put into an Event Hubs estimate first</h2>
+  <ul>
+    <li><strong>Events/sec</strong>: baseline and burst windows separately.</li>
+    <li><strong>Bytes/event</strong>: one large event type can skew the entire bill.</li>
+    <li><strong>Retention days</strong>: longer retention raises both storage exposure and replay temptation.</li>
+    <li><strong>Replay/backfill multiplier</strong>: many teams undercount how often consumers reread data.</li>
+    <li><strong>Downstream cost paths</strong>: compute, logs, and egress often rise with the same replay events.</li>
+  </ul>
 
   <h2>Event Hub pricing quick model</h2>
   <ul>
@@ -103,6 +117,14 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>When Event Hubs cost surprises teams</h2>
+  <ul>
+    <li><strong>Short incidents, large bursts</strong>: peak traffic can change throughput needs even if monthly averages look harmless.</li>
+    <li><strong>Replay-heavy workflows</strong>: re-indexing, debugging, and ML backfills can multiply data scanned and reprocessed.</li>
+    <li><strong>Long default retention</strong>: storage and replay windows quietly expand together.</li>
+    <li><strong>Consumer-side blind spots</strong>: downstream analytics and logging can cost more than the stream itself.</li>
+  </ul>
+
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
@@ -131,6 +153,14 @@ const faqs = [
     <li>Validate consumer lag and replay/backfill frequency.</li>
     <li>Validate retention settings and whether stored data is actually used.</li>
   </ul>
+
+  <h2>Next actions if you are budgeting Event Hubs</h2>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Estimate ingest volume</a>
+    <a class="btn" href="/calculators/log-retention-storage-cost-calculator/">Estimate retention storage</a>
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Estimate egress</a>
+    <a class="btn" href="/guides/log-costs/">Review downstream log cost</a>
+  </div>
 
   <h2>Related tools</h2>
   <div class="btn-row">
