@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
 
-const title = "EC2 Pricing Calculator (Monthly AWS EC2 Cost Estimator)";
+const title = "EC2 Pricing Calculator and Monthly AWS EC2 Cost Estimator";
 const description =
-  "Estimate monthly AWS EC2 cost from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 pricing and budget planning.";
+  "Estimate monthly AWS EC2 cost from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 pricing, budget planning, and quick cost checks.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/ec2-cost-calculator"
-  intro="This AWS EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand, Reserved Instances, and Savings Plans, then compare baseline vs peak."
+  intro="This AWS EC2 cost calculator estimates monthly compute spend from instance count, hourly price, and expected uptime. Use a blended $/hour if you mix on-demand, Reserved Instances, and Savings Plans, then compare baseline vs peak without hiding autoscaling risk."
   examples={[
     "10 instances at your blended $/hour with 100% uptime -> estimate monthly compute cost.",
     "Reduce hours/day for dev/test to avoid over-budgeting always-on assumptions.",
@@ -54,7 +54,7 @@ const description =
       a: "This page is a fast EC2 estimator for planning and scenario analysis. For final procurement-level budgets, confirm assumptions in AWS Pricing Calculator and compare against CUR usage history.",
     },
   ]}
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
@@ -69,6 +69,16 @@ const description =
       <li>Compare current blended hourly cost with a target purchase mix.</li>
       <li>Plan baseline vs peak compute budget before scaling changes.</li>
       <li>Create a compute-only baseline before adding EBS and transfer lines.</li>
+    </ul>
+  </div>
+
+  <div class="prose">
+    <h2 style="margin-top:0">Short answer: what an EC2 calculator should cover</h2>
+    <ul style="margin:10px 0 0; padding-left:18px">
+      <li><strong>Average instance-hours</strong>, not just provisioned instance count.</li>
+      <li><strong>Effective blended $/hour</strong>, not list price if finance tracks commitments.</li>
+      <li><strong>Peak vs baseline</strong>, so autoscaling and on-demand spillover stay visible.</li>
+      <li><strong>Separate non-compute lines</strong> like EBS, transfer, and load balancers.</li>
     </ul>
   </div>
   <ComputeInstanceCostCalculator client:load />
@@ -92,6 +102,13 @@ const description =
       <li>Using peak instance count as baseline.</li>
       <li>Applying both utilization and reduced hours/day for the same schedule.</li>
       <li>Forgetting storage, transfer, and load balancer line items.</li>
+    </ul>
+
+    <h2>How to choose a better blended EC2 rate</h2>
+    <ul>
+      <li><strong>Steady baseline</strong>: use the effective rate after Savings Plans or Reserved coverage.</li>
+      <li><strong>Burst capacity</strong>: keep on-demand or spot assumptions visible instead of averaging them away.</li>
+      <li><strong>Mixed fleets</strong>: compute a weighted average by family, schedule, and purchase model.</li>
     </ul>
 
     
@@ -179,6 +196,7 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/aws-ec2-cost-estimation/">Guide: EC2 cost estimation</a>
       <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute instance cost (generic)</a>
       <a class="btn" href="/calculators/reserved-vs-on-demand-break-even-calculator/">Reserved vs on-demand break-even</a>
       <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>

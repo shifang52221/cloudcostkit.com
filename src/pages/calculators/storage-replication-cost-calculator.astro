@@ -2,7 +2,7 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorComponent } from "../../components/calculators/StorageReplicationCost";
 
-const title = "Storage Replication Cost Calculator (CRR/SRR and Cross-Region Copy)";
+const title = "Storage Replication Cost Calculator (S3 CRR/SRR and Cross-Region Copy)";
 const description =
   "Estimate storage replication cost from changed GB, replication $/GB, and backfill scenarios. Built for CRR/SRR, cross-region, and DR planning.";
 ---
@@ -10,7 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/storage-replication-cost-calculator"
-  intro="Replication and multi-region storage can add meaningful transfer or feature charges. Estimate monthly replication cost and compare baseline vs peak replication volume."
+  intro="Replication and multi-region storage can add meaningful transfer or feature charges. Estimate monthly replication cost from changed GB, then compare baseline vs peak replication volume for S3 CRR, SRR, cross-region copy, and DR planning."
   examples={[
     "2,500 GB/month replicated at $0.02/GB -> $50/month (transfer/feature fee estimate).",
     "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at $0.01/GB -> about $15/month (replication fee only).",
@@ -54,7 +54,7 @@ const description =
       a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
     },
   ]}
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -65,6 +65,19 @@ const description =
 >
   <StorageReplicationCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">What this replication calculator is best for</h2>
+    <ul>
+      <li><strong>Ongoing replication</strong>: changed GB per month in normal operation.</li>
+      <li><strong>Backfills and migrations</strong>: one-time spikes that should not pollute your steady-state baseline.</li>
+      <li><strong>S3 CRR vs SRR planning</strong>: comparing same-region and cross-region copy assumptions.</li>
+    </ul>
+
+    <h2>Changed GB beats total stored GB</h2>
+    <p>
+      The most common replication mistake is using total dataset size instead of the data that actually changes and gets
+      copied. For ongoing replication, <strong>write volume and churn</strong> are usually the correct drivers.
+    </p>
+
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
@@ -76,6 +89,13 @@ const description =
     <ul>
       <li>Replication cost scales with changed data, not total stored GB.</li>
       <li>If replication spikes during backfills or migrations, model a peak month separately.</li>
+    </ul>
+
+    <h2>SRR vs CRR: when the estimate changes shape</h2>
+    <ul>
+      <li><strong>Same-region replication</strong>: often more about feature overhead and extra storage than internet-style transfer.</li>
+      <li><strong>Cross-region replication</strong>: usually needs explicit transfer assumptions and stronger peak modeling.</li>
+      <li><strong>DR planning</strong>: add drill, failover, and catch-up windows as separate scenarios instead of inflating the baseline.</li>
     </ul>
 
     <h2>Common mistakes</h2>
@@ -149,6 +169,7 @@ const description =
       <a class="btn" href="/guides/estimate-replication-gb-per-month-from-writes/">Estimate replication GB/month</a>
       <a class="btn" href="/guides/s3-crr-vs-srr-cost/">S3 CRR vs SRR cost</a>
       <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+      <a class="btn" href="/calculators/object-storage-cost-calculator/">Replica storage cost</a>
     </div>
   </div>
 </CalculatorLayout>

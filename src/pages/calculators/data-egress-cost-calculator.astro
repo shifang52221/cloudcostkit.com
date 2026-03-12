@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from "../../components/calculators/DataEgressCost";
 
-const title = "AWS Egress Cost Calculator (AWS, Azure, GCP Data Transfer)";
+const title = "AWS Egress Cost Calculator and Data Transfer Pricing Estimator";
 const description =
-  "Estimate monthly egress cost from GB transferred, tiered $/GB pricing, and peak scenarios. Useful for AWS egress budgeting and transfer planning.";
+  "Estimate monthly egress cost from GB transferred, tiered $/GB pricing, and peak scenarios. Useful for AWS egress budgeting, data transfer pricing, and charge planning.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/data-egress-cost-calculator"
-  intro="Data egress can be a major driver of cloud spend (including AWS egress cost). Use this calculator to estimate monthly egress cost with flat or tiered pricing, and compare baseline vs peak scenarios."
+  intro="Data egress can be a major driver of cloud spend, especially when teams search for AWS egress cost, egress pricing, or data transfer charges without separating traffic boundaries. Use this calculator to estimate monthly egress cost with flat or tiered pricing, then compare baseline vs peak scenarios."
   examples={[
     "If you send 2,500 GB/month and your effective price is $0.09/GB, estimated cost is $225/month.",
     "If you have tiered pricing, enter the tier thresholds and compare baseline vs peak traffic.",
@@ -54,7 +54,7 @@ const description =
       a: "No. Keep boundaries separate because rates and billing units often differ by destination path."
     }
   ]}
-  lastUpdated="2026-03-03"
+  lastUpdated="2026-03-12"
   related={[
     { href: "/guides/egress-costs", label: "Guide: egress costs" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
@@ -66,6 +66,13 @@ const description =
   <DataEgressCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:16px">
+    <h2 style="margin:0 0 10px">What this egress calculator answers</h2>
+    <ul class="muted" style="margin:0 0 14px; padding-left:18px">
+      <li>How much will monthly internet egress cost at my effective $/GB?</li>
+      <li>How different is a normal month from a launch or incident month?</li>
+      <li>Which path should I model separately: internet, cross-region, cross-AZ, or origin-to-CDN?</li>
+    </ul>
+
     <h2 style="margin:0 0 10px">Tips</h2>
     <ul class="muted" style="margin:0; padding-left:18px">
       <li>Model multiple scenarios: baseline month vs peak month.</li>
@@ -94,6 +101,14 @@ const description =
       <li>Mixing boundaries and applying the wrong $/GB rate.</li>
       <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
       <li>Applying internet rates to intra-region or cross-AZ traffic.</li>
+    </ul>
+
+    <h2>How to choose the right egress rate</h2>
+    <ul>
+      <li><strong>Internet egress</strong>: use the provider rate for public outbound traffic.</li>
+      <li><strong>Cross-region transfer</strong>: use a separate rate and model replication paths independently.</li>
+      <li><strong>Cross-AZ transfer</strong>: keep east-west traffic out of your internet estimate.</li>
+      <li><strong>Origin to CDN</strong>: treat cache fill as its own line item if your origin is billed separately.</li>
     </ul>
 
     
@@ -168,6 +183,7 @@ const description =
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
+      <a class="btn" href="/guides/networking-costs/">Guide: networking costs</a>
       <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
       <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
       <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>

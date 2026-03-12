@@ -3,15 +3,15 @@ import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
 import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
 
-const title = "CDN Cost Calculator (Bandwidth + Request Pricing Estimator)";
+const title = "CDN Cost Calculator and Pricing Estimator (Bandwidth + Requests)";
 const description =
-  "Estimate CDN monthly cost from bandwidth, request pricing, and peak traffic scenarios. Built for CDN pricing comparison and planning.";
+  "Estimate CDN monthly cost from bandwidth, request pricing, and peak traffic scenarios. Built for CDN cost comparison, pricing checks, and planning.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-cost-calculator"
-  intro="Most CDN bills have two big line items: bandwidth (cost per GB) and requests. This page helps you estimate both, then add them to get a total monthly CDN cost estimate and compare baseline vs peak scenarios."
+  intro="Most CDN bills have two big line items: bandwidth (cost per GB) and requests. This CDN cost calculator helps you estimate both, then add them to get a total monthly CDN pricing estimate and compare baseline vs peak scenarios."
   examples={[
     "Bandwidth: 4,000 GB/month at $0.06/GB -> $240/month; Requests: 300M/month at $0.0075 per 10k -> $225/month; Total -> ~$465/month.",
     "Bandwidth dominates for large media; requests dominate for API-like traffic with small payloads.",
@@ -57,7 +57,7 @@ const description =
       a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
     },
   ]}
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-03-12"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
     { href: "/guides/cdn-cost-comparison", label: "Guide: CDN cost comparison" },
@@ -77,6 +77,15 @@ const description =
       <li>You need a fast CDN pricing estimate before procurement.</li>
       <li>You are comparing two CDN providers using the same traffic inputs.</li>
       <li>You need baseline and peak numbers for budget reviews.</li>
+    </ul>
+  </div>
+
+  <div class="prose">
+    <h2 style="margin-top:0">Short answer: what most CDN pricing quotes miss</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Bandwidth and requests can be equally important; do not optimize one and ignore the other.</li>
+      <li>Origin egress is not the same as edge bandwidth, and low cache hit rate can hide a second bill.</li>
+      <li>Provider comparisons are only useful when the same traffic profile is reused across vendors.</li>
     </ul>
   </div>
 
@@ -171,6 +180,15 @@ const description =
       If you are comparing providers, use the same traffic inputs and swap pricing assumptions. This checklist helps:
       <a href="/guides/cloudfront-vs-cloudflare-cdn-cost/"> CloudFront vs Cloudflare CDN cost</a>.
     </p>
+  </div>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next actions after your first estimate</h2>
+    <div class="btn-row" style="margin-top:10px">
+      <a class="btn" href="/guides/cdn-costs/">Guide: CDN costs explained</a>
+      <a class="btn" href="/guides/cdn-cost-comparison/">Guide: CDN cost comparison</a>
+      <a class="btn" href="/calculators/cdn-origin-egress-calculator/">Estimate origin egress</a>
+      <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
+    </div>
   </div>
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">CDN input sources</h2>
