@@ -1,13 +1,17 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CDN cost per GB: how to estimate bandwidth pricing";
+const title = "CDN Cost Per GB and Per Gigabyte Guide";
 const description =
-  "How to estimate CDN cost per GB with a realistic bandwidth model: region mix, tiering, free allowances, and cache fill. Includes a step-by-step checklist.";
+  "Estimate CDN cost per GB with a realistic bandwidth model for region mix, tiering, free allowances, and cache fill. Built for CDN costs per GB and CDN cost per gigabyte queries.";
 const faqs = [
   {
     q: "Is CDN cost per GB the only price that matters?",
     a: "No. It is the biggest line item for media-heavy workloads, but requests and origin egress can be material depending on traffic shape.",
+  },
+  {
+    q: "When is CDN cost per gigabyte a good approximation?",
+    a: "It is a good first approximation for bandwidth-heavy workloads where request pricing is small relative to delivered GB and your regional mix is fairly stable.",
   },
   {
     q: "Should I use GB or GiB?",
@@ -23,13 +27,26 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/cdn-cost-per-gigabyte"
-  lastUpdated="2026-01-30"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <p class="muted">
-    The fastest way to estimate CDN bandwidth spend is a clean $/GB model, but you must normalize region mix and tiered
-    pricing first. Use this guide to avoid under-estimating.
+    If you searched for <em>CDN costs per GB</em>, <em>CDN cost per gigabyte</em>, or <em>CDN cost per GB</em>, this is
+    the right starting page. The fastest way to estimate CDN bandwidth spend is a clean $/GB model, but you must
+    normalize region mix and tiered pricing first to avoid under-estimating.
   </p>
+
+  <h2>Guide first or calculator first?</h2>
+  <ul>
+    <li><strong>Use this guide first</strong> when you need to turn raw bandwidth data into a defensible blended $/GB.</li>
+    <li><strong>Use the calculator first</strong> when you already know your monthly GB and effective bandwidth rate.</li>
+    <li><strong>Return to comparison mode</strong> when provider decisions depend on requests, origin egress, or contract terms too.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth calculator</a>
+    <a class="btn" href="/guides/cdn-cost-comparison/">CDN cost comparison</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN cost guide</a>
+  </div>
 
   <h2>Step 1: Get monthly GB delivered</h2>
   <ul>
@@ -83,6 +100,14 @@ const faqs = [
     <li>If your hit rate drops during deploys or incidents, your total spend can rise even with similar edge GB.</li>
   </ul>
 
+  <h2>Provider shortcuts for per-GB research</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare</a>
+    <a class="btn" href="/guides/azure-cdn-pricing/">Azure CDN pricing</a>
+    <a class="btn" href="/guides/gcp-cloud-cdn-pricing/">Cloud CDN pricing</a>
+    <a class="btn" href="/guides/cdn-cost-comparison/">Full comparison guide</a>
+  </div>
+
   <h2>Region mix example</h2>
   <p>
     If 60% of your traffic is in North America at $0.05/GB and 40% is in APAC at $0.09/GB, your blended rate is
@@ -117,6 +142,17 @@ const faqs = [
     <li><strong>Log or analytics add-ons</strong>: some providers bill these separately.</li>
   </ul>
 
+  <h2>When to stop using per-GB alone</h2>
+  <ul>
+    <li>When request-heavy traffic starts dominating small object delivery.</li>
+    <li>When your regional mix changes enough to move the blended rate materially.</li>
+    <li>When provider choice depends on more than bandwidth pricing.</li>
+  </ul>
+  <p class="muted">
+    At that point, move to <a href="/guides/cdn-cost-comparison/">CDN cost comparison</a> or the{" "}
+    <a href="/calculators/cdn-cost-calculator/">CDN total-cost calculator</a>.
+  </p>
+
   <h2>Use the calculator</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost calculator</a>
@@ -127,6 +163,7 @@ const faqs = [
   <h2>Related guides</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
+    <a class="btn" href="/guides/cdn-cost-comparison/">CDN cost comparison</a>
     <a class="btn" href="/guides/cdn-request-pricing/">CDN request pricing</a>
     <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
   </div>

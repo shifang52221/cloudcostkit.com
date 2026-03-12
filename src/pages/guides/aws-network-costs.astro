@@ -1,13 +1,17 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS network cost guide: NAT, VPC endpoints, PrivateLink, and data transfer (what to model)";
+const title = "AWS Network and Data Transfer Cost Guide";
 const description =
-  "A practical AWS network cost hub: how to model NAT Gateway, VPC endpoints/PrivateLink, and cross-AZ/cross-region data transfer. Includes formulas, break-even workflow, and a troubleshooting checklist.";
+  "A practical AWS network cost hub for data transfer, NAT Gateway, VPC endpoints, PrivateLink, and cross-AZ or cross-region pricing. Built to support AWS data transfer calculator and network-cost workflows.";
 const faqs = [
   {
     q: "What's the fastest way to model AWS network costs?",
     a: "Break it into three buckets: (1) NAT hourly + GB processed, (2) VPC endpoints/PrivateLink endpoint-hours + GB processed, and (3) data transfer boundaries (cross-AZ/cross-region/internet). Build a baseline and a high-usage scenario.",
+  },
+  {
+    q: "What is the difference between AWS data transfer and AWS egress?",
+    a: "AWS egress usually refers to data leaving AWS to the internet or another boundary. AWS data transfer is broader and can include internet egress, cross-AZ transfer, cross-region transfer, NAT processed GB, and service-specific transfer paths.",
   },
   {
     q: "Why do network bills spike unexpectedly?",
@@ -27,13 +31,36 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-network-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <p>
-    AWS networking cost modeling is simpler than it looks if you treat it as a set of consistent line items. This hub
-    gives you a practical workflow (with formulas) and links to the calculators and deep guides.
+    If you searched for <em>AWS data transfer cost calculator</em> or <em>AWS data transfer pricing calculator</em>, the
+    first move is to decide whether you only need transfer out, or the broader AWS network model. AWS networking cost
+    modeling is simpler than it looks if you treat it as a set of consistent line items.
   </p>
+
+  <h2>Use this page when "AWS data transfer" is bigger than one line item</h2>
+  <ul>
+    <li><strong>Use the egress calculator</strong> for a fast internet or boundary-based transfer estimate.</li>
+    <li><strong>Use this guide</strong> when NAT, VPC endpoints, cross-AZ, and cross-region paths all matter.</li>
+    <li><strong>Use the network calculators</strong> once you know which traffic path is causing the bill.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">AWS egress calculator</a>
+    <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+    <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway</a>
+    <a class="btn" href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC endpoints</a>
+  </div>
+
+  <h2>AWS data transfer vs AWS network cost</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: data leaving AWS to users or third-party systems.</li>
+    <li><strong>Cross-region transfer</strong>: replication, DR, or multi-region traffic.</li>
+    <li><strong>Cross-AZ transfer</strong>: east-west traffic between Availability Zones.</li>
+    <li><strong>NAT processed GB</strong>: outbound traffic through NAT Gateways.</li>
+    <li><strong>Endpoint and PrivateLink costs</strong>: endpoint-hours plus processed GB, where applicable.</li>
+  </ul>
 
   <h2>The 3 buckets (the mental model)</h2>
   <ol>
@@ -87,6 +114,18 @@ const faqs = [
     <a class="btn" href="/calculators/aws-nat-gateway-cost-calculator/">NAT gateway cost calculator</a>
     <a class="btn" href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC interface endpoint cost</a>
     <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints (guide)</a>
+  </div>
+
+  <h2>Fast path if the query started as "AWS data transfer calculator"</h2>
+  <ul>
+    <li><strong>Mostly internet transfer?</strong> Start with the egress calculator and the main egress guide.</li>
+    <li><strong>Mostly replication?</strong> Use cross-region transfer modeling first.</li>
+    <li><strong>Mostly private-subnet traffic?</strong> Check NAT processed GB and endpoint-hour assumptions first.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/guides/egress-costs/">Egress cost guide</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer</a>
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
   </div>
 
   <h2>Decision table (which lever to pull)</h2>
@@ -151,6 +190,7 @@ const faqs = [
   <div class="btn-row">
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
+    <a class="btn" href="/guides/egress-costs/">Egress costs</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
 

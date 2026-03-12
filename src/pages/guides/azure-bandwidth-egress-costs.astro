@@ -1,14 +1,18 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure bandwidth and egress costs: how to estimate outbound data transfer";
+const title = "Azure Egress Cost Guide: Bandwidth, Pricing, and Outbound Data Transfer";
 const description =
-  "A practical method to estimate outbound bandwidth costs: split by destination (internet, cross-region, CDN origin), validate units, and avoid double-counting.";
+  "Estimate Azure egress cost with a practical method for outbound bandwidth, destination boundaries, and double-counting checks. Built for Azure egress cost calculator and pricing workflows.";
 
 const faqs = [
   {
     q: "What usually drives egress cost?",
     a: "Total outbound GB to the internet is usually the main driver, but cross-region and CDN origin egress can add large hidden lines.",
+  },
+  {
+    q: "Should I use an Azure egress cost calculator first?",
+    a: "Use the calculator first if you already know the monthly outbound GB and a blended rate. Use this guide first if you still need to split internet, cross-region, and CDN-origin transfer boundaries.",
   },
   {
     q: "How do I estimate quickly?",
@@ -24,13 +28,27 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-bandwidth-egress-costs"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <p>
-    Bandwidth is a top source of surprise cloud bills. The core strategy is to split traffic into destinations and validate
-    boundaries: <strong>internet egress</strong>, <strong>cross-region transfer</strong>, and <strong>origin egress to CDN</strong>.
+    If you searched for <em>Azure egress cost calculator</em>, <em>Azure egress pricing</em>, or <em>Azure egress
+    charges</em>, start by splitting traffic into destinations before you touch rates. Bandwidth is a top source of
+    surprise cloud bills, and boundary mistakes create the biggest estimate errors.
   </p>
+
+  <h2>Guide first or calculator first?</h2>
+  <ul>
+    <li><strong>Use this guide first</strong> when Azure outbound traffic still needs to be split by boundary.</li>
+    <li><strong>Use the calculator first</strong> when you already know the GB/month and effective $/GB to model.</li>
+    <li><strong>Use cross-cloud guides next</strong> when you are comparing Azure assumptions with AWS or GCP.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost calculator</a>
+    <a class="btn" href="/guides/egress-costs/">Egress cost guide</a>
+    <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>
+    <a class="btn" href="/guides/gcp-vpc-egress-costs/">GCP egress</a>
+  </div>
 
   <h2>Azure egress inputs</h2>
   <ul>
@@ -39,6 +57,12 @@ const faqs = [
     <li><strong>Free allowances</strong>: subtract any free tiers first.</li>
   </ul>
 
+  <h2>Azure egress pricing: what users usually mean</h2>
+  <ul>
+    <li><strong>Internet egress</strong>: outbound traffic to end users or external systems.</li>
+    <li><strong>Cross-region transfer</strong>: data leaving one Azure region for another region or DR path.</li>
+    <li><strong>CDN origin egress</strong>: origin-to-CDN traffic during cache fill and revalidation.</li>
+  </ul>
 
   <h2>1) Break down traffic by destination (define the boundary)</h2>
   <ul>
@@ -81,6 +105,13 @@ const faqs = [
     Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
   </p>
 
+  <h2>Fast path if your query started as "Azure egress cost calculator"</h2>
+  <ul>
+    <li><strong>Mostly internet transfer?</strong> Use a blended outbound rate and run the egress calculator.</li>
+    <li><strong>Mostly CDN-related?</strong> Keep origin egress separate from edge delivery.</li>
+    <li><strong>Mostly replication?</strong> Treat cross-region movement as its own transfer path.</li>
+  </ul>
+
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
@@ -115,6 +146,7 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
+    <a class="btn" href="/guides/egress-costs/">Cross-cloud egress guide</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
 

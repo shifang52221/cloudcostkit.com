@@ -1,13 +1,17 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "CDN cost comparison: how to compare pricing across providers";
+const title = "CDN Cost Comparison Guide: Compare Pricing, Per-GB Rates, and Provider Trade-Offs";
 const description =
-  "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.";
+  "Compare CDN pricing across providers with a practical framework for bandwidth, requests, per-GB rates, regional mix, and origin egress. Built for CDN cost comparison and provider-decision workflows.";
 const faqs = [
   {
     q: "Why do CDN pricing comparisons often fail?",
     a: "Most comparisons ignore request fees, regional mix, and origin egress. Small differences in these inputs can outweigh headline $/GB rates.",
+  },
+  {
+    q: "Should I compare CDN providers by $/GB alone?",
+    a: "Only as a first pass. A fair comparison also needs request pricing, regional mix, and origin egress or cache-fill assumptions.",
   },
   {
     q: "Is a lower $/GB always cheaper?",
@@ -17,19 +21,37 @@ const faqs = [
     q: "What is the minimum data I need to compare providers?",
     a: "Monthly bandwidth, monthly requests, region mix, and origin egress volume (cache fill). With those inputs you can run a fair comparison.",
   },
+  {
+    q: "Where do CloudFront vs Cloudflare comparisons usually go wrong?",
+    a: "They usually go wrong when teams compare only headline bandwidth rates and ignore request pricing, regional spread, invalidations, origin egress, and contract structure.",
+  },
 ];
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/cdn-cost-comparison"
-  lastUpdated="2026-01-30"
+  lastUpdated="2026-03-12"
   faqs={faqs}
 >
   <p class="muted">
-    A reliable CDN cost comparison is not about a single $/GB number. You need a normalized input set that captures
-    bandwidth, requests, regions, and cache fill. Use this guide as a comparison checklist.
+    If you searched for <em>CDN cost comparison</em>, <em>CDN pricing comparison</em>, or a provider question such as{" "}
+    <em>CloudFront vs Cloudflare cost</em>, start with one normalized traffic profile. A reliable CDN comparison is not
+    about a single $/GB number. You need bandwidth, requests, regions, and cache fill in the same worksheet.
   </p>
+
+  <h2>Use this page when your question is really "which CDN is cheaper?"</h2>
+  <ul>
+    <li><strong>Use this guide</strong> when you are comparing two or more providers with the same traffic shape.</li>
+    <li><strong>Use the total-cost calculator</strong> when you already know your traffic assumptions and want a monthly estimate.</li>
+    <li><strong>Use the per-GB guide</strong> when bandwidth pricing is your first filter, but not yet your final answer.</li>
+  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
+    <a class="btn" href="/guides/cdn-costs/">CDN pricing guide</a>
+    <a class="btn" href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a>
+    <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare</a>
+  </div>
 
   <h2>Step 1: Normalize your inputs (the comparison worksheet)</h2>
   <ul>
@@ -46,6 +68,17 @@ const faqs = [
     <li><strong>Request fees</strong>: convert request units (per 10k vs per 1M) to a common unit.</li>
     <li><strong>Origin egress</strong>: model separately because it is billed by your origin provider, not the CDN.</li>
   </ul>
+
+  <h2>Comparison shortcut: when per-GB is useful and when it is not</h2>
+  <ul>
+    <li><strong>Useful first pass</strong>: media-heavy traffic with large objects and low request sensitivity.</li>
+    <li><strong>Weak first pass</strong>: small-object or API-heavy traffic where request pricing matters more.</li>
+    <li><strong>Dangerous shortcut</strong>: any workload with uneven region mix or low cache hit rate.</li>
+  </ul>
+  <p class="muted">
+    If your search was closer to <em>CDN costs per GB</em> or <em>CDN cost per gigabyte</em>, use{" "}
+    <a href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a> first, then return here for the full provider comparison.
+  </p>
 
   <h2>Step 3: Adjust for tiering and discounts</h2>
   <ul>
@@ -150,6 +183,14 @@ const faqs = [
     <li>Using peak rates for a baseline comparison (or vice versa).</li>
   </ul>
 
+  <h2>Provider shortcuts</h2>
+  <div class="btn-row">
+    <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare</a>
+    <a class="btn" href="/guides/azure-cdn-pricing/">Azure CDN pricing</a>
+    <a class="btn" href="/guides/gcp-cloud-cdn-pricing/">Cloud CDN pricing</a>
+    <a class="btn" href="/guides/cdn-request-pricing/">CDN request pricing</a>
+  </div>
+
   <h2>Use calculators to run the comparison</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
@@ -162,6 +203,7 @@ const faqs = [
   <h2>Related guides</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/cdn-costs/">CDN costs explained</a>
+    <a class="btn" href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a>
     <a class="btn" href="/guides/cdn-request-pricing/">CDN request pricing</a>
     <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare cost</a>
     <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>

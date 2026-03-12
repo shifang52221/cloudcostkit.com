@@ -197,8 +197,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS network cost guide: NAT, VPC endpoints, PrivateLink, and data transfer (what to model)",
-    "description": "A practical AWS network cost hub: how to model NAT Gateway, VPC endpoints/PrivateLink, and cross-AZ/cross-region data transfer. Includes formulas, break-even workflow, and a troubleshooting checklist.",
+    "title": "AWS Network and Data Transfer Cost Guide",
+    "description": "A practical AWS network cost hub for data transfer, NAT Gateway, VPC endpoints, PrivateLink, and cross-AZ or cross-region pricing. Built to support AWS data transfer calculator and network-cost workflows.",
     "canonicalPath": "/guides/aws-network-costs",
     "category": "AWS",
     "slug": "aws-network-costs",
@@ -1387,17 +1387,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure bandwidth and egress costs: how to estimate outbound data transfer",
-    "description": "A practical method to estimate outbound bandwidth costs: split by destination (internet, cross-region, CDN origin), validate units, and avoid double-counting.",
-    "canonicalPath": "/guides/azure-bandwidth-egress-costs",
-    "category": "Azure",
-    "slug": "azure-bandwidth-egress-costs",
-    "topics": [
-      "cdn",
-      "egress"
-    ]
-  },
-  {
     "title": "Azure Blob Storage pricing: a practical cost model",
     "description": "Model Blob Storage cost without copying price tables: GB-month, operations, redundancy/replication, retrieval, and egress.",
     "canonicalPath": "/guides/azure-blob-storage-pricing",
@@ -1441,6 +1430,16 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "egress",
       "storage"
+    ]
+  },
+  {
+    "title": "Azure Egress Cost Guide: Bandwidth, Pricing, and Outbound Data Transfer",
+    "description": "Estimate Azure egress cost with a practical method for outbound bandwidth, destination boundaries, and double-counting checks. Built for Azure egress cost calculator and pricing workflows.",
+    "canonicalPath": "/guides/azure-bandwidth-egress-costs",
+    "category": "Azure",
+    "slug": "azure-bandwidth-egress-costs",
+    "topics": [
+      "egress"
     ]
   },
   {
@@ -1584,8 +1583,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CDN cost comparison: how to compare pricing across providers",
-    "description": "A practical framework to compare CDN pricing across providers: normalize bandwidth, requests, regions, cache fill, and contract terms before choosing the lowest total cost.",
+    "title": "CDN Cost Comparison Guide: Compare Pricing, Per-GB Rates, and Provider Trade-Offs",
+    "description": "Compare CDN pricing across providers with a practical framework for bandwidth, requests, per-GB rates, regional mix, and origin egress. Built for CDN cost comparison and provider-decision workflows.",
     "canonicalPath": "/guides/cdn-cost-comparison",
     "category": "CDN",
     "slug": "cdn-cost-comparison",
@@ -1597,8 +1596,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CDN cost per GB: how to estimate bandwidth pricing",
-    "description": "How to estimate CDN cost per GB with a realistic bandwidth model: region mix, tiering, free allowances, and cache fill. Includes a step-by-step checklist.",
+    "title": "CDN Cost Per GB and Per Gigabyte Guide",
+    "description": "Estimate CDN cost per GB with a realistic bandwidth model for region mix, tiering, free allowances, and cache fill. Built for CDN costs per GB and CDN cost per gigabyte queries.",
     "canonicalPath": "/guides/cdn-cost-per-gigabyte",
     "category": "CDN",
     "slug": "cdn-cost-per-gigabyte",
