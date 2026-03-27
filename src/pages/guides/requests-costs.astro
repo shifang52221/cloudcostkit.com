@@ -31,13 +31,21 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
   title={title}
   description={description}
   canonicalPath="/guides/requests-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-27"
   faqs={faqs}
+  robots="noindex,follow"
 >
   <p class="muted">
-    Request-based pricing looks simple until retries, fan-out, and peak traffic show up. This hub connects the main
-    estimation workflows and tools so your model survives real production traffic.
+    Use this page as a quick orientation hub. For the full estimation workflow, start with{" "}
+    <a href="/guides/request-based-pricing/">request-based pricing explained</a>, which is the stronger step-by-step guide
+    for estimating monthly volume, request classes, retries, and adjacent spend.
   </p>
+
+  <div class="btn-row">
+    <a class="btn" href="/guides/request-based-pricing/">Main guide: request-based pricing</a>
+    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+    <a class="btn" href="/calculators/api-request-cost-calculator/">Request cost calculator</a>
+  </div>
 
   <h2>1) Convert traffic to monthly requests</h2>
   <ul>
@@ -64,6 +72,17 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
       Tool: <a href="/calculators/api-response-size-transfer-calculator/">response size transfer</a>
     </li>
   </ul>
+
+  <h2>When to stop here and jump to the main guide</h2>
+  <ul>
+    <li>If you need to decide what the provider actually bills as a request.</li>
+    <li>If your workload mixes API, CDN, queue, and security products in one estimate.</li>
+    <li>If you need a validation checklist before trusting the monthly total.</li>
+  </ul>
+  <p class="muted">
+    In those cases, continue with <a href="/guides/request-based-pricing/">request-based pricing explained</a> and keep
+    this page as a lightweight navigation stop.
+  </p>
 
   <h2>Related tools</h2>
   <div class="btn-row">

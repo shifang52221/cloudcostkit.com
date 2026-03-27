@@ -23,15 +23,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-cost-calculator"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-03-27"
   faqs={faqs}
+  robots="noindex,follow"
 >
   <p>
-    When people search for a "Kubernetes cost calculator", they usually want more than a node hourly price. A useful
-    estimate combines <strong>capacity planning</strong> (how many nodes you need) with <strong>line items</strong> that
-    show up on the bill (load balancers, storage, egress, logs).
+    Use this page as a supporting checklist, not the primary destination. For the broader workflow, start with{" "}
+    <a href="/guides/kubernetes-costs/">Kubernetes costs explained</a>. For hands-on math, go straight to the{" "}
+    <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>. This page stays available for teams
+    that want a short reminder of which line items to validate after node sizing.
   </p>
   <div class="btn-row">
+    <a class="btn" href="/guides/kubernetes-costs/">Main guide: Kubernetes costs</a>
     <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>
     <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits sizing</a>
   </div>
@@ -44,6 +47,13 @@ const faqs = [
     <li><strong>Persistent storage</strong>: volumes, snapshots, and IOPS/throughput where applicable.</li>
     <li><strong>Egress</strong>: NAT/Internet egress and cross-zone/region traffic.</li>
     <li><strong>Observability</strong>: logs, metrics, traces (often a surprise line item).</li>
+  </ul>
+
+  <h2>When this page is useful</h2>
+  <ul>
+    <li>As a pre-review checklist before you trust a node-based estimate.</li>
+    <li>As a handoff note for teams that already have node sizing but still need non-node line items.</li>
+    <li>As a quick reminder of which adjacent bills tend to surprise Kubernetes workloads.</li>
   </ul>
 
   <h2>Fast workflow (estimate in 10 minutes)</h2>
@@ -127,6 +137,7 @@ const faqs = [
 
   <h2>Related tools</h2>
   <div class="btn-row">
+    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs guide</a>
     <a class="btn" href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits sizing</a>
     <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Kubernetes node cost</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Data egress cost</a>

@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/request-based-pricing"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-03-27"
   faqs={faqs}
 >
   <p class="muted">
@@ -36,6 +36,20 @@ const faqs = [
     <li><strong>Requests/month</strong>: baseline volume from logs or metrics.</li>
     <li><strong>Price per unit</strong>: per 10k or per 1M depending on provider.</li>
     <li><strong>Retry factor</strong>: include retries and bot traffic multipliers.</li>
+    <li><strong>Peak profile</strong>: keep baseline and incident windows separate.</li>
+  </ul>
+
+  <h2>Map the workload to the billable request type</h2>
+  <p>
+    "Request pricing" is not one uniform billing model. Providers can bill origin requests, API calls, inspected WAF
+    requests, queue deliveries, or event invocations. Before doing the math, write down the exact billable unit in one
+    sentence so the estimate matches the pricing page.
+  </p>
+  <ul>
+    <li><strong>API</strong>: endpoint calls, auth checks, and internal retries can all count.</li>
+    <li><strong>CDN</strong>: request fees usually follow edge hits, while miss rate changes origin-side costs.</li>
+    <li><strong>Messaging</strong>: deliveries and fan-out often matter more than publishes.</li>
+    <li><strong>Security</strong>: WAF or bot filtering can bill inspected requests during attack spikes.</li>
   </ul>
 
   <h2>When request pricing is not the main driver</h2>
@@ -57,6 +71,17 @@ const faqs = [
   <p class="muted">
     If you do not have request metrics yet, estimate from business events: signups, orders, or jobs per month multiplied
     by requests per event.
+  </p>
+
+  <h2>Build the estimate by traffic shape, not by one average</h2>
+  <ul>
+    <li><strong>Baseline window</strong>: normal traffic and normal retries.</li>
+    <li><strong>Peak window</strong>: launches, seasonal surges, or batch jobs.</li>
+    <li><strong>Incident window</strong>: dependency failures, bot spikes, and retry amplification.</li>
+  </ul>
+  <p class="muted">
+    A request-priced system can look cheap on an average day and still produce a painful bill during a retry storm.
+    Keep at least a baseline and peak scenario, and add an incident case when the service is public-facing.
   </p>
 
   <h2>2) Confirm request units (per 10k vs per 1M)</h2>
@@ -147,6 +172,7 @@ const faqs = [
     <li>Not splitting endpoints: a heavy endpoint can dominate requests and transfer.</li>
     <li>Forgetting internal traffic: service-to-service calls can be larger than user traffic.</li>
     <li>Assuming retries are rare (they often become "normal" under throttling or dependency issues).</li>
+    <li>Forgetting which product counts publishes, deliveries, or inspected requests as the billable unit.</li>
   </ul>
   <h2>Checklist for a reliable estimate</h2>
   <ul>
@@ -174,6 +200,7 @@ const faqs = [
   <div class="btn-row">
     <a class="btn" href="/guides/cdn-costs/">CDN costs</a>
     <a class="btn" href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>
+    <a class="btn" href="/guides/security-costs/">Security costs</a>
     <a class="btn" href="/guides/log-costs/">Log costs</a>
     <a class="btn" href="/guides/egress-costs/">Egress costs</a>
   </div>
