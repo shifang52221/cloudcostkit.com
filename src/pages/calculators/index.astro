@@ -52,27 +52,33 @@ const slots = SITE.adsenseSlots;
 
   <section class="card section prose" style="margin-top:18px">
     <h2 style="margin-top:0">Search-led cluster paths</h2>
-    <div class="grid" style="margin-top:10px">
-      <div class="card2 col-4">
-        <div class="tool-title">CDN pricing cluster</div>
-        <div class="tool-desc">Move from CDN pricing language to bandwidth, requests, origin egress, and provider comparison.</div>
-        <div class="btn-row" style="margin-top:12px">
+    <div class="cluster-grid" style="margin-top:10px">
+      <div class="card2 cluster-card">
+        <div class="cluster-copy">
+          <div class="tool-title">CDN pricing cluster</div>
+          <div class="tool-desc">Move from CDN pricing language to bandwidth, requests, origin egress, and provider comparison.</div>
+        </div>
+        <div class="btn-row cluster-actions" style="margin-top:12px">
           <a class="btn" href="/calculators/cdn-cost-calculator/">Calculator</a>
           <a class="btn" href="/guides/cdn-costs/">Guide</a>
         </div>
       </div>
-      <div class="card2 col-4">
-        <div class="tool-title">EC2 pricing cluster</div>
-        <div class="tool-desc">Move from EC2 calculator intent to hidden line items and EC2 vs Fargate runtime comparison.</div>
-        <div class="btn-row" style="margin-top:12px">
+      <div class="card2 cluster-card">
+        <div class="cluster-copy">
+          <div class="tool-title">EC2 pricing cluster</div>
+          <div class="tool-desc">Move from EC2 calculator intent to hidden line items and EC2 vs Fargate runtime comparison.</div>
+        </div>
+        <div class="btn-row cluster-actions" style="margin-top:12px">
           <a class="btn" href="/calculators/ec2-cost-calculator/">EC2</a>
           <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Vs Fargate</a>
         </div>
       </div>
-      <div class="card2 col-4">
-        <div class="tool-title">Egress boundary cluster</div>
-        <div class="tool-desc">Move from AWS egress cost intent to internet, cross-region, cross-AZ, and origin-to-CDN boundaries.</div>
-        <div class="btn-row" style="margin-top:12px">
+      <div class="card2 cluster-card">
+        <div class="cluster-copy">
+          <div class="tool-title">Egress boundary cluster</div>
+          <div class="tool-desc">Move from AWS egress cost intent to internet, cross-region, cross-AZ, and origin-to-CDN boundaries.</div>
+        </div>
+        <div class="btn-row cluster-actions" style="margin-top:12px">
           <a class="btn" href="/calculators/data-egress-cost-calculator/">Calculator</a>
           <a class="btn" href="/guides/egress-costs/">Guide</a>
         </div>
@@ -356,5 +362,40 @@ const slots = SITE.adsenseSlots;
     })();
   </script>
 </BaseLayout>
+
+<style>
+  .cluster-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .cluster-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .cluster-copy {
+    flex: 1 1 auto;
+  }
+
+  .cluster-actions {
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  .cluster-actions .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .cluster-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 
 
