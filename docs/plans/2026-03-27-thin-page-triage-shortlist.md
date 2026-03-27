@@ -43,7 +43,7 @@ The goal is not to call these pages "bad." The goal is to decide whether each pa
 | 14 | `src/pages/calculators/api-response-size-transfer-calculator.astro` | Calculators | Real utility, but still behaves more like a support calculator than a primary destination. | `data-egress-cost-calculator`, `cdn-bandwidth-cost-calculator`, `cdn-origin-egress-calculator` | `Reduce internal prominence` | P1 |
 | 15 | `src/pages/calculators/rps-to-monthly-requests-calculator.astro` | Calculators | Generic helper with utility, but weak differentiation as a standalone SEO target in a large calculator library. | `api-request-cost-calculator`, request-estimator pages, `request-based-pricing` | `Reduce internal prominence` | P1 |
 | 16 | `src/pages/calculators/compute-instance-cost-calculator.astro` | Calculators | Generic compute helper that competes awkwardly with stronger provider-specific tools and broader compute guides. | `ec2-cost-calculator`, `compute-costs`, provider-specific compute pages | `Reduce internal prominence` | P1 |
-| 17 | `src/pages/calculators/cdn-origin-egress-calculator.astro` | Calculators | Narrow transfer helper that reinforces the “many small utility pages” pattern. | `cdn-cost-calculator`, `cdn-bandwidth-cost-calculator`, `data-egress-cost-calculator` | `Reduce internal prominence` | P1 |
+| 17 | `src/pages/calculators/cdn-origin-egress-calculator.astro` | Calculators | Narrow transfer helper that reinforces the "many small utility pages" pattern. | `cdn-cost-calculator`, `cdn-bandwidth-cost-calculator`, `data-egress-cost-calculator` | `Reduce internal prominence` | P1 |
 | 18 | `src/pages/guides/compute-costs.astro` | Guides | Broad topic page with limited unique framework relative to stronger provider and workload pages. | `aws-ec2-cost-estimation`, `aws-fargate-pricing`, `aws-lambda-pricing`, `kubernetes-costs` | `Keep and deepen` | P2 |
 | 19 | `src/pages/guides/observability-costs.astro` | Guides | Broad cluster hub that still needs sharper cross-signal workflow ownership. | `log-costs`, `metrics-costs`, `aws-cloudwatch-logs-pricing`, `aws-cloudwatch-metrics-pricing` | `Keep and deepen` | P2 |
 | 20 | `src/pages/calculators/api-request-cost-calculator.astro` | Calculators | Stronger than the tiny helper pages, but still generic unless its role is sharpened against provider-specific request calculators. | `aws-api-gateway-cost-calculator`, `request-based-pricing`, `rps-to-monthly-requests-calculator` | `Keep and deepen` | P2 |
@@ -90,7 +90,7 @@ Why this batch first:
 
 - highest confidence in the disposition
 - strong site-shape improvement without heavy content surgery
-- removes a visible chunk of “thin standalone utility/taxonomy” risk quickly
+- removes a visible chunk of "thin standalone utility/taxonomy" risk quickly
 
 ## Second-batch candidates
 

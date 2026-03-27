@@ -11,9 +11,10 @@ type Props = {
   canonicalPath: string;
   lastUpdated: string;
   faqs?: { q: string; a: string }[];
+  robots?: string;
 };
 
-const { title, description, canonicalPath, lastUpdated, faqs } = Astro.props;
+const { title, description, canonicalPath, lastUpdated, faqs, robots } = Astro.props;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
 const normalizedCanonicalPath = withTrailingSlash(canonicalPath);
 const canonical = new URL(normalizedCanonicalPath, siteUrl).toString();
@@ -155,7 +156,7 @@ const relatedTools = desiredToolSlugs
   .filter((t): t is (typeof TOOLS)[number] => Boolean(t))
   .slice(0, 6);
 ---
-<BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath}>
+<BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath} robots={robots}>
   <script
     type="application/ld+json"
     is:inline
