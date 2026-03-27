@@ -1,7 +1,5 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
-import { GUIDES } from "../../lib/guides.generated";
-import { withTrailingSlash } from "../../lib/url";
 
 const title = "Load balancing costs explained: hours, requests, and traffic processed";
 const description =
@@ -21,48 +19,82 @@ const faqs = [
     a: "Underestimating traffic processed, forgetting WAF and logging, and ignoring cross-zone patterns that create extra data transfer charges.",
   },
 ];
-
-const lbGuides = GUIDES.filter((g) => (g.topics || []).includes("load-balancing") && g.canonicalPath !== "/guides/load-balancing-costs")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .slice(0, 18);
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/load-balancing-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-27"
   faqs={faqs}
 >
   <p class="muted">
-    A planning-safe load balancer estimate includes: (1) hourly baseline, (2) request volume, (3) traffic processed (GB),
-    and (4) add-ons like WAF and logs. This hub links the strongest checklists and calculators.
+    This page is the cross-provider load-balancer diagnosis guide next to the broader{" "}
+    <a href="/guides/networking-costs/">networking cost model</a>. Its job is to help you decide whether the real cost
+    driver is the load balancer itself, traffic processed, cross-zone behavior, or adjacent services like WAF and logs.
   </p>
 
-  <h2>1) Hourly baseline</h2>
+  <h2>When this page should be your main guide</h2>
   <ul>
-    <li>Count load balancers per environment (dev/stage/prod).</li>
-    <li>Multiply by hours/month (usually ~730).</li>
+    <li>You know traffic is flowing through a load balancer but are not sure which dimension is creating the bill.</li>
+    <li>You need to separate LB charges from egress, WAF, logging, or cross-zone transfer.</li>
+    <li>You want a cross-provider framework before jumping into AWS, Azure, or GCP pricing specifics.</li>
+  </ul>
+  <p class="muted">
+    If the wider question is simply "which traffic boundary is expensive?", start with{" "}
+    <a href="/guides/networking-costs/">networking costs</a>. This guide is narrower: it is for load-balancer-shaped
+    architectures specifically.
+  </p>
+
+  <h2>1) Baseline cost: count the load balancers and hours first</h2>
+  <ul>
+    <li>Count load balancers per environment, region, and exposure pattern.</li>
+    <li>Multiply by hours/month and keep always-on production separate from part-time non-prod.</li>
+    <li>Do not stop here: the hourly line is often only the floor, not the full story.</li>
   </ul>
 
-  <h2>2) Requests and traffic processed</h2>
+  <h2>2) Requests, connections, and traffic processed</h2>
   <ul>
-    <li>Convert RPS to monthly requests.</li>
-    <li>Estimate GB processed from average response size (separate top endpoints if heavy-tailed).</li>
+    <li>Convert RPS to monthly requests and estimate GB processed from response size.</li>
+    <li>Separate heavy endpoints or large payload paths from lightweight API calls.</li>
+    <li>TLS handshakes, new connections, or high rule-evaluation volume can matter depending on provider and LB type.</li>
     <li>
       Tools: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
       <a href="/calculators/api-response-size-transfer-calculator/">transfer from response size</a>
     </li>
   </ul>
+  <p>
+    A useful habit is to ask: "Is the bill shaped more like requests, more like bytes, or more like persistent hours?"
+    That answer tells you which lever to optimize first.
+  </p>
 
-  <h2>3) WAF and logging</h2>
+  <h2>3) Cross-zone traffic and architecture shape</h2>
   <ul>
-    <li>WAF is request-driven and spikes with bot traffic.</li>
-    <li>Logs create ingestion + retention costs that can exceed the LB baseline.</li>
+    <li>Multi-zone or cross-zone target patterns can create a second networking bill beyond LB pricing.</li>
+    <li>Chatty east-west service calls can make transfer the real issue even if the LB line item looks reasonable.</li>
+    <li>Retries and uneven target distribution often amplify processed traffic during incidents.</li>
+  </ul>
+  <p class="muted">
+    This is one of the main reasons teams misread load balancing cost. They see the load balancer on the bill and assume
+    it is the culprit, when the deeper issue is topology or repeated cross-zone movement.
+  </p>
+
+  <h2>4) WAF, logs, and adjacent security/observability spend</h2>
+  <ul>
+    <li>WAF is request-driven and can spike sharply with bots, scans, or attacks.</li>
+    <li>Access logs create ingestion plus retention costs that can exceed the LB baseline.</li>
+    <li>Treat security and logging as adjacent line items, not as hidden parts of the LB estimate.</li>
     <li>
       Hubs: <a href="/guides/security-costs/">security costs</a>, <a href="/guides/log-costs/">log costs</a>
     </li>
   </ul>
+
+  <h2>5) Diagnose what is actually driving the bill</h2>
+  <ol>
+    <li>If hourly baseline dominates, reduce idle environments or simplify LB sprawl.</li>
+    <li>If requests dominate, review traffic spikes, bot pressure, and path-specific hot spots.</li>
+    <li>If GB processed dominates, review payload size, cache behavior, and cross-zone routing.</li>
+    <li>If WAF or logs dominate, move the optimization to those systems instead of tuning the LB blindly.</li>
+  </ol>
 
   <h2>Related tools</h2>
   <div class="btn-row">
@@ -72,18 +104,11 @@ const lbGuides = GUIDES.filter((g) => (g.topics || []).includes("load-balancing"
     <a class="btn" href="/guides/networking-costs/">Networking costs</a>
   </div>
 
-  {lbGuides.length ? (
-    <>
-      <h2>More load balancing guides</h2>
-      <div class="grid">
-        {lbGuides.map((g) => (
-          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-            <div class="tool-title">{g.title}</div>
-            <div class="tool-desc">{g.description}</div>
-          </a>
-        ))}
-      </div>
-    </>
-  ) : null}
+  <h2>Provider handoff: when to go deeper</h2>
+  <p>
+    Use the provider-specific pricing guides when you need exact charge boundaries for ALB/NLB/GLB on AWS, Azure Load
+    Balancer or Application Gateway on Azure, or GCP load-balancing pricing tiers. This page should help you reach those
+    guides with a clean diagnosis of whether you are optimizing hours, requests, bytes, or adjacent services.
+  </p>
 </GuideLayout>
 

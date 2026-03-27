@@ -13,6 +13,7 @@ const sitemapExcludedPaths = new Set([
   "/guides/azure/",
   "/guides/requests-costs/",
   "/guides/kubernetes-cost-calculator/",
+  "/guides/backups-and-snapshots-costs/",
   "/calculators/aws-api-gateway-request-estimator/",
   "/calculators/aws-kms-request-estimator/",
   "/calculators/aws-sns-delivery-estimator/",
