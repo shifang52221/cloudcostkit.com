@@ -52,27 +52,33 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
 
   <section class="card section prose" style="margin-top:18px">
     <h2 style="margin-top:0">Most-searched guide clusters right now</h2>
-    <div class="grid" style="margin-top:10px">
-      <div class="card2 col-4">
-        <div class="tool-title">CDN pricing and comparison</div>
-        <div class="tool-desc">Start with pricing and comparison framing, then move into bandwidth, requests, and origin egress.</div>
-        <div class="btn-row" style="margin-top:12px">
+    <div class="guide-cluster-grid" style="margin-top:10px">
+      <div class="card2 guide-cluster-card">
+        <div class="guide-cluster-copy">
+          <div class="tool-title">CDN pricing and comparison</div>
+          <div class="tool-desc">Start with pricing and comparison framing, then move into bandwidth, requests, and origin egress.</div>
+        </div>
+        <div class="btn-row guide-cluster-actions" style="margin-top:12px">
           <a class="btn" href="/guides/cdn-costs/">Guide</a>
           <a class="btn" href="/calculators/cdn-cost-calculator/">Calculator</a>
         </div>
       </div>
-      <div class="card2 col-4">
-        <div class="tool-title">AWS egress pricing</div>
-        <div class="tool-desc">Start with the transfer boundary, then estimate internet, cross-region, cross-AZ, and CDN-origin traffic.</div>
-        <div class="btn-row" style="margin-top:12px">
+      <div class="card2 guide-cluster-card">
+        <div class="guide-cluster-copy">
+          <div class="tool-title">AWS egress pricing</div>
+          <div class="tool-desc">Start with the transfer boundary, then estimate internet, cross-region, cross-AZ, and CDN-origin traffic.</div>
+        </div>
+        <div class="btn-row guide-cluster-actions" style="margin-top:12px">
           <a class="btn" href="/guides/egress-costs/">Guide</a>
           <a class="btn" href="/calculators/data-egress-cost-calculator/">Calculator</a>
         </div>
       </div>
-      <div class="card2 col-4">
-        <div class="tool-title">EC2 pricing and runtime choice</div>
-        <div class="tool-desc">Start with EC2 estimation, then switch to EC2 vs Fargate when the real decision is runtime model.</div>
-        <div class="btn-row" style="margin-top:12px">
+      <div class="card2 guide-cluster-card">
+        <div class="guide-cluster-copy">
+          <div class="tool-title">EC2 pricing and runtime choice</div>
+          <div class="tool-desc">Start with EC2 estimation, then switch to EC2 vs Fargate when the real decision is runtime model.</div>
+        </div>
+        <div class="btn-row guide-cluster-actions" style="margin-top:12px">
           <a class="btn" href="/guides/aws-ec2-cost-estimation/">Guide</a>
           <a class="btn" href="/calculators/aws-fargate-vs-ec2-cost-calculator/">Compare</a>
         </div>
@@ -86,7 +92,7 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
       <ol class="muted" style="margin:10px 0 0; padding-left:18px">
         <li>Start with a measurable driver (requests/month, GB/month, hours, GB-month).</li>
         <li>Use a calculator for the first estimate, then return to the guide for pitfalls and validation.</li>
-        <li>Validate with a real week of billing/metrics before “optimizing” pricing tiers.</li>
+        <li>Validate with a real week of billing/metrics before "optimizing" pricing tiers.</li>
       </ol>
       <div class="btn-row" style="margin-top:12px">
         <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
@@ -290,3 +296,38 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
     })();
   </script>
 </BaseLayout>
+
+<style>
+  .guide-cluster-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .guide-cluster-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .guide-cluster-copy {
+    flex: 1 1 auto;
+  }
+
+  .guide-cluster-actions {
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  .guide-cluster-actions .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .guide-cluster-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
