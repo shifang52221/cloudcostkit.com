@@ -10,6 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/rps-to-monthly-requests-calculator"
+  robots="noindex,follow"
   intro="If you think in RPS, convert to monthly requests to estimate request-based fees and plan capacity. Compare baseline vs peak traffic."
   examples={[
     "2,500 RPS at 35% utilization, 24 hours/day -> estimate monthly requests.",
@@ -49,6 +50,13 @@ const description =
 >
   <RpsToMonthlyRequestsCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This page is a support converter inside request-pricing workflows. For the main public entrypoints, start with{" "}
+      <a href="/guides/request-based-pricing/">request-based pricing</a> or{" "}
+      <a href="/calculators/api-request-cost-calculator/">API request cost</a>, then use this page only when you need to
+      translate a rate into monthly volume.
+    </p>
+
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
@@ -104,10 +112,10 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
       <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
       <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
       <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
-      <a class="btn" href="/calculators/unit-converter/">Units converter</a>
     </div>
   </div>
 </CalculatorLayout>

@@ -56,6 +56,12 @@ const description =
   <CdnOriginEgressCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This is a specialized support calculator inside CDN workflows. Use it after you already understand edge bandwidth and
+      request pricing, and only when you need to estimate what the origin still serves because of cache misses and
+      revalidation.
+    </p>
+
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Edge GB/month</strong>: use CDN analytics or billing exports.</li>
@@ -77,6 +83,7 @@ const description =
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
+      <a class="btn" href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>
       <a class="btn" href="/calculators/data-egress-cost-calculator/">Origin egress cost</a>
       <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 request cost</a>
       <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
