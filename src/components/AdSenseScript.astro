@@ -1,6 +1,6 @@
 ---
 import { SITE } from "../config/site";
-const client = SITE.adsenseClient?.trim();
+const client = SITE.ads.enabled ? SITE.adsenseClient?.trim() : "";
 ---
 {client ? (
   <script

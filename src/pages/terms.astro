@@ -3,51 +3,69 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../config/site";
 
 const title = `Terms | ${SITE.name}`;
-const description = "Terms of use for CloudCostKit.";
+const description =
+  "Terms of use for CloudCostKit: educational use, estimate responsibility, acceptable use, and relationship to provider documentation.";
 const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/terms" robots="noindex,follow">
   <section class="card hero">
     <h1>Terms</h1>
-    <p>Basic terms for using this site.</p>
+    <p>
+      These terms describe how CloudCostKit may be used as an educational and planning resource, and what limits apply
+      to estimates, external links, and site availability.
+    </p>
   </section>
 
   <section class="card section prose">
-    <h2 style="margin-top:0">Educational use</h2>
+    <h2 style="margin-top:0">Educational and planning use</h2>
     <p class="muted" style="margin:0">
-      {SITE.name} provides educational calculators and related content. Results are estimates and may not match provider
-      billing. You are responsible for validating assumptions and decisions.
+      {SITE.name} provides educational calculators, guides, and planning workflows. Outputs are estimates and may not
+      match provider billing exactly. You are responsible for validating assumptions, units, and final spending
+      decisions.
     </p>
 
-    <h2 style="margin:18px 0 10px">Not professional advice</h2>
+    <h2 style="margin:18px 0 10px">Not professional advice or official quotes</h2>
     <p class="muted" style="margin:0">
-      Nothing on this site is legal, financial, or professional advice. Use the tools as a starting point, then verify
-      pricing and behavior with official provider documentation and your own billing data.
+      Nothing on this site is legal, financial, accounting, procurement, or other professional advice. The site does
+      not provide official quotes, contract pricing, or guaranteed final bill amounts.
+    </p>
+
+    <h2 style="margin:18px 0 10px">Validation responsibility</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Use official provider pricing pages and your own billing data as the final source of truth.</li>
+      <li>Validate baseline and peak assumptions before using an estimate in a budget or procurement workflow.</li>
+      <li>Recheck models when pricing rules, regions, discounts, or workload boundaries change.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      See <a href="/methodology/">Methodology</a> for the estimate standard behind the tools.
     </p>
 
     <h2 style="margin:18px 0 10px">No warranties</h2>
     <p class="muted" style="margin:0">
-      The site is provided "as is" without warranties of any kind. We are not liable for losses arising from use of the
-      site.
+      The site is provided "as is" without warranties of any kind. We do not guarantee uninterrupted availability,
+      final billing accuracy, or fitness for a specific business decision.
     </p>
 
-    <h2 style="margin:18px 0 10px">External links</h2>
+    <h2 style="margin:18px 0 10px">External links and provider content</h2>
     <p class="muted" style="margin:0">
-      This site may link to third-party documentation and pricing pages. We do not control third-party content and are
-      not responsible for changes to those sites.
+      The site may link to third-party pricing pages, documentation, or other resources. We do not control third-party
+      content and are not responsible for changes made on those sites after publication.
     </p>
 
     <h2 style="margin:18px 0 10px">Acceptable use</h2>
     <p class="muted" style="margin:0">
-      Do not abuse or attempt to disrupt the site (for example, by automated scraping that degrades service). Use the
-      tools for personal or organizational planning and education.
+      Do not abuse, disrupt, or attempt to degrade the service, including automated behavior that materially harms
+      normal site operation. Use the site for educational, research, and organizational planning purposes.
     </p>
 
-    <h2 style="margin:18px 0 10px">Changes</h2>
-    <p class="muted" style="margin:0">We may update these terms over time. The page reflects the current version.</p>
-
-    <h2 style="margin:18px 0 10px">Contact</h2>
-    <p class="muted" style="margin:0">
+    <h2 style="margin:18px 0 10px">Related pages and contact</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><a href="/privacy-policy/">Privacy Policy</a>: how browser-side inputs, ads, and analytics are handled.</li>
+      <li><a href="/cookie-notice/">Cookie Notice</a>: consent and cookie behavior.</li>
+      <li><a href="/contact/">Contact</a>: estimate questions, corrections, and site issues.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      Questions about these terms:{" "}
       <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
         Email us
       </a>
@@ -55,6 +73,7 @@ const [emailUser, emailDomain] = SITE.email.split("@");
         {" "}
         ({emailUser} [at] {emailDomain})
       </noscript>
+      .
     </p>
   </section>
 </BaseLayout>

@@ -5,86 +5,104 @@ import { withTrailingSlash } from "../lib/url";
 
 const title = `Methodology | ${SITE.name}`;
 const description =
-  "How CloudCostKit calculators work: what inputs mean, what is included or excluded, how to validate estimates, and how to avoid unit and boundary mistakes.";
+  "How CloudCostKit estimates are built, when a model is unsafe, what calculators intentionally exclude, and how results should be validated against billing and usage data.";
 ---
 <BaseLayout title={title} description={description} canonicalPath="/methodology">
   <section class="card hero">
     <h1>Methodology</h1>
     <p>
-      CloudCostKit tools are built for planning: fast, transparent estimates you can validate against billing and
-      metrics. This page explains how to use the calculators so results stay reliable under real traffic.
+      This page is the estimation standard behind CloudCostKit. It explains how calculator outputs are built, when a
+      model should no longer be trusted, what is intentionally out of scope, and how a fast estimate should be checked
+      against real billing and usage data.
     </p>
     <div class="btn-row" style="margin-top:12px">
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
-      <a class="btn" href="/calculators/unit-converter/">Units converter</a>
-      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/contact/">Corrections and help</a>
+      <a class="btn" href="/editorial-policy/">Editorial policy</a>
     </div>
   </section>
 
   <section class="card section prose" style="margin-top:18px">
-    <h2 style="margin-top:0">What these calculators are and are not</h2>
+    <h2 style="margin-top:0">The estimate model behind the site</h2>
     <ul>
-      <li>
-        <strong>Planning models</strong>: directional estimates focused on main drivers (requests, GB transferred,
-        GB-month stored, instance-hours, and vCPU or memory hours).
-      </li>
-      <li>
-        <strong>Not official quotes</strong>: providers bill by region, tiering, free allowances, rounding, and
-        product-specific rules.
-      </li>
-      <li>
-        <strong>Bounded intentionally</strong>: each calculator states included and excluded items to reduce double
-        counting.
-      </li>
+      <li><strong>Driver first</strong>: start with requests, GB transferred, GB-month stored, or hours before pricing detail.</li>
+      <li><strong>Boundary first</strong>: separate transfer paths, retention paths, request classes, or storage copies before combining rates.</li>
+      <li><strong>Scenario based</strong>: keep baseline and peak views instead of relying on one blended monthly average.</li>
+      <li><strong>Validation required</strong>: an estimate becomes more useful only after it is checked against billing or usage data.</li>
     </ul>
 
-    <h2>How to get a useful estimate in 10 minutes</h2>
-    <ol>
-      <li>Pick one workload and one environment (mixing environments usually breaks assumptions).</li>
-      <li>Start with measurable drivers: requests/month, GB/month, instance-hours, and GB-month stored.</li>
-      <li>Use effective blended rates first, then refine with tier and region detail.</li>
-      <li>Add multipliers: retries, fan-out, cache hit rate, and incident windows.</li>
-      <li>Validate against a real week of metrics and billing before optimization work.</li>
-    </ol>
-
-    <h2>Boundary and unit quality checks</h2>
+    <h2>What a calculator output means on this site</h2>
     <ul>
-      <li>
-        <strong>GB vs GiB</strong>: billing usually uses decimal GB while tooling may show binary GiB. Convert
-        explicitly with the <a href="/calculators/unit-converter/">Units converter</a>.
-      </li>
-      <li>
-        <strong>Request units</strong>: pricing units differ (per 10k, 100k, or 1M). Unit mismatch creates large errors.
-      </li>
-      <li>
-        <strong>Origin egress vs CDN bandwidth</strong>: cache fill and edge delivery are separate line items.
-      </li>
-      <li>
-        <strong>Ingestion vs retention vs scan</strong>: observability often has three distinct billing drivers.
-      </li>
+      <li><strong>It is a planning model</strong>: meant to give a directional estimate around the main bill drivers.</li>
+      <li><strong>It is not a final quote</strong>: providers bill by region, tiering, discounts, rounding, request units, and product-specific rules.</li>
+      <li><strong>It is intentionally bounded</strong>: pages define what is included and excluded so the user can see where hidden line items might still exist.</li>
     </ul>
 
-    <h2>Validation workflow</h2>
+    <h2>When the current model is unsafe</h2>
+    <ul>
+      <li>A provider changes pricing tiers, regional rules, or included allowances in a way the current workflow does not reflect.</li>
+      <li>The workload gains new boundaries such as replication, cross-region movement, CDN, retention, or add-on services that were not in the original estimate.</li>
+      <li>An incident, launch, retry loop, or bot spike changes peak behavior enough to dominate cost.</li>
+      <li>The estimate no longer aligns with a recent billing slice after the driver assumptions have been rechecked.</li>
+    </ul>
+
+    <h2>Validation loop before trusting a number</h2>
     <ol>
-      <li>Define primary driver metrics for each line item.</li>
-      <li>Compare estimates to the first real bill and adjust drivers before rates.</li>
-      <li>Audit incident windows separately to capture retry-driven spikes.</li>
-      <li>Maintain baseline and peak scenarios for each workload.</li>
+      <li>Write down the primary drivers behind each line item, such as requests, GB, GB-month, or hours.</li>
+      <li>Confirm the unit system before pricing: GB versus GiB, per 10k versus per 1M, monthly versus hourly, and similar boundaries.</li>
+      <li>Separate baseline behavior from peak or incident behavior instead of averaging everything together.</li>
+      <li>Compare the estimate with a real billing slice or usage sample and adjust the drivers before adjusting the rates.</li>
+      <li>Keep only the changes that improve alignment with repeatable billing behavior.</li>
     </ol>
 
-    <h2>Editorial and update standards</h2>
+    <h2>What a review-ready estimate package looks like</h2>
     <ul>
-      <li>Every page must include unique decision guidance, failure patterns, and validation steps.</li>
-      <li>Similar slugs must keep distinct intent and user outcomes.</li>
-      <li>Calculator pages and guide pages are maintained as pairs for explanation plus execution.</li>
-      <li>High-impression pages are reviewed first during monthly refresh cycles.</li>
+      <li><strong>Named workload scope</strong>: which application, environment, or traffic path the estimate covers.</li>
+      <li><strong>Driver sheet</strong>: the measurable units behind the number, such as requests, runtime hours, GB transferred, or retention days.</li>
+      <li><strong>Boundary notes</strong>: what is inside the estimate and what adjacent charges still sit outside it.</li>
+      <li><strong>Scenario split</strong>: baseline, peak, migration, or incident behavior shown separately instead of blended beyond recognition.</li>
+      <li><strong>Validation reference</strong>: a bill slice, usage export, or provider unit definition used to sanity-check the model.</li>
+      <li><strong>Open questions</strong>: discounts, regional changes, burst paths, retries, or add-ons that still need confirmation before sign-off.</li>
+    </ul>
+    <p class="muted">
+      If those pieces are missing, the output may still be useful for rough planning, but it is not ready to carry a
+      serious review conversation on its own.
+    </p>
+
+    <h2>When a model has been pushed past safe use</h2>
+    <ul>
+      <li>The same page is trying to stand in for multiple products, traffic boundaries, or pricing mechanisms that should be estimated separately.</li>
+      <li>The final number depends more on hidden discounts, bundled allowances, or contract details than on the visible usage drivers.</li>
+      <li>A single average has flattened launch spikes, retries, seasonality, or incident behavior that meaningfully change the bill.</li>
+      <li>The missing line items are no longer edge cases and now dominate the total answer.</li>
+      <li>The estimate can no longer be reconciled to a recent billing sample without inventing new assumptions after the fact.</li>
+    </ul>
+    <p class="muted">
+      When that happens, the right fix is usually to split the workload into cleaner boundaries or move to a deeper
+      provider-specific review, not to keep stretching one simplified calculator.
+    </p>
+
+    <h2>Common exclusions that change the answer</h2>
+    <ul>
+      <li><strong>Networking</strong>: internet egress, cross-region, cross-AZ, origin-to-CDN, retries, and failover traffic.</li>
+      <li><strong>Observability</strong>: ingestion, retention, scan or query volume, and burst behavior during incidents.</li>
+      <li><strong>Storage</strong>: requests, replication, lifecycle copies, early deletion rules, and transfer charges.</li>
+      <li><strong>Runtime and managed services</strong>: support tiers, monitoring add-ons, backup storage, and adjacent services outside the page scope.</li>
+    </ul>
+
+    <h2>Where this page stops</h2>
+    <ul>
+      <li><a href="/guides/">Guides</a> explain billing boundaries, traps, and support questions for specific topics.</li>
+      <li><a href="/editorial-policy/">Editorial Policy</a> explains how pages qualify for publication, refresh, and correction review.</li>
+      <li><a href="/about/">About</a> explains what the site is for and what it does not claim to replace.</li>
+      <li><a href="/contact/">Contact</a> is the right place to report a mismatch, weak assumption, or broken workflow.</li>
     </ul>
 
     <h2>Data and pricing source policy</h2>
     <p class="muted">
-      Most calculators accept user-provided pricing because rates vary by region and discount model. Official pricing
-      pages and billing exports are the source of truth.
+      Most calculators accept user-provided pricing because rates vary by region, discount model, and product options.
+      Official pricing pages and billing exports remain the source of truth.
     </p>
     <ul>
       <li>
@@ -107,29 +125,29 @@ const description =
       </li>
     </ul>
 
-    <h2>Privacy</h2>
+    <h2>Privacy and browser-side handling</h2>
     <p class="muted">
-      Calculator inputs are processed in your browser. See <a href="/privacy-policy/">Privacy Policy</a> and{" "}
-      <a href="/cookie-notice/">Cookie Notice</a>.
+      Calculator inputs are processed in your browser. Some pages may store values in browser storage so your inputs
+      persist between visits. See <a href="/privacy-policy/">Privacy Policy</a> and <a href="/cookie-notice/">Cookie Notice</a>.
     </p>
 
     <h2>Suggested starting points</h2>
     <div class="grid" style="margin-top:10px">
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/data-egress-cost-calculator")}>
         <div class="tool-title">Data egress cost</div>
-        <div class="tool-desc">Start with GB/month and an effective $/GB baseline.</div>
+        <div class="tool-desc">Start with transfer paths and an effective $/GB baseline.</div>
       </a>
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/log-cost-calculator")}>
         <div class="tool-title">Log cost</div>
-        <div class="tool-desc">Model ingestion and retention, then add scan if needed.</div>
+        <div class="tool-desc">Model ingestion and retention first, then add scan or query volume if needed.</div>
       </a>
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/object-storage-cost-calculator")}>
         <div class="tool-title">Object storage cost</div>
-        <div class="tool-desc">Cover GB-month, requests, replication, and transfer.</div>
+        <div class="tool-desc">Cover GB-month, requests, replication, and transfer without hiding the boundaries.</div>
       </a>
       <a class="card2 tool col-6" href={withTrailingSlash("/calculators/rps-to-monthly-requests-calculator")}>
         <div class="tool-title">RPS to monthly requests</div>
-        <div class="tool-desc">Convert traffic rates into billing units with clear assumptions.</div>
+        <div class="tool-desc">Convert traffic rates into billable request units with visible assumptions.</div>
       </a>
     </div>
   </section>

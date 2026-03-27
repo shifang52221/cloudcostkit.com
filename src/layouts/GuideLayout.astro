@@ -34,6 +34,11 @@ const articleSchema = {
   description,
   dateModified: lastUpdated,
   mainEntityOfPage: canonical,
+  author: {
+    "@type": "Organization",
+    name: SITE.editorial.teamName,
+    url: SITE.url,
+  },
   publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
 };
 
@@ -163,6 +168,10 @@ const relatedTools = desiredToolSlugs
   />
   <article class="card section prose">
     <h1 style="margin-top:0">{title}</h1>
+    <div class="muted" style="margin:8px 0 12px; font-size:14px">
+      Reviewed by {SITE.editorial.teamName}. Last updated: {lastUpdated}.{" "}
+      <a href="/editorial-policy/">Editorial policy</a> and <a href="/methodology/">methodology</a>.
+    </div>
     {relatedTools.length ? (
       <>
         <p class="muted" style="margin:8px 0 12px">
@@ -225,6 +234,9 @@ const relatedTools = desiredToolSlugs
     ) : null}
 
     <hr style="border:0; height:1px; background: rgba(255,255,255,0.10); margin: 18px 0" />
-    <div class="muted">Last updated: {lastUpdated}</div>
+    <div class="muted">
+      Last updated: {lastUpdated}. {SITE.editorial.reviewLabel} See the <a href="/editorial-policy/">Editorial Policy</a>
+      .
+    </div>
   </article>
 </BaseLayout>

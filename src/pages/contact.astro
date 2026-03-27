@@ -3,16 +3,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../config/site";
 
 const title = `Contact | ${SITE.name}`;
-const description = "Contact CloudCostKit.";
+const description =
+  "Contact CloudCostKit for estimate questions, bug reports, corrections, tool requests, and editorial feedback.";
 const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/contact">
   <section class="card hero">
     <h1>Contact</h1>
-    <p>Questions, feedback, or tool requests.</p>
+    <p>
+      Use this page for estimate questions, calculator bugs, factual corrections, tool requests, and editorial
+      feedback. The more concrete the input, the easier it is to review quickly.
+    </p>
   </section>
 
   <section class="card section prose">
+    <h2 style="margin-top:0">Primary contact</h2>
     <p class="muted" style="margin:0">
       Email:{" "}
       <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
@@ -24,39 +29,56 @@ const [emailUser, emailDomain] = SITE.email.split("@");
       </noscript>
     </p>
 
-    <h2 style="margin:18px 0 10px">If you’re asking for help</h2>
+    <h2 style="margin:18px 0 10px">If you are asking for estimate help</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Include the page URL and the provider/region you care about.</li>
-      <li>Share your measured driver (requests/month, GB/month, retention days, instance-hours) and how you got it.</li>
-      <li>Tell us if you want a baseline estimate or a peak/incident scenario.</li>
-      <li>If something looks wrong, include the exact inputs you used (screenshots are fine).</li>
+      <li>Include the page URL and the provider or region you care about.</li>
+      <li>Share the measured driver you are using, such as requests per month, GB per month, retention days, or instance-hours.</li>
+      <li>Say whether you want a baseline estimate, a peak scenario, or help understanding a billing boundary.</li>
+      <li>If something looks wrong, include the exact inputs you used and the direction of the mismatch.</li>
     </ul>
 
-    <h2 style="margin:18px 0 10px">Tool requests</h2>
+    <h2 style="margin:18px 0 10px">If you are reporting a factual issue or calculator bug</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Describe the service and the key billable units (requests, GB processed, GB-month, hours).</li>
-      <li>List the line items you want included/excluded (transfer, logs, replication, add-ons).</li>
-      <li>Share one real-world example scenario so we can build a useful default.</li>
+      <li>Include the page URL and the specific statement, output, or workflow step that looks wrong.</li>
+      <li>Share the provider, region, unit, and any pricing rule involved if you know them.</li>
+      <li>If the problem is reproducible, include the exact inputs or a screenshot of the issue.</li>
+      <li>If the issue is about unclear wording or overlap with another page, link both pages.</li>
     </ul>
 
-    <h2 style="margin:18px 0 10px">What we can (and can’t) do</h2>
+    <h2 style="margin:18px 0 10px">If you want a new tool or guide</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>We can</strong>: help you model drivers, boundaries, and common missing line items.</li>
-      <li><strong>We can</strong>: fix calculator bugs and improve wording, units, and validation checklists.</li>
-      <li><strong>We can’t</strong>: provide official quotes or guarantee your final bill (tiers/regions/rounding vary).</li>
-      <li><strong>We can’t</strong>: access your provider billing data—share only what you’re comfortable sharing.</li>
+      <li>Describe the service and the key billable units, such as requests, GB processed, GB-month, or hours.</li>
+      <li>List the line items that must be included or excluded, such as transfer, logs, replication, or add-ons.</li>
+      <li>Share one realistic usage example so the default workflow can be designed around an actual planning task.</li>
+      <li>If a similar page already exists, explain what is missing from it instead of only naming a new keyword.</li>
     </ul>
 
-    <h2 style="margin:18px 0 10px">Response time</h2>
+    <h2 style="margin:18px 0 10px">What we can and cannot help with</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>We can</strong>: help model drivers, boundaries, units, and common missing line items.</li>
+      <li><strong>We can</strong>: fix calculator bugs and improve wording, routing, and validation guidance.</li>
+      <li><strong>We cannot</strong>: provide official quotes or guarantee a final bill because pricing tiers, regions, contracts, and rounding rules vary.</li>
+      <li><strong>We cannot</strong>: access your provider billing data, so only share what you are comfortable sending.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Response expectations</h2>
     <p class="muted" style="margin:0">
-      We typically respond within a few business days. If your request is time-sensitive, include that context in the
-      message.
+      We usually review messages within a few business days. If your request is time-sensitive, add that context so it
+      can be prioritized appropriately.
     </p>
+
+    <h2 style="margin:18px 0 10px">Related trust pages</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><a href="/about/">About</a>: what the site is for and how pages earn publication.</li>
+      <li><a href="/methodology/">Methodology</a>: how estimates should be built and validated.</li>
+      <li><a href="/editorial-policy/">Editorial Policy</a>: how topics are reviewed, updated, and corrected.</li>
+      <li><a href="/privacy-policy/">Privacy Policy</a>: how browser-side inputs and site usage are handled.</li>
+    </ul>
 
     <h2 style="margin:18px 0 10px">Privacy note</h2>
     <p class="muted" style="margin:0">
-      Calculator inputs run in your browser. Some pages store inputs in your browser storage to keep your values between
-      visits. See <a href="/privacy-policy/">Privacy Policy</a>.
+      Calculator inputs run in your browser. Some pages may store values in browser storage so your inputs persist
+      between visits. See <a href="/privacy-policy/">Privacy Policy</a> and <a href="/cookie-notice/">Cookie Notice</a>.
     </p>
   </section>
 </BaseLayout>

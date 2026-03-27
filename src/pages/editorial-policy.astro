@@ -1,0 +1,129 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+
+const title = `Editorial Policy | ${SITE.name}`;
+const description =
+  "How CloudCostKit qualifies pages for publication, reviews updates, handles corrections, and avoids thin or template-like cloud cost content.";
+const [emailUser, emailDomain] = SITE.email.split("@");
+---
+<BaseLayout title={title} description={description} canonicalPath="/editorial-policy">
+  <section class="card hero">
+    <h1>Editorial Policy</h1>
+    <p>
+      This page is the publishing and corrections standard for CloudCostKit. It explains what qualifies for
+      publication, how similar topics are kept distinct, what triggers refreshes or revision, and how factual issues or
+      workflow problems are reviewed.
+    </p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn btn-primary" href="/methodology/">Methodology</a>
+      <a class="btn" href="/about/">About</a>
+      <a class="btn" href="/contact/">Contact</a>
+      <a class="btn" href="/guides/">Guides</a>
+    </div>
+  </section>
+
+  <section class="card section prose">
+    <h2 style="margin-top:0">Publication standards</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>A page must answer a distinct user question rather than mirror a nearby keyword with minor wording changes.</li>
+      <li>A page must define a real workflow, boundary, validation step, or comparison frame that the user can apply.</li>
+      <li>A page should make its scope visible: what it includes, what it excludes, and where the next page should take over.</li>
+      <li>Pages that only restate generic provider concepts without workflow value are candidates for rejection, rewrite, or de-emphasis.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Review before publication or material revision</h2>
+    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Define the user question, the likely search intent, and the main billing drivers before writing.</li>
+      <li>Compare the intended page with existing pages so parent pages, comparison pages, and support pages keep clearly different roles.</li>
+      <li>Check that included and excluded cost boundaries, unit assumptions, and validation steps are explicit.</li>
+      <li>Link the page into a complete workflow so the reader can estimate, validate, compare, or report an issue.</li>
+      <li>Run build and site checks before publishing material changes.</li>
+    </ol>
+
+    <h2 style="margin:18px 0 10px">How overlap and page sprawl are handled</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>A parent page should own broad education and route the reader toward narrower tools only when the narrower page adds a distinct next step.</li>
+      <li>A support page should exist only if it clarifies a repeated decision, failure pattern, or validation step that the parent page cannot cover cleanly.</li>
+      <li>When two pages drift toward the same job, the stronger page is expanded and the weaker page is rewritten, merged, or de-emphasized.</li>
+      <li>Publishing an extra keyword variation is not treated as a win if it weakens the site's overall clarity or reviewability.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      This policy prefers fewer pages with clearer roles over a larger archive of near-duplicates.
+    </p>
+
+    <h2 style="margin:18px 0 10px">What can trigger revision or refresh</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Pricing structure, units, or included allowances materially change.</li>
+      <li>User intent shifts enough that a page starts overlapping heavily with a nearby page.</li>
+      <li>Search demand shows that a parent page should be strengthened before more narrow pages are added.</li>
+      <li>A correction request, broken workflow, or repeated user confusion shows that the current page is no longer carrying its role clearly.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      `Last updated` indicates when a page itself was last reviewed or materially revised. It should not be read as a
+      promise that every linked provider rule changed on that exact date.
+    </p>
+
+    <h2 style="margin:18px 0 10px">Corrections and feedback review</h2>
+    <p class="muted" style="margin:0">
+      If you find a factual issue, unclear boundary, broken calculator path, or estimate mismatch, please report it so
+      it can be reviewed against the page scope and source material.
+    </p>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Include the page URL and the specific statement, output, or workflow step that looks wrong.</li>
+      <li>Share the provider, region, and billing unit if they matter to the issue.</li>
+      <li>If the issue is a mismatch, include the inputs you used and the direction of the difference.</li>
+      <li>If the issue is overlap or thinness, link the adjacent page that seems to be carrying the same job.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      Review does not assume every report leads to the same outcome. Some issues require a factual correction, some
+      need a boundary rewrite, some reveal that a page should be merged into a stronger workflow page, and some show
+      that the existing page is carrying too much scope for one model.
+    </p>
+    <p class="muted" style="margin:12px 0 0">
+      Contact:{" "}
+      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+        Email us
+      </a>
+      <noscript>
+        {" "}
+        ({emailUser} [at] {emailDomain})
+      </noscript>
+      .
+    </p>
+
+    <h2 style="margin:18px 0 10px">What this page does not govern</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><a href="/methodology/">Methodology</a> governs how estimates are built, when they are unsafe, and how they should be validated.</li>
+      <li><a href="/about/">About</a> explains what the site is for, who it serves, and what it does not pretend to replace.</li>
+      <li><a href="/contact/">Contact</a> is the operational page for help requests, bug reports, and correction intake.</li>
+      <li><a href="/privacy-policy/">Privacy Policy</a> governs browser-side handling and site usage data.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">What we do not publish as final truth</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Official quotes or guaranteed final bill amounts.</li>
+      <li>Pages that rely on generic filler without a distinct workflow outcome.</li>
+      <li>Hidden formulas that cannot be traced back to measurable drivers or visible assumptions.</li>
+      <li>Provider-specific statements that have not been checked against current official documentation.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">When a page is rejected, rewritten, or reduced in prominence</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Rejected if it does not answer a distinct question or cannot support a real estimating workflow.</li>
+      <li>Rewritten if the core topic matters but the page is carrying weak assumptions, vague boundaries, or a template-like structure.</li>
+      <li>Merged or reduced in prominence if another page already serves the same user intent more clearly.</li>
+      <li>Refreshed and kept if the page still owns a useful role and the underlying assumptions can be made explicit again.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Source material used in review</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Official provider pricing and product documentation from AWS, Azure, and Google Cloud.</li>
+      <li>Billing exports, usage metrics, and unit definitions when explaining how to validate an estimate.</li>
+      <li>Observed user workflows that move from raw usage inputs to a decision-ready estimate.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      Provider documentation remains the source of truth for procurement decisions and final billing details.
+    </p>
+  </section>
+</BaseLayout>

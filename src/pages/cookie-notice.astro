@@ -3,50 +3,57 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../config/site";
 
 const title = `Cookie Notice | ${SITE.name}`;
-const description = "Cookie consent and preferences for CloudCostKit.";
+const description =
+  "Cookie Notice for CloudCostKit: consent, storage categories, ad-related cookies, and how to revisit your choices.";
 const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/cookie-notice" robots="noindex,follow">
   <section class="card hero">
-    <h1>Cookie notice</h1>
-    <p>Manage consent for ads and cookies.</p>
+    <h1>Cookie Notice</h1>
+    <p>
+      This page explains the main cookie and browser-storage categories used on CloudCostKit, how consent choices work,
+      and how to revisit those choices later.
+    </p>
   </section>
 
   <section class="card section prose">
-    <p class="muted" style="margin:0">
-      We use cookies for ads and basic site functionality. You can manage your preferences using the consent message
-      shown on this site (cookie banner).
-    </p>
-
-    <h2 style="margin:18px 0 10px">Cookie categories (high level)</h2>
+    <h2 style="margin-top:0">Cookie and storage categories on this site</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Required</strong>: core site functionality and security-related behavior.</li>
-      <li><strong>Preferences</strong>: optional settings like saved calculator inputs (browser storage).</li>
-      <li><strong>Analytics</strong>: aggregated usage measurement (when enabled by consent where required).</li>
-      <li><strong>Ads</strong>: ad delivery and (optionally) personalized ads, depending on consent and your region.</li>
+      <li><strong>Required</strong>: core site behavior, security, and consent-state handling.</li>
+      <li><strong>Preferences</strong>: optional browser-side storage such as saved calculator inputs.</li>
+      <li><strong>Analytics</strong>: aggregated usage measurement where enabled and allowed by consent.</li>
+      <li><strong>Ads</strong>: ad delivery and, where permitted, personalized ads and related measurement.</li>
     </ul>
 
-    <p class="muted" style="margin:12px 0 0">
-      If you don't see a consent message, you can try clearing site data for <code>cloudcostkit.com</code> and reloading
-      the page.
+    <h2 style="margin:18px 0 10px">How consent works here</h2>
+    <p class="muted" style="margin:0">
+      When consent controls are shown, they are used to manage ad and analytics choices before optional tracking or
+      personalized advertising is enabled where required by law or configuration.
     </p>
 
-    <h2 style="margin:18px 0 10px">How to clear site data</h2>
-    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Open your browser settings.</li>
-      <li>Find site data/cookies for <code>cloudcostkit.com</code>.</li>
-      <li>Remove site data, then reload the page.</li>
-    </ol>
+    <h2 style="margin:18px 0 10px">How to revisit your choices</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Use the consent controls presented on the site when available.</li>
+      <li>If you do not see them, clear site data for <code>cloudcostkit.com</code> and reload the page.</li>
+      <li>You can also use your browser settings to block or remove cookies and site storage directly.</li>
+    </ul>
 
-    <h2 style="margin:18px 0 10px">Third-party cookies</h2>
+    <h2 style="margin:18px 0 10px">Third-party cookies and ads</h2>
     <p class="muted" style="margin:0">
-      When ads are enabled, third parties (for example, ad networks) may set cookies or similar identifiers to deliver
-      and measure ads. Consent controls determine whether personalized ads are allowed where required.
+      If ads are enabled, third parties such as ad networks may set cookies or similar identifiers for ad delivery and
+      measurement. Whether personalized advertising is allowed depends on consent settings and local requirements.
     </p>
 
-    <h2 style="margin:18px 0 10px">Learn more</h2>
+    <h2 style="margin:18px 0 10px">Related pages</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><a href="/privacy-policy/">Privacy Policy</a>: broader site data-handling explanation.</li>
+      <li><a href="/terms/">Terms</a>: educational-use and site-use conditions.</li>
+      <li><a href="/contact/">Contact</a>: how to ask a consent or site-operation question.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Questions</h2>
     <p class="muted" style="margin:0">
-      See <a href="/privacy-policy/">Privacy Policy</a> for details. Questions:{" "}
+      Questions about cookies or consent settings:{" "}
       <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
         Email us
       </a>

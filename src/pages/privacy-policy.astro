@@ -3,60 +3,71 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../config/site";
 
 const title = `Privacy Policy | ${SITE.name}`;
-const description = "Privacy Policy for CloudCostKit.";
+const description =
+  "Privacy Policy for CloudCostKit: browser-side calculator inputs, storage, ads, analytics, consent, and contact for privacy questions.";
 const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/privacy-policy" robots="noindex,follow">
   <section class="card hero">
     <h1>Privacy Policy</h1>
-    <p>Summary of what we collect, what we don't, and how ads work.</p>
+    <p>
+      This page explains how CloudCostKit handles calculator inputs, browser storage, ads, analytics, and privacy
+      questions. The site is designed for lightweight planning use without account creation.
+    </p>
   </section>
 
   <section class="card section prose">
-    <h2 style="margin-top:0">Inputs</h2>
+    <h2 style="margin-top:0">Calculator inputs</h2>
     <p class="muted" style="margin:0">
-      Calculator inputs are processed in your browser. We do not require account creation.
+      Calculator inputs are processed in your browser. The site does not require account creation to use basic
+      calculators and planning workflows.
     </p>
 
     <h2 style="margin:18px 0 10px">Browser storage</h2>
     <p class="muted" style="margin:0">
-      Some calculators store your last used values in your browser (for example, using local storage) so inputs persist
-      between visits. You can clear site data for <code>cloudcostkit.com</code> in your browser settings to remove saved
-      values.
+      Some calculators store recent values in browser storage so your inputs persist between visits. You can remove
+      saved values by clearing site data for <code>cloudcostkit.com</code> in your browser settings.
     </p>
 
-    <h2 style="margin:18px 0 10px">Cookies & ads</h2>
+    <h2 style="margin:18px 0 10px">Ads and consent</h2>
     <p class="muted" style="margin:0">
-      We may show ads (for example, via Google AdSense). Ads may use cookies or similar identifiers. Where required by
-      law, we ask for your consent before serving personalized ads. You can change your preference on the
-      <a href="/cookie-notice/"> Cookie Notice</a> page.
+      The site may display ads, including Google AdSense. Ads may rely on cookies or similar identifiers. Where
+      required, consent controls are used before personalized ads are served. For cookie and consent details, see the
+      <a href="/cookie-notice/"> Cookie Notice</a>.
     </p>
 
-    <h2 style="margin:18px 0 10px">Analytics</h2>
-    <p class="muted" style="margin:0">
-      We may use privacy-conscious analytics to understand aggregate site usage. We do not sell personal data.
-    </p>
-
-    <h2 style="margin:18px 0 10px">What we may collect</h2>
+    <h2 style="margin:18px 0 10px">Analytics and operational data</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Basic server logs (for example, request time, URL, and user agent) for security and reliability.</li>
-      <li>Aggregated analytics events (page views, navigation) depending on your consent settings.</li>
-      <li>Ad-related signals and cookies if you consent to personalized ads where applicable.</li>
+      <li>Basic server or hosting logs may be used for security, uptime, and abuse prevention.</li>
+      <li>Aggregated analytics events may be used to understand site usage, depending on consent and configuration.</li>
+      <li>Ad-related signals may be processed if ads are enabled and your consent settings allow them where required.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">What this site does not ask for by default</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>No account signup is required for normal calculator use.</li>
+      <li>No billing account connection is required to run estimates.</li>
+      <li>No hidden request for provider credentials is part of the normal site workflow.</li>
     </ul>
 
     <h2 style="margin:18px 0 10px">Your choices</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Use the consent banner to manage ad and analytics preferences (when shown).</li>
-      <li>Block or clear cookies and site data in your browser settings.</li>
-      <li>Use privacy tools like tracking protection or content blockers where allowed.</li>
+      <li>Use the site consent controls to manage ad and analytics preferences where they are shown.</li>
+      <li>Clear cookies and site data in your browser settings.</li>
+      <li>Use tracking protection, content blockers, or browser privacy controls where allowed.</li>
     </ul>
 
-    <h2 style="margin:18px 0 10px">Changes</h2>
-    <p class="muted" style="margin:0">We may update this policy over time. The page reflects the current version.</p>
+    <h2 style="margin:18px 0 10px">Related pages</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><a href="/cookie-notice/">Cookie Notice</a>: how cookie categories and consent work on this site.</li>
+      <li><a href="/terms/">Terms</a>: educational-use limits and estimate responsibility.</li>
+      <li><a href="/contact/">Contact</a>: how to send privacy or site-operation questions.</li>
+    </ul>
 
-    <h2 style="margin:18px 0 10px">Contact</h2>
+    <h2 style="margin:18px 0 10px">Changes and contact</h2>
     <p class="muted" style="margin:0">
-      Questions about privacy:{" "}
+      This page may be updated as site behavior, ad configuration, or privacy controls change. Questions about privacy
+      or site data handling:{" "}
       <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
         Email us
       </a>

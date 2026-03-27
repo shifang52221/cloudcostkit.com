@@ -4,55 +4,86 @@ import { SITE } from "../config/site";
 
 const title = `About | ${SITE.name}`;
 const description =
-  "About CloudCostKit: fast, practical cloud cost and capacity calculators with transparent assumptions and validation workflows.";
+  "About CloudCostKit: practical cloud cost and capacity calculators, paired guides, and transparent validation workflows.";
 const [emailUser, emailDomain] = SITE.email.split("@");
 ---
 <BaseLayout title={title} description={description} canonicalPath="/about">
   <section class="card hero">
     <h1>About {SITE.name}</h1>
-    <p>Practical calculators for cloud planning: egress, logs, storage, Kubernetes, and break-even analysis.</p>
+    <p>
+      CloudCostKit is an independent cloud cost planning resource built for teams that need fast estimates, visible
+      assumptions, and a practical way to validate numbers before spend decisions.
+    </p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn btn-primary" href="/calculators/">Calculators</a>
+      <a class="btn" href="/guides/">Guides</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+      <a class="btn" href="/editorial-policy/">Editorial policy</a>
+      <a class="btn" href="/contact/">Contact</a>
+    </div>
   </section>
 
   <section class="card section prose">
-    <h2 style="margin-top:0">Principles</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Transparent assumptions: each tool defines what is included and excluded.</li>
-      <li>Utility first: focus on measurable drivers and decision-ready outputs.</li>
-      <li>Privacy-friendly: calculators run in your browser.</li>
-      <li>Validation-oriented: every estimate should map to real billing or metrics data.</li>
-    </ul>
-
-    <h2 style="margin:18px 0 10px">What this site is for</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Budgeting</strong>: get a directional monthly estimate quickly.</li>
-      <li><strong>Comparisons</strong>: compare workload shapes, tiers, and architecture options.</li>
-      <li><strong>Right-sizing</strong>: convert requirements into billable units.</li>
-      <li><strong>Validation</strong>: reconcile estimates against billing exports and metrics.</li>
-    </ul>
-
-    <h2 style="margin:18px 0 10px">How we maintain quality</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Each page must include unique decision guidance and validation steps.</li>
-      <li>Similar topics are split by intent so pages are not template duplicates.</li>
-      <li>High-traffic pages are refreshed first when pricing patterns drift.</li>
-      <li>Calculator and guide pages are maintained together for better user outcomes.</li>
-    </ul>
-
-    <h2 style="margin:18px 0 10px">How to get accurate estimates</h2>
-    <ol class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Start with measurable drivers (requests/month, GB/month, hours, GB-month).</li>
-      <li>Use effective rates first to get directionality.</li>
-      <li>Add boundaries and multipliers (retries, fan-out, cache hit rate).</li>
-      <li>Validate against a real week of data and update assumptions.</li>
-    </ol>
-    <p class="muted" style="margin:12px 0 0">
-      See <a href="/methodology/">Methodology</a> and the <a href="/guides/cloud-cost-estimation-checklist/">estimation checklist</a>.
+    <h2 style="margin-top:0">What this site is for</h2>
+    <p class="muted" style="margin:0">
+      The site is designed for practical planning work: estimating bills, checking cost drivers, comparing bounded
+      architecture options, and validating whether a number is directionally safe enough to carry into a real budget
+      conversation.
     </p>
 
-    <h2 style="margin:18px 0 10px">Data and pricing sources</h2>
+    <h2 style="margin:18px 0 10px">Who this site serves best</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li><strong>FinOps and finance teams</strong>: turn usage signals into budget conversations faster.</li>
+      <li><strong>Platform and SRE teams</strong>: isolate the real drivers behind networking, compute, storage, and logs.</li>
+      <li><strong>Application teams</strong>: compare runtime, request, storage, and transfer choices with fewer hidden assumptions.</li>
+      <li><strong>Technical buyers</strong>: sanity-check pricing structure before deeper procurement work.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">How a page earns publication</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>It must answer a distinct user question, not just mirror an adjacent keyword.</li>
+      <li>It must define clear boundaries, included line items, and common failure patterns.</li>
+      <li>It should improve a real workflow such as estimating, comparing, validating, or explaining.</li>
+      <li>It should connect to the next useful step, such as a paired calculator, guide, checklist, or policy page.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">How the site is maintained</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>Calculator pages and guide pages are maintained as connected workflows rather than isolated content pieces.</li>
+      <li>High-interest pages are reviewed first when pricing structure, traffic patterns, or user intent changes.</li>
+      <li>Similar topics are split by intent so parent pages, comparison pages, and support pages do not collapse into duplicates.</li>
+      <li>Corrections, wording problems, broken links, and unclear assumptions are part of normal maintenance, not afterthoughts.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      See the <a href="/editorial-policy/">Editorial Policy</a> for the publishing and corrections workflow, and{" "}
+      <a href="/methodology/">Methodology</a> for the estimation standard behind the tools.
+    </p>
+
+    <h2 style="margin:18px 0 10px">How pages get rewritten, merged, or retired</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If two pages start answering the same question, the stronger workflow page keeps the main role and the weaker page is rewritten, merged, or de-emphasized.</li>
+      <li>If a narrow page cannot support a distinct estimate, comparison, or validation job, the site favors strengthening the parent page rather than keeping a thin standalone page alive.</li>
+      <li>If a calculator or guide no longer reflects safe pricing boundaries, it is revised before it is promoted further in navigation.</li>
+      <li>If a page creates confusion without adding decision value, reducing its prominence is considered healthier than preserving page count.</li>
+    </ul>
+    <p class="muted" style="margin:12px 0 0">
+      The goal is not to publish the highest number of URLs. The goal is to keep a smaller set of pages that each do a
+      clear job in the estimating workflow.
+    </p>
+
+    <h2 style="margin:18px 0 10px">What the site will not pretend to do</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>It is not an official provider pricing page or procurement quote.</li>
+      <li>It is not a replacement for billing exports, internal ownership data, or contract-specific discounts.</li>
+      <li>It is not a one-click answer for an entire cloud bill without workload boundaries.</li>
+      <li>It does not treat a calculator output as trustworthy until boundaries, units, and assumptions are checked.</li>
+    </ul>
+
+    <h2 style="margin:18px 0 10px">Source and validation policy</h2>
     <p class="muted" style="margin:0">
       Calculators accept your own pricing because provider rates vary by region, tiering, discounts, and product
-      options. For official reference, use provider pricing pages and then validate against your billing exports.
+      options. Official provider pricing pages remain the source of truth, and estimates should be validated against
+      billing exports or usage metrics whenever possible.
     </p>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
       <li>
@@ -75,16 +106,17 @@ const [emailUser, emailDomain] = SITE.email.split("@");
       </li>
     </ul>
 
-    <h2 style="margin:18px 0 10px">Limitations</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Tools are simplified planning models; production bills can differ due to pricing rules.</li>
-      <li>Incidents can shift cost drivers quickly (retries, bot spikes, backfills).</li>
-      <li>Provider documentation remains the source of truth for procurement decisions.</li>
-    </ul>
-
-    <h2 style="margin:18px 0 10px">Contact</h2>
+    <h2 style="margin:18px 0 10px">Contact and corrections</h2>
     <p class="muted" style="margin:0">
-      Feedback and suggestions:{" "}
+      If you find a factual issue, a broken tool path, a weak boundary explanation, or a calculator result that looks
+      directionally wrong, please report it through the <a href="/contact/">Contact page</a>.
+    </p>
+    <p class="muted" style="margin:12px 0 0">
+      Reports about overlap, stale page roles, or pages that feel too thin are useful too. Those reviews help decide
+      whether a page should be expanded, merged into a stronger parent, or reduced in prominence.
+    </p>
+    <p class="muted" style="margin:12px 0 0">
+      Direct contact:{" "}
       <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
         Email us
       </a>

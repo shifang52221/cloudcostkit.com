@@ -142,6 +142,16 @@ const calculatorSchema = {
   url: canonical,
   applicationCategory: "FinanceApplication",
   operatingSystem: "Any",
+  creator: {
+    "@type": "Organization",
+    name: SITE.editorial.teamName,
+    url: SITE.url,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: SITE.name,
+    url: SITE.url,
+  },
   offers: {
     "@type": "Offer",
     price: "0",
@@ -189,6 +199,10 @@ const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].fil
   <section class="card hero">
     <h1>{title}</h1>
     <p>{intro}</p>
+    <p class="muted" style="margin:8px 0 0; font-size:14px">
+      Maintained by {SITE.editorial.teamName}. Last updated: {lastUpdated}.{" "}
+      <a href="/editorial-policy/">Editorial policy</a> and <a href="/methodology/">methodology</a>.
+    </p>
     <section id="calc-toolbar" class="btn-row" style="margin-top:12px; align-items:center">
       <button class="btn" type="button" id="calc-copy-link">Copy link</button>
       <button class="btn" type="button" id="calc-reset">Reset</button>
@@ -514,6 +528,9 @@ const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].fil
       Educational use only. Not legal, financial, or professional advice. Results are estimates based on the inputs and
       assumptions shown on this page. Verify pricing and limits with your providers and documentation.
     </p>
-    <p class="muted" style="margin:10px 0 0">Last updated: {lastUpdated}</p>
+    <p class="muted" style="margin:10px 0 0">
+      Last updated: {lastUpdated}. {SITE.editorial.reviewLabel} See the <a href="/editorial-policy/">Editorial Policy</a>
+      .
+    </p>
   </section>
 </BaseLayout>

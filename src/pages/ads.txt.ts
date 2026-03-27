@@ -1,26 +1,18 @@
-function getAdsensePublisherId() {
-  const fallback = "pub-8677561632094995";
-  const explicit = (
-    import.meta.env.ADSENSE_PUBLISHER_ID ||
-    import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ||
-    ""
-  ).trim();
-  if (explicit) return explicit;
-
-  const client = (import.meta.env.PUBLIC_ADSENSE_CLIENT || "").trim();
-  if (client.startsWith("ca-pub-")) return `pub-${client.slice("ca-pub-".length)}`;
-  return fallback;
-}
+import { SITE } from "../config/site";
 
 export function GET() {
-  const publisherId = getAdsensePublisherId();
+  const publisherId = SITE.ads.publisherId;
 
   const lines: string[] = [
     "# ads.txt for CloudCostKit",
-    "# Set ADSENSE_PUBLISHER_ID (or PUBLIC_ADSENSE_PUBLISHER_ID) to output your AdSense record.",
+    "# Set ADSENSE_PUBLISHER_ID or PUBLIC_ADSENSE_PUBLISHER_ID to output your AdSense record.",
   ];
 
-  lines.push(`google.com, ${publisherId}, DIRECT, f08c47fec0942fa0`);
+  if (publisherId) {
+    lines.push(`google.com, ${publisherId}, DIRECT, f08c47fec0942fa0`);
+  } else {
+    lines.push("# No AdSense publisher id configured.");
+  }
 
   return new Response(lines.join("\n") + "\n", {
     headers: {
