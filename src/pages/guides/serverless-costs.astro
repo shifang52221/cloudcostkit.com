@@ -1,7 +1,5 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
-import { GUIDES } from "../../lib/guides.generated";
-import { withTrailingSlash } from "../../lib/url";
 
 const title = "Serverless costs explained: invocations, duration, requests, and downstream spend";
 const description =
@@ -21,50 +19,93 @@ const faqs = [
     a: "Retry storms, chatty calls to downstream services, and verbose logs during incidents. Also, cold starts and concurrency can change resource usage patterns.",
   },
 ];
-
-const serverlessGuides = GUIDES.filter((g) => (g.topics || []).includes("serverless") && g.canonicalPath !== "/guides/serverless-costs")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .slice(0, 18);
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/serverless-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-27"
   faqs={faqs}
 >
   <p class="muted">
-    Serverless estimates fail when you model only invocations. The reliable approach is: invocations + duration + logs
-    + egress + downstream requests. This hub links the best checklists and calculators to avoid thin compute-only models.
+    This page is the cross-provider serverless architecture guide inside the broader{" "}
+    <a href="/guides/compute-costs/">compute cost model</a>. Its job is to help you estimate the full serverless system
+    bill: function compute, event amplification, downstream services, observability, and transfer, not just invocation math.
   </p>
 
-  <h2>1) Invocations and duration (compute time)</h2>
+  <h2>When this page should be your main guide</h2>
+  <ul>
+    <li>You are comparing event-driven or request-driven architectures across providers.</li>
+    <li>You need to understand why the bill is larger than "invocations x duration".</li>
+    <li>You need a cross-provider workflow before drilling into Lambda, Cloud Run, or Azure Functions pricing.</li>
+  </ul>
+  <p class="muted">
+    If you already know the exact provider and product, use this page to structure the estimate, then hand off to the
+    provider-specific pricing guide for final assumptions.
+  </p>
+
+  <h2>1) Compute billing shape: invocations, duration, and allocation</h2>
   <ul>
     <li>Convert traffic to invocations per month.</li>
-    <li>Model average duration and consider peak / incident scenarios separately.</li>
+    <li>Model average duration, memory or CPU allocation, and baseline vs peak concurrency separately.</li>
+    <li>Cold starts do not always dominate the bill, but poor memory sizing and long-running handlers often do.</li>
     <li>
-      Hub: <a href="/guides/requests-costs/">request-based pricing</a>
+      Hub: <a href="/guides/request-based-pricing/">request-based pricing</a>
     </li>
   </ul>
+  <p class="muted">
+    Serverless compute looks cheap because the unit price is small. The mistake is assuming the unit is the whole story.
+    The real budget driver is how often the workload runs, how long it runs, and how many extra systems each invocation touches.
+  </p>
 
-  <h2>2) Logs and metrics (often the surprise)</h2>
+  <h2>2) Event amplification: the hidden multiplier</h2>
   <ul>
-    <li>Verbose logs can dominate for chatty functions.</li>
-    <li>Metrics cost is a cardinality problem; label explosion is common in serverless apps.</li>
+    <li><strong>Retries</strong>: failures and timeouts can multiply invocations far beyond the happy path.</li>
+    <li><strong>Fan-out</strong>: one event can trigger many queue deliveries, webhooks, or subscriber executions.</li>
+    <li><strong>Downstream calls</strong>: each invocation may create API, database, storage, or messaging request costs.</li>
+    <li><strong>Batch size choices</strong>: inefficient batching can turn one business event into many paid invocations.</li>
+  </ul>
+  <p>
+    This is where many serverless estimates break. The function charge may be fine, but the architecture around it can
+    multiply requests, transfer, and storage operations enough to dominate the total.
+  </p>
+
+  <h2>3) Logs and metrics (often the surprise line item)</h2>
+  <ul>
+    <li>Verbose logs can dominate for chatty or high-throughput functions.</li>
+    <li>Metrics cost is a cardinality problem; label explosion is common in serverless apps and background jobs.</li>
+    <li>Incident months often increase compute and observability cost at the same time.</li>
     <li>
       Hubs: <a href="/guides/log-costs/">log costs</a>, <a href="/guides/metrics-costs/">metrics costs</a>
     </li>
   </ul>
 
-  <h2>3) Egress and downstream spend</h2>
+  <h2>4) Egress and downstream spend</h2>
   <ul>
     <li>Outbound transfer scales with payload size and traffic.</li>
     <li>Downstream requests (DB/queue/storage) can dwarf compute charges.</li>
+    <li>NAT, CDN misses, and cross-zone traffic can show up when functions call other services heavily.</li>
     <li>
       Hubs: <a href="/guides/networking-costs/">networking costs</a>, <a href="/guides/database-costs/">database costs</a>,{" "}
       <a href="/guides/messaging-costs/">messaging costs</a>
     </li>
+  </ul>
+
+  <h2>5) Build the estimate in layers</h2>
+  <ol>
+    <li>Start with invocations, average duration, and resource allocation.</li>
+    <li>Add retry and fan-out scenarios for peak and failure windows.</li>
+    <li>Add logs, metrics, and traces as separate observability lines.</li>
+    <li>Add downstream request and storage lines for each service the function touches.</li>
+    <li>Add egress or transfer only after you split the traffic boundaries clearly.</li>
+  </ol>
+
+  <h2>What teams usually miss</h2>
+  <ul>
+    <li><strong>Function success path only</strong>: no retry, timeout, or dead-letter scenario.</li>
+    <li><strong>No downstream budget</strong>: database, queue, cache, and storage operations omitted.</li>
+    <li><strong>No observability budget</strong>: logs left out even though every invocation emits them.</li>
+    <li><strong>No provider handoff</strong>: cross-provider estimates not translated into actual pricing boundaries.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -73,20 +114,18 @@ const serverlessGuides = GUIDES.filter((g) => (g.topics || []).includes("serverl
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+    <a class="btn" href="/guides/compute-costs/">Compute costs</a>
   </div>
 
-  {serverlessGuides.length ? (
-    <>
-      <h2>More serverless guides</h2>
-      <div class="grid">
-        {serverlessGuides.map((g) => (
-          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-            <div class="tool-title">{g.title}</div>
-            <div class="tool-desc">{g.description}</div>
-          </a>
-        ))}
-      </div>
-    </>
-  ) : null}
+  <h2>Provider handoff: where to go next</h2>
+  <ul>
+    <li>Use AWS Lambda pricing pages when you need function duration, request tiers, and add-on assumptions on AWS.</li>
+    <li>Use Azure Functions pricing when you need execution plan and hosting-plan boundaries.</li>
+    <li>Use Cloud Run or Cloud Functions pricing when you need request, CPU, memory, and concurrency behavior on GCP.</li>
+  </ul>
+  <p>
+    The role of this page is to help you bring a cleaner workload model into those provider-specific pages so you do not
+    just swap one vague estimate for another.
+  </p>
 </GuideLayout>
 

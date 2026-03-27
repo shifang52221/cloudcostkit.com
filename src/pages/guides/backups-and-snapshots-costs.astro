@@ -1,7 +1,5 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
-import { GUIDES } from "../../lib/guides.generated";
-import { withTrailingSlash } from "../../lib/url";
 
 const title = "Backup and snapshot costs explained: retention, growth, and transfer";
 const description =
@@ -21,47 +19,78 @@ const faqs = [
     a: "Long retention, high churn workloads, and forgetting cross-region backup copies or egress/transfer for restores and replication.",
   },
 ];
-
-const backupGuides = GUIDES.filter((g) => (g.topics || []).includes("backup") && g.canonicalPath !== "/guides/backups-and-snapshots-costs")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .slice(0, 18);
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/backups-and-snapshots-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-27"
   faqs={faqs}
+  robots="noindex,follow"
 >
   <p class="muted">
-    Backup bills grow quietly. The stable model is: change rate + retention + copy strategy. This hub links snapshot and
-    backup estimation workflows so retention policies are explicit and measurable.
+    Use this page as an internal support guide for backup retention and restore economics. The stronger public-facing
+    parent pages are <a href="/guides/storage-costs/">storage costs</a> and{" "}
+    <a href="/guides/database-costs/">database costs</a>, which usually own the broader search intent. This page stays
+    useful when you specifically need to think through retention ladders, restore testing, DR copies, and backup growth.
   </p>
 
-  <h2>1) Retention policy (daily/weekly/monthly)</h2>
-  <ul>
-    <li>Write the policy down: how many daily, weekly, and monthly backups.</li>
-    <li>Validate compliance vs practical troubleshooting needs.</li>
-  </ul>
+  <div class="btn-row">
+    <a class="btn" href="/guides/storage-costs/">Main guide: storage costs</a>
+    <a class="btn" href="/guides/database-costs/">Database costs</a>
+    <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">Snapshot cost calculator</a>
+  </div>
 
-  <h2>2) Storage growth (GB-month)</h2>
+  <h2>1) Retention ladder: operational vs compliance</h2>
   <ul>
-    <li>Estimate protected data size and daily change/churn rate.</li>
-    <li>Convert retention into stored GB-month over time.</li>
+    <li>Write the policy down explicitly: daily, weekly, monthly, and annual retention.</li>
+    <li>Separate <strong>operational recovery</strong> backups from <strong>long-term compliance</strong> copies.</li>
+    <li>Do not keep everything forever by default just because snapshots feel cheap.</li>
+  </ul>
+  <p class="muted">
+    The most common governance mistake is one flat retention policy for every environment and every dataset. Recovery
+    needs, compliance needs, and experiment leftovers should not all share the same retention curve.
+  </p>
+
+  <h2>2) Backup footprint grows from churn, not just size</h2>
+  <ul>
+    <li>Estimate protected data size and daily change rate separately.</li>
+    <li>Convert churn x retention into a steady-state backup footprint.</li>
+    <li>Model growth over time instead of assuming the current footprint is stable.</li>
     <li>
       Tool: <a href="/calculators/aws-ebs-snapshot-cost-calculator/">snapshot cost calculator</a>
     </li>
   </ul>
+  <p>
+    Backup cost surprises usually come from retention windows filling up on fast-changing datasets, not from the existence
+    of one backup copy. Churn is the multiplier people miss.
+  </p>
 
-  <h2>3) Copies and transfer</h2>
+  <h2>3) DR copies, restores, and transfer</h2>
   <ul>
-    <li>Cross-region copies duplicate storage and can add transfer charges.</li>
-    <li>Restore testing and DR drills add read/restore costs depending on provider.</li>
+    <li>Cross-region or cross-account copies duplicate stored footprint and can add transfer charges.</li>
+    <li>Restore testing and DR drills add read, restore, or transfer costs depending on provider.</li>
+    <li>Manual snapshots created during incidents or migrations can stay behind and become permanent cost leaks.</li>
     <li>
       Tools: <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>,{" "}
       <a href="/calculators/data-egress-cost-calculator/">egress</a>
     </li>
+  </ul>
+
+  <h2>4) Review checklist before changing policy</h2>
+  <ol>
+    <li>List which backups are for short-term recovery and which are for compliance.</li>
+    <li>Find manual snapshots or long-lived copies without an owner.</li>
+    <li>Confirm how often restores are tested and what those tests cost.</li>
+    <li>Check whether cross-region DR copies are priced separately from the primary backup pool.</li>
+    <li>Only then shorten retention or cleanup snapshots.</li>
+  </ol>
+
+  <h2>When this page is useful</h2>
+  <ul>
+    <li>As a focused backup-retention checklist inside a broader storage or database review.</li>
+    <li>As an internal handoff page for teams discussing snapshot growth and DR copies.</li>
+    <li>As a reminder that restore economics matter, not just stored backup GB.</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -71,19 +100,5 @@ const backupGuides = GUIDES.filter((g) => (g.topics || []).includes("backup") &&
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
     <a class="btn" href="/guides/database-costs/">Database costs</a>
   </div>
-
-  {backupGuides.length ? (
-    <>
-      <h2>More backup guides</h2>
-      <div class="grid">
-        {backupGuides.map((g) => (
-          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-            <div class="tool-title">{g.title}</div>
-            <div class="tool-desc">{g.description}</div>
-          </a>
-        ))}
-      </div>
-    </>
-  ) : null}
 </GuideLayout>
 

@@ -8,6 +8,7 @@
     "generate:guides": "node scripts/generate-guides.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "verify:live": "node scripts/verify-live-site.mjs",
+    "verify:live:post-deploy": "node scripts/verify-live-post-deploy.mjs",
     "build": "node scripts/generate-guides.mjs && astro build",
     "preview": "astro preview",
     "preview:lan": "astro preview --host 0.0.0.0 --port 4321",

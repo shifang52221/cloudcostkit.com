@@ -21,6 +21,7 @@ type Props = {
   excludes?: string[];
   examples?: string[];
   related?: RelatedLink[];
+  robots?: string;
 };
 
 const {
@@ -35,6 +36,7 @@ const {
   excludes,
   examples,
   related,
+  robots,
 } = Astro.props;
 const slots = SITE.adsenseSlots;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
@@ -188,7 +190,7 @@ const howToSchema =
 
 const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].filter(Boolean);
 ---
-<BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath}>
+<BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath} robots={robots}>
   {schemas.length ? (
     <script
       type="application/ld+json"

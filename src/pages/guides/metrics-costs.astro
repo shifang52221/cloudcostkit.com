@@ -1,7 +1,5 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
-import { GUIDES } from "../../lib/guides.generated";
-import { withTrailingSlash } from "../../lib/url";
 
 const title = "Metrics and monitoring costs explained: series, cardinality, and retention";
 const description =
@@ -21,43 +19,98 @@ const faqs = [
     a: "Unexpected label cardinality growth, verbose custom metrics, and always-on dashboards/alerts that poll frequently.",
   },
 ];
-
-const metricsGuides = GUIDES.filter((g) => (g.topics || []).includes("metrics") && g.canonicalPath !== "/guides/metrics-costs")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .slice(0, 18);
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/metrics-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-27"
   faqs={faqs}
 >
   <p class="muted">
-    Metrics bills are usually a cardinality problem. If you model only \"metrics per host\" you will miss label explosion
-    (pod names, paths, user IDs). This hub links the best checklists and the calculators that make series math explicit.
+    Metrics bills are usually a cardinality problem, not a "how many hosts do we have?" problem. This page is the
+    metrics-specific deep dive inside the broader <a href="/guides/observability-costs/">observability cost model</a>:
+    it focuses on how series are created, how labels multiply cost, and how to cut spend without blinding the team.
   </p>
 
-  <h2>1) Estimate unique series (cardinality)</h2>
+  <h2>When this page should be your main guide</h2>
   <ul>
-    <li>Count series = metrics x label combinations x environments.</li>
-    <li>High-cardinality labels are the common root cause of runaway spend.</li>
+    <li>You need to understand why series count grows faster than host or service count.</li>
+    <li>You suspect label choices, dashboards, or alert rules are multiplying cost silently.</li>
+    <li>You already know metrics are the problem and want a narrower workflow than the full observability guide.</li>
+  </ul>
+  <p class="muted">
+    If the bigger question is "logs vs metrics vs traces, which signal family is driving the bill?", start with{" "}
+    <a href="/guides/observability-costs/">observability costs</a> first.
+  </p>
+
+  <h2>1) Build the series count correctly</h2>
+  <ul>
+    <li><strong>Series count</strong> = metrics x label combinations x environments x cluster or region spread.</li>
+    <li><strong>Cardinality</strong> is the multiplier: one new high-uniqueness label can create thousands of series.</li>
+    <li><strong>Churn</strong> matters too: short-lived pods, dynamic paths, and ephemeral tenants can create noisy growth.</li>
     <li>
       Tool: <a href="/calculators/metrics-timeseries-cost-calculator/">Metrics time series cost</a>
     </li>
   </ul>
+  <p class="muted">
+    A common mistake is counting metric names but not the combinations behind them. Ten metrics with ten environments and
+    fifty route labels are not "ten metrics"; they are hundreds or thousands of billable series.
+  </p>
 
-  <h2>2) Retention and query behavior</h2>
+  <h2>2) The label patterns that usually create runaway cost</h2>
   <ul>
-    <li>Retention is a GB-month problem: longer retention grows stored dataset size.</li>
-    <li>Dashboards and API polling can create hidden request-based charges on some platforms.</li>
+    <li><strong>Request-level IDs</strong>: requestId, traceId, userId, sessionId, full URL path.</li>
+    <li><strong>Ephemeral infrastructure</strong>: pod name, task ID, autoscaled instance names.</li>
+    <li><strong>Unbounded tenant dimensions</strong>: raw customer IDs instead of tier or segment buckets.</li>
+    <li><strong>Copy-paste instrumentation</strong>: metrics duplicated across services with slightly different label sets.</li>
   </ul>
+  <p>
+    The safest pattern is to label metrics with values that stay useful in dashboards and alerts: route template, status
+    family, service, region, environment, or tenant tier. If a label is too unique to aggregate meaningfully, it is
+    usually too unique to belong on a metric.
+  </p>
 
-  <h2>3) Alerts and high-frequency collection</h2>
+  <h2>3) Resolution, retention, dashboards, and alerts</h2>
   <ul>
-    <li>Alert counts and evaluation frequency can add recurring cost.</li>
-    <li>Use high-resolution collection only for signals that require it.</li>
+    <li><strong>Resolution</strong>: higher-frequency collection creates more samples and more query load.</li>
+    <li><strong>Retention</strong>: longer retention increases stored footprint and keeps expensive data around longer.</li>
+    <li><strong>Dashboards</strong>: frequently refreshed boards or API polling can generate recurring query charges.</li>
+    <li><strong>Alerts</strong>: alert count, evaluation frequency, and high-resolution alarms can add a second bill.</li>
+  </ul>
+  <p class="muted">
+    Not every metric needs one-second resolution or long retention. Reserve the expensive settings for the signals that
+    truly support incident response, SLO tracking, or customer-visible performance.
+  </p>
+
+  <h2>4) A practical metrics review workflow</h2>
+  <ol>
+    <li>List the top metric families by active series count.</li>
+    <li>Identify which labels create the multiplication.</li>
+    <li>Cut or bucket the labels that do not improve alerting or decision-making.</li>
+    <li>Review dashboard refresh rates and query ranges for high-volume boards.</li>
+    <li>Shorten retention or reduce resolution for signals that are rarely used after incident windows.</li>
+  </ol>
+
+  <h2>5) Prioritize fixes by risk and savings</h2>
+  <ul>
+    <li><strong>First</strong>: stop the worst high-cardinality labels from generating new series.</li>
+    <li><strong>Second</strong>: remove duplicate custom metrics or collapse them into fewer dimensions.</li>
+    <li><strong>Third</strong>: trim refresh-heavy dashboards and overly frequent alert evaluations.</li>
+    <li><strong>Fourth</strong>: move rarely used long-tail metrics to lower frequency or shorter retention.</li>
+  </ul>
+  <p>
+    The fastest safe savings usually come from label hygiene, not from turning off whole dashboards blindly. Reduce cost
+    in the order that preserves operator confidence.
+  </p>
+
+  <h2>Worked review checklist</h2>
+  <ul>
+    <li>What are the top ten metric families by active series count?</li>
+    <li>Which labels are unbounded or effectively unique?</li>
+    <li>Which alerts truly need high resolution?</li>
+    <li>Which dashboards refresh constantly but are rarely used in incidents?</li>
+    <li>Which metrics could be logs or traces instead of high-cardinality metrics?</li>
   </ul>
 
   <h2>Related tools</h2>
@@ -65,19 +118,13 @@ const metricsGuides = GUIDES.filter((g) => (g.topics || []).includes("metrics") 
     <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
     <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics</a>
     <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">CloudWatch alarms</a>
+    <a class="btn" href="/guides/observability-costs/">Observability costs</a>
   </div>
 
-  {metricsGuides.length ? (
-    <>
-      <h2>More metrics guides</h2>
-      <div class="grid">
-        {metricsGuides.map((g) => (
-          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-            <div class="tool-title">{g.title}</div>
-            <div class="tool-desc">{g.description}</div>
-          </a>
-        ))}
-      </div>
-    </>
-  ) : null}
+  <h2>When to move to provider-specific pricing pages</h2>
+  <p>
+    Once you understand your series count and governance problem, move to provider-specific pricing when you need product
+    details such as CloudWatch custom metrics, alarm pricing, Azure Monitor charge boundaries, or Google Cloud monitoring
+    tiers. This page should help you arrive there with cleaner assumptions.
+  </p>
 </GuideLayout>

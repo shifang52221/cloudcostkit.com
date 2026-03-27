@@ -50,6 +50,12 @@ const description =
   <ApiResponseTransferCalculator client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      Treat this as a support estimator inside bigger egress, API, CDN, and load-balancing workflows. It is best when you
+      already know the request pattern and need to translate payload size into transfer, not when you need a full network
+      cost model by itself.
+    </p>
+
     <h2 style="margin-top:0">What response size should include</h2>
     <ul>
       <li><strong>Payload bytes</strong>: JSON/HTML/media returned by the endpoint (usually the dominant part).</li>
@@ -128,8 +134,9 @@ const description =
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+      <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
       <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
-      <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+      <a class="btn" href="/calculators/api-request-cost-calculator/">API request cost</a>
     </div>
   </div>
 </CalculatorLayout>

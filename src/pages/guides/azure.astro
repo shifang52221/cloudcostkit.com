@@ -14,7 +14,7 @@ const azureGuides = GUIDES.filter((g) => g.category === "Azure")
   .slice()
   .sort((a, b) => a.title.localeCompare(b.title));
 ---
-<BaseLayout title={title} description={description} canonicalPath="/guides/azure">
+<BaseLayout title={title} description={description} canonicalPath="/guides/azure" robots="noindex,follow">
   <section class="card hero">
     <h1>Azure cost guides</h1>
     <p>Practical models to estimate common Azure line items and avoid frequent surprises.</p>

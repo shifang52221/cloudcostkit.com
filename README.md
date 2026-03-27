@@ -57,16 +57,21 @@ Run this after deployment:
 
 ```bash
 npm run verify:live
+npm run verify:live:post-deploy
 ```
 
 Default behavior checks:
 
 - homepage and trust routes return `200`
 - representative pages do not expose AdSense script or ad containers
+- thin-page removals are absent from the live sitemap
+- demoted thin pages emit `noindex,follow`
+- representative kept pages remain indexable
 
 Useful overrides:
 
 ```bash
 SITE_URL=https://cloudcostkit.com npm run verify:live
 EXPECT_NO_ADS=false SITE_URL=https://cloudcostkit.com npm run verify:live
+SITE_URL=https://cloudcostkit.com npm run verify:live:post-deploy
 ```

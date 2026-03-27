@@ -14,7 +14,7 @@ const gcpGuides = GUIDES.filter((g) => g.category === "GCP")
   .slice()
   .sort((a, b) => a.title.localeCompare(b.title));
 ---
-<BaseLayout title={title} description={description} canonicalPath="/guides/gcp">
+<BaseLayout title={title} description={description} canonicalPath="/guides/gcp" robots="noindex,follow">
   <section class="card hero">
     <h1>GCP cost guides</h1>
     <p>Practical models to estimate common GCP line items and avoid the biggest cost traps.</p>
@@ -45,7 +45,7 @@ const gcpGuides = GUIDES.filter((g) => g.category === "GCP")
       <h2 style="margin-top:0">Common traps</h2>
       <ul class="muted" style="margin:10px 0 0; padding-left:18px">
         <li>Under-modeling inter-zone and cross-region transfer.</li>
-        <li>High-cardinality metrics labels creating “quietly growing” bills.</li>
+        <li>High-cardinality metrics labels creating "quietly growing" bills.</li>
         <li>Confusing CDN bandwidth with origin egress (cache fill).</li>
       </ul>
       <p class="muted" style="margin:12px 0 0">

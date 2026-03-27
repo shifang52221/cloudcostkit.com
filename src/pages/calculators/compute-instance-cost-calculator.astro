@@ -10,6 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/compute-instance-cost-calculator"
+  robots="noindex,follow"
   intro="For back-of-the-napkin budgeting, instance count x hourly price x billable hours gets you most of the way. Compare baseline vs peak instance counts with a simple utilization model."
   examples={[
     "6 instances at $0.18/hour running 24/7 -> estimate monthly compute cost.",
@@ -50,6 +51,12 @@ const description =
 >
   <ComputeInstanceCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This page is a support calculator for generic monthly compute math. For public-facing compute workflows, use stronger
+      primary destinations like <a href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a> or provider-specific
+      pricing guides, then use this page only when you need a generic cross-check.
+    </p>
+
     <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Instances</strong>: use average running instances from billing (instance-hours / monthly hours), not peak.</li>
@@ -106,9 +113,9 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
+      <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost calculator</a>
       <a class="btn" href="/calculators/reserved-vs-on-demand-break-even-calculator/">Reserved break-even</a>
       <a class="btn" href="/calculators/kubernetes-node-cost-calculator/">Kubernetes node cost</a>
-      <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
     </div>
   </div>
 </CalculatorLayout>
