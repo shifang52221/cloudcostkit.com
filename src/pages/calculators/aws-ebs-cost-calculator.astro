@@ -59,66 +59,40 @@ const description =
 >
   <AwsEbsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Separate storage baseline from paid performance headroom</h2>
+    <p>
+      EBS does not usually surprise teams because storage exists. It surprises them because performance is provisioned
+      above what the workload really needs, or because storage and snapshot thinking get mixed together into one blurry
+      number.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Measure storage GB-month separately from paid IOPS and throughput so you can see which side is driving spend.</li>
+      <li>Keep volume type explicit: gp2, gp3, and more specialized profiles do not carry the same cost shape.</li>
+      <li>Treat snapshots and backup retention as adjacent storage programs, not part of this core volume estimate.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where EBS estimates usually drift</h2>
     <ul>
-      <li>If performance costs dominate, consider tuning IOPS/throughput or switching volume types.</li>
-      <li>If storage dominates, check for over-provisioned volumes or stale snapshots.</li>
+      <li><strong>Idle overprovisioning</strong>: volumes often stay oversized long after the peak event that justified them.</li>
+      <li><strong>Paid performance headroom</strong>: IOPS and throughput premiums can dominate when teams provision for worst case and never revisit it.</li>
+      <li><strong>Volume-type mismatch</strong>: staying on an older or more expensive performance profile distorts the monthly baseline.</li>
+      <li><strong>Snapshot confusion</strong>: teams sometimes blame the volume page for snapshot or backup line items that belong elsewhere.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile the estimate with the bill</h2>
+    <ol>
+      <li>Compare billed storage, IOPS, and throughput charges with the actual volume configuration in the same period.</li>
+      <li>Check whether volumes are still provisioned for a past incident, migration, or benchmark instead of current workload.</li>
+      <li>Review whether snapshot storage is being counted as part of the core EBS spend by mistake.</li>
+      <li>Run a right-sized scenario beside the current scenario to see how much cost is really tied to performance headroom.</li>
+    </ol>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Track storage GB-month by volume type.</li>
-      <li>Include provisioned IOPS and throughput where enabled.</li>
-      <li>Model snapshot retention and daily change rate.</li>
-      <li>Use scheduled uptime if volumes are not always attached.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Storage</th>
-          <th>IOPS</th>
-          <th>Throughput</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Average</td>
-          <td>Expected</td>
-          <td>Expected</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>High</td>
-          <td>High</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do when one component dominates</h2>
+    <p>
+      If performance dominates, revisit IOPS, throughput, and volume-type choice. If storage dominates, inspect stale
+      volumes and oversized allocations. If the broader block-storage program still looks expensive after that, the next
+      stop is snapshots, backups, and restore policy rather than more tuning of the core volume estimate.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

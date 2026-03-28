@@ -60,66 +60,41 @@ const description =
 >
   <AwsLambdaCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Treat Lambda as a runtime-shape bill, not just a request counter</h2>
+    <p>
+      Lambda totals are driven by two moving parts at once: invocation count and GB-seconds. That means a request spike
+      is only half the story. Duration, memory size, retries, and cold-start-heavy traffic patterns often matter more
+      than the request fee itself.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Measure invocations and duration together over the same time window instead of estimating them separately.</li>
+      <li>Use realistic duration distributions such as p50 and p95 when baseline and burst traffic behave differently.</li>
+      <li>Keep memory settings tied to the actual function configuration; GB-seconds move immediately when memory changes.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where Lambda estimates usually drift</h2>
     <ul>
-      <li>GB-seconds per invocation is the main compute driver; reduce duration or memory to lower cost.</li>
-      <li>If request cost is small, focus on latency and memory tuning first.</li>
+      <li><strong>Retry bursts</strong>: async retries and failing downstream dependencies can multiply invocations.</li>
+      <li><strong>Long-tail duration</strong>: a small number of slow invocations can dominate compute cost in bursty systems.</li>
+      <li><strong>Concurrency behavior</strong>: cold-start mitigation, traffic spikes, and parallelism can change real runtime shape.</li>
+      <li><strong>Adjacent observability</strong>: logs, metrics, transfer, and downstream services are often larger than the Lambda request line item.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile the estimate with the bill</h2>
+    <ol>
+      <li>Compare invocation totals with measured function traffic over the same billing period.</li>
+      <li>Check whether p95 or retry-heavy duration explains why billed GB-seconds exceed the simple average case.</li>
+      <li>Separate core Lambda charges from CloudWatch, egress, and downstream service costs before deciding the calculator is wrong.</li>
+      <li>Run a second scenario for launch or incident months if normal traffic does not represent your highest-cost periods.</li>
+    </ol>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Use p50 and p95 duration for baseline and peak scenarios.</li>
-      <li>Memory size drives GB-seconds; model per-function differences.</li>
-      <li>Apply free tier or discounts as separate adjustments.</li>
-      <li>Include async retries or error bursts in invocation counts.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Invocations</th>
-          <th>Duration</th>
-          <th>Memory</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>p50</td>
-          <td>Configured</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>p95</td>
-          <td>Configured</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do when one side dominates</h2>
+    <p>
+      If GB-seconds dominate, tune memory, duration, and handler behavior first. If invocation growth dominates, inspect
+      retries, batching, and event fan-out. If the Lambda bill looks reasonable but the serverless stack still feels
+      expensive, move next to logs, queues, API Gateway, or egress instead of stretching this page into a full platform
+      cost model.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
