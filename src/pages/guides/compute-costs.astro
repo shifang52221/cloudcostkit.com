@@ -1,7 +1,5 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
-import { GUIDES } from "../../lib/guides.generated";
-import { withTrailingSlash } from "../../lib/url";
 
 const title = "Compute costs explained: instance-hours, utilization, and hidden drivers";
 const description =
@@ -21,70 +19,120 @@ const faqs = [
     a: "Underestimating idle capacity, bursty traffic, and downstream costs (databases, logging, networking). Commitments can help but only if you validate utilization.",
   },
 ];
-
-const computeGuides = GUIDES.filter((g) => (g.topics || []).includes("compute") && g.canonicalPath !== "/guides/compute-costs")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .slice(0, 18);
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/compute-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-28"
   faqs={faqs}
 >
   <p class="muted">
-    Compute-only estimates are almost always too optimistic. A planning-safe model includes compute time plus at least one
-    scenario for networking (egress) and observability (logs/metrics). This hub links the strongest checklists and tools.
+    Compute-only estimates are almost always too optimistic. A planning-safe model includes compute time plus at least
+    one scenario for networking, load balancing, and observability. This page is the parent framework for that model:
+    instances, containers, serverless, idle waste, adjacent spend, and the validation rules that decide whether the
+    budget is believable.
   </p>
 
-  <h2>1) Baseline compute</h2>
+  <h2>Start with the billing shape, not with the product name</h2>
+  <p>
+    Compute spend looks different on VMs, containers, and serverless platforms, but the underlying logic is still the
+    same. You are paying for reserved or consumed compute capacity over time, plus the operational choices that make
+    that capacity more or less efficient.
+  </p>
   <ul>
-    <li>Estimate instance-hours (or vCPU/GB-hours) for steady state, not peak-only.</li>
-    <li>Separate prod vs non-prod; dev/test can dominate if always on.</li>
+    <li><strong>Instance-based systems</strong>: estimate instance-hours and separate steady state from peak headroom.</li>
+    <li><strong>Container platforms</strong>: estimate vCPU and memory time, then validate how well workloads are packed on nodes or tasks.</li>
+    <li><strong>Serverless systems</strong>: estimate invocation-driven compute time, but keep downstream amplification visible instead of treating the function bill as the whole system.</li>
+  </ul>
+  <p>
+    The mistake at this layer is choosing a provider or product first, then trying to fit the cost model to the
+    product. A stronger workflow starts with workload behavior, then maps it onto the billing shape that best matches
+    how the system really runs.
+  </p>
+
+  <h2>Baseline capacity versus peak headroom is where waste begins</h2>
+  <p>
+    Most compute estimates break because the team mixes steady-state capacity with protective headroom and never shows
+    the two numbers separately. That makes the bill look unavoidable when part of it is really optional safety margin or
+    idle waste.
+  </p>
+  <ul>
+    <li><strong>Steady state</strong>: model the compute required for a normal period when traffic and batch work look typical.</li>
+    <li><strong>Peak headroom</strong>: keep burst, incident, and launch scenarios separate so you can see what the expensive month actually contains.</li>
+    <li><strong>Non-production</strong>: separate dev, test, staging, and support environments because always-on non-prod can distort the total more than people expect.</li>
+    <li><strong>Scheduling and off-hours</strong>: idle non-prod and oversized fleets are often the easiest part of the bill to reduce.</li>
   </ul>
 
-  <h2>2) Utilization and idle waste</h2>
+  <h2>Utilization is the bridge between a technical system and a believable budget</h2>
+  <p>
+    Once baseline and peak are separated, utilization tells you whether the compute fleet is actually earning its cost.
+    Right-sizing is not one action. It is a repeated check across CPU, memory, burst behavior, placement efficiency, and
+    workload shape.
+  </p>
   <ul>
-    <li>Right-size with real utilization (CPU, memory, and burst patterns).</li>
-    <li>For container platforms, validate packing efficiency and headroom.</li>
-    <li>
-      Deep dives: <a href="/guides/kubernetes-costs/">Kubernetes costs</a>, <a href="/guides/serverless-costs/">serverless architecture costs</a>
-    </li>
+    <li><strong>VM and instance fleets</strong>: check CPU, memory, and disk behavior together instead of resizing from one chart.</li>
+    <li><strong>Containers and Kubernetes</strong>: validate requests, limits, packing efficiency, and the buffer you hold for noisy neighbors or failover.</li>
+    <li><strong>Serverless platforms</strong>: validate execution duration, resource allocation, and retry patterns so low unit prices do not hide high total activity.</li>
+    <li><strong>Mixed workloads</strong>: separate interactive, batch, and background jobs if they force different sizing choices.</li>
+  </ul>
+  <p class="muted">
+    Deeper workload paths: <a href="/guides/kubernetes-costs/">Kubernetes costs</a>,{" "}
+    <a href="/guides/serverless-costs/">serverless architecture costs</a>,{" "}
+    <a href="/guides/aws-ec2-cost-estimation/">EC2 cost estimation</a>.
+  </p>
+
+  <h2>Adjacent cost drivers often explain why compute feels more expensive than expected</h2>
+  <p>
+    A large share of "compute cost problems" are not pure compute problems. They are systems problems sitting next to
+    compute: traffic boundaries, load balancer behavior, verbose logging, traces, and data movement between services.
+  </p>
+  <ul>
+    <li><strong>Networking</strong>: egress, NAT, and cross-zone or cross-region transfer can scale directly with compute-driven traffic.</li>
+    <li><strong>Load balancers</strong>: hourly charges plus processed traffic or request units create a second bill around the fleet.</li>
+    <li><strong>Logs and metrics</strong>: ingestion, retention, and cardinality often rise faster than compute during incidents or high-throughput periods.</li>
+    <li><strong>Databases and messaging</strong>: compute-heavy systems frequently trigger downstream request and storage charges that belong in the same budget conversation.</li>
+  </ul>
+  <p class="muted">
+    Adjacent deep dives: <a href="/guides/networking-costs/">networking costs</a>,{" "}
+    <a href="/guides/load-balancing-costs/">load-balancer cost diagnosis</a>,{" "}
+    <a href="/guides/log-costs/">log costs</a>,{" "}
+    <a href="/guides/database-costs/">database costs</a>.
+  </p>
+
+  <h2>Commitments and purchase choices only help after utilization is credible</h2>
+  <p>
+    Savings plans, reserved capacity, and similar commitments can improve the compute line dramatically, but only if
+    the workload shape is already understood. Buying a commitment before validating utilization often locks in waste
+    instead of reducing it.
+  </p>
+  <ul>
+    <li><strong>Commit after measurement</strong>: validate steady-state consumption before treating a commitment as a savings decision.</li>
+    <li><strong>Keep burst capacity separate</strong>: do not use a peak month to justify a commitment sized for the entire year.</li>
+    <li><strong>Re-check after architecture changes</strong>: containerization, caching, batching, or serverless migrations can change the commitment math materially.</li>
   </ul>
 
-  <h2>3) Hidden drivers adjacent to compute</h2>
+  <h2>How to validate a compute estimate before you trust it</h2>
+  <p>
+    A believable compute budget maps each major number back to an operating signal. If the model only looks clean
+    because the averages are blended together, it will fail the first time traffic, incidents, or architectural changes
+    move the system away from the happy path.
+  </p>
   <ul>
-    <li><strong>Networking</strong>: egress/NAT/transfer scales with traffic.</li>
-    <li><strong>Load balancers</strong>: hourly + request/GB processed.</li>
-    <li><strong>Logs</strong>: ingestion + retention can exceed compute for verbose systems.</li>
-    <li>
-      Deep dives: <a href="/guides/networking-costs/">networking</a>, <a href="/guides/load-balancing-costs/">load-balancer cost diagnosis</a>,{" "}
-      <a href="/guides/log-costs/">logs</a>
-    </li>
+    <li>Validate steady-state versus peak separately and keep both visible in the model.</li>
+    <li>Validate utilization with the real resource bottleneck, not only with CPU averages.</li>
+    <li>Validate non-prod uptime and idle fleet behavior instead of assuming they are minor.</li>
+    <li>Validate adjacent networking, load-balancer, and observability lines alongside compute, not after the fact.</li>
+    <li>Validate whether commitments are covering real baseline usage or just preserving over-provisioning.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Next paths after the compute framework is clear</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>
     <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost</a>
     <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+    <a class="btn" href="/guides/serverless-costs/">Serverless costs</a>
+    <a class="btn" href="/guides/kubernetes-costs/">Kubernetes costs</a>
   </div>
-
-  {computeGuides.length ? (
-    <>
-      <h2>More compute guides</h2>
-      <div class="grid">
-        {computeGuides.map((g) => (
-          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-            <div class="tool-title">{g.title}</div>
-            <div class="tool-desc">{g.description}</div>
-          </a>
-        ))}
-      </div>
-    </>
-  ) : null}
 </GuideLayout>
-
