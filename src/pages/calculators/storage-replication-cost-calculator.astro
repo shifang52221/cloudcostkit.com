@@ -66,45 +66,47 @@ const description =
   <StorageReplicationCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">What this replication calculator is best for</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is most useful when you need to separate steady changed-data replication from one-time copy bursts. It
+      is built for teams planning S3 CRR, SRR, cross-region copy, or DR replication and trying to avoid the classic
+      mistake of modeling the whole dataset instead of the data that actually moves each month.
+    </p>
     <ul>
       <li><strong>Ongoing replication</strong>: changed GB per month in normal operation.</li>
       <li><strong>Backfills and migrations</strong>: one-time spikes that should not pollute your steady-state baseline.</li>
       <li><strong>S3 CRR vs SRR planning</strong>: comparing same-region and cross-region copy assumptions.</li>
     </ul>
 
-    <h2>Changed GB beats total stored GB</h2>
+    <h2>Changed GB, not total stored GB, is the main driver</h2>
     <p>
       The most common replication mistake is using total dataset size instead of the data that actually changes and gets
       copied. For ongoing replication, <strong>write volume and churn</strong> are usually the correct drivers.
     </p>
-
-    <h2 style="margin-top:0">How to get your inputs</h2>
     <ul>
       <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
       <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
       <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
     </ul>
+  </div>
 
-    <h2>Result interpretation</h2>
-    <ul>
-      <li>Replication cost scales with changed data, not total stored GB.</li>
-      <li>If replication spikes during backfills or migrations, model a peak month separately.</li>
-    </ul>
-
-    <h2>SRR vs CRR: when the estimate changes shape</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">SRR, CRR, and billing boundaries</h2>
     <ul>
       <li><strong>Same-region replication</strong>: often more about feature overhead and extra storage than internet-style transfer.</li>
       <li><strong>Cross-region replication</strong>: usually needs explicit transfer assumptions and stronger peak modeling.</li>
       <li><strong>DR planning</strong>: add drill, failover, and catch-up windows as separate scenarios instead of inflating the baseline.</li>
+      <li><strong>Replica storage</strong>: keep storage in the destination region separate from the replication-transfer line.</li>
+      <li><strong>Requests and retries</strong>: high-write workloads may create adjacent request charges that deserve their own estimate.</li>
     </ul>
+    <p class="muted" style="margin-top:10px">
+      The estimate becomes much cleaner when you keep three things separate: changed GB that is copied, storage that
+      accumulates in the replica location, and one-time backfill or migration activity. Mixing those together is how a
+      normal month starts looking far more expensive than it really is.
+    </p>
+  </div>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning and validation</h2>
     <table>
       <thead>
         <tr>
@@ -129,42 +131,42 @@ const description =
         </tr>
       </tbody>
     </table>
-
-    <h2>Validate after changes</h2>
     <ul>
       <li>Compare your estimate to the first real bill and adjust assumptions.</li>
       <li>Track the primary driver metric (requests/GB/count) over time.</li>
       <li>Separate one-time backfill costs from ongoing replication to avoid distorted monthly baselines.</li>
-    </ul>
-
-    <h2>Replication intent matrix</h2>
-    <ul>
       <li><strong>DR readiness</strong>: steady changed GB with occasional test-failover spikes.</li>
       <li><strong>Migration</strong>: short-lived, very high replicated GB and transfer bursts.</li>
       <li><strong>Multi-region reads</strong>: steady replication plus possible egress from secondary reads.</li>
       <li><strong>Compliance archive</strong>: low change rate but long retention and storage growth.</li>
     </ul>
+    <p class="muted" style="margin-top:10px">
+      A good validation rule is simple: if a spike comes from a migration, DR drill, or backlog catch-up, it belongs in
+      a separate peak scenario, not in the steady-state replication baseline.
+    </p>
+  </div>
 
-    <h2>Billing boundary checklist</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Billing checklist and common failure patterns</h2>
     <ul>
       <li>Replication transfer fee and replica storage fee are modeled separately.</li>
       <li>One-time backfill is not merged into steady monthly change volume.</li>
       <li>Request amplification from replication is captured for high-write workloads.</li>
       <li>Directionality (source to destination) matches provider billing rules.</li>
-    </ul>
-
-    <h2>Common failure patterns</h2>
-    <ul>
       <li>Using total dataset size instead of changed data volume.</li>
       <li>Missing replica-region storage growth after policy changes.</li>
       <li>Treating DR drill traffic as a normal-month baseline.</li>
       <li>Ignoring write amplification from retries or small object churn.</li>
     </ul>
+    <p class="muted" style="margin-top:10px">
+      The most expensive modeling mistake is not usually the transfer rate. It is choosing the wrong driver: full
+      dataset size, mixed-in backfills, or missing replica storage growth.
+    </p>
+  </div>
 
-    <h2>Next steps</h2>
-    <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next actions after the first estimate</h2>
+    <div class="btn-row" style="margin-top:10px">
       <a class="btn" href="/guides/s3-replication-cost/">Guide: S3 replication cost</a>
       <a class="btn" href="/guides/estimate-replication-gb-per-month-from-writes/">Estimate replication GB/month</a>
       <a class="btn" href="/guides/s3-crr-vs-srr-cost/">S3 CRR vs SRR cost</a>
