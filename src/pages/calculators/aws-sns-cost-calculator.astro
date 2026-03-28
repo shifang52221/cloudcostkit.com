@@ -58,73 +58,39 @@ const description =
 >
   <AwsSnsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Separate publishes from deliveries before trusting the total</h2>
+    <p>
+      SNS estimates become misleading when teams model only publishes. The bill usually follows deliveries, and
+      deliveries are shaped by topic fan-out, filter-policy match rates, protocol mix, and retry behavior.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Count publishes and deliveries as separate drivers instead of assuming one publish equals one billable event.</li>
+      <li>Estimate matched subscribers per topic after filtering, not just total subscriptions configured.</li>
+      <li>Decide whether transfer matters for your path; if not, keep this as a publish-and-delivery estimate only.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where SNS costs usually drift</h2>
     <ul>
-      <li>Deliveries usually dominate; fan-out multiplies request cost quickly.</li>
-      <li>Payload size only matters when transfer is billable; set $/GB to zero if not.</li>
+      <li><strong>Fan-out growth</strong>: adding subscribers or broadening filter matches can multiply deliveries quickly.</li>
+      <li><strong>Retry bursts</strong>: failing HTTP endpoints and unstable consumers can inflate delivery attempts during incidents.</li>
+      <li><strong>Protocol mix</strong>: email, HTTP, Lambda, and queue endpoints do not all behave the same operationally.</li>
+      <li><strong>Downstream confusion</strong>: SQS, Lambda, logging, and endpoint-side processing costs do not belong in this page's total.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile the estimate with production behavior</h2>
+    <ol>
+      <li>Compare estimated publishes and deliveries with topic metrics over a representative period.</li>
+      <li>Check whether a small number of topics are responsible for most fan-out or retry noise.</li>
+      <li>Review endpoint failures and redelivery behavior before changing the pricing assumptions.</li>
+      <li>Run a separate incident scenario when alerts, retries, or emergency fan-out make the peak month structurally different.</li>
+    </ol>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Count subscriptions per topic to estimate deliveries per publish.</li>
-      <li>Separate protocol mix (SQS, HTTP, email) if pricing differs.</li>
-      <li>Estimate payload size for the largest topics.</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Publishes and deliveries are different; fan-out multiplies volume.</li>
-      <li>Protocol mix affects effective cost and retries.</li>
-      <li>Model incident windows where retries spike deliveries.</li>
-      <li>Estimate payload sizes if transfer charges apply.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Publishes</th>
-          <th>Deliveries</th>
-          <th>Payload</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>Expected</td>
-          <td>Typical</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>Burst</td>
-          <td>Same</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do if the bill is higher than expected</h2>
+    <p>
+      If deliveries dominate, inspect fan-out discipline, filter policies, and failing subscribers first. If transfer
+      dominates, examine payload size and delivery path. If the SNS line item looks reasonable but the messaging program
+      total does not, move next to SQS, Lambda, or endpoint-specific downstream costs.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
