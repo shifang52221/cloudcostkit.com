@@ -51,73 +51,40 @@ const description =
 >
   <AwsSesCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Split transactional email from campaign traffic first</h2>
+    <p>
+      SES looks like a simple send-volume bill until a team blends password resets, product notifications, and
+      marketing campaigns into one average. Those workloads peak differently, retry differently, and often carry very
+      different payload sizes.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Measure transactional and campaign traffic separately before settling on one monthly volume assumption.</li>
+      <li>Keep large-template or attachment-heavy email classes separate from plain-text or light transactional sends.</li>
+      <li>Decide whether transfer belongs in the model for your configuration; if not, keep this as a send-cost review.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where SES estimates usually miss</h2>
     <ul>
-      <li>Send volume drives cost; large payloads matter when transfer is billable.</li>
-      <li>Campaign spikes are the common peak case.</li>
+      <li><strong>Campaign bursts</strong>: launches, promotions, and digest sends can dwarf normal transactional volume.</li>
+      <li><strong>Retry and bounce behavior</strong>: failed deliveries and repeated attempts distort simple email-count assumptions.</li>
+      <li><strong>Heavy payloads</strong>: attachments and image-rich templates matter when transfer is billable or when payload size affects surrounding systems.</li>
+      <li><strong>Program extras</strong>: dedicated IPs, inbound email, analytics, and other email-program costs sit outside this page unless modeled separately.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile the calculator with your email program</h2>
+    <ol>
+      <li>Compare estimated send volume with a representative billing or campaign-reporting period.</li>
+      <li>Check whether the highest-cost periods align with campaigns, retries, or unusual bounce behavior.</li>
+      <li>Review average payload size by major email class instead of using one blended attachment assumption.</li>
+      <li>Build separate baseline and campaign scenarios so peaks do not disappear into a flat monthly average.</li>
+    </ol>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Split marketing vs transactional volume (different patterns and peaks).</li>
-      <li>Estimate average payload size including templates and attachments.</li>
-      <li>Confirm whether transfer charges apply for your path.</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Split transactional vs marketing volume to capture different patterns.</li>
-      <li>Apply a retry and bounce multiplier to sent volume.</li>
-      <li>Estimate attachment-heavy messages separately if payloads are large.</li>
-      <li>Include dedicated IPs or add-ons if you use them.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Emails</th>
-          <th>Avg size</th>
-          <th>Transfer</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>Typical</td>
-          <td>Derived</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>Same</td>
-          <td>Higher</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What this page should hand off to next</h2>
+    <p>
+      If send volume dominates, review send segmentation and campaign scheduling. If transfer or payload-related cost
+      dominates, examine template weight and attachment strategy. If the SES line item is not the whole story, the next
+      review usually belongs with analytics, queues, Lambdas, or the broader outbound email stack.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

@@ -50,73 +50,39 @@ const description =
 >
   <AwsKmsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Separate key inventory from downstream request fan-out</h2>
+    <p>
+      KMS has a small steady baseline and a potentially huge operation-driven bill. The steady part is key inventory.
+      The variable part comes from every upstream service that asks KMS to encrypt, decrypt, sign, or create data keys.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Count key-months separately from request volume so you can see whether the fixed or variable side matters more.</li>
+      <li>Estimate KMS calls by upstream service instead of assuming all request volume comes from one application.</li>
+      <li>Track batch jobs, re-encryption work, or deployment events that create short but expensive spikes.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where KMS bills usually surprise teams</h2>
     <ul>
-      <li>Key-month charges are predictable; request charges scale with encryption-heavy workloads.</li>
-      <li>Spikes usually map to retries, re-encryption jobs, or bursting traffic.</li>
+      <li><strong>Service fan-out</strong>: S3, EBS, RDS, secrets, and application code can all generate KMS calls at once.</li>
+      <li><strong>Per-request crypto in hot paths</strong>: decrypting or generating data keys too often can overwhelm the quiet key-month baseline.</li>
+      <li><strong>Retry and batch events</strong>: failed operations and large migration jobs create bursts that averages hide.</li>
+      <li><strong>Wrong blame surface</strong>: sometimes the KMS bill is really exposing an upstream service design problem, not a key-count problem.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile the estimate with the bill</h2>
+    <ol>
+      <li>Compare key-month charges with the actual active key inventory first so you know whether the variable side is the real issue.</li>
+      <li>Break request volume down by upstream service or job instead of treating KMS as one homogeneous caller.</li>
+      <li>Check for unusual deployment, migration, retry, or re-encryption windows that distort the month.</li>
+      <li>Run a second scenario for incident or batch periods if normal application traffic is not the real cost driver.</li>
+    </ol>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Count keys by environment (prod, staging, dev).</li>
-      <li>Estimate request volume by service (S3, EBS, RDS, secrets).</li>
-      <li>Check for batch re-encryption or rotation jobs.</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Count keys and requests as separate drivers.</li>
-      <li>Break out encrypt, decrypt, and data key calls if volumes differ.</li>
-      <li>Model batch jobs or incident spikes as a peak scenario.</li>
-      <li>Account for client-side caching if you use it.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Keys</th>
-          <th>Requests</th>
-          <th>Drivers</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Configured</td>
-          <td>Expected</td>
-          <td>Steady workload</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>Same</td>
-          <td>High</td>
-          <td>Incident/batch jobs</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do if request cost dominates</h2>
+    <p>
+      The next action is rarely "delete keys." It is usually to inspect upstream calling patterns, reduce unnecessary
+      crypto operations, apply caching or envelope-encryption discipline where appropriate, and isolate whichever service
+      is generating the most KMS traffic.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

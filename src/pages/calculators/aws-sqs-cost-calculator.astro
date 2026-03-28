@@ -56,66 +56,40 @@ const description =
 >
   <AwsSqsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Model SQS as request amplification, not just message count</h2>
+    <p>
+      SQS bills usually look simple until teams confuse message volume with billable request volume. One message can
+      create several requests: send, receive, delete, visibility changes, retries, and empty receives when consumers
+      poll aggressively.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Start with messages per month, then measure how many API requests each message tends to generate in steady state.</li>
+      <li>Keep FIFO and standard usage separate if their operational behavior or throughput patterns differ.</li>
+      <li>Treat long polling, batching, and visibility extensions as core modeling choices, not minor adjustments.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where SQS estimates usually drift</h2>
     <ul>
-      <li>Requests per message is the biggest lever; retries multiply cost fast.</li>
-      <li>If costs spike, inspect visibility timeout and retry behavior.</li>
+      <li><strong>Retry-heavy consumers</strong>: failures and poisoned messages can multiply receives and deletes fast.</li>
+      <li><strong>Short polling</strong>: aggressive polling creates many low-value receive calls, even when queue depth is modest.</li>
+      <li><strong>Visibility tuning</strong>: poor timeout settings create duplicate work and extra request overhead.</li>
+      <li><strong>Downstream confusion</strong>: Lambda, logs, transfer, and database writes are adjacent costs, not part of this page.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile this estimate with a real queue bill</h2>
+    <ol>
+      <li>Compare estimated total requests with CloudWatch or billing-export request counts, not only with message volume.</li>
+      <li>Check whether batch size and long-poll settings changed between quiet periods and peak periods.</li>
+      <li>Inspect dead-letter traffic, retries, and visibility extensions before assuming pricing inputs are wrong.</li>
+      <li>Run a separate incident scenario if backlog recovery or consumer failures drive a very different requests-per-message ratio.</li>
+    </ol>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Use messages per month and requests per message as the core driver.</li>
-      <li>Batch sizes and long polling reduce receive calls.</li>
-      <li>Retries and visibility timeout extensions add extra requests.</li>
-      <li>Separate FIFO vs standard usage if you mix them.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Messages</th>
-          <th>Req/msg</th>
-          <th>Total requests</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>Typical</td>
-          <td>Derived</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>High</td>
-          <td>Derived</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do with the result</h2>
+    <p>
+      If requests per message are high, the fastest win is often consumer behavior: batch better, poll less aggressively,
+      and reduce retries caused by timeout or handler problems. If the queue cost still looks low but the messaging stack
+      total is high, move next to Lambda, logs, and downstream storage rather than stretching this page to cover them.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
