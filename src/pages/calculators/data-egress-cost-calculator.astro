@@ -66,7 +66,12 @@ const description =
   <DataEgressCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:16px">
-    <h2 style="margin:0 0 10px">Fast answer: what this egress calculator answers</h2>
+    <h2 style="margin:0 0 10px">When this egress calculator is useful</h2>
+    <p class="muted" style="margin:0 0 10px">
+      This page works best when you already know the transfer boundary you want to price: internet, cross-region,
+      cross-AZ, or origin-to-CDN. It is designed for teams that need to isolate the expensive path first instead of
+      averaging all transfer together and hoping the number is close enough.
+    </p>
     <ul class="muted" style="margin:0 0 14px; padding-left:18px">
       <li>How much will monthly internet egress cost at my effective $/GB?</li>
       <li>How different is a normal month from a launch or incident month?</li>
@@ -77,8 +82,6 @@ const description =
       <a class="btn" href="/guides/aws-network-costs/">Guide: AWS network costs</a>
       <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Next: cross-region transfer</a>
     </div>
-
-    <h2 style="margin:0 0 10px">Tips</h2>
     <ul class="muted" style="margin:0; padding-left:18px">
       <li>Model multiple scenarios: baseline month vs peak month.</li>
       <li>Consider a CDN: it can reduce origin egress and shift cost structure.</li>
@@ -87,46 +90,38 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">How to map the transfer boundary and choose the right rate</h2>
     <ul>
       <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
       <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
       <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
       <li><strong>Sources</strong>: VPC flow logs, CDN logs, and cost exports provide the cleanest counts.</li>
     </ul>
-
-    <h2>Result interpretation</h2>
-    <ul>
-      <li>If tiered pricing drives cost, locate the tier where you spend the most.</li>
-      <li>Large gaps between baseline and peak suggest caching or throttling opportunities.</li>
-    </ul>
-
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
-      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
-      <li>Applying internet rates to intra-region or cross-AZ traffic.</li>
-    </ul>
-
-    <h2>How to choose the right egress rate</h2>
     <ul>
       <li><strong>Internet egress</strong>: use the provider rate for public outbound traffic.</li>
       <li><strong>Cross-region transfer</strong>: use a separate rate and model replication paths independently.</li>
       <li><strong>Cross-AZ transfer</strong>: keep east-west traffic out of your internet estimate.</li>
       <li><strong>Origin to CDN</strong>: treat cache fill as its own line item if your origin is billed separately.</li>
     </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
+    <p class="muted" style="margin-top:10px">
+      Most egress estimate failures are not math errors. They happen because the wrong path gets priced with the wrong
+      rate. If the estimate looks strange, check the boundary first, then the unit, and only then the architecture.
+    </p>
     <ul>
       <li>Split egress by destination (internet, cross-region, cross-AZ).</li>
       <li>Account for CDN cache hit rate to reduce origin egress.</li>
       <li>Compression or image optimization can change GB materially.</li>
       <li>Model one-time migrations separately from steady traffic.</li>
     </ul>
+  </div>
 
-    <h2>Scenario planning</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Scenario planning and boundary validation</h2>
+    <p class="muted" style="margin-top:8px">
+      A usable egress estimate needs more than one month shape. Baseline and peak often behave very differently,
+      especially when retries, launches, replication bursts, or cache misses appear. Keep those scenarios visible so
+      you can tell whether the expensive path is stable or event-driven.
+    </p>
     <table>
       <thead>
         <tr>
@@ -151,42 +146,45 @@ const description =
         </tr>
       </tbody>
     </table>
-
-    <h2>Validate after changes</h2>
     <ul>
       <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
       <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
       <li>Compare effective $/GB by path (internet, cross-region, cross-AZ) to catch wrong rate assumptions.</li>
-    </ul>
-
-    <h2>Boundary mapping template</h2>
-    <ul>
       <li><strong>Path A</strong>: internet egress from app/API endpoints.</li>
       <li><strong>Path B</strong>: cross-region replication and failover traffic.</li>
       <li><strong>Path C</strong>: cross-AZ east-west service chatter.</li>
       <li><strong>Path D</strong>: origin to CDN cache fill (separate from edge delivery).</li>
     </ul>
+    <p class="muted" style="margin-top:10px">
+      A simple sign-off check works well here: every major transfer path in the model should map back to a billable
+      usage type or a measurable network path. If you cannot explain that mapping, the estimate is still too soft.
+    </p>
+  </div>
 
-    <h2>Priority levers by dominant path</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Dominant-path levers and common failure patterns</h2>
     <ul>
       <li><strong>Internet egress dominates</strong>: compression, caching, and payload reduction usually win first.</li>
       <li><strong>Cross-region dominates</strong>: reduce replication fan-out and narrow replicated datasets.</li>
       <li><strong>Cross-AZ dominates</strong>: improve service locality and reduce chatty dependencies.</li>
       <li><strong>Origin-to-CDN dominates</strong>: increase cache hit rate and review cache key strategy.</li>
     </ul>
-
-    <h2>Sanity checks before sign-off</h2>
     <ul>
       <li>Peak scenario should be materially higher than baseline for internet-facing systems.</li>
       <li>Each path must map to a billable usage type in your billing export.</li>
       <li>Effective $/GB should be stable month over month for the same boundary.</li>
       <li>If model and bill differ by more than 15%, isolate unit conversion and destination mix first.</li>
     </ul>
+    <p class="muted" style="margin-top:10px">
+      The most common failure pattern is blending unrelated transfer types into one average rate. The second most common
+      is treating peak retry or failover traffic like a normal month. Keep those two mistakes visible and the model gets
+      much more trustworthy.
+    </p>
+  </div>
 
-    <h2>Next steps</h2>
-    <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next actions after the first estimate</h2>
+    <div class="btn-row" style="margin-top:10px">
       <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
       <a class="btn" href="/guides/aws-network-costs/">Guide: AWS network costs</a>
       <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
