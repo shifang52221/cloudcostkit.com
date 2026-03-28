@@ -4,31 +4,35 @@ import { ApiRequestCostCalculator as ApiRequestCostCalculatorComponent } from ".
 
 const title = "API Request Cost Calculator";
 const description =
-  "Estimate monthly request-based charges from request volume and price per million requests, with baseline vs peak scenarios. Educational use only.";
+  "Estimate monthly request-based charges from request volume and price per million requests, with scenario planning, billable-request checks, and validation guidance.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/api-request-cost-calculator"
-  intro="Many APIs and gateways price by request count. Use this calculator to estimate monthly request cost from your volume and per-million pricing, then compare baseline vs peak traffic."
+  intro="Use this page when you need generic request-based billing math before switching to a provider-specific calculator. The goal is not only to multiply requests by a price. It is to estimate billable requests, keep baseline and surge traffic separate, and validate whether retries, preflight calls, callbacks, or internal traffic are changing the true request total."
   examples={[
     "500,000,000 requests/month at $1.00 per 1M requests ~ $500/month.",
-    "Peak 180% scenario turns 500M into 900M requests for budget planning."
+    "Peak 180% scenario turns 500M into 900M requests for budget planning.",
+    "A 1.2x retry factor can move a calm-looking request estimate into a meaningfully higher billing tier."
   ]}
   includes={[
     "Request-fee estimate from requests/month and $ per 1M requests pricing.",
     "Optional RPS-based request estimator.",
     "Baseline vs peak scenario table for traffic spikes.",
-    "Useful for API gateways, serverless, and request-metered services.",
+    "Billable-request planning for APIs, gateways, messaging endpoints, and other request-metered services.",
+    "Validation guidance for request classes, endpoint mix, and retry-driven amplification.",
   ]}
   excludes={[
     "Data transfer/bandwidth costs (model separately).",
     "Minimums, free tiers, and tiered steps unless you reflect them in inputs.",
+    "Provider-specific request rules that need a dedicated service calculator.",
   ]}
   how={[
     "Request cost = (requests per month / 1,000,000) x price per million requests.",
-    "Use your provider's definition of billable requests and any request classes.",
-    "This tool ignores data transfer; model bandwidth separately if relevant."
+    "Use your provider's definition of billable requests and separate request classes if pricing differs.",
+    "Keep a steady scenario and a surge scenario; retries, auth failures, and noisy clients often change the bill faster than normal growth.",
+    "This tool ignores data transfer; model bandwidth and egress separately when payload size matters."
   ]}
   faqs={[
     {
@@ -45,84 +49,40 @@ const description =
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
     { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
     { href: "/calculators/data-egress-cost-calculator", label: "Egress cost" },
+    { href: "/guides/request-based-pricing", label: "Guide: request-based pricing" },
   ]}
 >
   <ApiRequestCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Billable requests: the detail that changes the estimate</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Confirm what the provider counts as a billable request (cache hits, errors, internal calls can differ).</li>
-      <li>Split request classes if pricing differs (for example, authenticated vs unauthenticated, edge vs origin).</li>
-      <li>Keep a baseline and peak scenario: retries and incident behavior can multiply request counts.</li>
-    </ul>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How teams reduce request-driven cost</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Caching</strong>: reduce repeat calls (browser, edge/CDN, server-side caching).</li>
-      <li><strong>Batching</strong>: fewer round trips for chatty clients.</li>
-      <li><strong>Payload shaping</strong>: smaller responses often unlock caching and reduce downstream compute too.</li>
-    </ul>
-  </div>
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">API-specific request accounting</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Split prod vs non-prod environments and sum them explicitly.</li>
-      <li>Include auth, validation, and preflight calls if they are billed.</li>
-      <li>Separate internal service-to-service calls from user traffic.</li>
-    </ul>
-  </div>
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Worked request estimate from business events</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Monthly active users x sessions per user = sessions/month.</li>
-      <li>Sessions/month x requests per session = requests/month.</li>
-      <li>Add a retry factor (for example, 1.2x) for timeouts.</li>
-    </ul>
-  </div>
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">API request taxonomy (what to count)</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>REST vs GraphQL: batch queries can hide request volume.</li>
-      <li>Pagination and polling can multiply calls per session.</li>
-      <li>Webhooks and callbacks add non-user traffic.</li>
-      <li>Search and autocomplete endpoints are often the busiest routes.</li>
-    </ul>
-  </div>
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">API data sources</h2>
+    <h2 style="margin-top:0">Billable requests are the real unit, not raw traffic</h2>
+    <p class="muted" style="margin:10px 0 0">
+      The fastest way to under-budget a request-metered service is to assume every request you see in analytics is
+      billed the same way. Providers count requests differently, and many stacks create more billable events than the
+      product team expects.
+    </p>
     <ul>
-      <li><strong>Gateway analytics</strong>: request counts by stage/environment.</li>
-      <li><strong>API logs</strong>: per-endpoint volume for hot routes.</li>
-      <li><strong>Client telemetry</strong>: retries and timeout-driven bursts.</li>
-      <li><strong>Internal traffic</strong>: service-to-service requests that never hit the edge.</li>
+      <li><strong>Provider billing definition</strong>: confirm what counts as billable, because cache hits, errors, health checks, or internal calls can vary by product.</li>
+      <li><strong>Request classes</strong>: split traffic if pricing differs by request type, endpoint family, auth path, or network boundary.</li>
+      <li><strong>Environment split</strong>: model prod, staging, and background traffic separately instead of hiding them in one monthly total.</li>
+      <li><strong>Internal and non-user traffic</strong>: callbacks, webhooks, service-to-service calls, and automation jobs often add more requests than the customer-visible flow.</li>
     </ul>
+    <p class="muted" style="margin:10px 0 0">
+      If you do not know the billable unit yet, this page should be used to frame the estimate, not to finalize it.
+    </p>
+  </div>
 
-    <h2>Result interpretation</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Build the estimate from business activity, then convert it into request volume</h2>
+    <p class="muted" style="margin:10px 0 0">
+      The cleanest generic workflow is to start with business events, translate them into requests, then add the
+      traffic patterns that make the billed total diverge from the neat product model.
+    </p>
     <ul>
-      <li>Small request deltas compound quickly at scale.</li>
-      <li>Spikes usually come from retries, auth failures, or noisy clients.</li>
+      <li><strong>Users to sessions</strong>: monthly active users times sessions per user gives you a starting activity level.</li>
+      <li><strong>Sessions to requests</strong>: requests per session should reflect real endpoint behavior, not only the happy path.</li>
+      <li><strong>Endpoint mix</strong>: search, autocomplete, auth refresh, pagination, and polling routes usually create the busiest request streams.</li>
+      <li><strong>Scenario split</strong>: keep a steady month and a surge month, because launches, incidents, and noisy clients rarely look like baseline traffic.</li>
     </ul>
-
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak or incident scenarios.</li>
-      <li>Missing internal service-to-service calls in request totals.</li>
-      <li>Ignoring health checks, preflight, or retry traffic that is billable.</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Normalize per-10k vs per-1M pricing units before estimating.</li>
-      <li>Separate endpoint or method mixes if rates differ.</li>
-      <li>Add a retry or error multiplier to request volume.</li>
-      <li>Split cache hits from origin requests when applicable.</li>
-    </ul>
-
-    <h2>Traffic scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -142,25 +102,72 @@ const description =
         <tr>
           <td>Surge</td>
           <td>High</td>
-          <td>Auth-heavy</td>
+          <td>Auth-heavy or retry-heavy</td>
           <td>High</td>
         </tr>
       </tbody>
     </table>
+    <p class="muted" style="margin:10px 0 0">
+      Use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a> when you already have
+      throughput data. Use this page when you need to turn business or endpoint activity into billable request math.
+    </p>
+  </div>
 
-    <h2>Validate after changes</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">What usually amplifies request cost after the first estimate</h2>
+    <p class="muted" style="margin:10px 0 0">
+      Generic request-cost pages often stop at "requests x price per million." That is the easy part. The real work is
+      identifying what quietly multiplies the request count.
+    </p>
     <ul>
-      <li>Compare API request counts to the billing usage type for requests.</li>
-      <li>Check per-endpoint dashboards after releases or throttling changes.</li>
+      <li><strong>Retries and timeouts</strong>: a modest retry factor can materially change the billed request total.</li>
+      <li><strong>Preflight and auth flows</strong>: token refresh, validation, and CORS preflight requests often sit outside the product team's mental model.</li>
+      <li><strong>Polling and pagination</strong>: chatty clients can create a request bill that grows faster than users or payload size.</li>
+      <li><strong>Callbacks and webhooks</strong>: machine-to-machine traffic is real request traffic even if the end user never sees it.</li>
+      <li><strong>Caching behavior</strong>: separating cache hits from origin requests matters when only some paths are billable or when the expensive requests sit behind cache misses.</li>
     </ul>
+    <p class="muted" style="margin:10px 0 0">
+      This is also where request cost meets transfer and egress. A request count can stay stable while payload size,
+      origin miss rate, or downstream compute changes the real cost picture.
+    </p>
+  </div>
 
-    <h2>Next steps</h2>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">How to validate the estimate before you trust it</h2>
+    <p class="muted" style="margin:10px 0 0">
+      A strong generic request estimate should map back to real request sources and billing signals, not just to a
+      spreadsheet formula.
+    </p>
+    <ul>
+      <li><strong>Gateway analytics</strong>: verify request totals by stage, environment, and endpoint family.</li>
+      <li><strong>API logs</strong>: identify hot routes and request classes that dominate volume.</li>
+      <li><strong>Client telemetry</strong>: check retries, timeout storms, and release windows that distort normal traffic.</li>
+      <li><strong>Billing usage type</strong>: compare your modeled request count to the provider's billed request metric after major releases or traffic shifts.</li>
+    </ul>
+    <ul>
+      <li>Do not rely on one average month if your product has launches, cron-heavy windows, or incident-driven retries.</li>
+      <li>Do not forget service-to-service traffic if the provider bills those requests the same way.</li>
+      <li>Do not stop at request math if payload size, origin traffic, or transfer charges are materially changing the bill.</li>
+    </ul>
+    <p class="muted" style="margin:10px 0 0">
+      Small request deltas compound quickly at scale. If the estimate is still off after validation, the gap is usually
+      in request classification, retry behavior, or traffic shape rather than in the multiplication itself.
+    </p>
+  </div>
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next steps after request math is clean</h2>
+    <ul>
+      <li><strong>RPS conversion</strong>: use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a> when traffic starts as throughput data.</li>
+      <li><strong>Transfer math</strong>: use <a href="/calculators/api-response-size-transfer-calculator/">API response transfer</a> when payload size starts to matter.</li>
+      <li><strong>Egress pricing</strong>: use <a href="/calculators/data-egress-cost-calculator/">egress cost</a> when request count is no longer the only meaningful driver.</li>
+      <li><strong>Conceptual workflow</strong>: use <a href="/guides/request-based-pricing/">request-based pricing</a> when you need the broader logic behind generic request charging models.</li>
+    </ul>
     <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
       <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
       <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
+      <a class="btn" href="/guides/request-based-pricing/">Request-based pricing guide</a>
     </div>
   </div>
 </CalculatorLayout>
