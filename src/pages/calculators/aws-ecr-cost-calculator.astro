@@ -50,66 +50,40 @@ const description =
 >
   <AwsEcrCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Separate quiet image inventory from bursty pull behavior</h2>
+    <p>
+      ECR costs usually have one slow-moving line item and one bursty one. Stored GB-month grows with image retention
+      and tag sprawl. Transfer or pull-driven cost changes when CI, release automation, or clusters pull far more often
+      than teams expect.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Measure average stored image size and retained tag count by repository to understand the steady baseline.</li>
+      <li>Estimate pull behavior separately for CI pipelines, cluster nodes, and any public or cross-region consumers.</li>
+      <li>Keep replication, scanning, and downstream compute-network spend outside this page unless you model them explicitly.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where ECR estimates usually drift</h2>
     <ul>
-      <li>Storage is steady; transfer usually spikes during deploys, CI, or multi-region pulls.</li>
-      <li>If transfer dominates, optimize cache/pull patterns before trimming storage.</li>
+      <li><strong>Retention sprawl</strong>: stale tags and repeated builds grow stored GB-month quietly over time.</li>
+      <li><strong>Release-day pull storms</strong>: node churn, rollouts, and CI rebuilds create transfer spikes that averages hide.</li>
+      <li><strong>Cache assumptions</strong>: local node cache or pull-through cache behavior changes real pull volume a lot.</li>
+      <li><strong>Boundary confusion</strong>: cluster egress, NAT, and runtime networking are adjacent costs, not registry cost.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to reconcile the estimate with production evidence</h2>
+    <ol>
+      <li>Compare stored GB-month against actual repository inventory rather than raw image count alone.</li>
+      <li>Review CI and deployment windows to see whether pull bursts explain the transfer portion of the bill.</li>
+      <li>Separate in-region cached pulls from cross-region, internet, or public pull paths before changing prices.</li>
+      <li>Run a release-week or release-month scenario if the platform behaves very differently during rollouts.</li>
+    </ol>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Average image size and retained tags per repo drive stored GB-month.</li>
-      <li>Pull volume from CI and cluster nodes can spike during releases.</li>
-      <li>Account for cache hit rates so you do not double count pulls.</li>
-      <li>Separate in-region pulls from cross-region or public pulls.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Stored GB</th>
-          <th>Egress GB</th>
-          <th>Drivers</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Average</td>
-          <td>Typical</td>
-          <td>Normal pull rate</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>Spike</td>
-          <td>Release day / CI surge</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do when storage or transfer dominates</h2>
+    <p>
+      If storage dominates, clean up retention policy and tag hygiene. If transfer dominates, investigate image size,
+      rollout frequency, and cache efficiency. If neither explains the broader platform total, the next review belongs
+      with cluster networking, NAT, or workload runtime rather than ECR alone.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

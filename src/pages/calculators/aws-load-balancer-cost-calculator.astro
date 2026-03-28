@@ -59,60 +59,41 @@ const description =
 >
   <AwsLoadBalancerCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Model load balancers as fixed footprint plus burst capacity</h2>
+    <p>
+      Load balancer bills have a steady hourly floor and a variable usage layer. Teams often focus only on traffic and
+      forget that idle balancers still bill, while burst traffic, bytes processed, and connection patterns can inflate
+      the LCU or NLCU side quickly.
+    </p>
     <ul>
-      <li><strong>Load balancers</strong>: count active ALBs/NLBs (idle LBs still bill).</li>
-      <li><strong>Capacity units</strong>: use average LCU/NLCU per hour from metrics, not monthly totals.</li>
-      <li><strong>Schedule</strong>: hours/day and days/month should match actual uptime.</li>
-      <li><strong>Pricing</strong>: use region-specific LB-hour and LCU/NLCU-hour rates.</li>
+      <li>Count active load balancers first so the fixed hourly baseline is visible before traffic modeling begins.</li>
+      <li>Use average LCU or NLCU per hour from metrics, not monthly unit-hours pasted into an hourly field.</li>
+      <li>Keep uptime, bytes, and connection behavior aligned to the same measurement window.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where load balancer estimates usually drift</h2>
     <ul>
-      <li>If usage share is high, focus on reducing LCU/NLCU drivers (connections, bytes, rule evals).</li>
-      <li>If fixed costs dominate, review the number of active load balancers.</li>
+      <li><strong>Idle sprawl</strong>: old or rarely used balancers keep charging even when traffic is negligible.</li>
+      <li><strong>Burst capacity patterns</strong>: launches, incidents, and bot spikes change LCU or NLCU drivers far faster than monthly averages suggest.</li>
+      <li><strong>Wrong unit interpretation</strong>: confusing hourly capacity units with monthly totals can overstate or understate costs badly.</li>
+      <li><strong>Boundary confusion</strong>: transfer, logs, NAT, and downstream instance cost are adjacent, not part of the core balancer fee.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-      <li>Entering LCU-hours/month as LCU per hour (overstates costs).</li>
-      <li>Ignoring idle LBs that stay billed even with no traffic.</li>
-    </ul>
+    <h2>How to reconcile the estimate with billing data</h2>
+    <ol>
+      <li>Compare billed LB-hours with the actual number of active balancers and their uptime.</li>
+      <li>Check CloudWatch-derived LCU or NLCU patterns for baseline versus burst windows rather than one blended number.</li>
+      <li>Verify that transfer or logging line items are not being mistaken for balancer usage charges.</li>
+      <li>Run a separate peak scenario if launches or incidents create a cost shape that normal traffic does not reflect.</li>
+    </ol>
 
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>LB count</th>
-          <th>Capacity units</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Current</td>
-          <td>Average</td>
-          <td>Normal traffic</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>Current</td>
-          <td>High</td>
-          <td>Launch or incident</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-      <li>Compare LB-hours and LCU/NLCU-hours with billing line items.</li>
-    </ul>
+    <h2>What to do if fixed or usage cost dominates</h2>
+    <p>
+      If fixed cost dominates, inspect balancer sprawl and consolidation opportunities. If usage dominates, isolate which
+      LCU or NLCU driver is responsible: connections, bytes, or other capacity factors. If the full network edge bill is
+      still higher than expected, the next review belongs with transfer, NAT, CDN, and east-west traffic rather than the
+      load balancer alone.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
