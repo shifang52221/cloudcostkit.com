@@ -59,56 +59,48 @@ const description =
 >
   <AwsApiGatewayCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Start by separating API type and traffic path</h2>
+    <p>
+      The quickest way to break an API Gateway estimate is to treat all traffic as one blended stream. Before trusting
+      the total, split traffic by API type and by delivery path: public internet responses, private integration traffic,
+      cached responses, and any large-payload endpoints that behave differently from the median route.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Measure monthly requests from CloudWatch, access logs, or billing exports rather than from one recent day.</li>
+      <li>Break out endpoints with unusually large response bodies instead of using one global average response size.</li>
+      <li>Write down whether transfer is really internet egress, private connectivity, or mostly absorbed by CDN caching.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where API Gateway estimates usually drift</h2>
+    <p>
+      API Gateway pages often look request-driven at first, but the bill drifts when one of the hidden multipliers
+      grows faster than request count.
+    </p>
     <ul>
-      <li>If transfer dominates, reduce response size or add CDN caching.</li>
-      <li>If request fees dominate, focus on caching, batching, and avoiding noisy clients.</li>
+      <li><strong>Retry storms</strong>: timeouts, client retries, and webhook redelivery can multiply request volume quickly.</li>
+      <li><strong>Log-heavy endpoints</strong>: access logs and downstream observability are adjacent costs that this page does not include.</li>
+      <li><strong>Large responses</strong>: file-like or report-like endpoints can turn transfer into the dominant line item.</li>
+      <li><strong>Cache miss behavior</strong>: a cache that is cold during launches or incidents can make peak months look nothing like baseline months.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>Reconcile the estimate with a real bill</h2>
+    <p>
+      If the calculator and the bill disagree, do not start by editing prices. First confirm the traffic shape and the
+      boundary you are paying for.
+    </p>
+    <ol>
+      <li>Pull one representative billing period and compare billed requests with your measured request count.</li>
+      <li>Check whether the routes with the highest payload size are also the routes with the highest call count.</li>
+      <li>Confirm whether CDN, WAF, custom domains, or private integrations are adding adjacent charges outside this page.</li>
+      <li>Re-run the calculator with separate baseline and launch or incident scenarios instead of one monthly average.</li>
+    </ol>
 
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Requests</th>
-          <th>Response size</th>
-          <th>Transfer path</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>Average</td>
-          <td>Typical</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>Higher under load</td>
-          <td>Worst-case</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do after the first estimate</h2>
+    <p>
+      If request fees dominate, focus on caching, batching, and noisy clients. If transfer dominates, reduce payload
+      size, compress aggressively, or hand off large responses to a CDN workflow. If both move together, this page is a
+      planning checkpoint and the next review should include logs, WAF, and backend dependencies.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

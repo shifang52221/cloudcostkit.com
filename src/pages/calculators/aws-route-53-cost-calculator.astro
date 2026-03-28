@@ -53,56 +53,41 @@ const description =
 >
   <AwsRoute53CostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Model the bill the way DNS behaves in production</h2>
+    <p>
+      Route 53 costs are rarely about zone count alone. Hosted zones and health checks form the steady floor, but DNS
+      query behavior is the real variable line item. That means this estimate is only as good as your understanding of
+      resolver behavior, TTL policy, and retry patterns.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Use measured query counts from Route 53 metrics or resolver logs rather than inferring DNS from page views alone.</li>
+      <li>Separate user traffic, service-to-service lookups, and cluster or pod churn when query patterns differ.</li>
+      <li>Write down whether failover or health-check workflows change materially during incidents.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Why Route 53 forecasts often miss high</h2>
     <ul>
-      <li>Queries usually dominate; hosted zones and health checks are steady base costs.</li>
-      <li>Low TTL or retry loops can create steep query spikes.</li>
+      <li><strong>Low TTL values</strong>: short TTLs increase repeat lookups dramatically, especially during traffic spikes.</li>
+      <li><strong>Retry loops</strong>: application or resolver retry behavior can inflate queries without any user growth.</li>
+      <li><strong>Internal lookup storms</strong>: container churn, service discovery, and autoscaling can create large background DNS demand.</li>
+      <li><strong>Feature confusion</strong>: routing policies, external monitoring, and adjacent observability costs can be misread as DNS cost.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How to check the estimate against DNS evidence</h2>
+    <ol>
+      <li>Compare estimated monthly queries with a representative period from Route 53 metrics or resolver logs.</li>
+      <li>Check whether low TTL settings or cluster restarts explain any abnormal spikes.</li>
+      <li>Confirm that health checks are a steady configured count rather than a hidden variable in the model.</li>
+      <li>Run a separate incident scenario if failover, bot traffic, or retry storms change lookup volume sharply.</li>
+    </ol>
 
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Zones</th>
-          <th>Queries</th>
-          <th>Health checks</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Configured</td>
-          <td>Expected</td>
-          <td>Configured</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>Same</td>
-          <td>High</td>
-          <td>Same</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>What to do with the result</h2>
+    <p>
+      If queries dominate, focus on TTL policy, resolver efficiency, and avoiding unnecessary repeated lookups. If the
+      bill is mostly hosted zones and health checks, the next win usually comes from inventory discipline rather than DNS
+      tuning. If the numbers still look strange, the follow-up review should include CDN, edge, and application retry
+      behavior instead of treating Route 53 in isolation.
+    </p>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
