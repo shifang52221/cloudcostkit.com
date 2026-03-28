@@ -1,7 +1,5 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
-import { GUIDES } from "../../lib/guides.generated";
-import { withTrailingSlash } from "../../lib/url";
 
 const title = "Observability costs explained: logs, metrics, traces, and query behavior";
 const description =
@@ -21,67 +19,111 @@ const faqs = [
     a: "Verbose logs, high-cardinality labels, and always-on dashboards. Retention defaults can silently grow costs over time.",
   },
 ];
-
-const obsGuides = GUIDES.filter((g) => (g.topics || []).some((t) => t === "logging" || t === "metrics") && g.canonicalPath !== "/guides/observability-costs")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title))
-  .slice(0, 18);
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/observability-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-03-28"
   faqs={faqs}
 >
   <p class="muted">
-    Observability is one of the most common sources of surprise cloud bills. A planning-safe model includes: log GB/day +
-    retention, metrics series count, and a scenario for incident windows (spikes in volume and queries).
+    Observability is one of the most common sources of surprise cloud bills. A planning-safe model includes log
+    ingestion and retention, metrics series growth, traces volume, and a scenario for incident windows where queries,
+    retries, and dashboards all become more expensive at the same time. This page is the parent framework for that
+    model.
   </p>
 
-  <h2>1) Logs: ingestion + retention + scan/search</h2>
+  <h2>Start by separating the signal families before you budget them</h2>
+  <p>
+    Logs, metrics, and traces often move together during incidents, but they are not priced the same way and they do
+    not fail for the same reasons. The first step in a believable observability budget is to split the signal families
+    and give each one its own drivers.
+  </p>
   <ul>
-    <li>Estimate log GB/day and retention days (steady state storage ~ GB/day x retention days).</li>
-    <li>Model scan/search if your provider charges by GB scanned.</li>
-    <li>
-      Hub: <a href="/guides/log-costs/">log costs</a>
-    </li>
+    <li><strong>Logs</strong>: usually driven by ingestion volume, retention, and query or scan behavior.</li>
+    <li><strong>Metrics</strong>: usually driven by active series count, label cardinality, resolution, and alerting footprint.</li>
+    <li><strong>Traces</strong>: usually driven by traffic volume, sampling policy, and how many spans the system emits per transaction.</li>
+  </ul>
+  <p>
+    The mistake at this layer is treating observability as one blended line item. A stronger workflow asks which signal
+    family is actually expanding first, then models the others around it.
+  </p>
+
+  <h2>Logs are usually an ingestion and retention problem before they are a query problem</h2>
+  <p>
+    Log spend often starts with volume: how many GB arrive each day, how much of that volume is duplicate or low-value,
+    and how long it is retained. Query charges matter too, but query cost usually becomes painful after the team has
+    already allowed ingestion and retention to drift upward.
+  </p>
+  <ul>
+    <li><strong>Ingestion</strong>: verbose application logs, duplicated pipeline logs, and debug-heavy default settings create the first large multiplier.</li>
+    <li><strong>Retention</strong>: long default retention quietly preserves expensive low-value data long after it stops helping operators.</li>
+    <li><strong>Query and scan behavior</strong>: broad searches, large default time ranges, and incident-time exploration can turn expensive storage into expensive usage.</li>
+  </ul>
+  <p class="muted">
+    Deeper path: <a href="/guides/log-costs/">log costs</a>.
+  </p>
+
+  <h2>Metrics are usually a cardinality governance problem</h2>
+  <p>
+    Metrics cost tends to look small until label design and service sprawl make the active series count explode.
+    Cardinality is the multiplier that makes one apparently harmless metric become thousands of billable series.
+  </p>
+  <ul>
+    <li><strong>High-cardinality labels</strong>: request IDs, user IDs, raw paths, pod names, and similar values turn metrics into unbounded cost generators.</li>
+    <li><strong>Resolution and refresh</strong>: aggressive publish frequency, dashboards, and alert evaluations increase both collection and consumption cost.</li>
+    <li><strong>Metric duplication</strong>: copy-paste instrumentation across services can create several near-identical series families that add cost without adding much signal.</li>
+  </ul>
+  <p class="muted">
+    Deeper path: <a href="/guides/metrics-costs/">metrics costs and cardinality governance</a>.
+  </p>
+
+  <h2>Traces and incident behavior reveal the real peak month</h2>
+  <p>
+    Many observability budgets are built from a calm month. That is exactly why they fail during outages or unstable
+    releases. Traces, retries, dashboards, and ad hoc searches often spike together during incident windows, creating
+    the most expensive period when the team has the least discipline about what it is querying and storing.
+  </p>
+  <ul>
+    <li><strong>Trace volume</strong>: traffic-driven span creation can rise quickly on busy or chatty systems.</li>
+    <li><strong>Incident amplification</strong>: logs, metrics, traces, and search behavior all expand together during failures.</li>
+    <li><strong>Dashboard pressure</strong>: always-on boards and large query ranges create recurring spend even when engineers are not actively investigating.</li>
+    <li><strong>Retry storms</strong>: unstable systems do not only create more application load; they create more observability data about that load.</li>
   </ul>
 
-  <h2>2) Metrics: series cardinality</h2>
+  <h2>Governance usually matters more than vendor price tables</h2>
+  <p>
+    Teams often look for savings in provider pricing before they have a governance problem under control. The fastest
+    observability savings usually come from discipline: what gets logged, which labels are allowed, which traces are
+    sampled, which dashboards refresh aggressively, and how long data is kept.
+  </p>
   <ul>
-    <li>Series count multiplies quickly with labels (pod name, path, userId, requestId).</li>
-    <li>
-      Deep dive: <a href="/guides/metrics-costs/">metrics costs and cardinality governance</a>
-    </li>
+    <li><strong>Logging discipline</strong>: drop noisy fields, reduce duplicate events, and reserve verbose modes for targeted windows.</li>
+    <li><strong>Metrics discipline</strong>: bucket or remove unbounded labels and review which custom metrics still support decisions.</li>
+    <li><strong>Tracing discipline</strong>: sample low-value spans more aggressively and keep full-fidelity tracing for the paths that matter operationally.</li>
+    <li><strong>Dashboard discipline</strong>: reduce refresh-heavy, rarely used dashboards and query ranges that are wider than the incident question requires.</li>
   </ul>
 
-  <h2>3) Traces and incident scenarios</h2>
+  <h2>How to validate an observability estimate before you trust it</h2>
+  <p>
+    A believable observability budget maps each major line item back to a real operating signal. If the model is only
+    based on a calm month or a rough provider calculator, it will usually miss the periods that actually matter.
+  </p>
   <ul>
-    <li>Trace volume is usually traffic-driven; sample aggressively for low-value spans.</li>
-    <li>During incidents, logs, retries, and query scans often spike together.</li>
+    <li>Validate daily log ingestion and retention separately rather than relying on one total storage number.</li>
+    <li>Validate the top metric families by active series count and identify which labels create the multiplication.</li>
+    <li>Validate dashboard, alert, and query behavior during incidents, not only during normal weeks.</li>
+    <li>Validate whether trace sampling policies match the diagnostic value of the spans being stored.</li>
+    <li>Validate whether retries, incidents, and release windows are creating temporary but expensive observability spikes.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Next paths after the observability framework is clear</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/log-cost-calculator/">Log cost</a>
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>
     <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Metrics series</a>
-    <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics</a>
+    <a class="btn" href="/guides/log-costs/">Log costs</a>
+    <a class="btn" href="/guides/metrics-costs/">Metrics costs</a>
   </div>
-
-  {obsGuides.length ? (
-    <>
-      <h2>More observability guides</h2>
-      <div class="grid">
-        {obsGuides.map((g) => (
-          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-            <div class="tool-title">{g.title}</div>
-            <div class="tool-desc">{g.description}</div>
-          </a>
-        ))}
-      </div>
-    </>
-  ) : null}
 </GuideLayout>
-
