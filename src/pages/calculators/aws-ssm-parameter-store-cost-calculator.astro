@@ -49,63 +49,41 @@ const description =
 >
   <AwsSsmParameterStoreCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Decide whether inventory or API behavior is the real cost driver</h2>
+    <p>
+      Parameter Store has a steadier shape than Secrets Manager, but it still breaks estimates when teams mix up
+      advanced-parameter inventory with request-heavy access patterns. This page is most useful when you measure both
+      sides separately instead of treating them as one blended cost stream.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li>Count advanced parameters by environment and ownership so you know the fixed baseline.</li>
+      <li>Estimate API reads from startup flows, cron jobs, deploys, and any polling loops that repeatedly fetch values.</li>
+      <li>Keep free-tier and standard-parameter behavior mentally separate from advanced-parameter billing.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Patterns that push Parameter Store bills above plan</h2>
     <ul>
-      <li>Advanced parameters are fixed; API calls drive spikes.</li>
-      <li>If API costs dominate, cache parameters and avoid per-request reads.</li>
+      <li><strong>Chatty polling</strong>: agents or applications that poll too often can turn a small config store into a request-heavy service.</li>
+      <li><strong>Startup churn</strong>: autoscaling, short-lived jobs, and rolling deploys bunch reads into visible spikes.</li>
+      <li><strong>Environment duplication</strong>: staging, ephemeral previews, and fragmented app ownership quietly expand advanced parameter count.</li>
+      <li><strong>Wrong service boundary</strong>: some teams treat Parameter Store like a secret vault and then compare it to the wrong workload shape.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
-    <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
-    </ul>
+    <h2>How this differs from a Secrets Manager review</h2>
+    <p>
+      Parameter Store usually rewards config discipline and caching. Secrets Manager reviews, by contrast, often center
+      on secret rotation and application secret fetches. If your bill is driven mainly by secret-like access patterns,
+      it is worth comparing this estimate with the Secrets Manager calculator instead of assuming both tools describe the
+      same operational behavior.
+    </p>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Count advanced parameters by environment (prod, staging, dev).</li>
-      <li>Estimate API calls per app instance and startup frequency.</li>
-      <li>Identify chatty polling or retries that inflate calls.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Advanced params</th>
-          <th>API calls</th>
-          <th>Drivers</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Configured</td>
-          <td>Expected</td>
-          <td>Normal runtime</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>Same</td>
-          <td>Burst</td>
-          <td>Deploy/incident</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
+    <h2>How to reconcile the estimate with runtime evidence</h2>
+    <ol>
+      <li>Check billed advanced parameters against the inventory you actually keep active.</li>
+      <li>Compare estimated API calls with deploy frequency, instance churn, and polling intervals.</li>
+      <li>Identify which reads happen once per startup versus repeatedly during normal request handling.</li>
+      <li>Run a separate deploy-month or incident-month scenario when startup storms dominate call volume.</li>
+    </ol>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
