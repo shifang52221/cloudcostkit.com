@@ -36,157 +36,136 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    If you are searching for "Azure Container Registry pricing", "ACR pricing", or "ACR Basic vs Standard vs Premium",
-    the practical model is still <strong>storage + pull volume + egress</strong>. A clean estimate separates what you
-    store from what you pull, and splits transfer by where it goes (same region, cross-region, internet). ACR pricing
-    tiers change limits and features, but the cost model still depends on storage, pulls, and egress. Most surprises
-    come from retention drift and pull storms (CI peaks, autoscaling, node churn).
+    If you are evaluating Azure Container Registry for real production usage, the cleanest starting point is not the
+    tier table by itself. It is the workload around the registry. ACR cost is usually shaped by four things that belong
+    in the same estimate: stored image data, pull behavior, billed transfer paths, and the operational reasons a team
+    moves from Basic to Standard or Premium. Most cost surprises do not come from the list price of the tier. They come
+    from retention drift, pull storms during CI or node churn, and cross-region patterns that were never modeled as
+    billable transfer.
   </p>
 
-  <h2>ACR pricing tiers (Basic, Standard, Premium)</h2>
+  <h2>What the ACR tier changes, and what it does not</h2>
+  <p>
+    Basic, Standard, and Premium are best understood as throughput and capability choices first. The tier changes
+    service limits, concurrency headroom, and advanced features such as geo-replication or private-networking-related
+    patterns. It does not remove the need to understand what your registry is storing, how often clients pull, or which
+    regions those pulls cross.
+  </p>
   <ul>
-    <li><strong>Basic</strong>: entry tier for low traffic and small teams.</li>
-    <li><strong>Standard</strong>: higher throughput and scale for production workloads.</li>
-    <li><strong>Premium</strong>: advanced features (geo-replication, private networking) with the highest limits.</li>
+    <li><strong>Basic</strong> fits small teams and low pull pressure, especially when usage stays single-region and operational spikes are rare.</li>
+    <li><strong>Standard</strong> is usually the production choice when pull throughput or CI reliability matters more than the lowest entry price.</li>
+    <li><strong>Premium</strong> makes sense when architecture, not just traffic, requires features such as geo-replication or stronger enterprise controls.</li>
   </ul>
   <p class="muted">
-    Tier selection affects limits and features, but your monthly spend still comes from stored GB-month, pull volume, and
-    billed data transfer paths.
+    Tier selection affects features and throughput ceilings, but monthly spend still tracks stored GB-month, pull
+    behavior, and billed transfer paths.
   </p>
 
-  <h2>Short answer: what to compare before you change ACR tiers</h2>
-  <ul>
-    <li><strong>Storage pressure</strong>: are old tags and layers actually growing the bill?</li>
-    <li><strong>Pull throughput pressure</strong>: are CI and cluster scale-outs causing delays or pull storms?</li>
-    <li><strong>Regional topology</strong>: are cross-region pulls or replication making architecture more expensive than the tier itself?</li>
-    <li><strong>Feature need</strong>: do you actually need Premium-only capabilities, or is this mostly a traffic-pattern problem?</li>
-  </ul>
-
-  <h2>0) Define your registry scope</h2>
-  <ul>
-    <li>
-      <strong>Environments</strong>: prod + staging + dev registries (or one shared registry with multiple repos).
-    </li>
-    <li>
-      <strong>Regions</strong>: cross-region clusters and geo-replication change transfer patterns.
-    </li>
-    <li>
-      <strong>Consumers</strong>: AKS nodes, VM scale sets, and external runners can each have different pull behavior.
-    </li>
-  </ul>
-
-  <h2>1) Storage (GB-month)</h2>
+  <h2>Build the first estimate from registry behavior</h2>
   <p>
-    Build a GB-month estimate from retention: average image size * tags retained * repos. Then adjust with reality: images
-    share layers, so storage is often less than "tags * size" when tags reuse common layers.
-  </p>
-  <p class="muted">
-    Tool: <a href="/calculators/object-storage-cost-calculator/">Storage cost (GB-month)</a>.
+    A usable ACR estimate starts by defining the registry as an operating system component, not as a flat storage
+    bucket. You need to know what is stored, who consumes it, where those consumers run, and which periods create the
+    worst pull pressure.
   </p>
   <ul>
-    <li>
-      If you store many versions, keep a separate line for "base images" and "app images" (they behave differently).
-    </li>
-    <li>
-      Model a growth rate if you keep long-lived tags (release tags, hotfix branches, multiple architectures).
-    </li>
+    <li><strong>Registry scope</strong>: separate prod, staging, and dev behavior if they do not share the same repositories or pull patterns.</li>
+    <li><strong>Stored GB-month</strong>: measure retained image data over time, not just what was pushed this month.</li>
+    <li><strong>Pull volume</strong>: separate normal deploy activity from CI peaks, autoscaling events, and incident-driven node churn.</li>
+    <li><strong>Regional topology</strong>: keep same-region pulls, cross-region pulls, internet pulls, and replication in separate lines.</li>
+    <li><strong>Feature trigger</strong>: document whether the pressure is really about throughput, multi-region access, or Premium-only capabilities.</li>
   </ul>
-
-  <h2>2) Pull volume (the hidden spike)</h2>
   <p>
-    Pulls scale with CI/CD, autoscaling, and node churn. A good first model is:
-    <strong>deployments/day * pulls per deployment * image size</strong>. Add a multiplier for cache misses and fresh nodes.
+    Two tools help anchor this first estimate: <a href="/calculators/object-storage-cost-calculator/">storage cost
+    (GB-month)</a> for retained data and <a href="/calculators/data-egress-cost-calculator/">data egress cost</a> for
+    billed outbound paths.
   </p>
-  <ul>
-    <li>
-      <strong>CI peaks</strong>: parallel builds and frequent pipeline retries can create pull storms.
-    </li>
-    <li>
-      <strong>Cluster scale-outs</strong>: new nodes pull many images at once (worst during incidents).
-    </li>
-    <li>
-      <strong>Warm caches</strong>: node-local caching can reduce pulls dramatically; do not assume every pod pull hits ACR.
-    </li>
-  </ul>
 
-  <h2>3) Data transfer (egress)</h2>
+  <h2>How storage, pull storms, and transfer shape the bill together</h2>
   <p>
-    Transfer is often the second bill: cross-region pulls, external runners, and any delivery outside your region. Split
-    outbound transfer by destination and validate which paths are billed.
+    The biggest mistake on ACR pages is to explain storage, pulls, and egress as separate checkboxes. In practice, they
+    reinforce each other. Retention policy decides your baseline. Pull activity decides whether the registry behaves
+    like a quiet artifact store or a high-churn delivery surface. Regional topology decides whether those pulls stay
+    local or turn into a second transfer bill.
   </p>
-  <p class="muted">
-    Tool: <a href="/calculators/data-egress-cost-calculator/">Data egress cost calculator</a>.
+  <ul>
+    <li><strong>Storage baseline</strong>: retained image data usually grows because old tags, hotfix branches, and multi-architecture artifacts stay longer than teams expect.</li>
+    <li><strong>Layer sharing</strong>: storage is not a simple tags-times-size formula because common layers are reused across images.</li>
+    <li><strong>Pull storms</strong>: CI retries, fresh nodes, autoscaling, and incident recovery can create short windows where pull demand is far above the weekly average.</li>
+    <li><strong>Warm caches</strong>: node-local cache behavior matters, because assuming every deploy hits ACR will overstate some workloads and understate others.</li>
+    <li><strong>Transfer paths</strong>: same-region pulls, cross-region pulls, internet delivery, and replication should never be priced with one blended assumption.</li>
+  </ul>
+  <ul>
+    <li><strong>Base images vs app images</strong>: model them separately when retention and pull frequency are different.</li>
+    <li><strong>Compressed pull size</strong>: use actual pulled size when possible instead of repository uncompressed size.</li>
+    <li><strong>Cross-region clusters</strong>: treat them as transfer decisions, not as invisible internal traffic.</li>
+    <li><strong>Geo-replication</strong>: model replication as its own operational and transfer decision instead of assuming Premium is just a bigger version of Standard.</li>
+  </ul>
+
+  <h2>When a tier upgrade is justified, and when it is hiding another problem</h2>
+  <p>
+    Tier upgrades usually pay off when the registry has become a reliability bottleneck, not when someone sees a bigger
+    storage number and assumes the answer is to move upward. The registry tier is often the symptom review. The real
+    question is whether throughput pressure, multi-region access, or feature requirements justify the change.
   </p>
-
-  <h2>4) Cross-region and geo-replication effects</h2>
   <ul>
-    <li>
-      If clusters pull from a registry in another region, model that as cross-region transfer, not "free internal traffic".
-    </li>
-    <li>
-      If you enable geo-replication, treat replication as its own line item (replicated data and any operational overhead).
-    </li>
+    <li><strong>Basic to Standard</strong> is usually justified when normal CI or deploy traffic is already hitting throughput or concurrency pain.</li>
+    <li><strong>Standard to Premium</strong> makes sense when multi-region workloads, geo-replication, or enterprise access patterns are operationally necessary.</li>
+    <li><strong>Do not upgrade blindly</strong> when the real issue is cross-region topology or pull inefficiency. In that case the architecture can keep the bill high even after the tier changes.</li>
   </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>If yes</th>
+        <th>If no</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Is pull throughput a normal reliability issue?</td>
+        <td>Review a tier move sooner</td>
+        <td>Focus on retention and topology first</td>
+      </tr>
+      <tr>
+        <td>Do workloads run across multiple regions?</td>
+        <td>Model geo-replication and cross-region pull paths explicitly</td>
+        <td>Keep single-region assumptions separate and simpler</td>
+      </tr>
+      <tr>
+        <td>Is egress dominating more than storage?</td>
+        <td>Review architecture and pull location before upgrading</td>
+        <td>Tier choice may matter more than transfer path</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <h2>ACR pricing calculator inputs that matter most</h2>
+  <h2>What usually goes wrong, and how to validate the estimate</h2>
+  <p>
+    Most weak ACR estimates fail because teams count artifacts but do not measure behavior. They know how many
+    repositories they have, but they do not know how retention, peak pull windows, and billed transfer interact.
+  </p>
   <ul>
-    <li><strong>Average stored GB</strong>: not just pushed GB this month.</li>
-    <li><strong>Pulls/month</strong>: separate normal deploy volume from peak CI and autoscaling windows.</li>
-    <li><strong>Average image size</strong>: use compressed pull size when possible.</li>
-    <li><strong>Billed transfer paths</strong>: same region, cross-region, internet, and geo-replication should not share one rate.</li>
+    <li>Counting tags instead of actual retained layer storage.</li>
+    <li>Treating a quiet week of cached pulls as the normal baseline.</li>
+    <li>Ignoring CI retries, node churn, or incident recovery when modeling pull volume.</li>
+    <li>Using one transfer assumption across same-region, cross-region, and internet consumers.</li>
+    <li>Assuming Premium is the answer when the bill is really being driven by topology.</li>
   </ul>
-
-  <h2>When tier upgrades usually pay off</h2>
+  <p>
+    Before you trust the model, validate it against real operating signals.
+  </p>
   <ul>
-    <li><strong>Basic to Standard</strong>: pull throughput or concurrency limits affect CI/CD reliability.</li>
-    <li><strong>Standard to Premium</strong>: multi-region traffic and geo-replication reduce pull latency risk.</li>
-    <li><strong>Check before upgrading</strong>: if spend is mostly egress from architecture, tier change alone may not reduce total cost.</li>
+    <li>Validate retention policy, cleanup behavior, and whether old layers remain billable longer than expected.</li>
+    <li>Sample pull counts during peak CI windows, scale-outs, and recovery events instead of only during calm periods.</li>
+    <li>Validate image size using compressed pull size where possible.</li>
+    <li>Validate which transfer paths are actually billed: same-region, cross-region, internet, and replication.</li>
+    <li>Validate whether the upgrade trigger is reliability, feature need, or a hidden architecture issue.</li>
   </ul>
-
-  <h2>Worked estimate template (copy/paste)</h2>
-  <ul>
-    <li>
-      <strong>Storage GB-month</strong> = avg stored GB over month (validate with registry stats if possible)
-    </li>
-    <li>
-      <strong>Pull GB/month</strong> = pulls/month * avg image size (GB) (baseline + peak)
-    </li>
-    <li>
-      <strong>Egress GB/month</strong> = pull GB to destinations that are billed as outbound (cross-region/internet)
-    </li>
-  </ul>
-
-  <h2>Common pitfalls</h2>
-  <ul>
-    <li>Retention drift: old tags and layers kept forever.</li>
-    <li>Assuming tags * size equals storage (layer sharing changes the math).</li>
-    <li>Ignoring CI and scale-out peaks (pull storms are the peak scenario).</li>
-    <li>Cross-region pulls hidden inside "it's internal" assumptions.</li>
-    <li>Missing that egress can dominate if you pull from outside the region.</li>
-  </ul>
-
-  <h2>How to validate</h2>
-  <ul>
-    <li>Validate retention policy and garbage collection behavior (old layers keep storage high).</li>
-    <li>Sample pull counts during peak CI windows and cluster scale-out events.</li>
-    <li>Validate where transfer is billed (same-region vs cross-region vs internet).</li>
-  </ul>
-
-  <h2>Tier decision framework</h2>
-  <ul>
-    <li><strong>Stay Basic</strong>: low pull concurrency, single-region, and no repeated CI queue delays.</li>
-    <li><strong>Move to Standard</strong>: CI pull throughput is a reliability bottleneck in normal weeks.</li>
-    <li><strong>Move to Premium</strong>: multi-region workloads need geo-replication and stable pull latency.</li>
-    <li><strong>Do not upgrade blindly</strong>: if egress dominates, architecture changes may beat tier upgrades.</li>
-  </ul>
-
-  <h2>Failure patterns</h2>
-  <ul>
-    <li>Counting tags instead of unique layer storage.</li>
-    <li>Ignoring pull storms during node churn and incident recovery.</li>
-    <li>Using one transfer rate across same-region and cross-region pulls.</li>
-    <li>Treating CI cache miss weeks as normal pull baselines.</li>
-  </ul>
+  <p>
+    A good sign-off rule is simple: every major number in the estimate should map back to registry stats, workload
+    behavior, or billing data. If a large number only exists because it felt directionally right, the estimate is still
+    too weak for budget or architecture decisions.
+  </p>
 
   <h2>Next actions if you are evaluating ACR spend</h2>
   <div class="btn-row">
@@ -195,15 +174,11 @@ const faqs = [
     <a class="btn" href="/guides/azure-aks-pricing/">Check AKS pull drivers</a>
     <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Review Azure egress paths</a>
   </div>
-
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/object-storage-cost-calculator/">GB-month</a>
-    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
-    <a class="btn" href="/calculators/kubernetes-cost-calculator/">Kubernetes</a>
-    <a class="btn" href="/guides/azure-aks-pricing/">AKS pricing</a>
-    <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure egress guide</a>
-  </div>
+  <p class="muted">
+    If the registry estimate is being reviewed alongside cluster cost, pair this page with the{" "}
+    <a href="/guides/azure-aks-pricing/">AKS pricing guide</a> so pull behavior and node churn are not analyzed in
+    isolation.
+  </p>
 
   <h2>Sources</h2>
   <ul>
