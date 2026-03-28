@@ -36,163 +36,143 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    If you are searching for "Cloud Run pricing per request, CPU, memory", the useful answer is: <strong>model all
-    four together</strong>. Cloud Run-style platforms are predictable when you model measurable drivers: requests,
-    CPU/memory time (duration), and outbound transfer. The main mistakes are ignoring response size and logging, and
-    ignoring peak periods where retries multiply costs.
+    If you are trying to budget Cloud Run from a simple "price per request" idea, the faster path is to stop treating
+    traffic as one number. A reliable estimate comes from modeling the service the way it behaves in production:
+    request volume, execution time, concurrency, outbound transfer, and logging. That sounds heavier than a quick
+    calculator shortcut, but in practice it prevents the two mistakes that break most first-pass budgets: assuming all
+    requests behave the same, and forgetting that slow periods, retries, and large responses change the bill shape at
+    the same time.
   </p>
 
-  <h2>Short answer: what most teams actually pay for</h2>
-  <ul>
-    <li><strong>Requests</strong> decide how often work runs.</li>
-    <li><strong>CPU and memory time</strong> decide how expensive each request becomes.</li>
-    <li><strong>Egress</strong> decides whether large responses turn a cheap service into a network-heavy one.</li>
-    <li><strong>Logs</strong> decide whether observability quietly becomes the second bill.</li>
-  </ul>
-
-  <h2>What to put in a Cloud Run pricing calculator first</h2>
-  <ul>
-    <li><strong>Requests/month</strong>: keep baseline and peak as separate numbers.</li>
-    <li><strong>Request duration</strong>: use p50 and p95, not one average.</li>
-    <li><strong>CPU and memory shape</strong>: track what one request really consumes during execution.</li>
-    <li><strong>Average response size</strong>: split normal endpoints from heavy payloads.</li>
-    <li><strong>Log bytes/request</strong>: estimate separately from application payload size.</li>
-  </ul>
-
-  <h2>0) Pick the right unit of analysis</h2>
-  <ul>
-    <li>
-      <strong>Requests/month</strong>: the driver for HTTP services.
-    </li>
-    <li>
-      <strong>Duration</strong>: the multiplier that turns requests into compute.
-    </li>
-    <li>
-      <strong>Concurrency</strong>: affects instance count and can change per-request CPU time under contention.
-    </li>
-    <li>
-      <strong>Egress</strong>: response bytes and external calls create transfer costs.
-    </li>
-    <li>
-      <strong>Logs</strong>: per-request bytes logged x request volume (often overlooked).
-    </li>
-  </ul>
-
-  <h2>1) Requests (monthly volume)</h2>
+  <h2>What Cloud Run teams usually pay for in the real world</h2>
   <p>
-    Convert request rate to monthly requests and keep baseline + peak separate. Peaks include bot spikes, marketing events,
-    and incident retry storms.
+    Most teams start with request count because it is easy to understand, but request count alone is not the bill.
+    Cloud Run cost is usually shaped by a stack of related drivers that need to be read together.
   </p>
+  <ul>
+    <li><strong>Requests</strong> tell you how often the service executes, but they only become meaningful after you split baseline traffic from peak and retry traffic.</li>
+    <li><strong>CPU and memory time</strong> decide how expensive each request becomes, which is why a slow path or poor concurrency setting can change the monthly total quickly.</li>
+    <li><strong>Egress</strong> matters when responses are large, clients are global, or the service is exporting files rather than returning small JSON payloads.</li>
+    <li><strong>Logs</strong> matter because request-by-request observability scales linearly with traffic and can become a second bill long before the application feels large.</li>
+  </ul>
+  <p>
+    The practical takeaway is simple: if you only model requests, you will usually undercount the expensive month. If
+    you model requests, execution time, transfer, and logs together, Cloud Run becomes much easier to budget.
+  </p>
+
+  <h2>Build the first estimate from service behavior, not from one average</h2>
+  <p>
+    A useful Cloud Run estimate starts with the inputs that map cleanly to how the service behaves under normal and
+    stressed conditions. The goal is not to create a perfect finance model on day one. The goal is to capture the
+    drivers that explain why this service is cheap in one month and surprisingly expensive in another.
+  </p>
+  <ul>
+    <li><strong>Requests per month</strong>: convert traffic into a monthly number, but keep baseline and peak separated instead of blending them.</li>
+    <li><strong>Duration by percentile</strong>: use p50 and p95 so you can see what normal execution looks like and what the slow path costs.</li>
+    <li><strong>CPU and memory shape</strong>: capture what each request actually consumes while it is running, especially for handlers that are not purely I/O-bound.</li>
+    <li><strong>Concurrency behavior</strong>: note whether higher concurrency improves efficiency or causes latency and contention that erase the savings.</li>
+    <li><strong>Response size and egress</strong>: isolate heavy endpoints, downloads, exports, or media responses so they do not disappear inside one blended average.</li>
+    <li><strong>Log bytes per request</strong>: estimate logging separately from application payload size because verbose logs often scale differently from response bodies.</li>
+  </ul>
   <p class="muted">
-    Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
+    Tools that help with these inputs: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>,{" "}
+    <a href="/calculators/api-response-size-transfer-calculator/">response transfer</a>,{" "}
+    <a href="/calculators/data-egress-cost-calculator/">egress cost</a>,{" "}
+    <a href="/calculators/log-cost-calculator/">log cost</a>.
   </p>
-
-  <h2>2) Duration and concurrency (compute time)</h2>
   <p>
-    Use percentiles (p50 and p95) instead of one average so you can model normal vs slow-path behavior. Slow paths often
-    come from upstream latency (DB/APIs), cold starts, and throttling.
+    The strongest habit on this page is to separate baseline service behavior from peak behavior. A launch week, retry
+    storm, or upstream slowdown does not just increase one line item. It changes requests, duration, transfer, and log
+    volume together.
   </p>
-  <ul>
-    <li>
-      If you increase concurrency, validate latency and CPU contention; concurrency is not free for CPU-bound handlers.
-    </li>
-    <li>
-      Track retries/timeouts: they multiply both request count and total compute time.
-    </li>
-  </ul>
 
-  <h2>When Cloud Run gets expensive faster than expected</h2>
-  <ul>
-    <li><strong>High latency + low concurrency</strong>: compute time dominates quickly.</li>
-    <li><strong>Large responses</strong>: egress can outgrow compute, especially for downloads and exports.</li>
-    <li><strong>Retry storms</strong>: requests, CPU/memory time, and logs all rise together.</li>
-    <li><strong>Verbose request logs</strong>: observability can scale linearly with traffic long before infra does.</li>
-  </ul>
-
-  <h2>3) Response transfer and egress</h2>
+  <h2>How compute, concurrency, transfer, and logs interact</h2>
   <p>
-    If each request returns significant data, egress becomes a major driver. Estimate average response size and multiply by
-    monthly requests, then split transfer by destination if needed.
-  </p>
-  <p class="muted">
-    Tools: <a href="/calculators/api-response-size-transfer-calculator/">Response transfer</a>,{" "}
-    <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
+    This is the part many quick guides skip. Cloud Run does not become expensive because one input goes up in
+    isolation. It gets expensive when several cost drivers reinforce each other.
   </p>
   <ul>
-    <li>
-      Model heavy-tail endpoints separately (downloads, exports) so they do not disappear into a blended average.
-    </li>
-    <li>
-      Include external dependency calls that return large payloads (they create egress too).
-    </li>
+    <li><strong>High latency with low effective concurrency</strong> means compute time dominates faster because every request holds resources longer.</li>
+    <li><strong>Large responses</strong> can push network transfer ahead of compute, especially for export, download, or media endpoints.</li>
+    <li><strong>Retry storms and timeouts</strong> multiply requests, compute time, downstream calls, and log volume together.</li>
+    <li><strong>Verbose request logging</strong> creates a second scale curve that keeps rising even if the application code itself is lightweight.</li>
   </ul>
-
-  <h2>4) Logs (often the second spike)</h2>
   <p>
-    Logging can outweigh compute if you log too much per request. Estimate log bytes per request and multiply by request
-    volume, then model retention and scan/search if you query heavily.
+    Concurrency deserves special attention because it changes the economics of the service. Higher concurrency can make
+    an I/O-bound handler much more efficient, but the same setting can harm a CPU-bound endpoint, increase tail latency,
+    and create a misleadingly optimistic estimate. When you model Cloud Run, treat concurrency as an operating choice
+    that needs evidence, not as a constant you can pick once and forget.
   </p>
-  <p class="muted">
-    Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
-    <a href="/calculators/log-storage-cost-calculator/">Tiered log storage</a>,{" "}
-    <a href="/calculators/log-search-scan-cost-calculator/">Log scan</a>.
+  <ul>
+    <li><strong>CPU-bound handlers</strong>: lower concurrency is often safer because it protects p95 latency and keeps contention visible.</li>
+    <li><strong>I/O-bound handlers</strong>: higher concurrency can improve cost efficiency, but only if latency stays controlled under load.</li>
+    <li><strong>Mixed workloads</strong>: split batch-like or heavy endpoints into separate services so one concurrency decision does not distort the entire estimate.</li>
+  </ul>
+
+  <h2>Scenario planning: the fastest way to avoid a weak budget</h2>
+  <p>
+    A Cloud Run estimate becomes useful when it explains more than one month shape. Instead of asking "what is my Cloud
+    Run cost," ask what a normal month, a peak month, and a bad month look like. That framing usually catches the same
+    risks that later show up in billing surprises.
   </p>
-  <h2>Cloud Run quick cost model</h2>
-  <ul>
-    <li><strong>Compute driver</strong>: requests x average compute time per request.</li>
-    <li><strong>Transfer driver</strong>: requests x average response bytes.</li>
-    <li><strong>Observability driver</strong>: requests x log bytes per request x retention policy.</li>
-    <li><strong>Peak factor</strong>: retries and timeouts can increase all three drivers at the same time.</li>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>What changes</th>
+        <th>Why it matters</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Baseline month</td>
+        <td>Expected traffic, normal latency, standard log volume</td>
+        <td>Gives you the operating floor for a stable period</td>
+      </tr>
+      <tr>
+        <td>Peak month</td>
+        <td>Higher request volume, larger response mix, busier endpoints</td>
+        <td>Shows whether network and logs scale faster than compute</td>
+      </tr>
+      <tr>
+        <td>Failure month</td>
+        <td>Retries, timeouts, slow upstreams, noisy logging</td>
+        <td>Reveals how incidents turn one service into several simultaneous cost spikes</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    If your estimate only covers a blended average month, it will look cleaner than the real system. That is exactly
+    why first-pass Cloud Run budgets tend to fail during launches or incidents.
+  </p>
 
-  <h2>Worked estimate template (copy/paste)</h2>
+  <h2>What usually goes wrong, and how to validate before you trust the estimate</h2>
+  <p>
+    Most weak Cloud Run estimates fail for operational reasons, not because the spreadsheet math is hard. Teams often
+    have the right variables but the wrong shape of data behind them.
+  </p>
   <ul>
-    <li>
-      <strong>Requests/month</strong> = baseline + peak (include retries)
-    </li>
-    <li>
-      <strong>Duration</strong> = p50 + p95 scenario (seconds)
-    </li>
-    <li>
-      <strong>Egress GB/month</strong> = requests/month x avg response size (GB) (split heavy endpoints)
-    </li>
-    <li>
-      <strong>Log GB/month</strong> = requests/month x avg log bytes/request (baseline + peak)
-    </li>
+    <li>One average duration is used for every endpoint, which hides the slow path that drives cost and tail latency.</li>
+    <li>Retry traffic appears in dashboards but never makes it into the budget model.</li>
+    <li>Large-response endpoints are blended into a harmless-looking average response size.</li>
+    <li>Logging assumptions stay frozen even after traffic growth or more verbose instrumentation.</li>
+    <li>Baseline and peak periods are merged, which makes the model look stable when the system is not.</li>
   </ul>
-
-  <h2>Common pitfalls</h2>
+  <p>
+    Before you sign off on the estimate, validate the service against real operating signals rather than intuition.
+  </p>
   <ul>
-    <li>Using only average duration and ignoring p95 (slow path drives cost and capacity).</li>
-    <li>Ignoring retries/timeouts which multiply requests, duration, and downstream calls.</li>
-    <li>Not modeling response size (egress dominates for large payloads).</li>
-    <li>Verbose logs per request (ingestion dominates at scale).</li>
-    <li>Not separating baseline vs peak months (incidents change the cost shape).</li>
+    <li>Check p50 and p95 latency for the endpoints that dominate traffic or spend.</li>
+    <li>Check concurrency behavior under load so you know whether your efficiency assumptions survive real traffic.</li>
+    <li>Check the top endpoints by response bytes, not just by request count.</li>
+    <li>Check retries, timeout windows, and incident periods separately from normal traffic.</li>
+    <li>Check log bytes per request and retention settings so observability is not treated as a rounding error.</li>
   </ul>
-
-  <h2>How to validate</h2>
-  <ul>
-    <li>Validate p50/p95 latency and cold start behavior.</li>
-    <li>Validate retries/timeouts and incident traffic windows.</li>
-    <li>Validate top endpoints by bytes (not just by request count).</li>
-    <li>Validate log bytes per request and retention settings.</li>
-  </ul>
-
-  <h2>Concurrency tuning decision matrix</h2>
-  <ul>
-    <li><strong>CPU-bound handlers</strong>: keep lower concurrency and scale out earlier.</li>
-    <li><strong>I/O-bound handlers</strong>: higher concurrency can improve cost efficiency.</li>
-    <li><strong>Latency-sensitive APIs</strong>: protect p95 first, then optimize concurrency.</li>
-    <li><strong>Batch-like endpoints</strong>: isolate them from interactive traffic in separate services.</li>
-  </ul>
-
-  <h2>Failure patterns</h2>
-  <ul>
-    <li>One average duration used for all endpoints and all traffic windows.</li>
-    <li>Retry traffic counted in infra dashboards but excluded from cost models.</li>
-    <li>Large response endpoints hidden inside blended average response size.</li>
-    <li>Verbose request logging left unchanged after traffic growth.</li>
-  </ul>
+  <p>
+    A practical sign-off rule works well here: every major number in the model should map back to something measurable
+    in production or a billing export. If you cannot explain where a number comes from, the estimate is not ready for
+    budget decisions yet.
+  </p>
 
   <h2>Next actions if you are budgeting Cloud Run now</h2>
   <div class="btn-row">
@@ -201,15 +181,11 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Estimate egress spend</a>
     <a class="btn" href="/calculators/log-cost-calculator/">Model logging cost</a>
   </div>
-
-  <h2>Related tools</h2>
-  <div class="btn-row">
-    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">Requests</a>
-    <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
-    <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
-    <a class="btn" href="/calculators/log-cost-calculator/">Logs</a>
-    <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
-  </div>
+  <p class="muted">
+    If you are building a review packet for finance or for an internal architecture discussion, pair those calculators
+    with the <a href="/guides/cloud-cost-estimation-checklist/">cloud cost estimation checklist</a> so your estimate is
+    tied to measurable inputs and a validation step.
+  </p>
 
   <h2>Sources</h2>
   <ul>
