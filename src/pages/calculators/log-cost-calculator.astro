@@ -87,37 +87,35 @@ const description =
   </div>
   <LogSearchScanCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Log cost is a chain, not one number</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should be read as a three-step logging cost chain: <strong>ingestion</strong>, <strong>retention</strong>,
+      and <strong>search or scan</strong>. Many teams only notice the first bill, but the expensive surprise often appears
+      later when retention policies drift or dashboards keep scanning wide windows every few minutes.
+    </p>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Estimator</strong>: use events/sec x bytes/event when you only have log rates.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
+      <li><strong>Ingestion</strong>: noisy producers and bytes per event create the first bill.</li>
+      <li><strong>Retention</strong>: policy decides how long the volume keeps costing money.</li>
+      <li><strong>Search</strong>: dashboards, alerts, and incident queries can create a behavior-driven second bill.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where total logging estimates usually drift</h2>
     <ul>
-      <li>If retention dominates, shorten retention or move cold logs to cheaper tiers.</li>
-      <li>If scans dominate, reduce query frequency and narrow time windows.</li>
+      <li>Ingestion is modeled, but retention and scan behavior are treated as rounding error.</li>
+      <li>One retention rule is applied to every log class even though audit, app, and debug logs have different value.</li>
+      <li>Incident months are blended into the baseline, hiding how expensive crisis-time search actually is.</li>
+      <li>Query-heavy dashboards are left on aggressive refresh intervals and never reflected in the estimate.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to separate before trusting the logging model</h2>
     <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
+      <li>Break out security, audit, application, and debug logs instead of using one blended GB/day assumption.</li>
+      <li>Keep ingestion, storage, and search as separate cost lines so optimization work has a real target.</li>
+      <li>Review retention by log value, not by default settings.</li>
+      <li>Track automated queries separately from ad hoc debugging and incident response behavior.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Estimate GB/day from events/sec and bytes per event.</li>
-      <li>Retention days set the storage GB-month baseline.</li>
-      <li>Query and scan volume can dominate during incidents.</li>
-      <li>Sampling and compression change bytes per event.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs incident-driven logging scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -143,11 +141,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real logging bill</h2>
     <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
-      <li>Review incident windows separately so peak scan/query behavior is not hidden by monthly averages.</li>
+      <li>Check whether the miss came from ingestion, retained volume, or scanned GB before changing every assumption.</li>
+      <li>Review incident windows separately so search-heavy periods do not distort the calm-month baseline.</li>
     </ul>
 
     <h2>Fast optimization order</h2>

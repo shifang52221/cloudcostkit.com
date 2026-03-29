@@ -52,34 +52,35 @@ const description =
 >
   <LogSearchScanCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Scan cost is driven by query behavior, not just stored volume</h2>
+    <p class="muted" style="margin-top:8px">
+      Search and scan bills often surprise teams because stored logs feel passive, but dashboards, alerts, and ad hoc
+      debugging turn them into an active, recurring workload. This page should be read as a model of <strong>query
+      behavior</strong>, not just a model of retained bytes.
+    </p>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
-      <li><strong>Estimator</strong>: use queries/day x avg GB per query when scan metrics are missing.</li>
+      <li><strong>Automated queries</strong>: dashboards, alerts, and scheduled searches create the calm-month baseline.</li>
+      <li><strong>Ad hoc investigations</strong>: incident response creates the expensive peak.</li>
+      <li><strong>Main lever</strong>: query window size and refresh cadence often matter as much as data volume.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where scan estimates usually drift</h2>
     <ul>
-      <li>Scan GB/day is the key driver; dashboards and alerts can multiply it.</li>
-      <li>If scan costs dominate, reduce query windows and pre-aggregate.</li>
+      <li>Teams model ingestion and retention but forget that dashboards are quietly scanning all day.</li>
+      <li>Average query scope is guessed without listing the top searches or their refresh cadence.</li>
+      <li>Incident-heavy search months are blended into the normal baseline.</li>
+      <li>Wide time windows and low-selectivity filters make search more expensive than users expect.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the scan baseline</h2>
     <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
+      <li>List the top dashboards and scheduled queries before estimating ad hoc usage.</li>
+      <li>Separate automated scan load from human troubleshooting and incident response.</li>
+      <li>Check whether query windows can be narrowed or pre-aggregated instead of scanning raw history each time.</li>
+      <li>Keep ingestion and retention adjacent, but separate, so you know whether search is truly the dominant problem.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>List top dashboards and their refresh rates.</li>
-      <li>Estimate average query window size (hours or days).</li>
-      <li>Separate ad hoc investigations from automated queries.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs incident-driven search scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -105,10 +106,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real scan-heavy month</h2>
     <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
+      <li>Check billed scanned GB against dashboard cadence and incident query history before changing ingestion assumptions.</li>
+      <li>Review whether a few expensive queries or a broad automated baseline caused most of the bill.</li>
     </ul>
 
     <h2>Next steps</h2>
