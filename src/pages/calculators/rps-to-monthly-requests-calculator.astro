@@ -57,26 +57,35 @@ const description =
       translate a rate into monthly volume.
     </p>
 
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">This page is a bridge from rate metrics to billing volume, not a full pricing model</h2>
+    <p class="muted" style="margin-top:8px">
+      Its purpose is narrow and useful: convert an RPS-style metric into monthly request volume so you can feed that
+      number into request-priced tools. The common mistake is asking this page to do the whole pricing job instead of
+      treating it as one bridge inside a larger workflow.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Rate</strong>: the baseline traffic level you are trying to convert into period volume.</li>
+      <li><strong>Utilization and hours</strong>: the levers that decide how long that rate is actually sustained.</li>
+      <li><strong>Scenario split</strong>: the difference between ordinary traffic and burst traffic that should not be blended away.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where rate-to-volume estimates usually drift</h2>
     <ul>
-      <li>Utilization is the biggest lever; it represents how long you sustain the given RPS.</li>
-      <li>Peak scenarios matter for autoscaling and request-billed services.</li>
+      <li>The rate number is known, but utilization is guessed too high or too low.</li>
+      <li>Teams mix baseline and burst traffic into one average, then lose the ability to explain the result.</li>
+      <li>Retries, bots, or non-user traffic are forgotten even though the next calculator may bill them.</li>
+      <li>This bridge page is mistaken for a final cost answer even though transfer, request class, and storage effects belong elsewhere.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before pasting the output into another calculator</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Keep baseline and burst scenarios separate if the downstream bill is sensitive to peaks.</li>
+      <li>Decide whether retries or automation traffic belong in the converted number before carrying it forward.</li>
+      <li>Use this output as a volume bridge, then move to the product-specific pricing page for the real bill.</li>
+      <li>Double-check units so a rate conversion error does not contaminate every downstream estimate.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs burst conversion scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -102,10 +111,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review a converted request-volume baseline</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare the converted monthly volume with real request counts before treating it as a durable planning baseline.</li>
+      <li>Check whether any mismatch came from utilization assumptions, burst duration, or missing retry traffic before changing the whole model.</li>
     </ul>
 
     <h2>Next steps</h2>

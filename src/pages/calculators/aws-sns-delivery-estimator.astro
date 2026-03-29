@@ -54,11 +54,32 @@ const description =
   <AwsSnsDeliveryEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">SNS delivery volume is a publish-to-fan-out multiplier problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page exists to translate publish activity into actual delivery attempts. The key levers are not only how
+      many messages are published, but how many subscriptions match each publish and how much retry behavior expands the
+      final delivery count.
+    </p>
     <ul>
-      <li><strong>Publishes</strong>: use CloudWatch metrics for NumberOfMessagesPublished.</li>
-      <li><strong>Fan-out</strong>: count subscriptions that match filter policies.</li>
-      <li><strong>Retries</strong>: add a buffer for failed or delayed endpoints.</li>
+      <li><strong>Publishes</strong>: the source traffic entering the topic.</li>
+      <li><strong>Matched fan-out</strong>: the filtered delivery multiplier after subscription rules are applied.</li>
+      <li><strong>Retry expansion</strong>: the extra delivery attempts caused by unhealthy or delayed endpoints.</li>
+    </ul>
+
+    <h2>Where SNS estimates usually drift</h2>
+    <ul>
+      <li>Total subscriptions are counted even though only a subset actually matches most publishes.</li>
+      <li>Retry behavior is ignored, so endpoint failures do not show up in the delivery estimate.</li>
+      <li>Multiple topics are blended together and hide which topic actually drives fan-out.</li>
+      <li>Teams think in publish count, but the bill grows with delivery multiplication.</li>
+    </ul>
+
+    <h2>What to review before feeding this into the main SNS calculator</h2>
+    <ul>
+      <li>Measure matched fan-out after filter policies instead of counting every subscriber equally.</li>
+      <li>Model unhealthy endpoints separately if retries are common during incidents.</li>
+      <li>Split high-volume topics so one noisy path does not distort the whole estimate.</li>
+      <li>Treat this page as a delivery estimator, not a full downstream system cost model.</li>
     </ul>
 
     <h2>Next steps</h2>
