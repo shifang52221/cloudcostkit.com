@@ -68,35 +68,41 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Log storage is mostly a retention-policy problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is less about raw ingestion math and more about policy design. Once logs exist, storage cost is shaped
+      by how long they stay hot, how much moves cold, and whether archive really means low-cost retained evidence or an
+      expensive pile of data nobody reads until an incident.
+    </p>
     <ul>
-      <li><strong>GB/day</strong>: use ingestion metrics for the top log sources.</li>
-      <li><strong>Hot days</strong>: use the retention window you need for troubleshooting and dashboards.</li>
-      <li><strong>Cold days</strong>: define extra archive days beyond the hot window.</li>
-      <li><strong>Archive fraction</strong>: estimate the percent of logs you actually archive.</li>
-      <li><strong>Compression ratio</strong>: use 1 unless your vendor bills cold storage on stored bytes.</li>
+      <li><strong>Hot window</strong>: expensive but immediately searchable retention for active troubleshooting.</li>
+      <li><strong>Cold window</strong>: longer-lived retained data with different access expectations.</li>
+      <li><strong>Archive fraction</strong>: only the log classes that truly need long memory should survive into cold storage.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Result interpretation</h2>
+    <h2 style="margin-top:0">Where storage estimates usually drift</h2>
     <ul>
-      <li>If cold storage dominates, review archive fraction and compression assumptions.</li>
-      <li>If hot storage dominates, shorten hot window or reduce ingestion volume.</li>
+      <li>Every log class gets archived by default, even when debug or low-value logs have no long-term use.</li>
+      <li>Hot retention days are mistaken for total retention policy, hiding the cold-storage footprint.</li>
+      <li>Compression and billed stored-bytes rules are guessed instead of checked against vendor behavior.</li>
+      <li>Retrieval or rehydration events are ignored until an investigation month creates a second storage bill.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Common mistakes</h2>
+    <h2 style="margin-top:0">What to review before trusting storage policy</h2>
     <ul>
-      <li>Archiving everything by default instead of a targeted subset.</li>
-      <li>Using hot retention days as the total retention window.</li>
-      <li>Ignoring retrieval or rehydration charges for cold tiers.</li>
+      <li>Split audit, security, application, and debug logs before choosing archive fraction.</li>
+      <li>Confirm which days are truly hot-searchable versus merely retained for compliance or forensics.</li>
+      <li>Check whether your vendor bills on ingested bytes, stored bytes, or compressed cold bytes.</li>
+      <li>Model retrieval-sensitive months separately if cold data is actually read during incidents or audits.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Scenario planning</h2>
+    <h2 style="margin-top:0">Baseline vs archive-policy scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -124,11 +130,11 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Validate after changes</h2>
+    <h2 style="margin-top:0">How to review the first real storage month</h2>
     <ul>
-      <li>Confirm hot retention days and archive fraction in policy settings.</li>
-      <li>Validate stored GB billing rules (ingested vs stored bytes, compression).</li>
-      <li>Track retrieval or rehydration charges after access-heavy months.</li>
+      <li>Confirm hot retention days and archive fraction in actual policy settings, not just in planning docs.</li>
+      <li>Validate billed stored GB against the vendor's storage-billing rules before changing retention assumptions.</li>
+      <li>Track retrieval or rehydration charges separately after audit- or incident-heavy months.</li>
     </ul>
   </div>
 </CalculatorLayout>

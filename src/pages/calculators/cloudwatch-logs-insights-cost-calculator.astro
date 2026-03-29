@@ -52,34 +52,35 @@ const description =
 >
   <LogSearchScanCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CloudWatch Logs Insights cost is mostly about scanned scope and cadence</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should stay CloudWatch-specific. The expensive part is not only that you have logs in CloudWatch. It is
+      that Logs Insights queries can repeatedly scan broad windows across active log groups. The real cost driver is how
+      often that happens and how wide each query reaches.
+    </p>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
-      <li><strong>Estimator</strong>: use queries/day x avg GB per query when scan metrics are missing.</li>
+      <li><strong>Dashboard cadence</strong>: repeated Insights queries create the calm-month scan baseline.</li>
+      <li><strong>Query window</strong>: wide time ranges expand scanned GB faster than teams expect.</li>
+      <li><strong>Incident mode</strong>: outages often multiply both query frequency and query breadth.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where Logs Insights estimates usually go wrong</h2>
     <ul>
-      <li>If scans dominate, reduce query time ranges and pre-filter noisy fields.</li>
-      <li>If incident spikes dominate, limit dashboard refresh during outages.</li>
+      <li>Query scan cost is blended together with ingestion and retention instead of treated as its own behavior-driven line.</li>
+      <li>Dashboard refresh cadence is forgotten even though it runs all day.</li>
+      <li>Common investigation windows are guessed instead of taken from actual team habits.</li>
+      <li>Peak incident search behavior is averaged into a normal month.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to capture before trusting the CloudWatch query model</h2>
     <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
+      <li>List top dashboards and Insights queries, then note their refresh intervals.</li>
+      <li>Estimate typical and incident-time query window sizes separately.</li>
+      <li>Keep Logs Insights scan cost separate from CloudWatch ingestion and retention lines.</li>
+      <li>Review whether filters, saved queries, or narrower group selection can cut scanned GB materially.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>List top dashboards and their refresh cadence.</li>
-      <li>Estimate query window sizes for common investigations.</li>
-      <li>Separate automated queries from ad hoc troubleshooting.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs incident-driven Insights scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -105,10 +106,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real Logs Insights bill</h2>
     <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
+      <li>Check scanned GB against real dashboard cadence and the most common incident queries before changing retention assumptions.</li>
+      <li>Identify whether the dominant driver was broad time windows, high refresh frequency, or too many active log groups in the query scope.</li>
     </ul>
 
     <h2>Next steps</h2>

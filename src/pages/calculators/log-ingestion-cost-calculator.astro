@@ -76,27 +76,35 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Log ingestion starts with event rate times bytes per event</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should stay focused on the first bill in the logging chain: how much data you emit before retention or
+      search policy even matters. The core math is simple, but the operational failure mode is always the same: teams
+      hide noisy producers inside one blended GB/day average and then lose track of what actually grew.
+    </p>
     <ul>
-      <li><strong>GB/day</strong>: use measured ingestion where possible (billing export or log platform metrics).</li>
-      <li><strong>Events/s</strong>: if you only have event rate, sample bytes/event and convert to GB/day.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a peak month for incident or deploy bursts.</li>
+      <li><strong>Event rate</strong>: requests, retries, background jobs, and exporters all add events.</li>
+      <li><strong>Bytes per event</strong>: structured payloads, stack traces, and verbose modes can expand size quickly.</li>
+      <li><strong>Operational truth</strong>: incident logging usually increases both event count and payload size at once.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where ingestion estimates usually break</h2>
     <ul>
-      <li>Ingestion is the first bill; retention and scan can easily exceed it.</li>
-      <li>Verbose logs and high-cardinality fields drive GB/day faster than traffic growth.</li>
+      <li>One blended GB/day hides the few sources that are actually driving most of the bill.</li>
+      <li>Bytes per event is assumed to stay flat even when error payloads or debug fields expand during incidents.</li>
+      <li>Retries, timeouts, or looped failures multiply event count without corresponding user traffic growth.</li>
+      <li>Launches and migrations are folded into the normal month instead of modeled as separate peaks.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to capture before trusting the ingestion baseline</h2>
     <ul>
-      <li>Using a single blended GB/day and hiding noisy sources.</li>
-      <li>Assuming bytes/event is constant during incidents (it usually grows).</li>
-      <li>Forgetting that retries and timeouts multiply event volume.</li>
+      <li>List the largest log sources separately instead of relying on a site-wide average.</li>
+      <li>Sample bytes per event from real production payloads, including error paths where practical.</li>
+      <li>Separate calm-month operations from verbose incident or deploy windows.</li>
+      <li>Remember that reducing ingestion usually improves every downstream logging bill as well.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs verbose-mode ingestion scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -122,10 +130,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real ingestion bill</h2>
     <ul>
-      <li>Compare estimated GB/day to the first real bill and adjust assumptions.</li>
-      <li>Track bytes/event and event rate after logging changes.</li>
+      <li>Compare billed or measured GB/day against the top log sources instead of only the total cluster average.</li>
+      <li>Check whether the miss came from event rate growth or bytes-per-event expansion before changing both inputs.</li>
     </ul>
   </div>
 </CalculatorLayout>
