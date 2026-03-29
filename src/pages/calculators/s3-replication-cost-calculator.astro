@@ -49,26 +49,35 @@ const description =
 >
   <StorageReplicationCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">S3 replication cost is a changed-data movement problem, not a total-storage problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page matters when teams confuse the size of the bucket with the size of the replication bill. Replication
+      charges usually follow writes, updates, and backfills. The dominant question is how much data changes and needs to
+      move, not how much data already exists quietly at rest.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Changed data</strong>: the write or update path that actually generates replication traffic.</li>
+      <li><strong>Policy coverage</strong>: how much of the write stream is included by the replication rule.</li>
+      <li><strong>Special months</strong>: migrations, backfills, or restores that create replication spikes unlike steady-state operation.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where replication estimates usually drift</h2>
     <ul>
-      <li>Replication fees scale with changed data, not total stored GB.</li>
-      <li>Backfills and migrations should be modeled as separate peak months.</li>
+      <li>Total stored size is used as the input even though only changed data is moving each month.</li>
+      <li>Backfills and migration events are hidden inside a calm monthly average and then blow up the real bill.</li>
+      <li>Teams model the movement fee but forget that destination storage and request activity are separate adjacent costs.</li>
+      <li>Replication rules are assumed to cover everything or nothing, even though many environments replicate only part of the object set.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the replication baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Estimate replicated GB from actual write or change volume, not from full bucket size.</li>
+      <li>Separate steady-state replication from one-time migration or backfill months.</li>
+      <li>Check replication-rule coverage so the estimate matches what is actually copied.</li>
+      <li>Keep movement fees separate from destination storage and request-side costs.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs backfill replication scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -94,10 +103,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real replication month</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether the miss came from changed-data volume, replication coverage, or a one-time copy event before changing the whole model.</li>
+      <li>Review replication movement separately from destination storage so adjacent costs do not get conflated.</li>
     </ul>
 
     <h2>Next steps</h2>

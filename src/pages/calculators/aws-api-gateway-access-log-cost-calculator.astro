@@ -75,26 +75,35 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">API Gateway access-log cost is a bytes-per-request problem before it is a logging problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page works when you think in two steps: requests become log lines, and log lines become ingestion plus
+      retained storage. The biggest misses usually come from underestimating bytes per line after adding headers, long
+      paths, user agents, or extra structured fields.
+    </p>
     <ul>
-      <li><strong>Volume</strong>: start from measured ingestion (GB/day) if you have it, then convert to monthly/retention where needed.</li>
-      <li><strong>Retention</strong>: decide retention days and model steady-state GB-month.</li>
-      <li><strong>Queries</strong>: model scan/query volume if your tool bills by GB scanned.</li>
+      <li><strong>Request volume</strong>: the source traffic that determines how many access-log lines are produced.</li>
+      <li><strong>Bytes per line</strong>: the density lever that usually decides whether logs stay cheap or quietly grow expensive.</li>
+      <li><strong>Retention policy</strong>: the rule that converts ingestion into stored-log cost over time.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where access-log estimates usually drift</h2>
     <ul>
-      <li>Requests and bytes/log drive ingestion; retention multiplies storage.</li>
-      <li>If ingestion dominates, cut log size or sampling before changing retention.</li>
+      <li>Average bytes per line are sampled once, then log format changes increase field count later.</li>
+      <li>Teams focus on request growth while noisy headers or structured fields are the real cost multiplier.</li>
+      <li>Retention is treated as an afterthought even though it creates the second half of the bill.</li>
+      <li>Scan and dashboard behavior are forgotten, so the logging month is under-modeled.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the access-log baseline</h2>
     <ul>
-      <li>Modeling ingestion but forgetting retention (GB-month) and scan/query costs.</li>
-      <li>Keeping noisy logs forever instead of setting explicit retention tiers.</li>
+      <li>Sample real log lines and re-sample after every format change that adds fields or headers.</li>
+      <li>Separate ingestion, retention, and query behavior so one logging dimension does not hide the others.</li>
+      <li>Set explicit retention tiers for high-volume access logs instead of letting them inherit longer defaults.</li>
+      <li>Use endpoint sampling or field reduction before assuming retention is the only lever.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs verbose-log access scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -120,10 +129,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real access-log month</h2>
     <ul>
-      <li>Check ingestion GB/day and retention GB-month after changes.</li>
-      <li>Check query scan GB and dashboard refresh frequency (common hidden driver).</li>
+      <li>Check whether the miss came from request volume, bytes per line, or retention policy before changing the whole estimate.</li>
+      <li>Review ingestion GB/day, retained GB-month, and query scan behavior together because all three can move at once.</li>
     </ul>
 
     <h2>Next steps</h2>
