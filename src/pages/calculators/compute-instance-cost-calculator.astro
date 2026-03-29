@@ -57,27 +57,35 @@ const description =
       pricing guides, then use this page only when you need a generic cross-check.
     </p>
 
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">This page is a generic billable-hours cross-check, not a provider-pricing destination</h2>
+    <p class="muted" style="margin-top:8px">
+      Its job is narrow and useful: estimate generic monthly compute from average running instances, billed hours, and
+      an effective hourly rate. It is not meant to replace cloud-specific pricing pages that include storage, transfer,
+      commitments, and managed-service differences.
+    </p>
     <ul>
-      <li><strong>Instances</strong>: use average running instances from billing (instance-hours / monthly hours), not peak.</li>
-      <li><strong>Hourly rate</strong>: use a blended effective $/hour if you mix on-demand, commitments, or spot.</li>
-      <li><strong>Schedule</strong>: set hours/day and days/month from real uptime windows or automation schedules.</li>
+      <li><strong>Average running instances</strong>: the real baseline, not the highest autoscaling moment.</li>
+      <li><strong>Billable hours</strong>: the schedule or uptime window that decides how much of the month is actually charged.</li>
+      <li><strong>Effective rate</strong>: the blended hourly cost after commitments, spot, or provider discounts are considered.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where generic compute estimates usually drift</h2>
     <ul>
-      <li>Instance count and billable hours are the core drivers.</li>
-      <li>Peak scenarios show autoscale risk; compare baseline vs peak for capacity planning.</li>
+      <li>Peak instance count is used as the baseline, which overstates ordinary monthly spend.</li>
+      <li>Utilization and reduced hours are both applied to the same schedule, which double-discounts the estimate.</li>
+      <li>Effective hourly rate is copied from list pricing even though commitments or spot usage change the true number.</li>
+      <li>The page is asked to model full cloud cost even though storage, transfer, and managed-service fees belong elsewhere.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before using this as a compute cross-check</h2>
     <ul>
-      <li>Using peak instance count as baseline and overestimating spend.</li>
-      <li>Applying both utilization and reduced hours/day for the same schedule (double discount).</li>
-      <li>Ignoring minimum autoscaling capacity that runs 24/7.</li>
+      <li>Use average instance-hours from billing or monitoring rather than snapshot peaks.</li>
+      <li>Pick one scheduling method so hours/day and utilization are not both discounting the same workload.</li>
+      <li>Set a realistic blended rate if you mix commitments, spot, or multiple purchase models.</li>
+      <li>Move to a provider-specific calculator when adjacent costs matter more than generic instance math.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs scale-out compute scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -103,10 +111,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review a generic compute estimate</h2>
     <ul>
-      <li>Compare instance-hours and effective $/hour to the first real bill and adjust.</li>
-      <li>Verify average instance count with metrics or inventory data.</li>
+      <li>Compare instance-hours and effective hourly rate against a real bill before treating this as a stable cross-check.</li>
+      <li>Check whether any miss came from schedule assumptions, blended rate, or average instance count before changing all inputs at once.</li>
     </ul>
 
     <h2>Next steps</h2>

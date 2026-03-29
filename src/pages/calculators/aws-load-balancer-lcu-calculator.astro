@@ -55,26 +55,35 @@ const description =
 >
   <AwsLoadBalancerCapacityUnitsCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">LCU and NLCU cost is a max-driver problem, not a sum-of-traffic problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page exists to answer one question: which hourly driver actually dominates the load balancer bill? New
+      connections, active connections, processed bytes, and rule evaluations do not all stack equally here. The billing
+      logic is driven by the highest usage dimension.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Connection drivers</strong>: new and active connection behavior that often dominates chatty or bursty traffic.</li>
+      <li><strong>Processed bytes</strong>: the payload-size dimension that can overtake everything during large-transfer periods.</li>
+      <li><strong>Rule evaluations</strong>: the ALB-specific driver that can matter more than traffic volume when rule count and request rate rise together.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where LCU and NLCU estimates usually drift</h2>
     <ul>
-      <li>LCU/NLCU is the max driver; focus on the largest driver first.</li>
-      <li>Processed bytes often dominates during large payload spikes.</li>
+      <li>Teams average all drivers together even though one hourly maximum determines the bill.</li>
+      <li>Processed bytes are modeled, but bursty connection behavior or rule evaluations are ignored.</li>
+      <li>One calm hour is used as the baseline even though peak traffic shifts the dominant driver.</li>
+      <li>Users assume more requests always means more cost, while the actual dominant dimension may be bytes or rule evaluations.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the capacity-unit baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Look at each driver separately and identify the max instead of blending them into one traffic story.</li>
+      <li>Check peak hours and burst windows because that is where the dominant driver often flips.</li>
+      <li>Model ALB rule evaluation pressure explicitly if routing complexity is part of the architecture.</li>
+      <li>Use this page to estimate units per hour, then move to the main load balancer cost page for full pricing.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs dominant-driver shift scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -100,10 +109,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real capacity-unit month</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check which driver actually dominated in production before changing all of the assumptions at once.</li>
+      <li>Review hourly peaks, not just monthly averages, because max-driver billing hides inside those windows.</li>
     </ul>
 
     <h2>Next steps</h2>
