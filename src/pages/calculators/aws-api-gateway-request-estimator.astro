@@ -54,11 +54,32 @@ const description =
   <AwsApiGatewayRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">API Gateway request volume is mostly a traffic-shape and retry-amplification problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This estimator is for translating API traffic behavior into billable gateway requests. The biggest misses usually
+      come from retry storms, bot traffic, mobile reconnect behavior, or burst windows that are small in duration but
+      large enough to move the monthly bill.
+    </p>
     <ul>
-      <li><strong>Baseline RPS</strong>: use CloudWatch or access logs for a representative week.</li>
-      <li><strong>Peak windows</strong>: document launches, incidents, or scheduled batch runs.</li>
-      <li><strong>Multiplier</strong>: add retries, timeouts, bots, and automated traffic.</li>
+      <li><strong>Baseline flow</strong>: the ordinary request path that runs most of the month.</li>
+      <li><strong>Burst windows</strong>: launches, campaigns, cron workloads, or incident traffic that distort averages.</li>
+      <li><strong>Amplifiers</strong>: retries, bots, automation, and client behavior that create billable requests without adding business value.</li>
+    </ul>
+
+    <h2>Where API Gateway estimates usually drift</h2>
+    <ul>
+      <li>Average RPS looks safe, but short burst windows materially change monthly request totals.</li>
+      <li>Only successful application traffic is counted while retries and failed gateway requests are ignored.</li>
+      <li>Bot and automation traffic is treated as noise even though it still hits the gateway and gets billed.</li>
+      <li>Peak traffic is modeled, but its duration is guessed too low.</li>
+    </ul>
+
+    <h2>What to review before feeding this into the main API Gateway calculator</h2>
+    <ul>
+      <li>Use gateway-side or edge-side counts that include all billable requests, not only successful application responses.</li>
+      <li>Model peak windows explicitly instead of hiding them in one monthly average.</li>
+      <li>Keep retries and bot traffic visible so the estimate can be defended in review.</li>
+      <li>Treat this page as a request-volume estimator only, not as a full API cost model.</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -54,11 +54,32 @@ const description =
   <AwsKmsRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">KMS request volume is a crypto-call-density problem inside a workload path</h2>
+    <p class="muted" style="margin-top:8px">
+      The job of this page is to estimate how many KMS calls are hidden inside a unit of work. What matters most is not
+      the raw traffic count alone, but how often each request, object, or secret read triggers Encrypt, Decrypt, or
+      GenerateDataKey calls once caching and batching are considered.
+    </p>
     <ul>
-      <li><strong>Units</strong>: app requests, secret reads, or object operations per month.</li>
-      <li><strong>Calls per unit</strong>: measure in a staging environment or from tracing.</li>
-      <li><strong>Multiplier</strong>: account for retries and burst windows.</li>
+      <li><strong>Workload units</strong>: the application event that causes cryptographic operations.</li>
+      <li><strong>Calls per unit</strong>: the real path-specific density of KMS usage inside that workflow.</li>
+      <li><strong>Amplifiers</strong>: retries, bursts, and uncached paths that create more crypto calls than expected.</li>
+    </ul>
+
+    <h2>Where KMS estimates usually drift</h2>
+    <ul>
+      <li>Teams count front-end traffic but do not measure how many KMS calls are triggered per unit of work.</li>
+      <li>Caching or batching assumptions are copied from one architecture path to another where they do not apply.</li>
+      <li>Incident or burst windows increase uncached traffic and drive more KMS calls than normal periods.</li>
+      <li>One blended unit is used even though multiple workflows have very different crypto-call density.</li>
+    </ul>
+
+    <h2>What to review before feeding this into the main KMS calculator</h2>
+    <ul>
+      <li>Trace the real application path and count crypto calls rather than assuming one static ratio.</li>
+      <li>Separate cached and uncached flows if their KMS behavior is materially different.</li>
+      <li>Model burst periods if retries or cold-start-like behavior changes KMS call density.</li>
+      <li>Use this page for request sizing only; key-month charges belong on the main KMS cost page.</li>
     </ul>
 
     <h2>Next steps</h2>

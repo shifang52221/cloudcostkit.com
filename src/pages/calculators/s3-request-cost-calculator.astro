@@ -55,36 +55,35 @@ const description =
 >
   <ObjectStorageCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">S3 request cost is mostly an operation-mix problem, not a generic storage problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page matters when object operations multiply faster than stored GB. The main question is usually not
+      "how much data do we store?" but "which operations are hitting the bucket and how often?" GET, PUT, LIST, HEAD,
+      multipart uploads, and retries can create a meaningful request bill even when storage itself looks modest.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Operation mix</strong>: the actual blend of GET, PUT, LIST, HEAD, multipart, and control-path requests.</li>
+      <li><strong>Workload shape</strong>: whether the bucket is read-heavy, write-heavy, metadata-heavy, or object-count heavy.</li>
+      <li><strong>Amplifiers</strong>: retries, multipart behavior, and origin-style request churn that expand the operation count.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where S3 request estimates usually drift</h2>
     <ul>
-      <li>Requests matter most when you have many small objects and high access rates.</li>
-      <li>If request fees are large, evaluate caching and request consolidation.</li>
+      <li>Teams count GET and PUT only, while LIST, HEAD, and metadata-heavy operations quietly create a second request bill.</li>
+      <li>Small-object workloads and chatty pipelines generate more operations than storage size suggests.</li>
+      <li>Multipart uploads, retries, or CDN-origin patterns create more request volume than the simple baseline assumed.</li>
+      <li>One blended request number hides whether reads, writes, or control-path calls are the real driver.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the S3 request baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Split request classes if GET, PUT, LIST, HEAD, or multipart operations are materially different.</li>
+      <li>Check whether retries, pipeline loops, or metadata scans are creating extra requests.</li>
+      <li>Keep request cost separate from storage and transfer so adjacent bills do not get blended together.</li>
+      <li>Model bursty ingest or processing months explicitly if object activity is not steady.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Split request classes (GET, PUT, LIST, DELETE) if possible.</li>
-      <li>Multipart uploads and retries can multiply request counts.</li>
-      <li>Use a baseline and peak for bursty workloads.</li>
-      <li>Separate CDN cache hits from origin requests where applicable.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs metadata-heavy request scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -110,10 +109,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real S3 request month</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Compare billed request classes to logs or metrics so you know whether reads, writes, or metadata calls caused the miss.</li>
+      <li>Check whether retries, multipart behavior, or bucket-scanning patterns explain the gap before changing the full model.</li>
     </ul>
 
     <h2>Next steps</h2>

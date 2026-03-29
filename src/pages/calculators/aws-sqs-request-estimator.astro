@@ -53,11 +53,32 @@ const description =
   <AwsSqsRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">SQS request volume is a message-lifecycle multiplier, not just a message count</h2>
+    <p class="muted" style="margin-top:8px">
+      The important idea on this page is that one message often becomes multiple billable requests. Send, receive,
+      delete, visibility changes, retries, and empty polling loops all push request volume above the simple
+      "messages sent" baseline.
+    </p>
     <ul>
-      <li><strong>Messages</strong>: use CloudWatch metrics or queue metrics exports.</li>
-      <li><strong>Requests per message</strong>: count Send + Receive + Delete and any retries.</li>
-      <li><strong>Retries</strong>: add a multiplier for timeouts, retries, and failures.</li>
+      <li><strong>Message volume</strong>: the workload baseline entering the queue.</li>
+      <li><strong>Lifecycle requests</strong>: send, receive, delete, and any additional control-path calls.</li>
+      <li><strong>Amplifiers</strong>: retries, visibility extensions, and polling behavior that turn one message into many requests.</li>
+    </ul>
+
+    <h2>Where SQS estimates usually drift</h2>
+    <ul>
+      <li>Teams assume three requests per message even though retries and visibility changes are common in production.</li>
+      <li>Polling loops generate extra receives, especially when consumers are inefficient or idle.</li>
+      <li>Failure periods create more request amplification than the calm baseline suggests.</li>
+      <li>Peak message spikes are modeled, but the request-per-message multiplier is left unchanged.</li>
+    </ul>
+
+    <h2>What to review before feeding this into the main SQS calculator</h2>
+    <ul>
+      <li>Trace one real message path so the request-per-message assumption reflects production behavior.</li>
+      <li>Review retry and visibility-extension patterns separately from normal message handling.</li>
+      <li>Use this page to size request volume only; storage and downstream compute belong elsewhere.</li>
+      <li>Keep peak or failure scenarios explicit because queue inefficiency shows up most clearly there.</li>
     </ul>
 
     <h2>Next steps</h2>
