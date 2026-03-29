@@ -77,30 +77,38 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Retained log storage is a policy problem before it is a pure GB problem</h2>
+    <p class="muted" style="margin-top:8px">
+      Log retention bills grow because teams keep too much of the wrong data hot for too long. The useful lens here is
+      not one blended logging average, but which sources deserve short hot windows, which need long audit retention, and
+      how much daily volume each source contributes to the stored total.
+    </p>
     <ul>
-      <li><strong>GB/day</strong>: use ingestion metrics per log source; avoid blended averages.</li>
-      <li><strong>Retention days</strong>: confirm settings per log group or table; defaults often drift.</li>
-      <li><strong>Stored GB billing</strong>: check whether your vendor bills on ingested or stored size.</li>
-      <li><strong>Seasonality</strong>: if volume changes by week or month, model separate scenarios.</li>
+      <li><strong>GB/day by source</strong>: the only reliable way to see which log classes are driving retained storage.</li>
+      <li><strong>Retention policy</strong>: the operational rule that multiplies daily volume into a stored dataset.</li>
+      <li><strong>Hot vs cold intent</strong>: whether the data really needs to stay searchable or only preserved.</li>
+      <li><strong>Billing definition</strong>: whether stored size, compressed size, or another vendor-specific basis is used.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Result interpretation</h2>
+    <h2 style="margin-top:0">Where retained-log estimates usually drift</h2>
     <ul>
-      <li>Retention days multiply GB/day; storage grows linearly with retention.</li>
-      <li>High-volume sources should have shorter hot retention.</li>
+      <li>One blended GB/day number hides the handful of noisy sources that really control retained storage.</li>
+      <li>Default retention settings drift longer over time and nobody re-checks them after the system is stable.</li>
+      <li>Audit and application logs are kept on the same hot policy even though their operational value is different.</li>
+      <li>Incident months create verbose logging that quietly changes the steady-state storage baseline.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the retention baseline</h2>
     <ul>
-      <li>Using blended GB/day and missing the top noisy sources.</li>
-      <li>Applying a single retention policy to all log types.</li>
-      <li>Assuming stored GB equals ingested GB (compression varies).</li>
+      <li>Split access, application, and audit logs so each class gets an intentional retention window.</li>
+      <li>Check top-volume sources directly instead of budgeting from one average ingestion number.</li>
+      <li>Review whether long-term needs belong in colder storage rather than in the hot searchable tier.</li>
+      <li>Confirm what the vendor bills as stored GB before translating GB/day into a dollar baseline.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs verbose-incident retention scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -126,11 +134,11 @@ const description =
       </tbody>
     </table>
 
-    <h2 style="margin-top:0">Validate after changes</h2>
+    <h2 style="margin-top:0">How to review the first real retention month</h2>
     <ul>
-      <li>Validate measured ingestion (GB/day) for your top sources, not a blended average.</li>
-      <li>Validate retention settings per table/source (defaults often drift).</li>
-      <li>Validate what the vendor bills as stored GB (compressed size vs ingested size differs by provider).</li>
+      <li>Validate measured GB/day on the top noisy sources instead of only checking a blended dashboard average.</li>
+      <li>Review actual retention settings per table, source, or log group because defaults often drift quietly.</li>
+      <li>Check whether the miss came from policy length, noisy-source growth, or billing-basis differences before changing the whole model.</li>
     </ul>
   </div>
 </CalculatorLayout>
