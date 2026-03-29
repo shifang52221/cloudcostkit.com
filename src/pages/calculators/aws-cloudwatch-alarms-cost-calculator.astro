@@ -48,33 +48,35 @@ const description =
 >
   <AwsCloudwatchAlarmsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CloudWatch alarm cost is mostly an inventory-sprawl problem</h2>
+    <p class="muted" style="margin-top:8px">
+      Alarm bills rarely get expensive because AWS suddenly changed the unit price. They get expensive because teams add
+      more alarms, duplicate them across environments, or create incident-only high-resolution alarms that never get
+      removed. This page is really about alarm inventory discipline.
+    </p>
     <ul>
-      <li><strong>Alarm counts</strong>: export alarms per account and environment; split standard, high-res, composite.</li>
-      <li><strong>Scope</strong>: identify per-tenant/per-pod alarms that multiply fast.</li>
-      <li><strong>Resolution</strong>: flag high-res alarms separately; they cost more.</li>
+      <li><strong>Standard alarms</strong>: the base inventory that grows with service surface area.</li>
+      <li><strong>High-resolution alarms</strong>: more expensive and often created reactively during incidents.</li>
+      <li><strong>Composite alarms</strong>: useful, but easy to multiply when ownership is unclear.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where alarm estimates usually drift</h2>
     <ul>
-      <li>High-res and composite alarms grow cost quickly; review their share of total alarms.</li>
-      <li>Alarm sprawl is often the real driver, not price changes.</li>
+      <li>Only production alarms are counted, while staging, dev, and shadow environments keep their own alarm inventories.</li>
+      <li>Migrations and refactors leave duplicate alarms behind.</li>
+      <li>Per-tenant or per-pod alarm patterns scale faster than the team expected.</li>
+      <li>High-resolution alarms created during outages remain after the original need is gone.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the alarm baseline</h2>
     <ul>
-      <li>Counting only production and ignoring staging or dev alarm inventories.</li>
-      <li>Leaving duplicate alarms after migrations or refactors.</li>
+      <li>Group alarms by team, service, and environment to expose ownership gaps.</li>
+      <li>Separate standard, composite, and high-resolution counts instead of using one blended total.</li>
+      <li>Check whether dynamic or per-resource alarm patterns are multiplying with the platform.</li>
+      <li>Treat incident-created alarms as a separate peak case until you know they are permanent.</li>
     </ul>
 
-    <h2>Alarm inventory checklist</h2>
-    <ul>
-      <li>Group alarms by team or service to find ownership gaps.</li>
-      <li>Separate composite alarms from standard ones for pricing accuracy.</li>
-      <li>Track high-res alarms created for incidents and never removed.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs incident-expanded alarm scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -100,10 +102,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real CloudWatch alarm month</h2>
     <ul>
-      <li>Compare alarm counts by type before and after changes.</li>
-      <li>Validate high-res alarm usage in a recent billing week.</li>
+      <li>Compare billed alarm counts by type against the exported inventory, not against memory or docs.</li>
+      <li>Validate whether high-resolution or duplicated alarms explain the miss before changing the entire baseline.</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -48,33 +48,35 @@ const description =
 >
   <MetricsTimeseriesCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Timeseries cost is mostly an active-series and cardinality problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is broader than any single vendor. The dominant question is usually not "how many dashboards do we
+      have?" but "how many active series are we creating once labels multiply?" A small change in dimensions can create
+      a much larger bill than a small change in traffic.
+    </p>
     <ul>
-      <li><strong>Counts</strong>: start from inventory (custom metrics, alarms, dashboards) per account/environment.</li>
-      <li><strong>Cardinality</strong>: model multiplicative dimensions (service x env x cluster x pod).</li>
-      <li><strong>API polling</strong>: add dashboard refresh and automation polling scenarios.</li>
+      <li><strong>Active series</strong>: the real baseline inventory the monitoring backend needs to store and evaluate.</li>
+      <li><strong>Cardinality</strong>: labels such as pod, container, tenant, request path, or user can multiply series explosively.</li>
+      <li><strong>Churn</strong>: autoscaling and short-lived jobs create temporary series that still cost money while active.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where timeseries estimates usually drift</h2>
     <ul>
-      <li>If series count dominates, reduce high-cardinality labels or aggregate metrics.</li>
-      <li>Spikes often come from new labels in deploys; audit new series creation.</li>
+      <li>Teams count metrics by name but ignore the multiplier effect of labels and environments.</li>
+      <li>Cardinality spikes introduced during deploys are treated as temporary and never cleaned up.</li>
+      <li>Autoscaling churn creates more short-lived series than the inventory model assumed.</li>
+      <li>Polling and dashboards are remembered, but the real explosion is in series creation itself.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the active-series baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/high-cardinality scenarios.</li>
-      <li>Forgetting API polling and dashboard refresh costs.</li>
+      <li>List the namespaces or services generating the most active series.</li>
+      <li>Audit high-cardinality labels explicitly instead of assuming they are harmless metadata.</li>
+      <li>Separate stable baseline series from bursty autoscaling or batch-job churn.</li>
+      <li>Decide whether aggregation, label reduction, or sampling is the right fix before touching dashboard behavior.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>List top namespaces or services that generate the most series.</li>
-      <li>Count high-cardinality labels (pod, container, user, request id).</li>
-      <li>Identify temporary series churn from autoscaling and batch jobs.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs cardinality-spike timeseries scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -100,10 +102,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real timeseries bill</h2>
     <ul>
-      <li>Measure actual custom metric/series counts and alarm/dashboards after rollout.</li>
-      <li>Watch API request volume trends (dashboards + automation).</li>
+      <li>Check whether the miss came from active-series growth, label explosion, or temporary churn before changing the core model.</li>
+      <li>Review deploy windows and autoscaling events separately so short-lived series spikes do not hide inside monthly averages.</li>
     </ul>
 
     <h2>Next steps</h2>
