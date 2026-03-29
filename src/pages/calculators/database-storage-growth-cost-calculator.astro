@@ -47,26 +47,35 @@ const description =
 >
   <DatabaseStorageGrowthCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Database storage growth is a forecasting problem, not a snapshot of today's size</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is about slope and horizon. Most teams know current size, but the real budgeting question is how fast
+      the dataset grows and what average size they will actually pay for over the next few months, not just where the
+      database ends up on the last day of the period.
+    </p>
     <ul>
-      <li><strong>Compute</strong>: instance-hours (or average serverless capacity) and a peak scenario.</li>
-      <li><strong>Storage</strong>: average GB-month plus growth over time.</li>
-      <li><strong>Backups</strong>: retention and churn (daily changed data x retention days) as a separate line item.</li>
+      <li><strong>Starting size</strong>: the current stored baseline before growth compounds over the chosen horizon.</li>
+      <li><strong>Growth slope</strong>: the daily or weekly expansion that determines average paid GB more than the end number alone.</li>
+      <li><strong>Horizon</strong>: the planning window that decides whether growth is a minor drift or a real budget problem.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where database-growth estimates usually drift</h2>
     <ul>
-      <li>Average GB is a better budget proxy than end-of-month GB.</li>
-      <li>Daily growth is the key driver; small increases compound over months.</li>
+      <li>Only current size is tracked, so the budget ignores how much average GB rises during the month.</li>
+      <li>Growth is assumed linear forever even though launches, retention changes, or new indexes can change the slope quickly.</li>
+      <li>Raw table growth is modeled, but replicas, indexes, or backup policy make total paid storage grow faster.</li>
+      <li>One short healthy period is used as the growth baseline even though imports or product changes are coming next.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the growth forecast</h2>
     <ul>
-      <li>Ignoring backup storage and long-term retention growth.</li>
-      <li>Modeling only today's size and missing 3-12 month growth.</li>
+      <li>Use average GB as the budgeting lens instead of only talking about end-of-month size.</li>
+      <li>Check whether indexes, replicas, or retention policy changes should raise the effective storage multiplier.</li>
+      <li>Model a launch or backfill scenario if the next quarter is not expected to look like the last month.</li>
+      <li>Keep backup and retained-history growth close by so the page does not understate total storage economics.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs accelerated-growth scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -92,10 +101,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real growth period</h2>
     <ul>
-      <li>Compare forecast vs actual storage/backup GB-month after a few weeks.</li>
-      <li>Re-check during batch jobs or backfills (churn spikes).</li>
+      <li>Compare forecasted average GB against actual paid GB-month instead of only checking the latest size snapshot.</li>
+      <li>Review whether the miss came from slope change, replica/index growth, or retention-related storage before changing the whole model.</li>
     </ul>
 
     <h2>Next steps</h2>

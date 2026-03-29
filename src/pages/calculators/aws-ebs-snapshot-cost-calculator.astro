@@ -54,26 +54,35 @@ const description =
 >
   <AwsEbsSnapshotCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">EBS snapshot cost is mostly a changed-data and retention problem</h2>
+    <p class="muted" style="margin-top:8px">
+      Snapshot bills become misleading when teams think in full volumes instead of changed blocks. The important drivers
+      are how much data changes each day, how long those changes are retained, and whether one-off rebuilds create
+      temporary churn spikes that look nothing like an ordinary week.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Volume baseline</strong>: the protected dataset that anchors the first snapshot layer.</li>
+      <li><strong>Daily churn</strong>: the real multiplier that turns routine backups into accumulating stored data.</li>
+      <li><strong>Retention</strong>: the policy choice that decides how long changed data keeps stacking up.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where snapshot estimates usually drift</h2>
     <ul>
-      <li>Daily change rate drives growth; small increases compound quickly with longer retention.</li>
-      <li>Large one-time churn (rebuilds, reindexing) should be modeled as peak months.</li>
+      <li>Daily change rate is guessed too low because only calm periods are measured.</li>
+      <li>One-off rebuilds, reindexing, patching, or migration work create far more changed blocks than the baseline model assumed.</li>
+      <li>Retention grows quietly over time, so the estimate keeps using last quarter's policy while the real window gets longer.</li>
+      <li>Teams talk about total volume size when the snapshot bill is really being pushed by changed-data accumulation.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the snapshot baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Measure ordinary daily churn separately from rebuild or maintenance windows.</li>
+      <li>Review retention policy and cleanup habits because they control how long changed blocks remain billable.</li>
+      <li>Model peak churn months explicitly instead of hiding them inside one blended average.</li>
+      <li>Keep snapshot storage separate from volume storage so the two bills do not get mixed together.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs churn-spike snapshot scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -99,10 +108,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real snapshot month</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether the miss came from daily churn, retention length, or one-off maintenance events before changing the whole model.</li>
+      <li>Compare actual stored snapshot GB to the retention window you thought was active, not just to raw volume size.</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -61,38 +61,37 @@ const description =
 >
   <AwsRdsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">RDS cost is a managed database bill with four different growth surfaces</h2>
+    <p class="muted" style="margin-top:8px">
+      This page works best when you stop treating RDS like one price line. A real month is usually made of
+      <strong> compute</strong>, <strong>primary storage</strong>, <strong>backup storage</strong>, and
+      <strong> workload-driven I/O</strong>. Different teams overfocus on instance size while backup churn or I/O
+      behavior quietly becomes the real reason the bill grows.
+    </p>
     <ul>
-      <li><strong>Compute</strong>: instance-hours from billing (hours/day x days/month) or average serverless capacity.</li>
-      <li><strong>Storage</strong>: average allocated or used GB-month and expected growth.</li>
-      <li><strong>Backups</strong>: retention x daily change rate to estimate backup GB-month.</li>
-      <li><strong>I/O</strong>: use engine metrics or billing for I/O request volume.</li>
+      <li><strong>Compute</strong>: the always-on database surface, including primary nodes, read replicas, or serverless runtime.</li>
+      <li><strong>Primary storage</strong>: the persistent data layer that grows with tables, indexes, and replicas.</li>
+      <li><strong>Backup storage</strong>: the retention-driven layer that expands with churn, not only with total size.</li>
+      <li><strong>I/O behavior</strong>: the variable layer that can spike during backfills, batch jobs, or poor query patterns.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where RDS estimates usually drift</h2>
     <ul>
-      <li>If backups are a large share, review retention and snapshot lifecycle policies.</li>
-      <li>If I/O is dominant, evaluate storage type and workload patterns before scaling instance size.</li>
+      <li>Instance-hours are modeled carefully, but backup storage is treated like a flat percentage instead of a churn problem.</li>
+      <li>I/O spikes are blamed on needing larger instances when the actual issue is workload shape or storage tier choice.</li>
+      <li>Allocated storage is treated as static even though growth, replicas, and backup policy change the total month by month.</li>
+      <li>One normal month is used even though migrations, reindexing, or backfills create very different database behavior.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the RDS baseline</h2>
     <ul>
-      <li>Ignoring backup storage growth and retention creep.</li>
-      <li>Using allocated storage as a constant without growth assumptions.</li>
-      <li>Forgetting I/O pricing for engines that charge per request.</li>
+      <li>Separate compute, primary storage, backups, and I/O so one noisy line item does not hide the others.</li>
+      <li>Check backup retention and daily change rate before assuming backups are a small fixed add-on.</li>
+      <li>Model replica or Multi-AZ overhead explicitly if that is part of production architecture.</li>
+      <li>Use a batch-heavy or churn-heavy scenario whenever your workload includes imports, backfills, or reporting spikes.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Model instance hours by size and uptime schedule.</li>
-      <li>Add storage GB-month plus provisioned IOPS if applicable.</li>
-      <li>Include backup and snapshot retention driven by churn.</li>
-      <li>Account for Multi-AZ or read replica overhead.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs churn-heavy RDS scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -121,10 +120,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real RDS month</h2>
     <ul>
-      <li>Compare instance-hours, storage, backups, and I/O to actual RDS line items.</li>
-      <li>Re-check during batch jobs or backfills when churn spikes.</li>
+      <li>Compare actual compute, storage, backup, and I/O line items separately so you know which surface missed the estimate.</li>
+      <li>Review batch windows and retention-driven backup growth before changing the whole baseline or instance strategy.</li>
     </ul>
 
     <h2>Next steps</h2>
