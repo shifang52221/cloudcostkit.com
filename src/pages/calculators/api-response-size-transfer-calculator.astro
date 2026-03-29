@@ -78,26 +78,40 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">This tool estimates payload transfer, not the whole network bill</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is a bridge tool. It translates request count and average response size into monthly transferred bytes,
+      which you can then use inside egress, CDN, or origin-cost models. It should stay focused on the payload math
+      instead of pretending to be a full network pricing calculator.
+    </p>
     <ul>
-      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
-      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
-      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+      <li><strong>Main drivers</strong>: requests per day and compressed bytes returned per request.</li>
+      <li><strong>What it explains well</strong>: how product or API shape changes turn into more transferred data.</li>
+      <li><strong>What it does not replace</strong>: egress rates, CDN pricing, or cross-region billing rules.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where transfer estimates get distorted</h2>
+    <p>
+      Average response size is only useful when the routes you blend together actually behave similarly. A small JSON
+      API and a file-download endpoint can share the same domain but should not share one response-size assumption.
+      Compression, cache hits, and retries can also make real transferred bytes diverge from naive payload math.
+    </p>
     <ul>
-      <li>Requests and response size multiply; one growing while the other stays flat still raises transfer quickly.</li>
-      <li>If transfer dominates, focus on caching and response compression first.</li>
+      <li><strong>Route mixing</strong>: separate tiny API calls, heavy list endpoints, and download-style responses.</li>
+      <li><strong>Compression drift</strong>: changes in gzip or brotli effectiveness alter over-the-wire bytes.</li>
+      <li><strong>Cache behavior</strong>: CDN or edge hits can reduce origin transfer without changing user-visible payloads.</li>
+      <li><strong>Retry amplification</strong>: incidents and client retries can multiply response transfer silently.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>How to measure a trustworthy response-size baseline</h2>
     <ul>
-      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
-      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+      <li>Use bytes-sent data from logs or APM by route group instead of guessing a single site-wide average.</li>
+      <li>Prefer compressed bytes over the wire when you plan bandwidth or egress cost.</li>
+      <li>Keep rare large exports or file responses outside the default API response baseline.</li>
+      <li>Track request growth and payload growth separately because either one can drive transfer up on its own.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs payload-growth scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -123,10 +137,11 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>Where to take this number next</h2>
     <ul>
-      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
+      <li>Use the egress calculator when you need to turn transfer GB into public bandwidth cost.</li>
+      <li>Use CDN calculators when cache hit ratio changes whether the origin actually pays the full transfer bill.</li>
+      <li>Re-check during peak or incident windows because retries and fallback paths can invalidate a calm-month baseline.</li>
     </ul>
 
     <h2>Next steps</h2>

@@ -57,39 +57,40 @@ const description =
 >
   <AwsNatGatewayCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">NAT cost has a fixed floor and a traffic multiplier</h2>
+    <p class="muted" style="margin-top:8px">
+      NAT Gateway bills usually become confusing because two different cost shapes are mixed together: a relatively
+      predictable <strong>gateway-hour floor</strong> and a workload-driven <strong>GB processed multiplier</strong>.
+      This page is most useful when you separate those two lines before thinking about optimization.
+    </p>
     <ul>
-      <li>
-        <strong>NAT gateways</strong>: count NAT gateways per AZ (teams often run 1 per AZ for HA).
-      </li>
-      <li>
-        <strong>Hours/day and days/month</strong>: use real uptime windows (24 x 30.4 for always-on).
-      </li>
-      <li>
-        <strong>GB processed</strong>: pull from NAT metrics or VPC Flow Logs, or estimate from throughput charts (Mbps to
-        GB/month).
-      </li>
-      <li>
-        <strong>Pricing</strong>: use region-specific NAT hourly and per-GB rates.
-      </li>
+      <li><strong>Fixed base</strong>: gateway count by AZ and runtime window.</li>
+      <li><strong>Variable line</strong>: all traffic that traverses the gateway, including hidden fleet-wide downloads.</li>
+      <li><strong>Review lens</strong>: hourly cost tells you footprint; processed GB tells you behavior.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What usually makes NAT bills spike</h2>
+    <p>
+      NAT rarely explodes because of one user request. The common pattern is fan-out: every node, task, or instance
+      repeating the same pulls, updates, package downloads, or retries. That is why NAT can look quiet in architecture
+      diagrams but expensive in the bill.
+    </p>
     <ul>
-      <li>If traffic share is high, focus on data path changes (endpoints, caching, or egress routing).</li>
-      <li>If hourly share dominates, review gateway count and uptime windows.</li>
+      <li><strong>Image pulls and bootstrap traffic</strong>: cluster scale-outs multiply outbound traffic quickly.</li>
+      <li><strong>Patch windows</strong>: package mirrors and OS updates create short but expensive bursts.</li>
+      <li><strong>Retry storms</strong>: incidents can inflate processed GB without obvious product growth.</li>
+      <li><strong>Shared egress paths</strong>: one NAT serving many workloads hides which team is actually driving cost.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>When NAT is the bill to reduce, and when it is just the symptom</h2>
     <ul>
-      <li>Modeling only the hourly fee and ignoring GB processed (usually the bigger driver).</li>
-      <li>Forgetting that "small" downloads multiply across fleets (node bootstrap, image pulls, package updates).</li>
-      <li>Ignoring retries/timeouts that multiply outbound traffic during incidents.</li>
-      <li>Assuming endpoints automatically replace NAT without checking the traffic mix.</li>
-      <li>Estimating GB from peak throughput without averaging over the month.</li>
+      <li>If processed GB dominates, investigate endpoints, mirrors, caching, and route-local traffic first.</li>
+      <li>If gateway-hours dominate, review whether you have too many always-on gateways for the actual topology.</li>
+      <li>If NAT drops but cross-AZ or endpoint charges rise elsewhere, you moved the path rather than removed the cost.</li>
+      <li>Always compare before-and-after architecture changes across the whole network bill, not only the NAT line.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs patch-window NAT scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -115,12 +116,12 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>What to validate after routing changes</h2>
     <ul>
       <li>Watch NAT GB processed trend (it should drop if endpoints/caching are working).</li>
-      <li>Confirm you did not increase cross-AZ/cross-region transfer elsewhere.</li>
-      <li>Re-check during peak/incident windows (that's when hidden multipliers show up).</li>
-      <li>Compare NAT gateway-hours and GB processed with billing line items.</li>
+      <li>Confirm you did not increase cross-AZ, cross-region, or endpoint spend elsewhere while reducing NAT.</li>
+      <li>Re-check during deploy, patch, and incident windows because that is where the hidden multipliers usually live.</li>
+      <li>Compare gateway-hours and processed GB against billing usage types before deciding the optimization really worked.</li>
     </ul>
 
     <h2>Next steps</h2>
