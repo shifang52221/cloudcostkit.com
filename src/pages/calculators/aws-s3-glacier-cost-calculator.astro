@@ -59,26 +59,39 @@ const description =
 >
   <AwsS3GlacierCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Archive bills stay quiet until restore month</h2>
+    <p class="muted" style="margin-top:8px">
+      Glacier-style storage feels simple when you look only at the storage line, but archive costs are defined by the
+      month when retrieval starts. A good estimate separates the quiet baseline from the months where restores, audits,
+      or downstream processing wake the archive back up.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Quiet month</strong>: mostly storage GB-month with little or no retrieval.</li>
+      <li><strong>Restore month</strong>: retrieval GB and request counts can quickly become the visible change.</li>
+      <li><strong>Operational reality</strong>: archive pricing is less about daily traffic and more about exception handling.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What usually causes the surprise</h2>
+    <p>
+      The common failure mode is not underestimating stored GB. It is missing the retrieval workflow. Many small-object
+      restores, investigative pulls, or compliance exports can create a retrieval pattern that looks nothing like a
+      normal archive month.
+    </p>
     <ul>
-      <li>Storage is steady; retrieval volume and request counts drive spikes.</li>
-      <li>Many small object restores can make request charges material.</li>
+      <li><strong>Large restore jobs</strong>: retrieval GB grows suddenly after an incident or migration.</li>
+      <li><strong>Many small objects</strong>: request fees become visible even when retrieved GB is modest.</li>
+      <li><strong>Policy mistakes</strong>: restoring data early can also expose minimum-duration or early-deletion effects.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to capture before you trust the archive estimate</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Average stored GB-month for the archive tier, not total hot-storage footprint.</li>
+      <li>Expected retrieval GB for audit, restore, or reprocessing events.</li>
+      <li>Approximate request volume when restore jobs touch many objects rather than a few large archives.</li>
+      <li>Whether early deletion, transition, or downstream analysis should be modeled outside this calculator.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Quiet month vs restore month planning</h2>
     <table>
       <thead>
         <tr>
@@ -104,10 +117,11 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>Archive-specific review before sign-off</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Keep restore events separate from the quiet-storage baseline so one incident does not distort every month.</li>
+      <li>Check whether retrieval requests, not just retrieved GB, could become material for many-small-object archives.</li>
+      <li>Add minimum-duration and early-deletion rules separately whenever your retention pattern is unstable.</li>
     </ul>
 
     <h2>Next steps</h2>

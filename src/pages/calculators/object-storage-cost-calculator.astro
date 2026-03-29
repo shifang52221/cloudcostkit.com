@@ -64,26 +64,39 @@ const description =
 >
   <ObjectStorageCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">What this object storage calculator is best at</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is most useful for the clean base case: average stored data plus request volume. It is the right model
+      when you want to understand whether a workload is mostly paying for capacity, request activity, or a combination
+      of both before you layer in transfer, replication, or archive-specific charges.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Good fit</strong>: standard object storage with predictable reads and writes.</li>
+      <li><strong>Also useful</strong>: comparing providers with your own blended storage and request rates.</li>
+      <li><strong>Not enough alone</strong>: archive restores, heavy egress, or replication-driven environments.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>When requests matter more than stored GB</h2>
+    <p>
+      Object storage is often marketed as cheap capacity, but request-heavy workloads can tilt the bill away from pure
+      GB-month economics. This usually shows up when you store many small objects, run frequent listings, or trigger
+      repeated writes through batch pipelines and retries.
+    </p>
     <ul>
-      <li>Storage GB-month is steady; requests spike during traffic bursts or batch jobs.</li>
-      <li>If requests dominate, review object size and access patterns.</li>
+      <li><strong>Small-object catalogs</strong>: request counts rise much faster than stored GB.</li>
+      <li><strong>Data pipelines</strong>: batch rewrites and validation passes can multiply PUT and LIST traffic.</li>
+      <li><strong>Traffic bursts</strong>: a launch or migration month can create request spikes without much storage growth.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to measure before trusting the estimate</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Average stored GB across the month, not just the current bucket size.</li>
+      <li>Separate read-heavy and write-heavy periods if your request mix changes during launches or batch jobs.</li>
+      <li>Count management traffic such as LIST or retry storms if those are visible in logs or billing exports.</li>
+      <li>Keep transfer, replication, and archive operations outside this baseline so the number stays interpretable.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs burst patterns for object storage</h2>
     <table>
       <thead>
         <tr>
@@ -109,10 +122,11 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>When to hand off to adjacent calculators</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Use the data egress calculator when downloads or cross-provider delivery become a meaningful line item.</li>
+      <li>Use the storage replication calculator when changed data copied each month matters more than local requests.</li>
+      <li>Model archive tiers separately when retrieval or restore behavior can shock the bill.</li>
     </ul>
 
     <h2>Next steps</h2>
