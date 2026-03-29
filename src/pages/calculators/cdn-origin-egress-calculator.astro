@@ -62,23 +62,32 @@ const description =
       revalidation.
     </p>
 
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Origin egress is the cache-miss remainder of your CDN architecture</h2>
+    <p class="muted" style="margin-top:8px">
+      The purpose of this page is to isolate what the origin still pays for after the CDN does its job. That remainder
+      is rarely zero. It grows when hit rate falls, content turns over quickly, or revalidation and multi-POP behavior
+      cause more fetches than the team expected.
+    </p>
     <ul>
-      <li><strong>Edge GB/month</strong>: use CDN analytics or billing exports.</li>
-      <li><strong>Edge requests</strong>: use CDN request counts (all responses, hit + miss).</li>
-      <li><strong>Hit rate</strong>: use cache metrics from your CDN dashboard.</li>
+      <li><strong>Edge traffic</strong>: the viewer-facing baseline that the origin leakage is derived from.</li>
+      <li><strong>Miss rate</strong>: the main financial driver once bandwidth and requests leave the edge.</li>
+      <li><strong>Revalidation overhead</strong>: the part teams forget when they assume one miss equals one origin fetch.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where origin-egress estimates usually drift</h2>
     <ul>
-      <li>Origin egress is the input for your origin provider's $/GB pricing.</li>
-      <li>Origin requests can drive S3/ALB/API costs if your origin bills per request.</li>
+      <li>Hit rate is taken from a healthy short window while deploys, invalidations, or incidents have much worse miss behavior.</li>
+      <li>Teams model origin GB but forget that origin request counts can also drive S3, ALB, or API line items.</li>
+      <li>Revalidation and cache-fill behavior create more origin work than the simplest miss-rate formula suggests.</li>
+      <li>Origin leakage is assumed to be stable even though it can worsen sharply during launches or content churn.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the origin baseline</h2>
     <ul>
-      <li>Assuming origin egress is zero because the CDN exists.</li>
-      <li>Using cache hit rate from a short window (miss spikes during deploys or incidents).</li>
+      <li>Check hit rate across ordinary weeks, deploy windows, and incident periods instead of using one flattering number.</li>
+      <li>Separate origin GB and origin requests because they often feed different downstream calculators and bills.</li>
+      <li>Review TTL policy, invalidations, and asset churn to understand why the origin is still seeing traffic.</li>
+      <li>Treat this page as the bridge between edge economics and origin economics, not as a generic transfer converter.</li>
     </ul>
 
     <h2>Next steps</h2>

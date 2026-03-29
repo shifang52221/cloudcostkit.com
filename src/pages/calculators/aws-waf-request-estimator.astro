@@ -55,17 +55,32 @@ const description =
   <AwsWafRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">WAF evaluated requests are normal traffic plus attack windows, not just average RPS</h2>
+    <p class="muted" style="margin-top:8px">
+      This estimator exists to model the traffic that security teams actually pay to evaluate. That means baseline
+      traffic, blocked traffic, retries, and attack windows all belong here. If you only use calm-day averages, the
+      downstream WAF cost model will almost always be too low.
+    </p>
     <ul>
-      <li><strong>Baseline RPS</strong>: use CDN/LB/WAF metrics for a normal window.</li>
-      <li><strong>Attack RPS</strong>: use incident logs or peak traffic spikes.</li>
-      <li><strong>Attack hours</strong>: total duration per month of spikes.</li>
+      <li><strong>Baseline traffic</strong>: the ordinary evaluated path on a normal day.</li>
+      <li><strong>Attack windows</strong>: short periods that can dominate monthly evaluated-request totals.</li>
+      <li><strong>Blocked and retried requests</strong>: still part of the security workload and should not be left out.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where WAF request estimates usually drift</h2>
     <ul>
-      <li>Total evaluated requests drive the WAF request charge line item.</li>
-      <li>Even short attack windows can dominate monthly request volume.</li>
+      <li>Only allowed traffic is counted, even though blocked traffic is also evaluated.</li>
+      <li>Attack RPS is modeled, but attack duration is guessed too low because many small incidents are forgotten.</li>
+      <li>Retry storms and bot loops make evaluated traffic much larger than application success metrics suggest.</li>
+      <li>Teams use one average month even though security traffic is burstier than product traffic.</li>
+    </ul>
+
+    <h2>What to review before feeding this into the main WAF calculator</h2>
+    <ul>
+      <li>Use CDN, load balancer, or WAF-side counts that reflect evaluated traffic rather than only successful app requests.</li>
+      <li>Model a conservative defensive month if you do not yet have enough incident history.</li>
+      <li>Keep attack windows explicit so you can explain the estimate during security reviews and budgeting.</li>
+      <li>Treat this page as a support estimator for the WAF bill, not as a generic RPS converter.</li>
     </ul>
 
     <h2>Next steps</h2>

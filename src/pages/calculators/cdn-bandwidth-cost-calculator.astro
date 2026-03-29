@@ -98,36 +98,34 @@ const description =
     </p>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CDN bandwidth cost is an edge-delivery volume problem, not a generic transfer estimate</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should stay focused on what the CDN serves to end users at the edge. The biggest mistakes happen when
+      teams mix this with origin backhaul, internal transfers, or request-heavy effects that belong on other pages.
+    </p>
     <ul>
-      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
-      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
-      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+      <li><strong>Delivered GB</strong>: the direct edge output to viewers, not the cache-fill path back to origin.</li>
+      <li><strong>Rate mix</strong>: the effective $/GB changes with region, traffic tiers, and commercial plan terms.</li>
+      <li><strong>Traffic shape</strong>: object size, video share, and compression settings move this bill more than request tuning.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where CDN bandwidth estimates usually drift</h2>
     <ul>
-      <li>Bandwidth is the single driver; small % traffic growth scales cost linearly.</li>
-      <li>Compression and image optimization reduce GB/month more than request tuning.</li>
+      <li>Average throughput is converted once, but launch days or media events compress a large share of the month into a short window.</li>
+      <li>Traffic mix shifts toward larger assets, poorer compression, or more international delivery after the estimate was made.</li>
+      <li>Origin traffic is accidentally blended in, making the CDN bill look larger or smaller than it really is.</li>
+      <li>One global effective rate is used even though top geographies have meaningfully different economics.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the bandwidth baseline</h2>
     <ul>
-      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
-      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+      <li>Separate edge delivery from origin egress and cache-fill traffic before choosing the price assumption.</li>
+      <li>Check object-size trends and compression wins because they matter more than small request optimizations here.</li>
+      <li>Model a peak event month explicitly if launches, streaming, or large downloads are part of the business.</li>
+      <li>Use a rate that matches the actual region mix rather than one marketing headline number.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Average response size and request volume drive GB/month.</li>
-      <li>Cache hit rate determines origin vs edge bandwidth.</li>
-      <li>Compression and image optimization reduce transfer.</li>
-      <li>Model peak events separately from steady traffic.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs media-heavy bandwidth scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -153,10 +151,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real CDN bandwidth month</h2>
     <ul>
-      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
+      <li>Check whether the miss came from delivered GB growth, regional mix, or accidental origin leakage before changing every assumption.</li>
+      <li>Review peak windows separately because that is where hidden bandwidth multipliers usually show up first.</li>
     </ul>
 
     <h2>Next steps</h2>
