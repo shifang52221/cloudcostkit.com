@@ -75,35 +75,41 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CloudWatch Logs is one AWS bill with three moving parts</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should be read as a CloudWatch-specific logging model: <strong>ingestion</strong>, <strong>retention</strong>,
+      and <strong>Logs Insights scan behavior</strong>. Teams often notice the first line and miss the other two, which
+      is why CloudWatch log cost can feel unpredictable even when ingestion is stable.
+    </p>
     <ul>
-      <li><strong>GB/day ingested</strong>: use CloudWatch usage metrics or billing exports for the top log groups.</li>
-      <li><strong>Retention days</strong>: read the retention policy for each log group (defaults often drift).</li>
-      <li><strong>Insights scan GB</strong>: estimate from query history (range length x data scanned per query).</li>
-      <li><strong>Billing days</strong>: use 30 or 31 days, or 730 hours if you model monthly hours elsewhere.</li>
+      <li><strong>Log groups</strong>: the real unit of policy drift in CloudWatch, because retention often varies group by group.</li>
+      <li><strong>Retention</strong>: defaults and drift create silent cost growth when groups stay on long or infinite retention.</li>
+      <li><strong>Insights</strong>: query cadence and scan scope create a behavior-driven second bill.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Result interpretation</h2>
+    <h2 style="margin-top:0">Where CloudWatch log estimates usually drift</h2>
     <ul>
-      <li>If ingestion dominates, reduce verbose logs or drop noisy sources at ingest.</li>
-      <li>If retention dominates, shorten retention or move cold logs to cheaper storage.</li>
-      <li>If scans dominate, narrow Insights queries and reduce dashboard refresh frequency.</li>
+      <li>Large log groups are inventoried, but small long-lived groups with bad retention policies are ignored.</li>
+      <li>Insights scan activity is treated as occasional debugging even though dashboards may be querying constantly.</li>
+      <li>One blended GB/day number hides which log groups are actually driving ingestion growth.</li>
+      <li>Default "never expire" retention is assumed to be temporary but remains in place for months.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Common mistakes</h2>
+    <h2 style="margin-top:0">What to review before trusting the CloudWatch total</h2>
     <ul>
-      <li>Assuming default retention is set (many groups stay "never expire").</li>
-      <li>Leaving dashboards to scan wide windows at high frequency.</li>
-      <li>Mixing ingestion and scan costs into one blended GB number.</li>
+      <li>List the highest-volume log groups and verify retention on each one, not only on the largest few.</li>
+      <li>Separate ingestion, retention, and Insights scan behavior so you know which lever actually matters.</li>
+      <li>Review dashboard refresh cadence and recurring Insights queries before assuming scans are ad hoc only.</li>
+      <li>Treat incident-heavy months separately because CloudWatch query behavior changes materially during outages.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Scenario planning</h2>
+    <h2 style="margin-top:0">Baseline vs scan-heavy CloudWatch scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -131,11 +137,10 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Validate after changes</h2>
+    <h2 style="margin-top:0">How to review the first real CloudWatch Logs bill</h2>
     <ul>
-      <li>Validate ingestion GB/day for your largest log groups (ingress, API, audit).</li>
-      <li>Validate retention days per log group and ensure defaults are not "forever".</li>
-      <li>Validate Insights scanned bytes for dashboards/alerts (query frequency matters as much as window size).</li>
+      <li>Check whether the miss came from ingestion, long-retention groups, or Insights-scanned bytes before changing assumptions.</li>
+      <li>Validate retention per log group and review whether recurring dashboards are causing most of the scan behavior.</li>
     </ul>
   </div>
 </CalculatorLayout>

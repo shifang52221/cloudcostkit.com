@@ -60,33 +60,35 @@ const description =
 >
   <AwsCloudwatchMetricsCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CloudWatch metrics cost is a monitoring-surface bill, not just a metric count</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should not be reduced to "custom metrics x price." In CloudWatch, metrics, dashboards, alarms, and API
+      polling interact as one AWS monitoring surface. Costs rise not only when you publish more series, but also when
+      teams build more dashboards, poll more aggressively, and duplicate namespaces across accounts and environments.
+    </p>
     <ul>
-      <li><strong>Counts</strong>: start from inventory (custom metrics, alarms, dashboards) per account/environment.</li>
-      <li><strong>Cardinality</strong>: model multiplicative dimensions (service x env x cluster x pod).</li>
-      <li><strong>API polling</strong>: add dashboard refresh and automation polling scenarios.</li>
+      <li><strong>Custom metrics</strong>: namespace sprawl and duplicated dimensions raise the base inventory.</li>
+      <li><strong>Dashboards and polling</strong>: refresh cadence and automation can quietly create a second usage layer.</li>
+      <li><strong>Alarm adjacency</strong>: metrics and alarms often grow together, even when only one team "owns" the monitoring stack.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where CloudWatch metrics estimates usually drift</h2>
     <ul>
-      <li>If metrics dominate, reduce custom metric count or high-cardinality dimensions.</li>
-      <li>If API polling dominates, reduce dashboard refresh and automation query frequency.</li>
+      <li>Metric count is inventoried once, but namespace and environment sprawl continue after the estimate is made.</li>
+      <li>API polling and dashboard refresh are forgotten because they are operational habits rather than resource counts.</li>
+      <li>High-cardinality dimensions are added during launches and never removed.</li>
+      <li>Automation and human usage are blended together, hiding the true driver of request growth.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the metrics baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/high-cardinality scenarios.</li>
-      <li>Forgetting API polling and dashboard refresh costs.</li>
+      <li>List custom metrics by namespace and environment instead of relying on one global total.</li>
+      <li>Separate dashboard refresh, automation polling, and ad hoc usage into different request patterns.</li>
+      <li>Review whether the real problem is inventory growth, polling frequency, or both.</li>
+      <li>Keep alarms related, but separate, so the cost decision stays interpretable.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>List custom metrics by namespace and environment.</li>
-      <li>Estimate dashboard refresh rate and viewer count.</li>
-      <li>Separate automation polling from human dashboard usage.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs high-cardinality metrics scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -115,10 +117,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real metrics bill</h2>
     <ul>
-      <li>Measure actual custom metric/series counts and alarm/dashboards after rollout.</li>
-      <li>Watch API request volume trends (dashboards + automation).</li>
+      <li>Check whether the miss came from custom metric inventory, request polling, or dashboard behavior before changing every assumption.</li>
+      <li>Watch namespace growth and API request trends together, because either one can dominate the CloudWatch metrics bill.</li>
     </ul>
 
     <h2>Next steps</h2>
