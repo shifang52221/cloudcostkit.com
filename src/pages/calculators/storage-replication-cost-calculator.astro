@@ -83,9 +83,9 @@ const description =
       copied. For ongoing replication, <strong>write volume and churn</strong> are usually the correct drivers.
     </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Measure writes first</strong>: estimate changed GB from write throughput, sync batch size, or daily churn.</li>
+      <li><strong>Separate event types</strong>: keep ongoing replication, one-time backfills, and DR drills in different scenarios.</li>
+      <li><strong>Match billing direction</strong>: confirm whether your provider bills source-to-destination copy, feature fees, or both.</li>
     </ul>
   </div>
 
@@ -106,7 +106,7 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Scenario planning and validation</h2>
+    <h2 style="margin-top:0">Scenario planning and first-bill validation</h2>
     <table>
       <thead>
         <tr>
@@ -132,9 +132,9 @@ const description =
       </tbody>
     </table>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-      <li>Separate one-time backfill costs from ongoing replication to avoid distorted monthly baselines.</li>
+      <li>Reconcile steady-state changed GB against observed writes, not total dataset growth.</li>
+      <li>Keep one-time backfill costs out of the recurring monthly baseline after the migration is finished.</li>
+      <li>Check whether replica storage growth or request amplification explains the remaining gap before changing the transfer rate.</li>
       <li><strong>DR readiness</strong>: steady changed GB with occasional test-failover spikes.</li>
       <li><strong>Migration</strong>: short-lived, very high replicated GB and transfer bursts.</li>
       <li><strong>Multi-region reads</strong>: steady replication plus possible egress from secondary reads.</li>
@@ -153,10 +153,10 @@ const description =
       <li>One-time backfill is not merged into steady monthly change volume.</li>
       <li>Request amplification from replication is captured for high-write workloads.</li>
       <li>Directionality (source to destination) matches provider billing rules.</li>
-      <li>Using total dataset size instead of changed data volume.</li>
-      <li>Missing replica-region storage growth after policy changes.</li>
-      <li>Treating DR drill traffic as a normal-month baseline.</li>
-      <li>Ignoring write amplification from retries or small object churn.</li>
+      <li>Using total dataset size instead of changed data volume is treated as a modeling error, not a peak assumption.</li>
+      <li>Replica-region storage growth after policy changes is checked separately from copy traffic.</li>
+      <li>DR drill traffic is kept in a test scenario instead of becoming the default monthly baseline.</li>
+      <li>Write amplification from retries, retries after failures, or small-object churn is reviewed before sign-off.</li>
     </ul>
     <p class="muted" style="margin-top:10px">
       The most expensive modeling mistake is not usually the transfer rate. It is choosing the wrong driver: full

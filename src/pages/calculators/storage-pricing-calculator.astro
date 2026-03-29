@@ -103,36 +103,39 @@ const description =
     </p>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">When a generic storage pricing model is the right tool</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is intentionally broader than the S3- or Glacier-specific calculators. It is best for early commercial
+      sizing, provider comparisons, and blended-rate budgeting when you need a realistic storage baseline without
+      modeling every product rule on day one.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Use it for</strong>: broad object storage budgeting with storage, request, and optional egress inputs.</li>
+      <li><strong>Use it carefully for</strong>: multi-provider comparisons where you need one normalized worksheet.</li>
+      <li><strong>Do not stretch it too far</strong>: archive retrieval, lifecycle transitions, and product-specific replication need dedicated follow-up models.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What a blended storage assumption hides</h2>
+    <p>
+      A generic storage calculator becomes less truthful when teams collapse several storage classes or regions into one
+      rate without knowing the mix. That does not make the model useless, but it does mean the estimate should be
+      presented as a planning range rather than a promise.
+    </p>
     <ul>
-      <li>GB-month is usually the main driver; request fees show up when you have very high request volume.</li>
-      <li>If egress is included, it can dominate; separate it so you know what to optimize first.</li>
+      <li><strong>Class mix</strong>: standard, infrequent access, and archive tiers can have very different cost shapes.</li>
+      <li><strong>Request mix</strong>: low-request media archives and request-heavy application storage should not share one mental model.</li>
+      <li><strong>Transfer boundaries</strong>: egress, cross-region transfer, and replication must stay as separate lines.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to capture before you present a storage estimate</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Average stored GB and likely month-over-month growth, not only today's total footprint.</li>
+      <li>The request families that matter at your scale, especially when you have many small objects or automation-heavy workflows.</li>
+      <li>Whether egress is a normal operating line or just an occasional export event.</li>
+      <li>Any storage-class or region mix that makes one blended rate too optimistic.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Average stored GB and growth rate set the baseline.</li>
-      <li>Request mix matters when you have high request volume.</li>
-      <li>Separate egress from cross-region transfer line items.</li>
-      <li>Include lifecycle transitions and retrievals if used.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs stressed storage pricing scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -158,10 +161,11 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>Where generic storage pricing breaks down</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Move to the object storage calculator when you need a cleaner view of storage plus request behavior without generic comparison language.</li>
+      <li>Move to S3, replication, or Glacier pages when provider-specific rules become material to the decision.</li>
+      <li>Keep one-time migration or restoration events in a separate peak case so the generic monthly baseline stays honest.</li>
     </ul>
 
     <h2>Next steps</h2>

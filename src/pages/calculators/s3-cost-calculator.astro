@@ -95,38 +95,75 @@ const description =
   </div>
   <StorageReplicationCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Read the S3 bill as four separate lines</h2>
+    <p class="muted" style="margin-top:8px">
+      This page works best when you split an S3-style bill into four buckets instead of treating object storage as one
+      flat number: <strong>stored GB-month</strong>, <strong>request volume</strong>, <strong>data egress</strong>,
+      and <strong>replicated or copied data</strong>. Most estimate errors happen when one of those lines is missing or
+      when a one-time event is blended into the normal month.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
-      <li><strong>Sources</strong>: Storage metrics, request logs, and cost exports are the best starting points.</li>
+      <li><strong>Storage</strong>: average GB stored across the month, ideally separated by class.</li>
+      <li><strong>Requests</strong>: GET, PUT, LIST, and any request family that matters at your scale.</li>
+      <li><strong>Egress</strong>: downloads to the internet, another provider, or another region when billed separately.</li>
+      <li><strong>Replication</strong>: changed GB copied to another destination, not the full dataset size.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Which S3 driver is likely to dominate?</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Workload shape</th>
+          <th>Likely dominant line</th>
+          <th>What to verify</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Large static asset library</td>
+          <td>Storage GB-month</td>
+          <td>Average stored GB and storage-class mix</td>
+        </tr>
+        <tr>
+          <td>Millions of small-object reads or writes</td>
+          <td>Requests</td>
+          <td>GET, PUT, LIST, and retry-heavy request counts</td>
+        </tr>
+        <tr>
+          <td>Download-heavy distribution or exports</td>
+          <td>Egress</td>
+          <td>Internet or cross-region transfer volume</td>
+        </tr>
+        <tr>
+          <td>Cross-region durability or sync workflows</td>
+          <td>Replication plus extra storage</td>
+          <td>Changed GB copied and destination storage growth</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>When this S3 estimate stops being enough</h2>
+    <p>
+      A basic S3 estimate becomes too shallow when your storage estate crosses into archive tiers, lifecycle transition
+      rules, analytics features, or complex regional pricing. In those cases, keep this page as the top-level monthly
+      frame and then break out the missing lines separately.
+    </p>
     <ul>
-      <li>Identify the dominant driver (storage vs requests vs egress vs replication).</li>
-      <li>If requests dominate, consider caching or batching to reduce per-request costs.</li>
-      <li>If egress dominates, check CDN or data locality options.</li>
+      <li><strong>Archive or IA tiers</strong>: retrieval, restore, and minimum duration rules need their own model.</li>
+      <li><strong>Replication-heavy environments</strong>: separate ongoing changed GB from migrations and backfills.</li>
+      <li><strong>CDN-backed delivery</strong>: origin egress and CDN offload should be modeled together, not guessed from one bill line.</li>
+      <li><strong>Feature-rich buckets</strong>: inventory, logging, encryption, and analytics can become visible adjacent charges.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>Pre-bill review checklist for S3 estimates</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Average stored GB is based on a monthly average, not the last day of the month.</li>
+      <li>Request-heavy workloads include retries, batch jobs, and object management traffic where material.</li>
+      <li>Egress is separated from replication and from intra-platform transfers that are billed differently.</li>
+      <li>One-time backfills or migrations are kept in a peak scenario, not blended into the baseline.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Break down storage by class and average GB-month.</li>
-      <li>Separate request classes and counts.</li>
-      <li>Include retrieval fees for IA or archive tiers.</li>
-      <li>Model data transfer and replication separately.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs peak planning for object storage</h2>
     <table>
       <thead>
         <tr>
@@ -155,10 +192,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to reconcile against the first real bill</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check which of the four lines actually dominated, then adjust that driver first instead of tweaking every assumption.</li>
+      <li>Track request counts, egress GB, and changed GB over time so the next estimate is based on observed workload shape.</li>
     </ul>
 
     <h2>Next steps</h2>
