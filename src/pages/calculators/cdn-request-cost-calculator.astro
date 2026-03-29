@@ -107,37 +107,35 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">CDN request data sources</h2>
+    <h2 style="margin-top:0">CDN request cost is mostly a request-shape and cache-key problem</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should not be treated like a simple rate converter. CDN request fees usually become interesting when
+      request classes fragment, cache keys multiply, or bots and client behavior add requests without adding much
+      bandwidth.
+    </p>
     <ul>
-      <li><strong>CDN analytics</strong>: use edge request counts from CDN dashboards.</li>
-      <li><strong>Cache hit rate</strong>: track hit vs miss to understand origin side effects.</li>
-      <li><strong>Region mix</strong>: split request volume by geography if pricing differs.</li>
+      <li><strong>Edge analytics</strong>: the real source for billable request counts, not origin-side counts.</li>
+      <li><strong>Request classes</strong>: static, dynamic, hit, miss, or other classes may need separate assumptions.</li>
+      <li><strong>Cache-key behavior</strong>: headers, query strings, and URL variations can raise request volume faster than traffic growth alone.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where CDN request estimates usually drift</h2>
     <ul>
-      <li>Edge request fees can grow even when bandwidth stays flat.</li>
-      <li>When requests dominate, focus on caching and reducing chatty clients.</li>
+      <li>Page views look stable, but assets per page, API fan-out, and image variants increase total edge requests.</li>
+      <li>Bot traffic, health checks, and cache-busting behavior raise requests without moving delivered GB very much.</li>
+      <li>Teams use one request class even though dynamic or miss traffic is behaving differently from the main static path.</li>
+      <li>Request growth is blamed on users when the real issue is cache-key fragmentation or low TTL behavior.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the request baseline</h2>
     <ul>
-      <li>Using origin request counts instead of edge request counts.</li>
-      <li>Ignoring bot traffic that spikes requests without adding bandwidth.</li>
-      <li>Mixing cache hit and miss classes when pricing differs.</li>
+      <li>Use edge request counts and split high-noise traffic classes if pricing or behavior differs.</li>
+      <li>Check assets per page, image variant generation, and API fan-out before assuming user growth caused the change.</li>
+      <li>Review query-string churn, header-based cache keys, and short TTLs because they often create the real multiplier.</li>
+      <li>Treat bot and incident traffic as a separate scenario instead of hiding it in one average month.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Derive requests/month from RPS and time windows.</li>
-      <li>Normalize per-10k vs per-1M pricing units.</li>
-      <li>Separate bot or attack traffic from normal traffic.</li>
-      <li>Confirm which request types are billable for your provider.</li>
-    </ul>
-
-    <h2>Request scenarios</h2>
+    <h2>Baseline vs bot-heavy request scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -163,10 +161,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real CDN request month</h2>
     <ul>
-      <li>Compare edge request counts to CDN billing request units.</li>
-      <li>Watch cache hit rate during bot spikes and cache busting events.</li>
+      <li>Compare billed request units to edge analytics and identify whether the miss came from class mix, bot spikes, or cache-key sprawl.</li>
+      <li>Watch request volume and cache hit rate together so traffic-quality changes do not get mistaken for normal growth.</li>
     </ul>
 
     <h2>Next steps</h2>

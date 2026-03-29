@@ -77,36 +77,35 @@ const description =
   </div>
   <CdnRequestCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">CloudFront cost is usually a two-line edge bill, but traffic mix decides which line hurts</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is strongest when you treat CloudFront as two separate edge charges that happen together:
+      <strong> bandwidth delivered to users</strong> and <strong>request volume at the edge</strong>. Many teams only
+      watch one of them, then get surprised when request-heavy traffic or regional mix shifts move the monthly bill.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Bandwidth</strong>: the edge-delivery line item that usually dominates media-heavy workloads.</li>
+      <li><strong>Requests</strong>: the line item that grows faster on small-object, API-heavy, or bot-heavy traffic.</li>
+      <li><strong>Origin side effects</strong>: separate from CloudFront itself, but often confused with it during reviews.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where CloudFront estimates usually drift</h2>
     <ul>
-      <li>If bandwidth dominates, focus on cache hit rate and content compression.</li>
-      <li>If requests dominate, review object size, caching strategy, and origin response headers.</li>
+      <li>One blended rate is used even though region mix changes materially across months.</li>
+      <li>Average object size changes, so request fees and bandwidth stop moving together.</li>
+      <li>Teams compare CloudFront edge charges to origin egress and accidentally double-count or undercount adjacent bills.</li>
+      <li>Bot spikes and cache-busting releases increase requests faster than delivered GB.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the CloudFront baseline</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Split edge bandwidth and edge requests into separate assumptions instead of forcing one blended story.</li>
+      <li>Check whether your top regions need different effective rates.</li>
+      <li>Review cache hit rate and invalidation habits before assuming request growth is purely user demand.</li>
+      <li>Keep origin egress, log delivery, and invalidation-related work nearby, but not inside the same line item.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Bandwidth and request counts are separate cost drivers.</li>
-      <li>Use cache hit rate to estimate origin egress.</li>
-      <li>Apply an effective rate for your regional traffic mix.</li>
-      <li>Add log delivery and invalidations if you use them.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs request-heavy CloudFront scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -132,10 +131,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real CloudFront month</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether the miss came from regional rate mix, request growth, or origin-side leakage before rewriting the whole model.</li>
+      <li>Compare edge bandwidth and edge requests separately against billing data so one driver does not hide the other.</li>
     </ul>
 
     <h2>Next steps</h2>

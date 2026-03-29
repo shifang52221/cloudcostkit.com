@@ -58,44 +58,35 @@ const description =
 >
   <AwsWafCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">AWS WAF cost is a layered security bill, and attacks can create a second bill beside it</h2>
+    <p class="muted" style="margin-top:8px">
+      The visible WAF line items are only the first layer: Web ACLs, rules, and evaluated requests. In practice, attack
+      periods also create downstream logging, scan, and analysis costs that make the true incident month more expensive
+      than the WAF charge alone suggests.
+    </p>
     <ul>
-      <li><strong>Requests</strong>: estimate evaluated requests/month (include blocked traffic).</li>
-      <li><strong>RPS</strong>: if you only have RPS, use the WAF request estimator to model baseline + attack volume.</li>
-      <li><strong>Baselines</strong>: count ACLs and rules as billed in your pricing model.</li>
-      <li><strong>Downstream</strong>: add logging/storage/analytics volume as a second bill.</li>
+      <li><strong>ACL inventory</strong>: the steady monthly security surface across accounts, regions, and environments.</li>
+      <li><strong>Rule inventory</strong>: managed and custom logic that grows as protection coverage expands.</li>
+      <li><strong>Evaluated requests</strong>: the variable layer that spikes during attacks, bot waves, or sudden traffic shifts.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where WAF estimates usually drift</h2>
     <ul>
-      <li>ACL and rule counts are steady; request volume drives spikes.</li>
-      <li>If costs jump, verify bot traffic and retries before changing rules.</li>
+      <li>Baseline traffic is modeled carefully, but blocked traffic and attack windows are undercounted or ignored.</li>
+      <li>Rule inventory expands gradually across regions and environments after the original estimate was made.</li>
+      <li>Teams review the WAF invoice but forget that log ingestion and query costs exploded at the same time.</li>
+      <li>One blended request assumption hides the difference between a quiet month and a defensive month.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the WAF baseline</h2>
     <ul>
-      <li>Budgeting steady traffic but ignoring attack/bot surge scenarios.</li>
-      <li>Forgetting downstream log/scan costs that can exceed the WAF line item.</li>
+      <li>Count Web ACLs and rules by environment and region so the steady security surface is visible.</li>
+      <li>Estimate evaluated requests with blocked traffic included, not just successful application traffic.</li>
+      <li>Model attack or bot weeks separately because request-based charges are the first part of the defensive cost story.</li>
+      <li>Keep downstream logging and analytics nearby so the incident month is not falsely treated as a pure WAF problem.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Count Web ACLs per account and region.</li>
-      <li>Separate managed rule groups from custom rules if billing differs.</li>
-      <li>Estimate evaluated requests for peak traffic and attack weeks.</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Count ACLs per region and environment.</li>
-      <li>Include managed rule groups in your rule count.</li>
-      <li>Estimate evaluated requests including blocked or bot traffic.</li>
-      <li>Add logging and analytics volume as a second bill.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs attack-expanded WAF scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -121,10 +112,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real WAF incident month</h2>
     <ul>
-      <li>Track evaluated request volume and rule/ACL sprawl over time.</li>
-      <li>Check downstream log ingestion and scan/query costs during incidents.</li>
+      <li>Check whether the miss came from evaluated-request spikes, inventory growth, or downstream observability costs before changing the entire model.</li>
+      <li>Review attack periods separately so a few defensive days do not disappear inside one monthly average.</li>
     </ul>
 
     <h2>Next steps</h2>
