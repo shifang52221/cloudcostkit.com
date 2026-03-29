@@ -5,7 +5,7 @@ import { SITE } from "../config/site";
 const title = `Contact | ${SITE.name}`;
 const description =
   "Contact CloudCostKit for estimate questions, bug reports, corrections, tool requests, and editorial feedback.";
-const [emailUser, emailDomain] = SITE.email.split("@");
+const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/contact">
   <section class="card hero">
@@ -20,13 +20,9 @@ const [emailUser, emailDomain] = SITE.email.split("@");
     <h2 style="margin-top:0">Primary contact</h2>
     <p class="muted" style="margin:0">
       Email:{" "}
-      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+      <a href={contactHref}>
         Email us
       </a>
-      <noscript>
-        {" "}
-        ({emailUser} [at] {emailDomain})
-      </noscript>
     </p>
 
     <h2 style="margin:18px 0 10px">If you are asking for estimate help</h2>

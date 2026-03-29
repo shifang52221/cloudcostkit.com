@@ -5,7 +5,7 @@ import { SITE } from "../config/site";
 const title = `Editorial Policy | ${SITE.name}`;
 const description =
   "How CloudCostKit qualifies pages for publication, reviews updates, handles corrections, and avoids thin or template-like cloud cost content.";
-const [emailUser, emailDomain] = SITE.email.split("@");
+const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/editorial-policy">
   <section class="card hero">
@@ -82,13 +82,9 @@ const [emailUser, emailDomain] = SITE.email.split("@");
     </p>
     <p class="muted" style="margin:12px 0 0">
       Contact:{" "}
-      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+      <a href={contactHref}>
         Email us
       </a>
-      <noscript>
-        {" "}
-        ({emailUser} [at] {emailDomain})
-      </noscript>
       .
     </p>
 
