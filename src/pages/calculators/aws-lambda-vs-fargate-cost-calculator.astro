@@ -61,28 +61,35 @@ const description =
 >
   <AwsLambdaVsFargateCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Lambda vs Fargate is a burst-shape question first</h2>
+    <p class="muted" style="margin-top:8px">
+      This comparison works best when you frame the workload by shape before you frame it by price. Lambda is strongest
+      when execution is bursty and idle time is real. Fargate becomes stronger as work turns into <strong>steady,
+      always-on capacity</strong> that keeps tasks busy for much of the month.
+    </p>
     <ul>
-      <li><strong>Lambda</strong>: use monthly request count, avg duration (p50/p95), and memory size from metrics.</li>
-      <li><strong>Fargate</strong>: use average running tasks, vCPU, and memory from the task definition.</li>
-      <li><strong>Pricing</strong>: apply region-specific rates and toggle free tier if it applies.</li>
-      <li><strong>Schedule</strong>: hours/day and days/month should reflect actual Fargate uptime.</li>
+      <li><strong>Lambda lens</strong>: request count, duration, and memory per execution.</li>
+      <li><strong>Fargate lens</strong>: average running tasks, task size, and uptime window.</li>
+      <li><strong>Boundary line</strong>: background work and persistent concurrency often move the decision toward Fargate.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What usually distorts this comparison</h2>
     <ul>
-      <li>If Lambda is cheaper only at peak, consider hybrid: Lambda for bursts, Fargate for baseline.</li>
-      <li>If Fargate wins at baseline, check whether steady traffic makes always-on capacity more efficient.</li>
+      <li>Cold-start or peak duration is used as the average duration for every Lambda invocation.</li>
+      <li>Provisioned concurrency or steady background traffic is ignored, making Lambda look cheaper than real operation.</li>
+      <li>Fargate is modeled as always-on even when the service only runs for specific windows.</li>
+      <li>Retries, logs, and networking are forgotten even though they can move the real platform decision.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>When a hybrid model is more honest than either extreme</h2>
     <ul>
-      <li>Using cold-start duration for all Lambda requests.</li>
-      <li>Ignoring provisioned concurrency or steady background load.</li>
-      <li>Mixing MB and GB when converting memory sizes.</li>
+      <li>Use Lambda for burst and event fan-out when requests are spiky and idle gaps are meaningful.</li>
+      <li>Use Fargate for steady baselines, warm state, or long-running workers that would keep Lambda active continuously.</li>
+      <li>Model the baseline and the burst separately if the system genuinely has both shapes.</li>
+      <li>Do not force a binary answer when the workload already behaves like two different systems.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs spike-driven runtime scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -108,10 +115,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real month</h2>
     <ul>
-      <li>Compare request count and GB-seconds to billing or CloudWatch metrics.</li>
-      <li>Validate average task count and hours with ECS/Fargate usage reports.</li>
+      <li>Check Lambda requests and GB-seconds against billing and verify that the modeled average duration matches observed execution data.</li>
+      <li>Check Fargate average task count and runtime against ECS history instead of against deployment peaks.</li>
     </ul>
 
     <h2>Next steps</h2>
