@@ -57,33 +57,35 @@ const description =
   </div>
   <MetricsTimeseriesCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Observability often becomes the second Kubernetes bill</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should not read like a generic cluster-cost appendix. In many mature Kubernetes environments, logs and
+      metrics become the second major bill after node compute. The two drivers are related, but they do not scale the
+      same way and should not be tuned as if they were one number.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Logs</strong>: ingestion and retention scale with emitted volume and debugging behavior.</li>
+      <li><strong>Metrics</strong>: active series scale with label cardinality, scrape targets, and retention strategy.</li>
+      <li><strong>Operational truth</strong>: incidents often inflate both lines at once, but for different reasons.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What makes observability costs jump unexpectedly</h2>
     <ul>
-      <li>Logs and metrics are separate drivers; tune them independently.</li>
-      <li>High-cardinality metrics can outpace logs even at low GB/day.</li>
+      <li>High-cardinality labels multiply time-series count faster than teams expect.</li>
+      <li>Debug logging stays enabled longer than intended after an incident.</li>
+      <li>New namespaces, services, or exporters quietly multiply collection surface area.</li>
+      <li>Retention changes look harmless but compound quickly once ingestion is already high.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to separate before trusting the observability estimate</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Keep log GB/day and active series as separate drivers instead of forcing one blended observability number.</li>
+      <li>Separate calm-month operations from incident, audit, or migration periods.</li>
+      <li>Track cardinality-heavy labels such as pod, container, tenant, or user dimensions explicitly.</li>
+      <li>Review retention and sampling choices as first-class levers, not afterthoughts.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Estimate log GB/day per namespace or team.</li>
-      <li>Count active series for high-cardinality labels (pod, container, user).</li>
-      <li>Separate baseline ops from incident/debug volume.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs incident-driven observability scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -109,10 +111,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real observability bill</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether the miss came from log volume, active series growth, or retention expansion before changing ingestion assumptions.</li>
+      <li>Review post-incident periods separately because they often distort the calm-month baseline.</li>
     </ul>
 
     <h2>Next steps</h2>

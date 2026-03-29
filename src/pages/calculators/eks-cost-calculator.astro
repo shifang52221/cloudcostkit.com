@@ -73,36 +73,35 @@ const description =
   </div>
   <KubernetesNodeCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">EKS is generic Kubernetes cost plus AWS-specific edges</h2>
+    <p class="muted" style="margin-top:8px">
+      EKS estimates become misleading when teams copy a generic Kubernetes model and stop at node-hours. Managed control
+      plane fees, AWS networking patterns, and pod-cap realities can change the cost shape enough that EKS deserves its
+      own framing rather than a generic cluster template.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Managed base</strong>: control plane cost exists even when the workload is small.</li>
+      <li><strong>Node economics</strong>: instance hours still dominate most of the compute line.</li>
+      <li><strong>AWS-specific edges</strong>: pod caps, load balancers, NAT, and CloudWatch can all move the result.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What usually gets missed in EKS planning</h2>
     <ul>
-      <li>If nodes dominate, focus on pod requests, allocatable %, and bin-packing efficiency.</li>
-      <li>If node count spikes at peak, review HPA targets and pod resource requests.</li>
+      <li>Control plane fees are forgotten because nodes feel like the "real" cluster cost.</li>
+      <li>Max pods per node or CNI constraints force higher node count than CPU and memory math suggested.</li>
+      <li>AWS add-ons such as ALB, NAT, and CloudWatch are treated as unrelated, even though they are part of operating the cluster.</li>
+      <li>Peak cluster events are modeled as normal-month behavior, overstating steady-state EKS spend.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to separate before calling the estimate complete</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Keep control plane, node-hours, storage, networking, and observability as distinct lines.</li>
+      <li>Review whether pod-cap limits or allocatable reserve are the hidden node-count driver.</li>
+      <li>Model incident, migration, or launch traffic in a peak scenario instead of inflating the baseline.</li>
+      <li>Use EKS-specific adjacent calculators for logs, metrics, and network paths where needed.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Control plane fees are fixed per cluster.</li>
-      <li>Node hours by instance type drive most compute cost.</li>
-      <li>Add-ons like ingress and service mesh add overhead.</li>
-      <li>Logs and metrics ingestion can be a hidden second bill.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs AWS add-on-heavy EKS scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -128,10 +127,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real EKS month</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether the miss came from node-hours, managed control plane, networking, or observability before editing requests.</li>
+      <li>Use node history and pod-density data to verify whether the planned EKS packing assumptions held in production.</li>
     </ul>
 
     <h2>Next steps</h2>

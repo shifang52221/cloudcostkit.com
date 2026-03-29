@@ -106,36 +106,35 @@ const description =
     </ul>
   </div>
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Nodes are the first Kubernetes bill, not the whole bill</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is best used as the top-level frame for cluster cost, not as a promise that nodes explain everything.
+      In most clusters, node-hours are the primary baseline, but storage, load balancers, transfer, and observability
+      often become the second set of bills once the platform grows up.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Node layer</strong>: instance count, runtime, and density create the base monthly spend.</li>
+      <li><strong>Scheduling layer</strong>: pod requests, limits, and pod-cap constraints decide how many nodes you really need.</li>
+      <li><strong>Adjacent layers</strong>: storage, ingress, egress, and observability should be modeled as separate cost surfaces.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where generic Kubernetes cost models usually drift</h2>
     <ul>
-      <li>If node count is driven by pod limits, adjust max pods per node or CNI settings.</li>
-      <li>If CPU or memory requests drive nodes, refine request sizing and overprovisioning.</li>
+      <li>Node count is modeled correctly, but control-plane, storage, or network lines are silently ignored.</li>
+      <li>Pod-cap or allocatable constraints force more nodes even though CPU and memory math looked fine.</li>
+      <li>Autoscaling headroom and deployment overlap are treated like waste instead of real operating requirements.</li>
+      <li>Cluster add-ons such as ingress, service mesh, backup, or observability are left out of the real bill.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to separate before you trust the cluster estimate</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Keep node-hours separate from storage, backups, and snapshot retention.</li>
+      <li>Separate load balancers, NAT, and egress so network costs do not disappear inside node math.</li>
+      <li>Review whether pod limits, max pods per node, or allocatable settings are driving hidden node growth.</li>
+      <li>Treat logs and metrics as a likely second bill once clusters reach meaningful scale.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Node hours by instance type and utilization drive baseline.</li>
-      <li>Add headroom for autoscaling and over-provisioning.</li>
-      <li>Persistent volumes and backups add storage costs.</li>
-      <li>Network transfer and load balancers add non-node costs.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs add-on-heavy cluster scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -161,10 +160,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real cluster bill</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether the gap came from node-hours, storage, networking, or observability before changing the node model.</li>
+      <li>Use autoscaler history and node inventory to confirm whether planned density matches what the cluster actually sustained.</li>
     </ul>
 
     <h2>Next steps</h2>
