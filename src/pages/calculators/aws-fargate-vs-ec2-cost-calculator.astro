@@ -71,27 +71,35 @@ const description =
       <li><strong>Keep non-compute lines separate</strong> so the runtime comparison does not hide transfer, load balancer, and log costs.</li>
     </ul>
 
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2>What this comparison is really testing</h2>
+    <p class="muted" style="margin-top:8px">
+      A Fargate vs EC2 decision is rarely just "which hourly rate is lower?" The real tradeoff is whether your service
+      pays more from <strong>idle EC2 capacity and packing inefficiency</strong> or more from <strong>Fargate's premium
+      for convenience and fine-grained runtime billing</strong>.
+    </p>
     <ul>
-      <li><strong>Fargate</strong>: use average running tasks and task size from ECS metrics and definitions.</li>
-      <li><strong>EC2</strong>: use average instance count and a blended $/hour if you mix commitments.</li>
-      <li><strong>Schedule</strong>: apply the same hours/day and days/month to both sides.</li>
-      <li><strong>Scope</strong>: this is compute-only; add logs, transfer, and load balancers separately.</li>
+      <li><strong>Fargate side</strong>: less idle headroom, more direct alignment with running tasks.</li>
+      <li><strong>EC2 side</strong>: cheaper unit economics when instances stay utilized and commitments are well matched.</li>
+      <li><strong>Decision trap</strong>: comparing different workload shapes on each side invalidates the result.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where EC2 vs Fargate comparisons usually go wrong</h2>
     <ul>
-      <li>If Fargate wins, verify EC2 packing efficiency and idle capacity assumptions.</li>
-      <li>If EC2 wins, confirm you can sustain steady utilization and use commitments effectively.</li>
+      <li>Peak Fargate usage is compared to average EC2 capacity, or the reverse.</li>
+      <li>EC2 packing efficiency is assumed instead of measured against real service density and headroom.</li>
+      <li>Commitment coverage is ignored, making EC2 look worse than the actual effective rate.</li>
+      <li>Non-compute lines are silently mixed in on one side but not the other.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to pressure-test before making the platform call</h2>
     <ul>
-      <li>Comparing peak Fargate usage to average EC2 usage (or vice versa).</li>
-      <li>Ignoring EC2 packing efficiency and idle capacity.</li>
+      <li>Check whether EC2 can really maintain the assumed utilization once spare capacity, deployments, and failure headroom are included.</li>
+      <li>Check whether Fargate's higher unit rate is offset by less idle capacity and simpler operations for the service shape you actually run.</li>
+      <li>Use the same monthly hours and the same traffic envelope on both sides.</li>
+      <li>Treat networking, logging, storage, and load balancers as separate decision layers after compute is understood.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs burst-capacity comparisons</h2>
     <table>
       <thead>
         <tr>
@@ -117,10 +125,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first month after choosing a side</h2>
     <ul>
-      <li>Compare EC2 instance-hours and Fargate vCPU/GB hours from billing.</li>
-      <li>Use a real month of metrics to calibrate the averages.</li>
+      <li>Compare actual EC2 instance-hours or Fargate vCPU/GB-hours against the modeled baseline using the same month of workload data.</li>
+      <li>If the result is off, identify whether the miss came from utilization assumptions, commitment coverage, or workload shape drift.</li>
     </ul>
 
     <h2>Non-compute checklist before you make the final call</h2>

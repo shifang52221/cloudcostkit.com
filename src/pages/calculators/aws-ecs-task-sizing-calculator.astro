@@ -56,26 +56,35 @@ const description =
 >
   <AwsEcsTaskSizingCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">This page solves sizing before pricing</h2>
+    <p class="muted" style="margin-top:8px">
+      ECS task sizing is upstream of cost. If task count is wrong, every Fargate or EC2 cost estimate built on top of
+      it will also be wrong. That is why this page should focus on <strong>resource demand</strong>, <strong>headroom</strong>,
+      and <strong>safe task count</strong> before any pricing model is applied.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>CPU constraint</strong>: task count rises when vCPU demand is the bottleneck.</li>
+      <li><strong>Memory constraint</strong>: task count rises when memory saturation arrives first.</li>
+      <li><strong>Recommendation rule</strong>: the higher of the two counts should drive planning.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where ECS sizing estimates usually go wrong</h2>
     <ul>
-      <li>If CPU and memory recommend different task counts, the higher value should drive sizing.</li>
-      <li>Very high utilization targets can lead to unstable performance under burst traffic.</li>
+      <li>A single calm-month average is used without a separate deployment or incident envelope.</li>
+      <li>High utilization targets are chosen without leaving room for rolling deploys or transient bursts.</li>
+      <li>CPU and memory are blended into one intuition instead of tested as separate constraints.</li>
+      <li>Sizing is treated as a billing problem before service behavior has been measured.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before carrying this into a cost model</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Measure CPU and memory demand from representative service history, not from one unusual peak.</li>
+      <li>Lower utilization targets when you expect deployment overlap, burst traffic, or noisy-neighbor sensitivity.</li>
+      <li>Use separate baseline and stress scenarios so the recommended task count is honest about operational headroom.</li>
+      <li>Only after task count is credible should you hand the result to Fargate or EC2 pricing pages.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs headroom-sensitive sizing scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -101,10 +110,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to validate the sizing result in production</h2>
     <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
+      <li>Check whether CPU or memory saturation is the real scaling trigger once the service runs under normal and burst traffic.</li>
+      <li>If production task count is higher than planned, identify whether the miss came from headroom, deployment overlap, or the wrong dominant resource.</li>
     </ul>
 
     <h2>Next steps</h2>

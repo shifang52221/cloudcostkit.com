@@ -57,27 +57,36 @@ const description =
 >
   <AwsFargateVsEc2CostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">ECS on EC2 vs ECS on Fargate is not the same as generic EC2 vs Fargate</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is narrower than a generic runtime comparison because ECS changes the tradeoff. On EC2, you are not
+      only buying instances. You are also buying the right to <strong>pack multiple services onto hosts</strong> and to
+      absorb some cluster overhead yourself. On Fargate, you pay more directly per task, but you remove much of that
+      host-management burden.
+    </p>
     <ul>
-      <li><strong>Fargate</strong>: use average running tasks and task size from ECS metrics.</li>
-      <li><strong>EC2</strong>: use average instance count and a blended $/hour if you use commitments.</li>
-      <li><strong>Schedule</strong>: apply the same hours/day and days/month to both sides.</li>
-      <li><strong>Scope</strong>: compute-only; add load balancers, logs, and transfer separately.</li>
+      <li><strong>ECS on EC2</strong>: density and commitment coverage can win if hosts stay busy.</li>
+      <li><strong>ECS on Fargate</strong>: cleaner task-level billing can win when headroom and host waste dominate.</li>
+      <li><strong>Decision trap</strong>: host overhead, daemon workloads, and spare capacity are often forgotten on the EC2 side.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where ECS platform comparisons usually go wrong</h2>
     <ul>
-      <li>If Fargate wins only at peak, consider mixed capacity: EC2 baseline + Fargate burst.</li>
-      <li>If EC2 wins, confirm you can keep instances utilized and commitments aligned.</li>
+      <li>Peak task counts are compared to average EC2 host count, or the reverse.</li>
+      <li>EC2 packing assumes perfect density without leaving room for deployments, rebalancing, or noisy neighbors.</li>
+      <li>Cluster overhead on EC2, such as daemon tasks and spare headroom, is ignored.</li>
+      <li>Networking, ALB, and observability lines are mixed in unevenly across the two sides.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to test before making the ECS platform decision</h2>
     <ul>
-      <li>Comparing peak tasks to average instances (or vice versa).</li>
-      <li>Ignoring EC2 packing efficiency and idle capacity.</li>
+      <li>Check whether your services are steady enough to keep EC2 hosts meaningfully utilized across the month.</li>
+      <li>Check whether deployment overlap, autoscaling headroom, and cluster operations reduce the host density you think you have.</li>
+      <li>Use Fargate when per-service isolation and task-level elasticity matter more than host economics.</li>
+      <li>Use the same service envelope on both sides before you compare totals.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs host-density stress scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -103,10 +112,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first month after the ECS choice</h2>
     <ul>
-      <li>Compare EC2 instance-hours and Fargate vCPU/GB hours in billing.</li>
-      <li>Use a real month of metrics to calibrate averages.</li>
+      <li>Compare EC2 instance-hours or Fargate task-hours to the same month of ECS service history, not to design assumptions.</li>
+      <li>If EC2 underperforms, check real host density and idle headroom before declaring the platform economics wrong.</li>
     </ul>
 
     <h2>Next steps</h2>

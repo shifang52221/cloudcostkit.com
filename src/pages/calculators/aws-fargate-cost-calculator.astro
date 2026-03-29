@@ -63,38 +63,39 @@ const description =
 >
   <AwsFargateCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Fargate bills are mostly about steady task-hours</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is strongest when you already know the service runs as persistent tasks. Fargate cost usually does not
+      hinge on one request spike in isolation. It is driven by the monthly accumulation of <strong>running tasks</strong>,
+      <strong>vCPU per task</strong>, and <strong>memory per task</strong> across real uptime windows.
+    </p>
     <ul>
-      <li><strong>Tasks</strong>: use average running tasks from ECS metrics, not peak or desired count.</li>
-      <li><strong>Task size</strong>: pull vCPU and memory from the task definition (GB, not MB).</li>
-      <li><strong>Pricing</strong>: use region-specific vCPU-hour and GB-hour rates.</li>
-      <li><strong>Schedule</strong>: hours/day and days/month should reflect real uptime windows.</li>
+      <li><strong>Main driver</strong>: average running tasks, not desired count and not short-lived peak count.</li>
+      <li><strong>Sizing lever</strong>: task shape determines whether memory or vCPU dominates the bill.</li>
+      <li><strong>Operational boundary</strong>: this page is compute-only, so adjacent network and observability lines stay separate.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where Fargate estimates usually drift</h2>
+    <p>
+      Teams often misread Fargate by sizing from peak tasks, copying task definitions that carry too much headroom, or
+      forgetting that always-on background services silently accumulate hours even when user traffic looks quiet.
+    </p>
     <ul>
-      <li>If memory cost dominates, right-size memory per task or adjust task count.</li>
-      <li>If vCPU cost dominates, check CPU utilization and consider lower vCPU per task.</li>
+      <li><strong>Peak-first modeling</strong>: using surge count as the monthly baseline makes always-on services look too expensive.</li>
+      <li><strong>Over-sized task definitions</strong>: memory-heavy task shapes can keep costs elevated even when CPU is mostly idle.</li>
+      <li><strong>Mixed workload shapes</strong>: cron, worker, and API services should not share one average task assumption.</li>
+      <li><strong>Adjacent lines</strong>: NAT, egress, ALB, logs, and metrics can rival compute but should not be hidden in this number.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to validate before you trust the baseline</h2>
     <ul>
-      <li>Using peak task count as the average baseline.</li>
-      <li>Mixing MB and GB for memory inputs.</li>
-      <li>Assuming data transfer or logs are included in compute.</li>
+      <li>Pull average running tasks from ECS metrics or billing-backed history rather than from deployment intent.</li>
+      <li>Review whether memory or vCPU is the real bottleneck before changing task count.</li>
+      <li>Separate always-on services from burst or schedule-based tasks so the model reflects real runtime behavior.</li>
+      <li>Keep transfer, load balancers, and logs as separate cost lines instead of treating Fargate as the whole service bill.</li>
     </ul>
 
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>vCPU and memory per task times running hours is the baseline.</li>
-      <li>Separate always-on services from batch or cron workloads.</li>
-      <li>Include ephemeral storage or platform add-ons if used.</li>
-      <li>Add data transfer and logs as separate line items.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs autoscaling burst scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -120,10 +121,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to reconcile the first real Fargate bill</h2>
     <ul>
-      <li>Compare vCPU-hours and GB-hours in billing to your estimate.</li>
-      <li>Check ECS service metrics for average running tasks.</li>
+      <li>Compare billed vCPU-hours and GB-hours to the service-level average task history instead of to peak alerts.</li>
+      <li>Check whether the main gap came from task count, task size, or uptime before changing multiple assumptions at once.</li>
     </ul>
 
     <h2>Next steps</h2>
