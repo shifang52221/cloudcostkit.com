@@ -62,31 +62,40 @@ const description =
   client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Model VPC transfer by boundary, not by one blended rate</h2>
+    <p class="muted" style="margin-top:8px">
+      This calculator becomes useful only when you identify the actual boundary you are paying for. Cross-AZ,
+      cross-region, and internet paths may all move the same bytes, but they are not the same commercial event. The
+      biggest mistake is collapsing them into one average number too early.
+    </p>
     <ul>
-      <li>
-        <strong>GB/month</strong>: start from billing exports or flow logs; if you only have throughput charts, convert
-        Mbps to GB/month using <a href="/calculators/unit-converter/">Units converter</a>.
-      </li>
-      <li>
-        <strong>$ / GB</strong>: use your effective rate for the specific boundary (cross-AZ, cross-region, internet).
-      </li>
+      <li><strong>Cross-AZ</strong>: east-west traffic created by placement or load-balancing choices.</li>
+      <li><strong>Cross-region</strong>: replication, DR, and geographically split architectures.</li>
+      <li><strong>Internet egress</strong>: public delivery, partner traffic, or downloads leaving the platform.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Why transfer grows before anyone notices</h2>
+    <p>
+      Transfer cost often rises without a corresponding jump in user traffic because topology changes are enough to
+      create new billable boundaries. A service moved to another AZ, a cache miss path, or a new replication stream can
+      create meaningful spend long before application owners realize the path changed.
+    </p>
     <ul>
-      <li>Boundary mix is the primary driver; split cross-AZ, cross-region, and internet.</li>
-      <li>Small % increases in east-west traffic can outweigh compute savings.</li>
+      <li><strong>Chatty services</strong>: many small east-west calls can outweigh compute gains.</li>
+      <li><strong>Failover or balancing changes</strong>: a resilience decision can silently create new cross-AZ traffic.</li>
+      <li><strong>Cache and origin behavior</strong>: a CDN miss or cache refill can move cost, not eliminate it.</li>
+      <li><strong>Retry amplification</strong>: incident windows can multiply transfer without lasting traffic growth.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>Boundary-first checklist before you trust the number</h2>
     <ul>
-      <li>Mixing boundaries (cross-AZ vs cross-region vs internet) and using the wrong $/GB rate.</li>
-      <li>Ignoring cache fill / origin egress (CDN) that shifts cost to another place.</li>
-      <li>Under-modeling retries/timeouts that multiply traffic during incidents.</li>
+      <li>Map the top transfer paths and label each as cross-AZ, cross-region, or internet before assigning rates.</li>
+      <li>Keep CDN origin traffic, replication, and service-to-service traffic as separate lines even if they share similar units.</li>
+      <li>Use measured monthly GB where possible, and convert throughput carefully only when metrics are all you have.</li>
+      <li>Do not treat a blended rate as final unless you know the boundary mix is stable.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs topology-shift transfer scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -112,11 +121,11 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review transfer after an architecture change</h2>
     <ul>
-      <li>Validate top transfer paths and their boundaries (cross-AZ vs cross-region vs internet).</li>
-      <li>Re-check after routing or AZ locality changes; small shifts can create big costs.</li>
-      <li>Compare measured GB/month to billing usage types and adjust assumptions.</li>
+      <li>Validate the top transfer paths and confirm the billed boundary still matches your intended design.</li>
+      <li>Re-check after routing, failover, cache, or AZ-locality changes because small topology shifts can create large costs.</li>
+      <li>Compare measured GB/month to billing usage types before assuming optimization efforts actually saved money.</li>
     </ul>
 
     <h2>Next steps</h2>

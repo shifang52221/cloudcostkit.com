@@ -61,41 +61,40 @@ const description =
   <AwsVpcInterfaceEndpointCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">PrivateLink has a fixed AZ footprint before traffic even arrives</h2>
+    <p class="muted" style="margin-top:8px">
+      Interface endpoints behave differently from NAT and generic transfer tools because they create a recurring
+      <strong>endpoint-hour base cost</strong> the moment you deploy them. This means the first question is not only
+      "how much GB will flow?" but also "how many endpoints across how many AZs are we willing to keep alive?"
+    </p>
     <ul>
-      <li>
-        <strong>Interface endpoints</strong>: count distinct interface endpoints you plan to deploy (often by AWS service).
-      </li>
-      <li>
-        <strong>AZs per endpoint</strong>: this is the main multiplier (2 vs 3 AZs changes endpoint-hours materially).
-      </li>
-      <li>
-        <strong>Schedule</strong>: hours/day and days/month should match endpoint uptime.
-      </li>
-      <li>
-        <strong>GB processed</strong>: estimate how much NAT traffic to AWS services will shift to endpoints (use flow logs
-        or model scenarios).
-      </li>
-      <li>
-        <strong>Pricing</strong>: use region-specific endpoint-hour and data processing rates.
-      </li>
+      <li><strong>Fixed base</strong>: endpoints x AZs x runtime window.</li>
+      <li><strong>Variable line</strong>: processed GB after the path shifts away from NAT or public routing.</li>
+      <li><strong>Main multiplier</strong>: AZ count often matters more than teams expect.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What makes endpoint projects look cheaper on paper than in production</h2>
+    <p>
+      The common modeling error is to compare one endpoint against one NAT line without accounting for endpoint sprawl,
+      per-environment duplication, or the fact that the traffic path may still create cross-AZ spend elsewhere. Private
+      connectivity can be the right decision and still fail as a cost model if the surrounding topology is ignored.
+    </p>
     <ul>
-      <li>Endpoint-hours scale with AZ count; that is usually the fixed base cost.</li>
-      <li>Data processed scales with traffic shifts; model a migration spike if moving traffic from NAT.</li>
+      <li><strong>AZ expansion</strong>: moving from 2 to 3 AZs raises endpoint-hours immediately.</li>
+      <li><strong>Endpoint sprawl</strong>: multiple services, environments, and accounts create a quiet fixed-cost floor.</li>
+      <li><strong>NAT displacement assumptions</strong>: not every byte behind NAT actually moves to an endpoint.</li>
+      <li><strong>Service mismatch</strong>: gateway endpoints such as S3 and DynamoDB should not be counted as interface endpoints.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to confirm before calling endpoints a savings win</h2>
     <ul>
-      <li>Forgetting that interface endpoints are per AZ (endpoint-hours scale with AZ count).</li>
-      <li>Creating endpoint sprawl across environments without ownership/lifecycle.</li>
-      <li>Moving traffic across AZ boundaries and creating transfer charges elsewhere.</li>
-      <li>Counting gateway endpoints (S3/DynamoDB) in PrivateLink endpoint costs.</li>
+      <li>Verify which service paths really leave NAT and which still require public or alternate egress.</li>
+      <li>Check whether the endpoint path introduces cross-AZ traffic that offsets some of the NAT reduction.</li>
+      <li>Separate one-time migration traffic from normal processed GB after the routing change settles.</li>
+      <li>Track ownership and lifecycle so unused endpoints do not become permanent fixed cost.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs migration-shift endpoint scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -121,12 +120,12 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first bill after enabling endpoints</h2>
     <ul>
       <li>Verify NAT GB processed decreases for the targeted destinations.</li>
-      <li>Verify endpoint-hours match your endpoint x AZ deployment.</li>
-      <li>Check cross-AZ transfer trends after routing changes.</li>
-      <li>Compare endpoint-hours and GB processed line items to billing.</li>
+      <li>Verify endpoint-hours match the real endpoint x AZ deployment instead of the planned diagram.</li>
+      <li>Check cross-AZ transfer trends after routing changes so savings are not being offset elsewhere.</li>
+      <li>Compare endpoint-hours and processed GB line items to billing before treating the rollout as complete.</li>
     </ul>
 
     <h2>Next steps</h2>

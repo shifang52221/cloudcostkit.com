@@ -53,43 +53,40 @@ const description =
     defaultPricePerGbUsd={0.02}
   client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Cross-region transfer is usually directional, not symmetric</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is for one of the easiest cloud charges to misread: traffic that moves between regions. The billing
+      event is often <strong>directional</strong>, so a clean estimate starts with region pair and traffic direction,
+      not just total bytes moved.
+    </p>
     <ul>
-      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
-      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
-      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
+      <li><strong>Steady-state replication</strong>: predictable monthly copy volume from the primary path.</li>
+      <li><strong>Backfill or migration</strong>: one-time bulk transfer that should never be mixed into the normal month.</li>
+      <li><strong>DR or failover</strong>: rare but expensive spikes that need their own peak scenario.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>What people usually miss on cross-region bills</h2>
+    <p>
+      The transfer line itself is only one part of a multi-region decision. Teams often estimate the copied GB but miss
+      the fact that replica storage, destination reads, and backlog catch-up events all have different billing behavior.
+      That is why this page should stay focused on the transfer line and hand off the adjacent lines to other tools.
+    </p>
     <ul>
-      <li>Cross-region traffic is often one-way; confirm the billed direction.</li>
-      <li>Replication, DR, and backfill spikes should be modeled separately from steady-state.</li>
+      <li><strong>Directionality</strong>: confirm whether the cost is charged on the outbound side only.</li>
+      <li><strong>Event separation</strong>: migrations and backlog replays belong in a separate peak case.</li>
+      <li><strong>Neighboring charges</strong>: replica storage and destination-side processing should not be hidden in this number.</li>
+      <li><strong>Compression changes</strong>: payload optimization may reduce copied GB without changing request count.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to capture before you trust the estimate</h2>
     <ul>
-      <li>Mixing boundaries and applying the wrong $/GB rate.</li>
-      <li>Ignoring retries/timeouts that multiply traffic during incidents.</li>
+      <li>Identify the specific source and destination region pair instead of using a generic cross-region assumption.</li>
+      <li>Split steady replication from migrations, backfills, DR drills, and failover recovery windows.</li>
+      <li>Keep cross-region traffic separate from internet egress and cross-AZ transfer even if the same system generates all three.</li>
+      <li>Review whether the real business question is transfer-only or a wider multi-region cost model.</li>
     </ul>
 
-    <h2>Input checklist</h2>
-    <ul>
-      <li>Identify source and destination region pairs.</li>
-      <li>Separate steady replication from one-time backfills or migrations.</li>
-      <li>Confirm billing direction (outbound vs inbound).</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Separate source and destination region pairs and track directionality.</li>
-      <li>Split steady replication traffic from one-time backfill or migration windows.</li>
-      <li>Distinguish cross-region transfer from cross-AZ and internet egress.</li>
-      <li>Adjust GB for compression or payload size changes where relevant.</li>
-    </ul>
-
-    <h2>Scenario planning</h2>
+    <h2>Steady-state vs event-driven region transfer</h2>
     <table>
       <thead>
         <tr>
@@ -115,10 +112,11 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to review the first real cross-region bill</h2>
     <ul>
-      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
+      <li>Check whether the billed direction matches the direction you modeled for the region pair.</li>
+      <li>Keep one-time migrations and failover windows outside the recurring baseline after the event is complete.</li>
+      <li>Investigate destination storage, replay traffic, or read behavior before blaming the transfer rate itself.</li>
     </ul>
 
     <h2>Next steps</h2>
