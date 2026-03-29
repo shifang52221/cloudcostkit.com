@@ -63,27 +63,35 @@ const description =
     <p class="muted" style="margin-top:0">
       Add a peak scenario to model autoscaling or seasonal spikes and compare the delta to your baseline budget.
     </p>
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Node cost is about node-hours, not pod utilization</h2>
+    <p class="muted" style="margin-top:8px">
+      This page should stay narrow. It is for estimating the cost of the nodes themselves, which means instance shape,
+      node count, and node uptime matter more here than per-pod CPU charts. Node cost rises when the autoscaler keeps
+      capacity online, even if pods are not fully consuming it every minute.
+    </p>
     <ul>
-      <li><strong>Nodes</strong>: use average node count after autoscaler changes (exclude drained nodes).</li>
-      <li><strong>Hourly rate</strong>: use the actual node type price, including OS licensing if applicable.</li>
-      <li><strong>Schedule</strong>: hours/day and days/month should reflect cluster uptime, not pod CPU usage.</li>
+      <li><strong>Main drivers</strong>: average node count, instance rate, and uptime window.</li>
+      <li><strong>Common hidden floor</strong>: system nodes, buffer nodes, and spare capacity for safe scheduling.</li>
+      <li><strong>Boundary</strong>: this page excludes control plane, storage, and observability by design.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Where node-cost estimates usually drift</h2>
     <ul>
-      <li>If baseline cost is high, check node type and average node count assumptions.</li>
-      <li>Large peak deltas usually indicate aggressive autoscaling or workload seasonality.</li>
+      <li>Pod utilization is confused with node uptime, making the cluster look cheaper than the bill.</li>
+      <li>Drained nodes, warm pools, or buffer capacity are omitted because they do not feel "productive."</li>
+      <li>Autoscaler behavior during launches or incidents is ignored when picking the baseline node count.</li>
+      <li>Control plane and add-ons are mixed into node cost even though they belong in separate cluster lines.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>What to review before trusting the node baseline</h2>
     <ul>
-      <li>Mixing pod utilization with node uptime (different concepts).</li>
-      <li>Forgetting system nodes, headroom, or buffer capacity.</li>
-      <li>Ignoring control plane fees and add-ons in total cost.</li>
+      <li>Use average node count from autoscaler or billing-backed history, excluding only clearly transient noise.</li>
+      <li>Check whether instance mix or OS licensing changes the effective hourly rate you should use.</li>
+      <li>Keep spare capacity, system overhead, and safety buffers visible instead of treating them as mistakes.</li>
+      <li>Use other calculators for control plane, observability, storage, and network after node-hours are understood.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>Baseline vs autoscaler-spike node scenarios</h2>
     <table>
       <thead>
         <tr>
@@ -109,10 +117,10 @@ const description =
       </tbody>
     </table>
 
-    <h2>Validate after changes</h2>
+    <h2>How to reconcile node cost with the bill</h2>
     <ul>
-      <li>Compare node-hours and effective $/hour to billing line items.</li>
-      <li>Check autoscaler metrics for average node count over the month.</li>
+      <li>Compare node-hours and effective hourly rate to billing-backed node usage, not only to scheduler dashboards.</li>
+      <li>Check whether autoscaler spikes or instance-mix changes explain the gap before changing the baseline model.</li>
     </ul>
 
     <h2>Next steps</h2>
