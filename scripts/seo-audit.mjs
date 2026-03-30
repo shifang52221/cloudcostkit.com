@@ -1,50 +1,14 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import { extractInternalLinks, isSameSite, normalizeUrl } from "./lib/seo-audit-links.mjs";
+
 const DEFAULT_BASE_URL = process.env.SITE_URL || process.env.PUBLIC_SITE_URL || "https://cloudcostkit.com";
 
 function nowStamp() {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-}
-
-function shouldHaveTrailingSlash(pathname) {
-  if (pathname === "/") return false;
-  if (pathname.endsWith("/")) return false;
-  const last = pathname.split("/").pop() || "";
-  if (last.includes(".")) return false;
-  return true;
-}
-
-function normalizeInternalPathname(pathname) {
-  if (!pathname.startsWith("/")) pathname = `/${pathname}`;
-  if (shouldHaveTrailingSlash(pathname)) return `${pathname}/`;
-  return pathname;
-}
-
-function normalizeUrl(input, baseUrl) {
-  try {
-    const u = new URL(input, baseUrl);
-    u.hash = "";
-    // Keep query params; they can represent distinct states, but treat as separate URLs.
-    u.pathname = normalizeInternalPathname(u.pathname);
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
-
-function isSameSite(url, baseUrl) {
-  try {
-    const u = new URL(url);
-    const b = new URL(baseUrl);
-    const hostA = u.hostname.replace(/^www\./i, "").toLowerCase();
-    const hostB = b.hostname.replace(/^www\./i, "").toLowerCase();
-    return hostA === hostB;
-  } catch {
-    return false;
-  }
 }
 
 async function fetchWithRedirectChain(url, { maxRedirects = 10, timeoutMs = 20_000 } = {}) {
@@ -205,22 +169,6 @@ function extractHreflang(html) {
     out.push({ hreflang: String(m[1] || "").trim(), href: String(m[2] || "").trim() });
   }
   return out;
-}
-
-function extractInternalLinks(html, baseUrl) {
-  const out = new Set();
-  const re = /<a\b[^>]*\bhref\s*=\s*(["'])(.*?)\1/gi;
-  let m;
-  while ((m = re.exec(html))) {
-    const href = String(m[2] || "").trim();
-    if (!href) continue;
-    if (href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) continue;
-    const abs = normalizeUrl(href, baseUrl);
-    if (!abs) continue;
-    if (!isSameSite(abs, baseUrl)) continue;
-    out.add(abs);
-  }
-  return Array.from(out);
 }
 
 function extractJsonLd(html) {
