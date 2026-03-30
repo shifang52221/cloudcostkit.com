@@ -5,7 +5,7 @@ import { SITE } from "../config/site";
 const title = `Terms | ${SITE.name}`;
 const description =
   "Terms of use for CloudCostKit: educational use, estimate responsibility, acceptable use, and relationship to provider documentation.";
-const [emailUser, emailDomain] = SITE.email.split("@");
+const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/terms" robots="noindex,follow">
   <section class="card hero">
@@ -66,13 +66,9 @@ const [emailUser, emailDomain] = SITE.email.split("@");
     </ul>
     <p class="muted" style="margin:12px 0 0">
       Questions about these terms:{" "}
-      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+      <a href={contactHref}>
         Email us
       </a>
-      <noscript>
-        {" "}
-        ({emailUser} [at] {emailDomain})
-      </noscript>
       .
     </p>
   </section>

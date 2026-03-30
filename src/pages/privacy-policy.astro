@@ -5,7 +5,7 @@ import { SITE } from "../config/site";
 const title = `Privacy Policy | ${SITE.name}`;
 const description =
   "Privacy Policy for CloudCostKit: browser-side calculator inputs, storage, ads, analytics, consent, and contact for privacy questions.";
-const [emailUser, emailDomain] = SITE.email.split("@");
+const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/privacy-policy" robots="noindex,follow">
   <section class="card hero">
@@ -68,13 +68,9 @@ const [emailUser, emailDomain] = SITE.email.split("@");
     <p class="muted" style="margin:0">
       This page may be updated as site behavior, ad configuration, or privacy controls change. Questions about privacy
       or site data handling:{" "}
-      <a href="#" data-email-user={emailUser} data-email-domain={emailDomain}>
+      <a href={contactHref}>
         Email us
       </a>
-      <noscript>
-        {" "}
-        ({emailUser} [at] {emailDomain})
-      </noscript>
       .
     </p>
   </section>
