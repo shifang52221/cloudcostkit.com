@@ -1,0 +1,77 @@
+---
+import { buildContactSurface } from "../lib/contact-surface.js";
+
+type Props = {
+  email: string;
+  label?: string;
+  variant?: "full" | "compact";
+};
+
+const { email, label = "Direct email", variant = "full" } = Astro.props;
+const surface = buildContactSurface(email, { variant });
+const statusFailure = "Copy is unavailable here. Use the visible address to copy manually.";
+---
+<div class={`contact-surface contact-surface--${surface.variant}`} data-contact-surface data-email={surface.email}>
+  <div class="contact-surface__label">{label}</div>
+  <p class="muted contact-surface__helper">{surface.helperText}</p>
+  <div class="contact-surface__address" aria-label={`Contact email ${surface.email}`}>{surface.email}</div>
+  <div class="contact-surface__actions">
+    <a class="btn btn-primary" href={surface.mailtoHref}>
+      {surface.openLabel}
+    </a>
+    <button class="btn" type="button" data-copy-email>
+      {surface.copyLabel}
+    </button>
+  </div>
+  <p
+    class="muted contact-surface__status"
+    data-copy-status
+    data-status-idle={surface.statusIdle}
+    data-status-success={surface.statusSuccess}
+    data-status-failure={statusFailure}
+  >
+    {surface.statusIdle}
+  </p>
+</div>
+
+<script is:inline>
+  if (!window.__contactSurfaceCopyBound) {
+    window.__contactSurfaceCopyBound = true;
+
+    document.addEventListener("click", async (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const button = target.closest("[data-copy-email]");
+      if (!(button instanceof HTMLButtonElement)) return;
+
+      const surface = button.closest("[data-contact-surface]");
+      if (!(surface instanceof HTMLElement)) return;
+
+      const email = surface.dataset.email || "";
+      const statusNode = surface.querySelector("[data-copy-status]");
+      if (!(statusNode instanceof HTMLElement) || !email) return;
+
+      const idleMessage = statusNode.dataset.statusIdle || "";
+      const successMessage = statusNode.dataset.statusSuccess || "Email copied.";
+      const failureMessage = statusNode.dataset.statusFailure || idleMessage;
+
+      if (!navigator.clipboard || !window.isSecureContext) {
+        statusNode.textContent = failureMessage;
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(email);
+        statusNode.textContent = successMessage;
+        window.setTimeout(() => {
+          if (statusNode.textContent === successMessage) {
+            statusNode.textContent = idleMessage;
+          }
+        }, 2500);
+      } catch (_error) {
+        statusNode.textContent = failureMessage;
+      }
+    });
+  }
+</script>

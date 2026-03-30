@@ -1,5 +1,6 @@
 ﻿---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 import { TOOLS } from "../lib/tools";
 import AdSlot from "../components/AdSlot.astro";
@@ -19,7 +20,6 @@ const featuredSlugs = [
 
 const featured = TOOLS.filter((t) => featuredSlugs.includes(t.slug));
 const slots = SITE.adsenseSlots;
-const contactHref = `mailto:${SITE.email}`;
 
 const demandPaths = [
   {
@@ -142,13 +142,7 @@ const demandPaths = [
         Provider pricing varies by region, tiers, free allowances, request classes, and rounding rules. Always confirm
         assumptions in official docs before committing spend.
       </p>
-      <p class="muted" style="margin:10px 0 0">
-        Questions or feedback:{" "}
-        <a href={contactHref}>
-          Email us
-        </a>
-        .
-      </p>
+      <ContactSurface email={SITE.email} label="Questions and feedback" variant="compact" />
     </div>
   </section>
 

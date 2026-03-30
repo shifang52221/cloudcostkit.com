@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:lan": "astro dev --host 0.0.0.0 --port 4321",
+    "test": "node --test",
     "generate:guides": "node scripts/generate-guides.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "verify:live": "node scripts/verify-live-site.mjs",

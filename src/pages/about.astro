@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 
 const title = `About | ${SITE.name}`;
 const description =
   "About CloudCostKit: practical cloud cost and capacity calculators, paired guides, and transparent validation workflows.";
-const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/about">
   <section class="card hero">
@@ -115,12 +115,6 @@ const contactHref = `mailto:${SITE.email}`;
       Reports about overlap, stale page roles, or pages that feel too thin are useful too. Those reviews help decide
       whether a page should be expanded, merged into a stronger parent, or reduced in prominence.
     </p>
-    <p class="muted" style="margin:12px 0 0">
-      Direct contact:{" "}
-      <a href={contactHref}>
-        Email us
-      </a>
-      .
-    </p>
+    <ContactSurface email={SITE.email} label="Direct contact" variant="compact" />
   </section>
 </BaseLayout>

@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 
 const title = `Privacy Policy | ${SITE.name}`;
 const description =
   "Privacy Policy for CloudCostKit: browser-side calculator inputs, storage, ads, analytics, consent, and contact for privacy questions.";
-const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/privacy-policy" robots="noindex,follow">
   <section class="card hero">
@@ -67,11 +67,8 @@ const contactHref = `mailto:${SITE.email}`;
     <h2 style="margin:18px 0 10px">Changes and contact</h2>
     <p class="muted" style="margin:0">
       This page may be updated as site behavior, ad configuration, or privacy controls change. Questions about privacy
-      or site data handling:{" "}
-      <a href={contactHref}>
-        Email us
-      </a>
-      .
+      or site data handling can be sent using the address below.
     </p>
+    <ContactSurface email={SITE.email} label="Privacy contact" variant="compact" />
   </section>
 </BaseLayout>

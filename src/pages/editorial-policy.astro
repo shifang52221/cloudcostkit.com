@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 
 const title = `Editorial Policy | ${SITE.name}`;
 const description =
   "How CloudCostKit qualifies pages for publication, reviews updates, handles corrections, and avoids thin or template-like cloud cost content.";
-const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/editorial-policy">
   <section class="card hero">
@@ -80,13 +80,7 @@ const contactHref = `mailto:${SITE.email}`;
       need a boundary rewrite, some reveal that a page should be merged into a stronger workflow page, and some show
       that the existing page is carrying too much scope for one model.
     </p>
-    <p class="muted" style="margin:12px 0 0">
-      Contact:{" "}
-      <a href={contactHref}>
-        Email us
-      </a>
-      .
-    </p>
+    <ContactSurface email={SITE.email} label="Corrections contact" variant="compact" />
 
     <h2 style="margin:18px 0 10px">What this page does not govern</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">
