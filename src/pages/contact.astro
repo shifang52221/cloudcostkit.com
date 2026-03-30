@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 
 const title = `Contact | ${SITE.name}`;
 const description =
   "Contact CloudCostKit for estimate questions, bug reports, corrections, tool requests, and editorial feedback.";
-const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/contact">
   <section class="card hero">
@@ -19,11 +19,10 @@ const contactHref = `mailto:${SITE.email}`;
   <section class="card section prose">
     <h2 style="margin-top:0">Primary contact</h2>
     <p class="muted" style="margin:0">
-      Email:{" "}
-      <a href={contactHref}>
-        Email us
-      </a>
+      Use the contact module below if you want the most reliable path. It works even when the local mail app does not
+      open automatically.
     </p>
+    <ContactSurface email={SITE.email} label="Primary email" variant="full" />
 
     <h2 style="margin:18px 0 10px">If you are asking for estimate help</h2>
     <ul class="muted" style="margin:10px 0 0; padding-left:18px">

@@ -232,6 +232,52 @@ main.container{flex:1}
 }
 .footer-links a:hover{color:var(--text)}
 
+.contact-surface{
+  margin-top:12px;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.03);
+}
+.contact-surface--compact{
+  padding:12px;
+}
+.contact-surface__label{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color: rgba(184,195,230,.92);
+}
+.contact-surface__helper{
+  margin:8px 0 0;
+  font-size:14px;
+  line-height:1.5;
+}
+.contact-surface__address{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid rgba(163,255,18,.18);
+  background: rgba(163,255,18,.08);
+  color: var(--text);
+  font-size:15px;
+  font-weight:700;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+.contact-surface__actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.contact-surface__status{
+  margin:10px 0 0;
+  font-size:13px;
+  line-height:1.45;
+}
+
 /* Calculator UI */
 .calc-grid{
   display:grid;
@@ -327,6 +373,7 @@ summary:focus-visible{
   .footer{padding-bottom:28px}
   .footer-inner{padding:12px 14px; flex-direction:column}
   .footer-links{justify-content:flex-start}
+  .contact-surface{padding:12px}
 }
 .kpi{
   padding:12px;

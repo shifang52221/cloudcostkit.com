@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 
 const title = `Terms | ${SITE.name}`;
 const description =
   "Terms of use for CloudCostKit: educational use, estimate responsibility, acceptable use, and relationship to provider documentation.";
-const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/terms" robots="noindex,follow">
   <section class="card hero">
@@ -64,12 +64,7 @@ const contactHref = `mailto:${SITE.email}`;
       <li><a href="/cookie-notice/">Cookie Notice</a>: consent and cookie behavior.</li>
       <li><a href="/contact/">Contact</a>: estimate questions, corrections, and site issues.</li>
     </ul>
-    <p class="muted" style="margin:12px 0 0">
-      Questions about these terms:{" "}
-      <a href={contactHref}>
-        Email us
-      </a>
-      .
-    </p>
+    <p class="muted" style="margin:12px 0 0">Questions about these terms can be sent using the address below.</p>
+    <ContactSurface email={SITE.email} label="Terms contact" variant="compact" />
   </section>
 </BaseLayout>

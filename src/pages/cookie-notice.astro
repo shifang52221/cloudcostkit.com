@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactSurface from "../components/ContactSurface.astro";
 import { SITE } from "../config/site";
 
 const title = `Cookie Notice | ${SITE.name}`;
 const description =
   "Cookie Notice for CloudCostKit: consent, storage categories, ad-related cookies, and how to revisit your choices.";
-const contactHref = `mailto:${SITE.email}`;
 ---
 <BaseLayout title={title} description={description} canonicalPath="/cookie-notice" robots="noindex,follow">
   <section class="card hero">
@@ -53,11 +53,8 @@ const contactHref = `mailto:${SITE.email}`;
 
     <h2 style="margin:18px 0 10px">Questions</h2>
     <p class="muted" style="margin:0">
-      Questions about cookies or consent settings:{" "}
-      <a href={contactHref}>
-        Email us
-      </a>
-      .
+      Questions about cookies or consent settings can be sent using the address below.
     </p>
+    <ContactSurface email={SITE.email} label="Consent contact" variant="compact" />
   </section>
 </BaseLayout>
