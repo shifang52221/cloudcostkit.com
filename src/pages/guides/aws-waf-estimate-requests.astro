@@ -21,10 +21,8 @@ const description =
     },
   ]}
 >
-  <p>
-    WAF request charges scale with <strong>evaluated requests</strong>. A good estimate starts with your real traffic and
-    then adds a safety factor for bot spikes and incidents.
-  </p>
+  <p class="muted">This page is the measurement workflow, not the budget-boundary page: the goal is to turn observed traffic and attack windows into a defendable evaluated-request model.</p>
+  <p class="muted">If you still are not sure which costs belong inside the WAF bill, go back to the pricing guide first.</p>
 
   <h2>Step 0: define evaluated requests (the number that matters)</h2>
   <ul>
@@ -82,6 +80,14 @@ const description =
     Use <a href="/calculators/aws-waf-request-estimator/">WAF request volume estimator</a> to model baseline and spike together.
   </p>
 
+  <h2>Evidence pack for a defendable evaluated-request model</h2>
+  <ul>
+    <li><strong>Baseline source</strong>: where the normal request volume came from, such as CDN metrics, load balancer metrics, or WAF logs for a representative window.</li>
+    <li><strong>Attack source</strong>: the incident or bot-wave window kept separate, with allowed and blocked traffic both counted.</li>
+    <li><strong>Hot-path split</strong>: login, search, API, or other endpoints broken out when one path attracts most abusive traffic.</li>
+    <li><strong>Open uncertainty</strong>: anything still estimated loosely, such as scraper intensity, retry storms, or partial host coverage.</li>
+  </ul>
+
   <h2>Turn volume into cost</h2>
   <p>
     Use <a href="/calculators/aws-waf-cost-calculator/">AWS WAF Cost Calculator</a> to translate ACLs, rules, and request
@@ -105,6 +111,13 @@ const description =
     <li>Compare your modeled evaluated requests to one week of real request counts (CDN/LB/WAF logs) scaled to monthly.</li>
     <li>Keep a peak scenario for the largest spike window you see (attacks, bot waves, scraping).</li>
     <li>Confirm whether blocked requests are included in the evaluated volume you used.</li>
+  </ul>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-waf-pricing/">WAF pricing</a> if your measurement work changes what you think belongs in the WAF bill versus the logging bill.</li>
+    <li>Hand off to <a href="/guides/aws-waf-cost-optimization/">WAF cost optimization</a> once the evaluated-request model is stable enough to judge before/after changes.</li>
+    <li>Do not move into optimization with only a guessed attack multiplier if the main driver is still unclear.</li>
   </ul>
 
   <h2>Related guides</h2>
