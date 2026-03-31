@@ -26,10 +26,8 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p>
-    Most endpoint cost models require two inputs: <strong>endpoint-hours</strong> and <strong>GB processed</strong>. This
-    guide shows quick ways to estimate both without perfect data.
-  </p>
+  <p class="muted">This page is the input-measurement workflow, not the bill-boundary page: the goal is to turn endpoint inventory, AZ coverage, hours, and GB into a defendable model.</p>
+  <p class="muted">If you still are not sure which charges belong inside the endpoint bill, go back to the pricing guide first.</p>
 
   <h2>1) Estimate endpoint-hours</h2>
   <ul>
@@ -71,6 +69,14 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>Evidence pack for a defendable endpoint-hours and GB model</h2>
+  <ul>
+    <li><strong>Inventory source</strong>: where the endpoint count came from, including per-VPC and per-environment duplication.</li>
+    <li><strong>AZ and hours source</strong>: which endpoints are always-on versus ephemeral, and how active hours were measured rather than assumed.</li>
+    <li><strong>GB source</strong>: NAT metrics, flow logs, or scenario logic used to decide what traffic actually moves to endpoints.</li>
+    <li><strong>Open uncertainty</strong>: any migration spikes, image pulls, backfills, or path changes still modeled loosely.</li>
+  </ul>
+
   <h2>3) Turn inputs into cost</h2>
   <p>
     Use <a href="/calculators/aws-vpc-interface-endpoint-cost-calculator/">VPC Interface Endpoint Cost Calculator</a> for
@@ -95,6 +101,13 @@ const faqs = [
     <li>Compare endpoint-hours in billing to endpoints * AZs * hours. Large gaps usually mean inventory mistakes.</li>
     <li>Use flow logs to validate the GB processed order of magnitude and the top destinations.</li>
     <li>After rollout, reconcile NAT GB processed and endpoint GB processed as a before/after.</li>
+  </ul>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a> if your measurement work changes what you think belongs in the endpoint bill versus the transfer or NAT bill.</li>
+    <li>Hand off to <a href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints cost optimization</a> once the endpoint-hours and GB model is stable enough to judge before/after changes.</li>
+    <li>Do not move into optimization with only guessed environment counts or guessed GB shifts if the main drivers are still unclear.</li>
   </ul>
 
   <h2>Related guides</h2>
