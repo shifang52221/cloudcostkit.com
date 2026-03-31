@@ -35,6 +35,8 @@ const faqs = [
     message</strong> and prevent the multipliers: retries, empty receives, and poison loops. This playbook focuses on
     changes that are measurable and safe.
   </p>
+  <p class="muted">Optimization starts only after the request model is believable; otherwise teams cut the wrong thing and keep the real multiplier.</p>
+  <p class="muted">This page is for operational intervention: batching, polling, retry control, visibility tuning, and DLQ policy changes.</p>
 
   <h2>Step 0: baseline “requests per message”</h2>
   <ul>
@@ -89,6 +91,13 @@ const faqs = [
     Tool: <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a>
   </p>
 
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You do not yet trust the requests/message baseline for a representative week.</li>
+    <li>You cannot separate empty receives, retries, and poison-loop behavior from normal successful traffic.</li>
+    <li>You are still mixing SQS request cost with downstream compute, logging, or transfer spend in one blended total.</li>
+  </ul>
+
   <h2>Quick triage: what’s driving requests?</h2>
   <ul>
     <li><strong>If received ≫ sent</strong>: retries/poison loops are likely dominating.</li>
@@ -104,6 +113,14 @@ const faqs = [
     <li>Not using DLQs, so poison messages loop indefinitely.</li>
     <li>Visibility timeout too short, causing repeated receives and duplicate work.</li>
     <li>Optimizing SQS requests but ignoring downstream retries (which can recreate the problem).</li>
+  </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ul>
+    <li>Measure the current request model first with <a href="/guides/aws-sqs-estimate-requests/">Estimate SQS requests</a>.</li>
+    <li>Change one dominant multiplier at a time: batching, polling, retries, visibility, or DLQ handling.</li>
+    <li>Re-measure with the same sent/received/deleted window before declaring the optimization real.</li>
+    <li>Keep latency, backlog, and failure-rate checks beside cost checks so a cheaper queue path does not create a worse system.</li>
   </ul>
 
   <h2>Related guides</h2>

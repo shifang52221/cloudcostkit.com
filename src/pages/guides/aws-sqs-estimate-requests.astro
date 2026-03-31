@@ -36,6 +36,8 @@ const faqs = [
     delete), and retries or poison loops can multiply it quickly. This guide gives you a model you can validate with real
     metrics.
   </p>
+  <p class="muted">This page is the measurement workflow, not the policy page: the goal is to turn observed message behavior into a request-volume model you can defend.</p>
+  <p class="muted">If you still are not sure whether SQS is even the right service boundary, go back to the pricing guide first.</p>
 
   <h2>Step 1: estimate messages per month</h2>
   <ul>
@@ -90,6 +92,14 @@ const faqs = [
     <li><strong>Polling tax</strong>: 50M empty receives/month adds 50M requests even with zero extra messages</li>
   </ul>
 
+  <h2>Evidence pack for a defendable request model</h2>
+  <ul>
+    <li><strong>Traffic source</strong>: where messages/month came from, such as steady producer rate, upstream publish volume, or business event counts.</li>
+    <li><strong>Multiplier source</strong>: where retries, visibility changes, and empty receives were measured instead of guessed.</li>
+    <li><strong>Scenario split</strong>: baseline week, incident week, and any replay or backfill window kept separate.</li>
+    <li><strong>Open uncertainty</strong>: anything still estimated loosely, such as poison-loop frequency or polling tax during low traffic.</li>
+  </ul>
+
   <h2>Turn requests into cost</h2>
   <p class="muted">
     Use <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a> with your request volume and pricing assumptions.
@@ -106,6 +116,13 @@ const faqs = [
     <li>Use a representative week of CloudWatch: NumberOfMessagesSent/Received/Deleted.</li>
     <li>Compute requests/message = (sent + received + deleted + visibility changes + empty receives) / sent.</li>
     <li>Use that “real” requests/message number for budgeting and optimization.</li>
+  </ul>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-sqs-pricing/">SQS pricing</a> if your new measurements show the queue is not the main budget problem after all.</li>
+    <li>Hand off to <a href="/guides/aws-sqs-cost-optimization/">SQS cost optimization</a> once the request model is stable enough to judge before/after changes.</li>
+    <li>Do not move into optimization with only a guessed requests/message number if the workload is still incident-heavy or polling-heavy.</li>
   </ul>
 
   <h2>Common pitfalls</h2>
