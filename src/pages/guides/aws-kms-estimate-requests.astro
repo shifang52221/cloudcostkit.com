@@ -26,11 +26,8 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p>
-    KMS request charges are the part that surprises budgets. The good news is you can estimate them with a simple
-    workflow: identify what triggers KMS calls, translate workload volume into “KMS calls per unit”, then validate using
-    billing and CloudTrail.
-  </p>
+  <p class="muted">This page is the request-measurement workflow, not the bill-boundary page: the goal is to turn workload units and KMS calls per unit into a defendable request model.</p>
+  <p class="muted">If you still are not sure which charges and call sources belong inside the KMS bill, go back to the pricing guide first.</p>
 
   <h2>Step 1: list your KMS call sources (don’t start from pricing)</h2>
   <p>Write down every place encryption happens in your architecture:</p>
@@ -104,6 +101,14 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>Evidence pack for a defendable KMS request model</h2>
+  <ul>
+    <li><strong>Source inventory</strong>: every application path, secret read path, storage workflow, and job that can trigger KMS.</li>
+    <li><strong>Per-unit ratio source</strong>: where calls per app request, per object, per secret read, or per job run came from instead of being guessed blindly.</li>
+    <li><strong>Baseline versus incident split</strong>: normal weeks kept separate from retry-heavy or deployment-heavy windows.</li>
+    <li><strong>Open uncertainty</strong>: anything still modeled loosely, such as secret-cache hit rate, retry amplification, or service-side fan-out.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Estimating from key count only and treating requests as negligible.</li>
@@ -120,6 +125,13 @@ const faqs = [
     <a class="btn" href="/guides/aws-kms-cost-optimization/">KMS cost optimization</a>
     <a class="btn" href="/guides/request-based-pricing/">Request-based pricing</a>
   </div>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-kms-pricing/">KMS pricing</a> if your measurement work changes what you think belongs in the KMS bill versus the surrounding service bill.</li>
+    <li>Hand off to <a href="/guides/aws-kms-cost-optimization/">KMS cost optimization</a> once the request model is stable enough to judge before and after changes.</li>
+    <li>Do not move into optimization with only guessed calls-per-unit if the biggest caller is still unclear.</li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>
