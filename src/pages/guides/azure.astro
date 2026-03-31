@@ -3,72 +3,208 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
 import { GUIDES } from "../../lib/guides.generated";
+import type { GuideLink } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
 const title = `Azure cost guides | ${SITE.name}`;
 const description =
-  "Azure cost estimation guides for storage, networking (egress/private link), CDN/Front Door, observability/logs, and core managed services.";
+  "Azure cost guide hub for routing into the right provider-specific estimate: networking, observability, storage, runtime, and premium SKU boundaries.";
 const slots = SITE.adsenseSlots;
 
-const azureGuides = GUIDES.filter((g) => g.category === "Azure")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title));
+type GuideGroup = {
+  title: string;
+  description: string;
+  items: GuideLink[];
+};
+
+const azureGuides = GUIDES.filter((g) => g.category === "Azure");
+
+function hasAnyTopic(guide: GuideLink, topics: string[]) {
+  return topics.some((topic) => guide.topics?.includes(topic));
+}
+
+function slugMatches(guide: GuideLink, parts: string[]) {
+  return parts.some((part) => guide.slug.includes(part));
+}
+
+function sortGuides(guides: GuideLink[]) {
+  return guides.slice().sort((a, b) => a.title.localeCompare(b.title));
+}
+
+const routeCards = [
+  {
+    title: "Networking and edge",
+    description: "Start here when bandwidth, Front Door, CDN, Application Gateway, or Private Link boundaries are likely to move the bill.",
+    guideHref: "/guides/azure-bandwidth-egress-costs/",
+    toolHref: "/calculators/data-egress-cost-calculator/",
+  },
+  {
+    title: "Observability and operations",
+    description: "Start here when Log Analytics, Application Insights, or Azure Monitor metrics are quietly growing faster than the main workload.",
+    guideHref: "/guides/azure-log-analytics-pricing/",
+    toolHref: "/calculators/log-cost-calculator/",
+  },
+  {
+    title: "Containers and managed platforms",
+    description: "Start here when AKS, Functions, Event Hubs, or registry workflows have surrounding costs that a generic category page will not expose.",
+    guideHref: "/guides/azure-aks-pricing/",
+    toolHref: "/calculators/kubernetes-cost-calculator/",
+  },
+];
+
+const azureGuideGroups: GuideGroup[] = [
+  {
+    title: "Networking and delivery",
+    description: "Use these when egress destinations, backbone paths, gateways, and delivery layers are the real cost boundary.",
+    items: sortGuides(
+      azureGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["cdn", "egress", "load-balancing"]) ||
+          slugMatches(guide, ["bandwidth", "private-link", "front-door", "load-balancer", "application-gateway", "cdn", "nat-gateway"]),
+      ),
+    ),
+  },
+  {
+    title: "Runtime, platform, and data services",
+    description: "Use these when managed runtime choice, Kubernetes overhead, registry behavior, or service-tier baselines drive the answer.",
+    items: sortGuides(
+      azureGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["compute", "database", "kubernetes", "serverless", "storage"]) ||
+          slugMatches(guide, ["aks", "functions", "container-registry", "sql-database", "cosmos-db", "blob-storage"]),
+      ),
+    ),
+  },
+  {
+    title: "Observability, messaging, and security",
+    description: "Use these when logs, metrics, ingestion throughput, or security-oriented request paths are the reason the budget no longer fits.",
+    items: sortGuides(
+      azureGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["logging", "metrics", "messaging", "security", "requests"]) ||
+          slugMatches(guide, ["log-analytics", "application-insights", "monitor-metrics", "event-hubs", "service-bus", "key-vault", "api-management"]),
+      ),
+    ),
+  },
+].filter((group) => group.items.length);
 ---
 <BaseLayout title={title} description={description} canonicalPath="/guides/azure" robots="noindex,follow">
   <section class="card hero">
     <h1>Azure cost guides</h1>
-    <p>Practical models to estimate common Azure line items and avoid frequent surprises.</p>
+    <p>Use this hub when the Azure-specific billing boundary matters more than the generic category page.</p>
     <div class="btn-row" style="margin-top:12px">
-      <a class="btn" href="/guides/">All guides</a>
-      <a class="btn" href="/calculators/">Calculators</a>
+      <a class="btn btn-primary" href="/calculators/azure/">Azure calculators</a>
       <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
       <a class="btn" href="/methodology/">Methodology</a>
+      <a class="btn" href="/guides/">All guides</a>
     </div>
   </section>
 
   <section class="grid" style="margin-top:18px">
     <section class="card section prose col-6">
-      <h2 style="margin-top:0">A simple Azure estimate</h2>
-      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
-        <li>Start with requests/month and GB/month.</li>
-        <li>Add storage (GB-month) and retention policies.</li>
-        <li>Add egress boundaries (internet vs region vs zone).</li>
-        <li>Validate units (GB vs GiB) and request pricing units.</li>
-      </ol>
-      <div class="btn-row" style="margin-top:12px">
-        <a class="btn" href="/calculators/networking/">Networking calculators</a>
-        <a class="btn" href="/calculators/logging/">Logging calculators</a>
-        <a class="btn" href="/calculators/storage/">Storage calculators</a>
-      </div>
+      <h2 style="margin-top:0">What this hub helps you decide</h2>
+      <p class="muted" style="margin:0">
+        Use this page to choose the next Azure guide when you know the provider matters, but the exact cost path is
+        still blurry.
+      </p>
+      <ul class="muted" style="margin:12px 0 0; padding-left:18px">
+        <li>Pick the guide by boundary problem first, not by SKU keyword alone.</li>
+        <li>Move to the calculator when you already have measurable drivers and pricing assumptions.</li>
+        <li>Use the deeper service page once the billing path is specific enough to model directly.</li>
+      </ul>
     </section>
     <section class="card section prose col-6">
-      <h2 style="margin-top:0">Common traps</h2>
-      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-        <li>Underestimating egress by mixing destinations and tiers.</li>
-        <li>Ignoring retries/timeouts and fan-out patterns (requests explode during incidents).</li>
-        <li>Letting logs and metrics grow without retention and query guardrails.</li>
+      <h2 style="margin-top:0">Azure-specific estimate failures</h2>
+      <p class="muted" style="margin:0">Azure estimates break fastest when internet egress, private backbone paths, and premium SKU baselines are blended into one number too early.</p>
+      <ul class="muted" style="margin:12px 0 0; padding-left:18px">
+        <li>Networking models mix internet egress, regional traffic, and private connectivity before separating destinations.</li>
+        <li>Managed service estimates ignore premium tier baselines, reserved throughput, or feature-gated add-ons.</li>
+        <li>Observability costs are treated as tiny side items even when ingestion and retention are becoming first-order drivers.</li>
+        <li>Retry-heavy event and API workloads are budgeted from successful requests only.</li>
       </ul>
-      <p class="muted" style="margin:12px 0 0">
-        Start with effective rates and validate against billing exports before optimizing tiers.
-      </p>
     </section>
   </section>
 
-  <section class="card section">
-    <div class="muted" style="font-size:13px; margin-bottom:10px">
-      {azureGuides.length} Azure guides
-    </div>
-    <div class="grid">
-      {azureGuides.map((g) => (
-        <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-          <div class="tool-title">{g.title}</div>
-          <div class="tool-desc">{g.description}</div>
-        </a>
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Best first routes inside Azure</h2>
+    <div class="guide-cluster-grid" style="margin-top:14px">
+      {routeCards.map((card) => (
+        <div class="card2 guide-cluster-card">
+          <div class="guide-cluster-copy">
+            <div class="tool-title">{card.title}</div>
+            <div class="tool-desc">{card.description}</div>
+          </div>
+          <div class="btn-row guide-cluster-actions" style="margin-top:12px">
+            <a class="btn" href={card.guideHref}>Guide</a>
+            <a class="btn" href={card.toolHref}>Calculator</a>
+          </div>
+        </div>
       ))}
     </div>
   </section>
 
+  {azureGuideGroups.map((group) => (
+    <section class="card section" style="margin-top:18px">
+      <div class="prose">
+        <h2 style="margin-top:0">{group.title}</h2>
+        <p class="muted" style="margin:0">{group.description}</p>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        {group.items.map((guide) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(guide.canonicalPath)}>
+            <div class="tool-title">{guide.title}</div>
+            <div class="tool-desc">{guide.description}</div>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
   <section class="section">
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">When to skip this hub</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If the real issue is generic egress, logging, or storage math, start from the broader category guide first.</li>
+      <li>If you already know the exact Azure service and billing unit, go to the service page directly.</li>
+      <li>If you already have inputs, use <a href="/calculators/azure/">Azure calculators</a> first and come back for boundary review.</li>
+    </ul>
+  </section>
 </BaseLayout>
+
+<style>
+  .guide-cluster-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .guide-cluster-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .guide-cluster-copy {
+    flex: 1 1 auto;
+  }
+
+  .guide-cluster-actions {
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  .guide-cluster-actions .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .guide-cluster-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

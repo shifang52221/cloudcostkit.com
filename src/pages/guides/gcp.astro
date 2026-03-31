@@ -3,72 +3,208 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
 import { GUIDES } from "../../lib/guides.generated";
+import type { GuideLink } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
 const title = `GCP cost guides | ${SITE.name}`;
 const description =
-  "GCP cost estimation guides for storage, networking (egress/inter-zone), CDN, observability/logging, and core managed services.";
+  "GCP cost guide hub for routing into the right provider-specific estimate: transfer boundaries, serverless paths, observability growth, and storage or data platform drivers.";
 const slots = SITE.adsenseSlots;
 
-const gcpGuides = GUIDES.filter((g) => g.category === "GCP")
-  .slice()
-  .sort((a, b) => a.title.localeCompare(b.title));
+type GuideGroup = {
+  title: string;
+  description: string;
+  items: GuideLink[];
+};
+
+const gcpGuides = GUIDES.filter((g) => g.category === "GCP");
+
+function hasAnyTopic(guide: GuideLink, topics: string[]) {
+  return topics.some((topic) => guide.topics?.includes(topic));
+}
+
+function slugMatches(guide: GuideLink, parts: string[]) {
+  return parts.some((part) => guide.slug.includes(part));
+}
+
+function sortGuides(guides: GuideLink[]) {
+  return guides.slice().sort((a, b) => a.title.localeCompare(b.title));
+}
+
+const routeCards = [
+  {
+    title: "Transfer and edge",
+    description: "Start here when inter-zone, cross-region, CDN origin, or load-balancer traffic is the part most likely to distort the estimate.",
+    guideHref: "/guides/gcp-vpc-egress-costs/",
+    toolHref: "/calculators/data-egress-cost-calculator/",
+  },
+  {
+    title: "Serverless and request-heavy",
+    description: "Start here when Cloud Run, Cloud Functions, Pub/Sub, or retry multiplication is more important than the headline service price.",
+    guideHref: "/guides/gcp-cloud-run-pricing/",
+    toolHref: "/calculators/api-request-cost-calculator/",
+  },
+  {
+    title: "Storage, databases, and observability",
+    description: "Start here when Cloud Storage, Cloud SQL, BigQuery, Bigtable, Logging, or Monitoring are compounding in the background.",
+    guideHref: "/guides/gcp-cloud-storage-pricing/",
+    toolHref: "/calculators/log-cost-calculator/",
+  },
+];
+
+const gcpGuideGroups: GuideGroup[] = [
+  {
+    title: "Networking and delivery",
+    description: "Use these when transfer boundaries, traffic processed, or origin-vs-edge behavior are the real pricing problem.",
+    items: sortGuides(
+      gcpGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["cdn", "egress", "load-balancing"]) ||
+          slugMatches(guide, ["vpc-egress", "inter-zone", "load-balancing", "cloud-cdn", "cloud-nat", "private-service-connect"]),
+      ),
+    ),
+  },
+  {
+    title: "Runtime, analytics, and data services",
+    description: "Use these when managed runtime choice, workload shape, worker scaling, or database/storage growth is what actually moves the bill.",
+    items: sortGuides(
+      gcpGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["compute", "database", "serverless", "storage"]) ||
+          slugMatches(guide, ["cloud-run", "cloud-functions", "dataflow", "cloud-sql", "cloud-storage", "spanner", "bigquery", "bigtable"]),
+      ),
+    ),
+  },
+  {
+    title: "Observability, Kubernetes, and messaging",
+    description: "Use these when GKE overhead, logging growth, monitoring cardinality, or message delivery amplification is the part you need to validate next.",
+    items: sortGuides(
+      gcpGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["kubernetes", "logging", "messaging", "metrics", "requests"]) ||
+          slugMatches(guide, ["gke", "cloud-logging", "cloud-monitoring", "pubsub", "artifact-registry"]),
+      ),
+    ),
+  },
+].filter((group) => group.items.length);
 ---
 <BaseLayout title={title} description={description} canonicalPath="/guides/gcp" robots="noindex,follow">
   <section class="card hero">
     <h1>GCP cost guides</h1>
-    <p>Practical models to estimate common GCP line items and avoid the biggest cost traps.</p>
+    <p>Use this hub when the provider boundary is the real question, not just the category label.</p>
     <div class="btn-row" style="margin-top:12px">
-      <a class="btn" href="/guides/">All guides</a>
-      <a class="btn" href="/calculators/">Calculators</a>
+      <a class="btn btn-primary" href="/calculators/gcp/">GCP calculators</a>
       <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
       <a class="btn" href="/methodology/">Methodology</a>
+      <a class="btn" href="/guides/">All guides</a>
     </div>
   </section>
 
   <section class="grid" style="margin-top:18px">
     <section class="card section prose col-6">
-      <h2 style="margin-top:0">A simple GCP estimate</h2>
-      <ol class="muted" style="margin:10px 0 0; padding-left:18px">
-        <li>Start with requests/month and GB/month (egress + inter-zone).</li>
-        <li>Add storage (GB-month) and lifecycle/retention rules.</li>
-        <li>Add logs/metrics ingestion + retention + scan/query.</li>
-        <li>Validate boundaries (internet vs internal) and unit conversions.</li>
-      </ol>
-      <div class="btn-row" style="margin-top:12px">
-        <a class="btn" href="/calculators/networking/">Networking calculators</a>
-        <a class="btn" href="/calculators/logging/">Logging calculators</a>
-        <a class="btn" href="/calculators/storage/">Storage calculators</a>
-      </div>
+      <h2 style="margin-top:0">What this hub helps you route</h2>
+      <p class="muted" style="margin:0">
+        Start here when a GCP-specific path like inter-zone traffic, serverless retries, or managed analytics/storage
+        behavior needs to be separated before you can trust the estimate.
+      </p>
+      <ul class="muted" style="margin:12px 0 0; padding-left:18px">
+        <li>Pick the next guide by boundary first, not by whichever service name looks closest.</li>
+        <li>Move to calculators when you already have request, GB, GB-month, or runtime inputs.</li>
+        <li>Use the service guide directly once the provider-specific unit path is clear enough to model.</li>
+      </ul>
     </section>
     <section class="card section prose col-6">
-      <h2 style="margin-top:0">Common traps</h2>
-      <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-        <li>Under-modeling inter-zone and cross-region transfer.</li>
-        <li>High-cardinality metrics labels creating "quietly growing" bills.</li>
-        <li>Confusing CDN bandwidth with origin egress (cache fill).</li>
+      <h2 style="margin-top:0">GCP-specific estimate failures</h2>
+      <p class="muted" style="margin:0">GCP estimates usually drift when inter-zone transfer, serverless retry multiplication, and logging growth are modeled after the main service price instead of before it.</p>
+      <ul class="muted" style="margin:12px 0 0; padding-left:18px">
+        <li>Transfer paths are blended instead of separating internet, inter-zone, and cross-region movement.</li>
+        <li>Serverless estimates stop at successful requests and ignore retries, cold-start mitigation, or timeout spillover.</li>
+        <li>Observability is budgeted as a side effect even when label cardinality and query patterns are driving spend.</li>
+        <li>Storage and analytics workloads skip lifecycle, retention, and replay/backfill scenarios.</li>
       </ul>
-      <p class="muted" style="margin:12px 0 0">
-        Use a baseline + peak scenario and validate against a real week before making commitments.
-      </p>
     </section>
   </section>
 
-  <section class="card section">
-    <div class="muted" style="font-size:13px; margin-bottom:10px">
-      {gcpGuides.length} GCP guides
-    </div>
-    <div class="grid">
-      {gcpGuides.map((g) => (
-        <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-          <div class="tool-title">{g.title}</div>
-          <div class="tool-desc">{g.description}</div>
-        </a>
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Best first routes inside GCP</h2>
+    <div class="guide-cluster-grid" style="margin-top:14px">
+      {routeCards.map((card) => (
+        <div class="card2 guide-cluster-card">
+          <div class="guide-cluster-copy">
+            <div class="tool-title">{card.title}</div>
+            <div class="tool-desc">{card.description}</div>
+          </div>
+          <div class="btn-row guide-cluster-actions" style="margin-top:12px">
+            <a class="btn" href={card.guideHref}>Guide</a>
+            <a class="btn" href={card.toolHref}>Calculator</a>
+          </div>
+        </div>
       ))}
     </div>
   </section>
 
+  {gcpGuideGroups.map((group) => (
+    <section class="card section" style="margin-top:18px">
+      <div class="prose">
+        <h2 style="margin-top:0">{group.title}</h2>
+        <p class="muted" style="margin:0">{group.description}</p>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        {group.items.map((guide) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(guide.canonicalPath)}>
+            <div class="tool-title">{guide.title}</div>
+            <div class="tool-desc">{guide.description}</div>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
   <section class="section">
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">When to skip this hub</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If the estimate problem is still generic storage, egress, or logging math, start from the broader category guide.</li>
+      <li>If you already know the exact GCP service and cost unit, go straight to that page.</li>
+      <li>If you already have inputs, use <a href="/calculators/gcp/">GCP calculators</a> first and return here for boundary review.</li>
+    </ul>
+  </section>
 </BaseLayout>
+
+<style>
+  .guide-cluster-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .guide-cluster-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .guide-cluster-copy {
+    flex: 1 1 auto;
+  }
+
+  .guide-cluster-actions {
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  .guide-cluster-actions .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .guide-cluster-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
