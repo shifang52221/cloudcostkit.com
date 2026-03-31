@@ -26,11 +26,8 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p>
-    VPC endpoints are a common way to reduce NAT Gateway traffic and keep AWS-service access private. Cost modeling is
-    simple if you separate two concepts: <strong>endpoint-hours</strong> and <strong>data processed (GB)</strong>, plus
-    any data transfer boundaries in your architecture.
-  </p>
+  <p class="muted">Use this page when you need to decide what belongs inside the endpoint bill model before you argue about optimization.</p>
+  <p class="muted">This guide is about bill boundaries: endpoint-hours, GB processed, endpoint type, and the transfer or architecture costs that should be tracked beside endpoints rather than confused with them.</p>
 
   <h2>What to model (interface vs gateway endpoints)</h2>
   <ul>
@@ -47,6 +44,13 @@ const faqs = [
   <p class="muted">
     The same "private access" goal can be achieved with different endpoint types. Always model the endpoint line item and the transfer path together.
   </p>
+
+  <h2>Inside the endpoint bill vs outside the endpoint bill</h2>
+  <ul>
+    <li><strong>Inside the endpoint bill</strong>: interface endpoint-hours, per-GB processing where applicable, and endpoint-type differences that change the direct line item.</li>
+    <li><strong>Usually outside the endpoint bill</strong>: NAT charges that remain, cross-AZ transfer created by the path, and downstream service bills that endpoints merely expose or reroute.</li>
+    <li><strong>Why that boundary matters</strong>: teams often blame endpoints for the whole network bill when the real multiplier sits in path locality, transfer boundaries, or services still using NAT.</li>
+  </ul>
 
   <h2>Interface vs gateway endpoints: decision points</h2>
   <ul>
@@ -112,6 +116,13 @@ const faqs = [
     <li>Reconcile endpoint-hours in billing against endpoints * AZs * hours.</li>
     <li>Spot-check the top destinations and verify they are the services you intended to route through endpoints.</li>
     <li>After rollout, compare NAT GB processed and endpoint GB processed as a before/after sanity check.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is measuring endpoint inventory, AZ coverage, active hours, and GB sources, go to <a href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>.</li>
+    <li>If the hours and GB model is already believable and you now need operational changes, go to <a href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints cost optimization</a>.</li>
+    <li>If the main decision is endpoint versus NAT path economics rather than line-item scope, compare with <a href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs VPC endpoints</a>.</li>
   </ul>
 
   <h2>Related guides</h2>

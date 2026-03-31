@@ -26,10 +26,8 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    VPC endpoints are often deployed to reduce NAT costs and improve security. Cost optimization is mostly about reducing
-    the multipliers (endpoints x AZs) and validating your traffic path.
-  </p>
+  <p class="muted">Optimization starts only after the endpoint-hours and GB model is believable; otherwise teams cut the wrong endpoint or AZ and keep the real cost driver.</p>
+  <p class="muted">This page is for production intervention: endpoint consolidation, AZ right-sizing, traffic reduction, and locality fixes.</p>
 
   <h2>What to model (endpoint-hours + GB processed + transfer boundaries)</h2>
   <ul>
@@ -97,6 +95,13 @@ const faqs = [
     <li>Compare against <a href="/calculators/aws-nat-gateway-cost-calculator/">NAT Gateway cost</a> to find break-even.</li>
   </ul>
 
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You do not yet trust the endpoint inventory across VPCs, environments, and AZs.</li>
+    <li>You cannot separate steady-state GB from migrations, image pulls, retries, or other burst traffic.</li>
+    <li>You are still mixing endpoint line-item cost with NAT, cross-AZ transfer, and downstream service spend in one blended total.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Adding endpoints for every service without validating who uses them.</li>
@@ -111,6 +116,14 @@ const faqs = [
     <li>Reconcile endpoint-hours in billing against endpoints * AZs * hours.</li>
     <li>Spot-check "GB processed" with flow logs or NAT metrics to confirm the traffic moved as expected.</li>
     <li>After changes, re-check cross-AZ transfer usage. Endpoint changes can shift traffic paths.</li>
+  </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ul>
+    <li>Measure the current endpoint-hours and GB model first with <a href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>.</li>
+    <li>Change one main lever at a time: endpoint count, AZ coverage, GB path, or client locality.</li>
+    <li>Re-measure endpoint-hours, GB processed, NAT usage, and transfer paths before declaring the savings real.</li>
+    <li>Keep resiliency and routing checks beside cost checks so a cheaper path does not become a weaker or less predictable architecture.</li>
   </ul>
 
   <h2>Related guides</h2>
