@@ -29,10 +29,8 @@ const description =
     },
   ]}
 >
-  <p class="muted">
-    SQS costs are usually predictable: estimate monthly messages, convert to monthly requests, then multiply by $ per 1M
-    requests. Most surprises come from retries and extra receive/delete activity.
-  </p>
+  <p class="muted">Use this page when you still need to decide what belongs inside the SQS bill model before you argue about optimization.</p>
+  <p class="muted">This guide is about scope discipline: queue requests, retry amplification, polling tax, and the downstream services that should be budgeted beside SQS rather than confused with it.</p>
 
   <h2>What to model (SQS is request-driven)</h2>
   <ul>
@@ -48,6 +46,13 @@ const description =
     <li>
       <strong>Failure rate</strong>: retries and poison messages can turn a good estimate into an under-budget in a single day
     </li>
+  </ul>
+
+  <h2>Inside the SQS bill vs outside the SQS bill</h2>
+  <ul>
+    <li><strong>Inside the SQS bill</strong>: Send, Receive, Delete, visibility changes, retry-driven reprocessing, and queue-type or region pricing differences.</li>
+    <li><strong>Usually outside the SQS bill</strong>: Lambda or worker compute, downstream database writes, logging ingestion, and transfer charges created by the consumer path.</li>
+    <li><strong>Why that distinction matters</strong>: teams often blame SQS for total workflow spend when the queue charge is only the visible trigger, not the dominant line item.</li>
   </ul>
 
   <h2>1) Start with messages per month</h2>
@@ -123,6 +128,13 @@ const description =
     <li>In Cost Explorer / CUR, reconcile request usage against your modeled requests/month.</li>
     <li>In CloudWatch metrics, spot-check message age, receives, and errors around peak windows.</li>
     <li>Confirm your consumer behavior: visibility timeout, batching, and retry settings match what you modeled.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is turning observed message behavior into a defendable requests/month model, go to <a href="/guides/aws-sqs-estimate-requests/">Estimate SQS requests</a>.</li>
+    <li>If the request model is already believable and you now need operational fixes, go to <a href="/guides/aws-sqs-cost-optimization/">SQS cost optimization</a>.</li>
+    <li>If the real question is whether queueing is even the right architecture boundary, compare the adjacent messaging or downstream service stack before tuning SQS alone.</li>
   </ul>
 
   <h2>Related reading</h2>
