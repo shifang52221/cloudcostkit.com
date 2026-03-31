@@ -25,11 +25,8 @@ const description =
     },
   ]}
 >
-  <p>
-    API Gateway access logging is easy to enable, but at high request volume it can become a real bill line item. A good
-    estimate needs three parts: <strong>ingestion (GB/day)</strong>, <strong>retention (GB-month)</strong>, and{" "}
-    <strong>queries</strong> (if you run searches/analytics over the logs).
-  </p>
+  <p class="muted">This page is the logging-cost branch of the API Gateway cluster, not the core request-pricing page: it exists to model ingestion, retention, and query spend once you already know logging is a meaningful side bill.</p>
+  <p class="muted">If you are still deciding what belongs inside the API Gateway bill overall, go back to the pricing guide first.</p>
 
   <h2>Where the cost shows up</h2>
   <ul>
@@ -103,6 +100,13 @@ const description =
     </li>
   </ul>
 
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is measuring total API requests per month, go to <a href="/guides/aws-api-gateway-estimate-requests/">Estimate API requests per month</a>.</li>
+    <li>If you need to define what belongs inside the core API Gateway bill versus transfer, logs, and adjacent services, go to <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>.</li>
+    <li>If the request and transfer model is already believable and you now need production changes, go to <a href="/guides/aws-api-gateway-cost-optimization/">API Gateway cost optimization</a>.</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Validate requests/day from a representative window (include weekday/weekend patterns).</li>
@@ -114,6 +118,9 @@ const description =
   <h2>Related links</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost</a>
+    <a class="btn" href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a>
+    <a class="btn" href="/guides/aws-api-gateway-estimate-requests/">Estimate API requests</a>
+    <a class="btn" href="/guides/aws-api-gateway-cost-optimization/">API Gateway optimization</a>
     <a class="btn" href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>
     <a class="btn" href="/guides/aws-cloudwatch-logs-pricing/">CloudWatch Logs pricing</a>
     <a class="btn" href="/guides/log-costs/">Log costs (overview)</a>

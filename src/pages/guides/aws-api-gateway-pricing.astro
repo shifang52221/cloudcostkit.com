@@ -21,10 +21,8 @@ const description =
     },
   ]}
 >
-  <p>
-    API Gateway pricing is usually dominated by <strong>request charges</strong> plus <strong>data transfer</strong>.
-    Depending on API type and features, you may also see add-ons that matter for production workloads.
-  </p>
+  <p class="muted">Use this page when you need to decide what belongs inside the API Gateway bill model before you argue about optimization.</p>
+  <p class="muted">This guide is about bill boundaries: request charges, transfer-sensitive line items, API Gateway features, and the adjacent log, CDN, WAF, and downstream execution costs that should be tracked beside API Gateway rather than confused with it.</p>
 
   <h2>API Gateway pricing inputs</h2>
   <ul>
@@ -69,6 +67,13 @@ const description =
     </li>
   </ul>
 
+  <h2>Inside the API Gateway bill vs outside the API Gateway bill</h2>
+  <ul>
+    <li><strong>Inside the API Gateway bill</strong>: request charges, API type feature charges, caching if enabled inside API Gateway, and transfer-sensitive billing lines that are part of the API path you are modeling.</li>
+    <li><strong>Usually outside the API Gateway bill</strong>: CloudFront, WAF, access-log storage and query costs, Lambda execution, databases, queues, and other downstream workflow spend.</li>
+    <li><strong>Why that boundary matters</strong>: teams often blame API Gateway for the whole request path bill when the real multiplier sits in transfer shape, log verbosity, retries, or downstream execution.</li>
+  </ul>
+
   <h2>A fast model</h2>
   <p class="muted">
     Use <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway Cost Calculator</a> for a quick request +
@@ -111,6 +116,13 @@ const description =
     <li>Validate the primary driver with measured usage from a representative window.</li>
     <li>Confirm units (GB vs GiB) and request pricing units (per 10k vs per 1M).</li>
     <li>Re-check incident windows: retries/timeouts often multiply cost drivers.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is turning metrics, logs, RPS, automated traffic, and retries into a defendable requests-per-month model, go to <a href="/guides/aws-api-gateway-estimate-requests/">Estimate API requests per month</a>.</li>
+    <li>If the request and transfer model is already believable and you now need production changes, go to <a href="/guides/aws-api-gateway-cost-optimization/">API Gateway cost optimization</a>.</li>
+    <li>If the real question is whether access logs are the side bill that matters, go to <a href="/guides/aws-api-gateway-access-logs-cost/">API Gateway access logs cost</a> instead of blending logging into the core API price estimate.</li>
   </ul>
 
   <h2>Related tools</h2>

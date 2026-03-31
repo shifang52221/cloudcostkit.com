@@ -25,11 +25,8 @@ const description =
     },
   ]}
 >
-  <p>
-    If your cost driver is per request, you need a defensible <strong>requests/month</strong> number. The key is to
-    estimate from a measured source (metrics or logs) and include <strong>retries</strong> and{" "}
-    <strong>automated traffic</strong>.
-  </p>
+  <p class="muted">This page is the request-measurement workflow, not the bill-boundary page: the goal is to turn metrics, logs, RPS, automated traffic, and retries into a defendable requests-per-month model.</p>
+  <p class="muted">If you still are not sure which costs and traffic belong inside the API Gateway bill, go back to the pricing guide first.</p>
 
   <h2>Quick request count sources</h2>
   <ul>
@@ -88,6 +85,14 @@ const description =
     <li>Mixing environments (prod + staging) when you only want production.</li>
   </ul>
 
+  <h2>Evidence pack for a defendable API request model</h2>
+  <ul>
+    <li><strong>Primary source</strong>: which metrics, logs, or request counters were used as the base request signal.</li>
+    <li><strong>Automated traffic source</strong>: how health checks, bots, cron jobs, integrations, and other non-user traffic were identified instead of guessed.</li>
+    <li><strong>Retry source</strong>: where timeout-driven or SDK-driven retry inflation was measured for the busiest endpoints.</li>
+    <li><strong>Open uncertainty</strong>: any traffic slice still modeled loosely, such as staging bleed-through, missing logs, or poorly segmented endpoints.</li>
+  </ul>
+
   <h2>Next: turn volume into cost</h2>
   <p>
     Use <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway Cost Calculator</a> to translate requests
@@ -99,6 +104,13 @@ const description =
     <li>Cross-check at least two sources (metrics + logs, or metrics + analytics).</li>
     <li>Validate the busiest endpoints separately (they often dominate total requests).</li>
     <li>Confirm whether the request count includes cached hits (CDN) vs origin requests (API).</li>
+  </ul>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a> if your measurement work changes what you think belongs in the API Gateway bill versus transfer, logs, or downstream system cost.</li>
+    <li>Hand off to <a href="/guides/aws-api-gateway-cost-optimization/">API Gateway cost optimization</a> once the request model is stable enough to judge before and after changes.</li>
+    <li>Do not move into optimization with only guessed retries or guessed automated traffic if the busiest API path is still unclear.</li>
   </ul>
 
   <h2>Sources</h2>
