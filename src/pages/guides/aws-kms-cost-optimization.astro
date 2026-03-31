@@ -26,11 +26,8 @@ const faqs = [
   lastUpdated="2026-02-07"
   faqs={faqs}
 >
-  <p>
-    KMS cost optimization is usually not about reducing keys; it’s about reducing <strong>request volume</strong>. If you
-    have a hot-path decrypt, a “fetch secret per request” pattern, or too-frequent data key generation, request charges
-    can scale linearly with traffic. This checklist focuses on the high-leverage fixes that keep security intact.
-  </p>
+  <p class="muted">Optimization starts only after the KMS request model is believable; otherwise teams trim the wrong cache or batch and keep the real cost driver.</p>
+  <p class="muted">This page is for production intervention: caching, batching, key-generation frequency, retry control, and non-prod discipline.</p>
 
   <h2>KMS cost levers</h2>
   <ul>
@@ -87,6 +84,13 @@ const faqs = [
     <li>Track “KMS calls per 1M app requests” as a unit metric for regressions.</li>
   </ul>
 
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You do not yet trust which callers are generating most KMS requests.</li>
+    <li>You cannot separate normal request volume from retry storms, deploy spikes, or non-prod churn.</li>
+    <li>You are still mixing KMS line-item cost with the broader storage, compute, or secret-management bill in one blended number.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Reducing security controls to cut cost instead of reducing request volume safely.</li>
@@ -94,6 +98,14 @@ const faqs = [
     <li>Ignoring incident windows where retries multiply calls and dominate monthly totals.</li>
     <li>Optimizing prod but leaving non-prod always-on with the same high-frequency patterns.</li>
     <li>Not attributing top callers, so you can’t tell whether the change worked.</li>
+  </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ul>
+    <li>Measure the current KMS request model first with <a href="/guides/aws-kms-estimate-requests/">Estimate KMS requests per month</a>.</li>
+    <li>Change one main lever at a time: cache behavior, batching scope, key-generation frequency, retry policy, or non-prod schedule.</li>
+    <li>Re-measure top callers and KMS calls per unit before declaring the savings real.</li>
+    <li>Keep security and rotation checks beside cost checks so a cheaper KMS pattern does not become a weaker operating model.</li>
   </ul>
 
   <h2>Related tools and guides</h2>

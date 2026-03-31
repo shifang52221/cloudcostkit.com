@@ -20,11 +20,8 @@ const faqs = [
 ];
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-kms-pricing" lastUpdated="2026-02-07" faqs={faqs}>
-  <p>
-    KMS pricing is usually a combination of <strong>key-month</strong> charges and <strong>request</strong> charges. The
-    hard part is that many services use KMS “under the hood”, and request volume can come from application patterns you
-    don’t notice until the bill spikes. This page gives you a checklist for a realistic estimate.
-  </p>
+  <p class="muted">Use this page when you need to decide what belongs inside the KMS bill model before you argue about optimization.</p>
+  <p class="muted">This guide is about bill boundaries: key-months, request charges, service-triggered KMS calls, and the adjacent costs that should be tracked beside KMS rather than confused with it.</p>
 
   <h2>KMS pricing inputs</h2>
   <ul>
@@ -49,6 +46,13 @@ const faqs = [
   <p class="muted">
     Tool: <a href="/calculators/aws-kms-cost-calculator/">AWS KMS cost calculator</a>
   </p>
+
+  <h2>Inside the KMS bill vs outside the KMS bill</h2>
+  <ul>
+    <li><strong>Inside the KMS bill</strong>: key-month charges, Encrypt or Decrypt or GenerateDataKey style request charges, and service-triggered KMS calls that still land on KMS usage.</li>
+    <li><strong>Usually outside the KMS bill</strong>: the storage, compute, or secret-management service costs that happen to call KMS as part of a broader workflow.</li>
+    <li><strong>Why that boundary matters</strong>: teams often blame KMS for the whole workflow bill when the real multiplier sits in caller behavior or the adjacent service pattern.</li>
+  </ul>
 
   <h2>Step 1: inventory keys (it’s usually the easy part)</h2>
   <ul>
@@ -99,6 +103,13 @@ const faqs = [
     <li>In Cost Explorer/CUR, filter to KMS and group by usage type to confirm key-month vs request drivers.</li>
     <li>Use CloudTrail event history for KMS API calls to identify top callers and operations.</li>
     <li>Compare “requests per app request” before/after changes (caching, batching, retries).</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is turning workload units and caller behavior into a defendable request model, go to <a href="/guides/aws-kms-estimate-requests/">Estimate KMS requests per month</a>.</li>
+    <li>If the request model is already believable and you now need production changes, go to <a href="/guides/aws-kms-cost-optimization/">KMS cost optimization</a>.</li>
+    <li>If the real question is which caller or service is creating the volume, use the estimate workflow before treating KMS pricing as solved.</li>
   </ul>
 
   <h2>Related guides</h2>
