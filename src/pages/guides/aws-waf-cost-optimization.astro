@@ -25,10 +25,8 @@ const description =
     },
   ]}
 >
-  <p>
-    Most WAF savings come from reducing the <strong>volume</strong> and the <strong>blast radius</strong> of evaluated
-    requests, and from avoiding rule/ACL sprawl across many apps and environments.
-  </p>
+  <p class="muted">Optimization starts only after the evaluated-request model is believable; otherwise teams trim the wrong control and keep the real cost driver.</p>
+  <p class="muted">This page is for production intervention: caching strategy, rate limits, rule consolidation, and logging controls.</p>
 
   <h2>What to model (WAF + the hidden log bill)</h2>
   <ul>
@@ -84,6 +82,13 @@ const description =
     <li>Compare: WAF vs log storage/search costs if you enable full logging.</li>
   </ul>
 
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You do not yet trust the evaluated-request baseline for a representative normal window.</li>
+    <li>You cannot separate normal traffic from attack, scraper, or bot-wave traffic.</li>
+    <li>You are still mixing WAF line-item cost with logging, storage, SIEM, and query-analysis spend in one blended number.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Optimizing the WAF line item while ignoring the logging and analysis bill.</li>
@@ -98,6 +103,14 @@ const description =
     <li>Reconcile evaluated requests and rule counts against the bill in Cost Explorer / CUR.</li>
     <li>Compare baseline vs peak windows (incidents, bot waves) and keep the peak scenario in your budget.</li>
     <li>Validate security outcomes: false positives/negatives should not worsen after cost optimizations.</li>
+  </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ul>
+    <li>Measure the current evaluated-request model first with <a href="/guides/aws-waf-estimate-requests/">Estimate WAF requests</a>.</li>
+    <li>Change one main lever at a time: caching coverage, rate limits, rule scope, ACL sprawl, or logging policy.</li>
+    <li>Re-measure baseline and attack windows before declaring the savings real.</li>
+    <li>Keep security outcome checks beside cost checks so a cheaper WAF path does not become a weaker defense.</li>
   </ul>
 
   <h2>Related guides</h2>

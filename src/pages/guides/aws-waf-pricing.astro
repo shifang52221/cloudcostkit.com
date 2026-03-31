@@ -21,10 +21,8 @@ const description =
     },
   ]}
 >
-  <p>
-    AWS WAF-style pricing is usually a combination of <strong>fixed monthly baselines</strong> (Web ACLs + rules) plus a{" "}
-    <strong>request-based charge</strong> that scales with total evaluated requests.
-  </p>
+  <p class="muted">Use this page when you need to decide what belongs inside the WAF bill model before you argue about optimization.</p>
+  <p class="muted">This guide is about budget boundaries: Web ACLs, rules, evaluated requests, and the downstream logging or SIEM costs that should be tracked beside WAF rather than confused with it.</p>
 
   <h2>What to model (baseline + variable)</h2>
   <ul>
@@ -44,6 +42,13 @@ const description =
   <p class="muted">
     The two most common budgeting failures are (1) modeling only the baseline and missing request spikes and (2) paying a second bill for logs and analysis.
   </p>
+
+  <h2>Inside the WAF bill vs outside the WAF bill</h2>
+  <ul>
+    <li><strong>Inside the WAF bill</strong>: Web ACL baselines, rule or managed-rule coverage, and evaluated requests including blocked traffic during attack windows.</li>
+    <li><strong>Usually outside the WAF bill</strong>: log delivery, retention, query scans, SIEM ingestion, and analyst workflows triggered by WAF events.</li>
+    <li><strong>Why that boundary matters</strong>: teams often blame WAF for total security-observability spend when the real multiplier sits in downstream logging and investigation.</li>
+  </ul>
 
   <h2>A fast estimate (baseline + spike)</h2>
   <p class="muted">
@@ -99,6 +104,13 @@ const description =
     <li>Reconcile evaluated requests against the bill for the same window (baseline week + spike window).</li>
     <li>Confirm rule/ACL inventory matches what is deployed (copy/paste ACL sprawl is common).</li>
     <li>Verify logging controls: sampling, retention, and dashboard query windows.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is turning real traffic and attack windows into a defendable evaluated-request model, go to <a href="/guides/aws-waf-estimate-requests/">Estimate WAF requests</a>.</li>
+    <li>If the model is already believable and you now need operational changes, go to <a href="/guides/aws-waf-cost-optimization/">WAF cost optimization</a>.</li>
+    <li>If you are investigating a specific surge window, use <a href="/guides/aws-waf-cost-spikes-during-attacks/">WAF cost spikes during attacks</a> instead of treating every month like the same pattern.</li>
   </ul>
 
   <h2>Related guides</h2>
