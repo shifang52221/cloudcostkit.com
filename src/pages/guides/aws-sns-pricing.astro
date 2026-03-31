@@ -20,11 +20,8 @@ const faqs = [
 ];
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-sns-pricing" lastUpdated="2026-01-27" faqs={faqs}>
-  <p>
-    SNS cost models are easiest when you treat them as <strong>publishes</strong> plus <strong>deliveries</strong>. The
-    key idea: deliveries can be much larger than publishes because of fan-out, and retries can multiply delivery
-    attempts during failures. This page is a checklist for a realistic estimate.
-  </p>
+  <p class="muted">Use this page when you need to decide what belongs inside the SNS bill model before you argue about optimization.</p>
+  <p class="muted">This guide is about bill boundaries: publishes, deliveries, fan-out and retry-driven SNS cost, and the adjacent downstream costs that should be tracked beside SNS rather than confused with it.</p>
 
   <h2>What to include in the model</h2>
   <ul>
@@ -37,6 +34,13 @@ const faqs = [
   <p class="muted">
     Tool: <a href="/calculators/aws-sns-cost-calculator/">AWS SNS cost calculator</a>
   </p>
+
+  <h2>Inside the SNS bill vs outside the SNS bill</h2>
+  <ul>
+    <li><strong>Inside the SNS bill</strong>: publish requests, delivery attempts, fan-out expansion, and retry-driven SNS usage during failure windows.</li>
+    <li><strong>Usually outside the SNS bill</strong>: downstream SQS, HTTP, logging, or application processing costs that happen after SNS has already delivered or attempted delivery.</li>
+    <li><strong>Why that boundary matters</strong>: teams often blame SNS for the whole notification workflow bill when the real multiplier sits in subscriber design or downstream systems.</li>
+  </ul>
 
   <h2>Step 1: estimate publishes</h2>
   <ul>
@@ -78,6 +82,13 @@ const faqs = [
     <li>Compare publishes and deliveries from a representative week to your baseline model.</li>
     <li>Check delivery failure rate; if failures are non-trivial, expect higher effective deliveries.</li>
     <li>Validate fan-out after filters: are you delivering broadly when you intended narrow topics?</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If your main problem is turning publishes, matched subscribers, and retries into a defendable delivery model, go to <a href="/guides/aws-sns-estimate-deliveries/">Estimate SNS deliveries per month</a>.</li>
+    <li>If the delivery model is already believable and you now need production changes, go to <a href="/guides/aws-sns-cost-optimization/">SNS cost optimization</a>.</li>
+    <li>If the real question is whether downstream consumers or topic design are creating the cost, use the estimate workflow before treating SNS pricing as solved.</li>
   </ul>
 
   <h2>Worked estimate template (copy/paste)</h2>

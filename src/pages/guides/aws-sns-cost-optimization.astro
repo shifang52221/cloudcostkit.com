@@ -30,11 +30,8 @@ const faqs = [
   lastUpdated="2026-02-07"
   faqs={faqs}
 >
-  <p>
-    SNS costs are usually delivery-driven. The fastest way to save is to reduce <strong>deliveries</strong> (fan-out) and
-    reduce <strong>retries</strong> (failures and timeouts). This playbook focuses on changes that reduce spend without
-    breaking message semantics.
-  </p>
+  <p class="muted">Optimization starts only after the SNS delivery model is believable; otherwise teams trim the wrong topic or filter and keep the real cost driver.</p>
+  <p class="muted">This page is for production intervention: topic split, filter policies, endpoint repair, dedupe, and rate limits.</p>
 
   <h2>SNS cost levers</h2>
   <ul>
@@ -98,6 +95,13 @@ const faqs = [
     Tool: <a href="/calculators/aws-sns-cost-calculator/">SNS cost calculator</a>
   </p>
 
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You do not yet trust matched fan-out by topic after filters are applied.</li>
+    <li>You cannot separate normal delivery volume from retry-heavy or alert-storm windows.</li>
+    <li>You are still mixing SNS line-item cost with downstream SQS, HTTP, logging, or application costs in one blended total.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Reducing publishes but leaving fan-out unchanged (deliveries stay high).</li>
@@ -105,6 +109,14 @@ const faqs = [
     <li>Ignoring failures; retries can dominate “quiet” topics during incidents.</li>
     <li>Building alert systems without dedupe/rate limits (inevitable storm later).</li>
     <li>Not removing stale subscriptions (they create ongoing failure/retry cost).</li>
+  </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ul>
+    <li>Measure the current SNS delivery model first with <a href="/guides/aws-sns-estimate-deliveries/">Estimate SNS deliveries per month</a>.</li>
+    <li>Change one main lever at a time: topic split, filter policy, endpoint fix, dedupe, or rate limit.</li>
+    <li>Re-measure publishes, deliveries, failure rate, and matched fan-out before declaring the savings real.</li>
+    <li>Keep subscriber correctness checks beside cost checks so a cheaper SNS pattern does not become a broken notification path.</li>
   </ul>
 
   <h2>Related guides</h2>
