@@ -26,11 +26,8 @@ const faqs = [
   lastUpdated="2026-02-07"
   faqs={faqs}
 >
-  <p>
-    SNS costs are usually delivery-driven, so you need a good delivery estimate. The easiest model is fan-out:
-    <strong>publishes x matched subscribers</strong>. The mistake is to use subscriber count without accounting for filter
-    policies and retries. This guide shows a workflow that gets you close quickly and stays valid when incidents happen.
-  </p>
+  <p class="muted">This page is the delivery-measurement workflow, not the bill-boundary page: the goal is to turn publishes, matched fan-out, and retries into a defendable delivery model.</p>
+  <p class="muted">If you still are not sure which costs and traffic belong inside the SNS bill, go back to the pricing guide first.</p>
 
   <h2>Delivery estimate inputs</h2>
   <ul>
@@ -110,12 +107,27 @@ const faqs = [
     <li>Re-check after architecture changes (topic splits, new subscribers, new endpoints).</li>
   </ul>
 
+  <h2>Evidence pack for a defendable SNS delivery model</h2>
+  <ul>
+    <li><strong>Publish source</strong>: where publishes per topic came from, including prod versus non-prod and incident windows.</li>
+    <li><strong>Matched fan-out source</strong>: how subscriber count, filter policies, and match rate were measured instead of guessed.</li>
+    <li><strong>Retry source</strong>: where failure rate and repeated delivery attempts were observed for each protocol.</li>
+    <li><strong>Open uncertainty</strong>: anything still modeled loosely, such as alert-storm intensity, endpoint reliability, or duplicated topics.</li>
+  </ul>
+
   <h2>Related guides</h2>
   <div class="btn-row">
     <a class="btn" href="/guides/aws-sns-pricing/">SNS pricing checklist</a>
     <a class="btn" href="/guides/aws-sns-cost-optimization/">SNS cost optimization</a>
     <a class="btn" href="/guides/aws-sqs-vs-sns-cost/">SQS vs SNS</a>
   </div>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-sns-pricing/">SNS pricing</a> if your measurement work changes what you think belongs in the SNS bill versus the downstream system bill.</li>
+    <li>Hand off to <a href="/guides/aws-sns-cost-optimization/">SNS cost optimization</a> once the delivery model is stable enough to judge before and after changes.</li>
+    <li>Do not move into optimization with only guessed match rate or guessed retry factor if the biggest topic is still unclear.</li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>
