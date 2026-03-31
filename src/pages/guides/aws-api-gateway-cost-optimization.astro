@@ -25,11 +25,8 @@ const description =
     },
   ]}
 >
-  <p>
-    API Gateway bills scale with <strong>requests</strong> and often <strong>bytes transferred</strong>. The fastest
-    savings come from identifying the dominant driver, then applying targeted fixes that reduce one (or both) without
-    breaking correctness.
-  </p>
+  <p class="muted">Optimization starts only after the API request and transfer model is believable; otherwise teams cache or compress the wrong path and keep the real cost driver.</p>
+  <p class="muted">This page is for production intervention: caching, batching, retry control, payload reduction, and traffic-shape fixes.</p>
 
   <h2>Step 0: identify the dominant driver</h2>
   <ul>
@@ -47,6 +44,13 @@ const description =
     If you don’t know which dominates, model all three with a quick estimate, then validate against a real week of
     measured usage.
   </p>
+
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You do not yet trust the split between user traffic, automated traffic, retries, and incident spikes.</li>
+    <li>You cannot tell whether requests, transfer, or logs are the dominant cost driver for the busiest API paths.</li>
+    <li>You are still mixing API Gateway line items with CDN, WAF, logging, or downstream execution costs in one blended total.</li>
+  </ul>
 
   <h2>1) Reduce request volume (without losing functionality)</h2>
   <ul>
@@ -115,6 +119,14 @@ const description =
     Use <a href="/calculators/aws-api-gateway-cost-calculator/">API Gateway cost calculator</a> to quantify savings from
     reduced requests or smaller payload sizes.
   </p>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ul>
+    <li>Measure the current request and transfer model first with <a href="/guides/aws-api-gateway-estimate-requests/">Estimate API requests per month</a>.</li>
+    <li>Change one major lever at a time: caching, batching, retry policy, payload reduction, or endpoint shape.</li>
+    <li>Re-measure requests, transferred bytes, retry rate, and cache behavior before declaring the savings real.</li>
+    <li>Keep correctness and latency checks beside cost checks so a cheaper API pattern does not become a broken production path.</li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
