@@ -30,11 +30,8 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p>
-    SES budgets depend on one input: <strong>emails per month</strong>. The trick is that “normal week” and “incident week”
-    behave very differently. This guide gives you a simple model for baseline volume plus a peak/incident factor so you
-    don’t get surprised.
-  </p>
+  <p class="muted">This page is the send-measurement workflow, not the bill-boundary page: the goal is to turn product events, campaign calendars, recipient counts, and resend behavior into a defendable email-volume model.</p>
+  <p class="muted">If you still are not sure which costs and traffic belong inside the SES bill, go back to the pricing guide first.</p>
 
   <h2>Step 1: split volume by intent (because variability differs)</h2>
   <ul>
@@ -86,6 +83,14 @@ const faqs = [
     <li>Do you have a “silent resend” job that retries failed deliveries in bulk?</li>
   </ul>
 
+  <h2>Evidence pack for a defendable SES volume model</h2>
+  <ul>
+    <li><strong>Event source</strong>: where transactional email counts came from, including orders, signups, resets, alerts, or other user-triggered flows.</li>
+    <li><strong>Campaign source</strong>: where marketing send counts came from, including campaign calendars, segment splits, tests, and resend policy.</li>
+    <li><strong>Resend source</strong>: where retry, duplicate, or outage-driven send inflation was observed instead of guessed.</li>
+    <li><strong>Open uncertainty</strong>: anything still modeled loosely, such as silent resend jobs, missing event instrumentation, or temporary incident patterns.</li>
+  </ul>
+
   <h2>Worked example (structure)</h2>
   <ul>
     <li>Transactional: 200k orders/month × 1 email/order = 200k</li>
@@ -115,6 +120,13 @@ const faqs = [
     <a class="btn" href="/guides/aws-ses-cost-optimization/">SES cost optimization</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost estimation checklist</a>
   </div>
+
+  <h2>What this page should hand off next</h2>
+  <ul>
+    <li>Hand off to <a href="/guides/aws-ses-pricing/">SES pricing</a> if your measurement work changes what you think belongs in the SES bill versus the surrounding workflow bill.</li>
+    <li>Hand off to <a href="/guides/aws-ses-cost-optimization/">SES cost optimization</a> once the send model is stable enough to judge before and after changes.</li>
+    <li>Do not move into optimization with only guessed resend rate or guessed incident volume if the biggest send driver is still unclear.</li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>
