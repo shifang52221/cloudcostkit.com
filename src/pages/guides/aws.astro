@@ -2,475 +2,257 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE } from "../../config/site";
 import AdSlot from "../../components/AdSlot.astro";
+import { GUIDES } from "../../lib/guides.generated";
+import type { GuideLink } from "../../lib/guides.generated";
+import { withTrailingSlash } from "../../lib/url";
 
 const title = `AWS cost guides | ${SITE.name}`;
 const description =
-  "AWS cost estimation guides for CloudFront, EKS, EC2, S3, VPC data transfer, and CloudWatch-style logging.";
+  "AWS cost guide hub for routing into the right estimating workflow: networking, runtime, storage, observability, messaging, and service-specific budgeting traps.";
 const slots = SITE.adsenseSlots;
+
+type GuideGroup = {
+  title: string;
+  description: string;
+  items: GuideLink[];
+};
+
+const awsGuides = GUIDES.filter((g) => g.category === "AWS");
+
+function hasAnyTopic(guide: GuideLink, topics: string[]) {
+  return topics.some((topic) => guide.topics?.includes(topic));
+}
+
+function slugMatches(guide: GuideLink, parts: string[]) {
+  return parts.some((part) => guide.slug.includes(part));
+}
+
+function sortGuides(guides: GuideLink[]) {
+  return guides.slice().sort((a, b) => a.title.localeCompare(b.title));
+}
+
+const routeCards = [
+  {
+    title: "Transfer-heavy bill",
+    description: "Start here when NAT, CDN origin, PrivateLink, cross-AZ, or Route 53 style traffic is the real source of uncertainty.",
+    guideHref: "/guides/aws-network-costs/",
+    guideLabel: "Network cost hub",
+    toolHref: "/calculators/data-egress-cost-calculator/",
+    toolLabel: "Egress calculator",
+  },
+  {
+    title: "Runtime-heavy bill",
+    description: "Start here when the hard question is EC2 vs Fargate vs Lambda vs ECS/EKS, not just the hourly rate on one service page.",
+    guideHref: "/guides/aws-fargate-pricing/",
+    guideLabel: "Runtime guide",
+    toolHref: "/calculators/aws-fargate-vs-ec2-cost-calculator/",
+    toolLabel: "Runtime compare",
+  },
+  {
+    title: "Storage-growth-heavy bill",
+    description: "Start here when storage, backups, snapshots, retention, or replication is compounding quietly month over month.",
+    guideHref: "/guides/aws-rds-pricing/",
+    guideLabel: "Storage and data guide",
+    toolHref: "/calculators/database-storage-growth-cost-calculator/",
+    toolLabel: "Growth calculator",
+  },
+  {
+    title: "Observability-heavy bill",
+    description: "Start here when Logs, Insights, Metrics, Alarms, or CloudTrail spend is growing faster than the workload itself.",
+    guideHref: "/guides/aws-cloudwatch-logs-pricing/",
+    guideLabel: "Observability guide",
+    toolHref: "/calculators/log-cost-calculator/",
+    toolLabel: "Log calculator",
+  },
+  {
+    title: "Request-heavy bill",
+    description: "Start here when retries, polling, fan-out, API calls, or request-unit math is the part most likely to make the estimate wrong.",
+    guideHref: "/guides/aws-sqs-pricing/",
+    guideLabel: "Request-driven guide",
+    toolHref: "/calculators/api-request-cost-calculator/",
+    toolLabel: "Request calculator",
+  },
+];
+
+const awsGuideGroups: GuideGroup[] = [
+  {
+    title: "Networking and delivery",
+    description: "Use these when transfer boundaries, edge services, endpoint hours, or traffic shape are the main source of cost risk.",
+    items: sortGuides(
+      awsGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["cdn", "egress", "load-balancing"]) ||
+          slugMatches(guide, ["route-53", "nat", "vpc", "privatelink", "cloudfront", "alb", "api-gateway"]),
+      ),
+    ),
+  },
+  {
+    title: "Runtime and platform",
+    description: "Use these when the estimate depends on runtime choice, idle capacity, autoscaling behavior, or cluster overhead.",
+    items: sortGuides(
+      awsGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["compute", "kubernetes", "serverless"]) ||
+          slugMatches(guide, ["ec2", "lambda", "fargate", "ecs", "eks"]),
+      ),
+    ),
+  },
+  {
+    title: "Storage and data",
+    description: "Use these when stored GB-month, retention, backups, snapshots, replication, or database growth are likely to dominate.",
+    items: sortGuides(
+      awsGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["backup", "database", "storage"]) ||
+          slugMatches(guide, ["s3", "rds", "aurora", "ebs", "dynamodb", "ecr", "glacier"]),
+      ),
+    ),
+  },
+  {
+    title: "Observability and operations",
+    description: "Use these when logs, metrics, alarms, dashboards, or audit event volume are drifting faster than expected.",
+    items: sortGuides(
+      awsGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["logging", "metrics"]) ||
+          slugMatches(guide, ["cloudwatch", "cloudtrail", "logs", "metrics", "alarm"]),
+      ),
+    ),
+  },
+  {
+    title: "Messaging, security, and request multipliers",
+    description: "Use these when deliveries, polling, retries, crypto calls, WAF traffic, or request-unit amplification is the real problem.",
+    items: sortGuides(
+      awsGuides.filter(
+        (guide) =>
+          hasAnyTopic(guide, ["messaging", "requests", "security"]) ||
+          slugMatches(guide, ["sqs", "sns", "ses", "kms", "secrets", "ssm", "waf"]),
+      ),
+    ),
+  },
+].filter((group) => group.items.length);
 ---
-<BaseLayout title={title} description={description} canonicalPath="/guides/aws">
+<BaseLayout title={title} description={description} canonicalPath="/guides/aws" robots="noindex,follow">
   <section class="card hero">
     <h1>AWS cost guides</h1>
-    <p>Short, practical notes to estimate common AWS line items and avoid pricing pitfalls.</p>
-  </section>
-
-  <section class="card section">
-    <div class="grid">
-      <a class="card2 tool col-6" href="/guides/aws-cloudfront-pricing/">
-        <div class="tool-title">CloudFront pricing (how to model)</div>
-        <div class="tool-desc">Bandwidth, requests, tiers, and common pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudfront-cache-hit-rate/">
-        <div class="tool-title">Cache hit rate and origin egress</div>
-        <div class="tool-desc">Estimate origin egress from cache behavior.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudfront-invalidation-pricing/">
-        <div class="tool-title">CloudFront invalidation pricing</div>
-        <div class="tool-desc">When invalidations matter and how to estimate volume.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudfront-logs-cost/">
-        <div class="tool-title">CloudFront logs cost</div>
-        <div class="tool-desc">Estimate log storage, retention, and query costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-eks-pricing/">
-        <div class="tool-title">EKS pricing (what to include)</div>
-        <div class="tool-desc">Control plane, nodes, and surrounding line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-eks-control-plane-cost/">
-        <div class="tool-title">EKS control plane cost</div>
-        <div class="tool-desc">When it matters and how to avoid multi-cluster cost traps.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-eks-node-sizing/">
-        <div class="tool-title">EKS node sizing</div>
-        <div class="tool-desc">Requests vs limits, overhead, and packing caveats.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-pricing/">
-        <div class="tool-title">S3 pricing (storage, requests, egress)</div>
-        <div class="tool-desc">A practical cost model for object storage.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-storage-classes/">
-        <div class="tool-title">S3 storage classes</div>
-        <div class="tool-desc">Archive tradeoffs: retrieval, transitions, and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-request-costs/">
-        <div class="tool-title">S3 request costs</div>
-        <div class="tool-desc">When GET/PUT/LIST becomes meaningful.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-data-transfer/">
-        <div class="tool-title">S3 data transfer costs</div>
-        <div class="tool-desc">Egress, cross-region access, and surprises.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-replication-pricing/">
-        <div class="tool-title">S3 replication pricing</div>
-        <div class="tool-desc">Estimate replicated GB/month and extra storage.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-vpc-data-transfer/">
-        <div class="tool-title">VPC data transfer</div>
-        <div class="tool-desc">Cross-zone/region patterns and how to estimate.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cross-az-data-transfer-cost/">
-        <div class="tool-title">Cross-AZ transfer cost</div>
-        <div class="tool-desc">Common sources and how to estimate GB/month.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-nat-gateway-cost/">
-        <div class="tool-title">NAT gateway cost</div>
-        <div class="tool-desc">Why NAT bills spike and how to estimate traffic.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-nat-gateway-estimate-gb-processed/">
-        <div class="tool-title">Estimate NAT GB processed</div>
-        <div class="tool-desc">From metrics/flow logs or from Mbps charts.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-nat-gateway-cost-optimization/">
-        <div class="tool-title">NAT cost optimization</div>
-        <div class="tool-desc">Reduce GB processed and avoid retry storms.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">
-        <div class="tool-title">NAT vs VPC endpoints (cost)</div>
-        <div class="tool-desc">When endpoints beat NAT GB processed and how to model it.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-network-costs/">
-        <div class="tool-title">AWS network cost hub</div>
-        <div class="tool-desc">NAT, endpoints/PrivateLink, and data transfer: what to model.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-vpc-endpoints-pricing/">
-        <div class="tool-title">VPC endpoints pricing</div>
-        <div class="tool-desc">Interface vs gateway endpoints: what to model.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-privatelink-pricing/">
-        <div class="tool-title">PrivateLink pricing</div>
-        <div class="tool-desc">Endpoint-hours, data processed, and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">
-        <div class="tool-title">Estimate endpoint-hours and GB</div>
-        <div class="tool-desc">How to estimate inputs for endpoint cost models.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-vpc-endpoints-cost-optimization/">
-        <div class="tool-title">VPC endpoints cost optimization</div>
-        <div class="tool-desc">Reduce endpoint-hours, traffic, and transfer pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-privatelink-cost-optimization/">
-        <div class="tool-title">PrivateLink cost optimization</div>
-        <div class="tool-desc">Control endpoint sprawl, hours, and GB processed.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-load-balancer-cost/">
-        <div class="tool-title">Load balancer cost</div>
-        <div class="tool-desc">Hourly + traffic-based components to remember.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-load-balancer-lcu-explained/">
-        <div class="tool-title">LCU/NLCU explained</div>
-        <div class="tool-desc">How capacity units drive load balancer bills.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-load-balancer-estimate-lcu/">
-        <div class="tool-title">Estimate LCU from metrics</div>
-        <div class="tool-desc">New connections, active connections, bytes processed, and rule evals.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-alb-vs-nlb-cost/">
-        <div class="tool-title">ALB vs NLB cost</div>
-        <div class="tool-desc">A practical checklist: LCU vs NLCU drivers and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-load-balancer-cost-optimization/">
-        <div class="tool-title">Load balancer cost optimization</div>
-        <div class="tool-desc">Reduce LB count and unit usage.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-pricing/">
-        <div class="tool-title">API Gateway pricing</div>
-        <div class="tool-desc">Requests, transfer, and the add-ons to model.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-access-logs-cost/">
-        <div class="tool-title">API Gateway access logs cost</div>
-        <div class="tool-desc">Estimate ingestion + retention and reduce log spend.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-estimate-requests/">
-        <div class="tool-title">Estimate API requests/month</div>
-        <div class="tool-desc">Convert RPS or logs into monthly volume.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-api-gateway-cost-optimization/">
-        <div class="tool-title">API Gateway cost optimization</div>
-        <div class="tool-desc">Cut requests, bytes, and retry-driven spikes.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudtrail-pricing/">
-        <div class="tool-title">CloudTrail pricing</div>
-        <div class="tool-desc">What to model: management vs data events + downstream.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudtrail-estimate-events/">
-        <div class="tool-title">Estimate CloudTrail events</div>
-        <div class="tool-desc">Fast methods to approximate monthly event volume.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudtrail-cost-optimization/">
-        <div class="tool-title">CloudTrail cost optimization</div>
-        <div class="tool-desc">Reduce high-volume drivers and downstream waste.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-waf-pricing/">
-        <div class="tool-title">WAF pricing</div>
-        <div class="tool-desc">ACLs, rules, requests, and downstream costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-waf-estimate-requests/">
-        <div class="tool-title">Estimate WAF requests</div>
-        <div class="tool-desc">From RPS/metrics/logs, plus bot spike buffers.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-waf-cost-optimization/">
-        <div class="tool-title">WAF cost optimization</div>
-        <div class="tool-desc">Reduce evaluated requests and rule sprawl.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-waf-cost-spikes-during-attacks/">
-        <div class="tool-title">WAF cost spikes during attacks</div>
-        <div class="tool-desc">How to budget request surges and avoid surprise bills.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-waf-vs-cloudflare-waf-cost/">
-        <div class="tool-title">AWS WAF vs Cloudflare WAF cost</div>
-        <div class="tool-desc">Compare request pricing, baselines, and logging/analytics.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecr-pricing/">
-        <div class="tool-title">ECR pricing</div>
-        <div class="tool-desc">Storage + transfer cost model for container registries.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecr-estimate-storage-gb-month/">
-        <div class="tool-title">Estimate ECR storage</div>
-        <div class="tool-desc">GB-month model from image size and retention.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecr-cost-optimization/">
-        <div class="tool-title">ECR cost optimization</div>
-        <div class="tool-desc">Retention, smaller images, fewer pulls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-route-53-pricing/">
-        <div class="tool-title">Route 53 pricing</div>
-        <div class="tool-desc">Zones, query volume, health checks.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-route-53-estimate-dns-queries/">
-        <div class="tool-title">Estimate DNS queries</div>
-        <div class="tool-desc">From metrics/logs, plus TTL and retry drivers.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-route-53-cost-optimization/">
-        <div class="tool-title">Route 53 cost optimization</div>
-        <div class="tool-desc">Reduce query volume and zone sprawl.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-glacier-pricing/">
-        <div class="tool-title">Glacier/Deep Archive pricing</div>
-        <div class="tool-desc">Storage, retrieval, and minimum duration rules.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-glacier-estimate-retrieval/">
-        <div class="tool-title">Estimate retrieval volume</div>
-        <div class="tool-desc">Model retrieval GB and retrieval requests.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-s3-glacier-cost-optimization/">
-        <div class="tool-title">Archive cost optimization</div>
-        <div class="tool-desc">Reduce restores, request volume, and penalties.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sns-pricing/">
-        <div class="tool-title">SNS pricing</div>
-        <div class="tool-desc">Publishes, deliveries, and fan-out.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sns-estimate-deliveries/">
-        <div class="tool-title">Estimate SNS deliveries</div>
-        <div class="tool-desc">Messages x subscribers x filters (plus retries).</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sns-cost-optimization/">
-        <div class="tool-title">SNS cost optimization</div>
-        <div class="tool-desc">Reduce deliveries, retries, and alert storms.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ses-pricing/">
-        <div class="tool-title">SES pricing</div>
-        <div class="tool-desc">Send volume, payload size, and add-ons.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ses-estimate-email-volume/">
-        <div class="tool-title">Estimate email volume</div>
-        <div class="tool-desc">Transactional + marketing, plus retry factors.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ses-cost-optimization/">
-        <div class="tool-title">SES cost optimization</div>
-        <div class="tool-desc">Reduce volume, retries, and payload.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-kms-pricing/">
-        <div class="tool-title">KMS pricing</div>
-        <div class="tool-desc">Key-months and request-based charges.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-kms-estimate-requests/">
-        <div class="tool-title">Estimate KMS requests</div>
-        <div class="tool-desc">Find the biggest request drivers.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-kms-cost-optimization/">
-        <div class="tool-title">KMS cost optimization</div>
-        <div class="tool-desc">Reduce request volume safely.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ssm-parameter-store-pricing/">
-        <div class="tool-title">Parameter Store pricing</div>
-        <div class="tool-desc">Advanced parameters and request-based charges.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ssm-parameter-store-estimate-api-calls/">
-        <div class="tool-title">Estimate Parameter Store calls</div>
-        <div class="tool-desc">Model GetParameter volume and churn effects.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ssm-parameter-store-cost-optimization/">
-        <div class="tool-title">Parameter Store cost optimization</div>
-        <div class="tool-desc">Reduce API calls safely with caching.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-secrets-manager-pricing/">
-        <div class="tool-title">Secrets Manager pricing</div>
-        <div class="tool-desc">Secret-month baseline and request charges.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-secrets-manager-estimate-api-calls/">
-        <div class="tool-title">Estimate secret API calls</div>
-        <div class="tool-desc">Model GetSecretValue volume and churn effects.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-secrets-manager-cost-optimization/">
-        <div class="tool-title">Secrets cost optimization</div>
-        <div class="tool-desc">Reduce API calls safely with caching.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-logs-pricing/">
-        <div class="tool-title">CloudWatch Logs pricing</div>
-        <div class="tool-desc">Ingestion, retention, and cost-control levers.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-logs-insights-pricing/">
-        <div class="tool-title">Logs Insights pricing</div>
-        <div class="tool-desc">Scan costs, query patterns, and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb/">
-        <div class="tool-title">Estimate scanned GB</div>
-        <div class="tool-desc">Estimate Logs Insights scanned GB/day.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-logs-insights-cost-optimization/">
-        <div class="tool-title">Logs Insights optimization</div>
-        <div class="tool-desc">Reduce scanned GB and query frequency.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-metrics-pricing/">
-        <div class="tool-title">CloudWatch metrics pricing</div>
-        <div class="tool-desc">High-cardinality pitfalls and series costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-metrics-estimate-custom-metrics/">
-        <div class="tool-title">Estimate custom metrics</div>
-        <div class="tool-desc">Quick methods to estimate custom metrics count.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-metrics-cost-optimization/">
-        <div class="tool-title">Metrics cost optimization</div>
-        <div class="tool-desc">Reduce cardinality, alarms, dashboards, and polling.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-dashboards-pricing/">
-        <div class="tool-title">CloudWatch dashboards pricing</div>
-        <div class="tool-desc">How to estimate dashboard-month costs and prevent sprawl.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">
-        <div class="tool-title">Estimate metrics API requests</div>
-        <div class="tool-desc">Dashboard refresh and polling cost models.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-alarms-pricing/">
-        <div class="tool-title">CloudWatch Alarms pricing</div>
-        <div class="tool-desc">Alarm-month model and what else to include.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-alarms-estimate-alarm-count/">
-        <div class="tool-title">Estimate alarm count</div>
-        <div class="tool-desc">Inventory alarms and avoid alarm sprawl.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-alarms-cost-optimization/">
-        <div class="tool-title">Alarms cost optimization</div>
-        <div class="tool-desc">Reduce alarm sprawl and high-res usage.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-lambda-pricing/">
-        <div class="tool-title">Lambda pricing (what to include)</div>
-        <div class="tool-desc">Requests, duration x memory, and the hidden line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-fargate-pricing/">
-        <div class="tool-title">Fargate pricing (what to include)</div>
-        <div class="tool-desc">vCPU-hours + GB-hours, plus load balancers, logs, and transfer.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-fargate-vs-eks-cost/">
-        <div class="tool-title">Fargate vs EKS cost</div>
-        <div class="tool-desc">A practical checklist: unit economics, overhead, and hidden line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-fargate-vs-ec2-cost/">
-        <div class="tool-title">Fargate vs EC2 cost</div>
-        <div class="tool-desc">Compare compute, idle capacity, and the hidden line items.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-lambda-vs-fargate-cost/">
-        <div class="tool-title">Lambda vs Fargate cost</div>
-        <div class="tool-desc">Compare unit economics and steady vs bursty workloads.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-pricing/">
-        <div class="tool-title">ECS pricing</div>
-        <div class="tool-desc">ECS on EC2 vs ECS on Fargate: what to include.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-cost-model-beyond-compute/">
-        <div class="tool-title">ECS cost model (beyond compute)</div>
-        <div class="tool-desc">The checklist: LBs, logs, NAT/egress, cross-AZ, storage.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-ec2-vs-fargate-cost/">
-        <div class="tool-title">ECS on EC2 vs Fargate cost</div>
-        <div class="tool-desc">A practical checklist for compute, idle capacity, and hidden costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-task-sizing/">
-        <div class="tool-title">ECS task sizing</div>
-        <div class="tool-desc">Pick CPU/memory and estimate task count with headroom.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-autoscaling-cost-pitfalls/">
-        <div class="tool-title">ECS autoscaling cost pitfalls</div>
-        <div class="tool-desc">Noisy signals, oscillation, retries, and hidden costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ecs-vs-eks-cost/">
-        <div class="tool-title">ECS vs EKS cost</div>
-        <div class="tool-desc">A consistent checklist for compute, overhead, and add-ons.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-lambda-cost-optimization/">
-        <div class="tool-title">Lambda cost optimization</div>
-        <div class="tool-desc">Reduce duration, right-size memory, and cut log costs.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-lambda-concurrency-and-cold-starts/">
-        <div class="tool-title">Concurrency and cold starts</div>
-        <div class="tool-desc">Cost pitfalls: retries, tail latency, and incident loops.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-rds-pricing/">
-        <div class="tool-title">RDS pricing (what to include)</div>
-        <div class="tool-desc">Compute, storage, backups, I/O, and common pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-aurora-pricing/">
-        <div class="tool-title">Aurora pricing (what to include)</div>
-        <div class="tool-desc">Compute, storage, backups, and workload scenarios.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-aurora-serverless-v2-pricing/">
-        <div class="tool-title">Aurora Serverless v2 pricing</div>
-        <div class="tool-desc">Estimate ACU-hours and model peaks.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-rds-vs-aurora-cost/">
-        <div class="tool-title">RDS vs Aurora cost</div>
-        <div class="tool-desc">A fair checklist to compare compute, storage, and retention.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-rds-backups-and-snapshots/">
-        <div class="tool-title">RDS backups and snapshots</div>
-        <div class="tool-desc">How to estimate backup GB-month from churn and retention.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-rds-backup-storage-gb-month-estimate/">
-        <div class="tool-title">Estimate backup GB-month</div>
-        <div class="tool-desc">A simple churn x retention model for budgeting.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-rds-snapshot-retention-policy-cost/">
-        <div class="tool-title">Snapshot retention policy (cost)</div>
-        <div class="tool-desc">Safe defaults, lifecycle, and cost traps to avoid.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-rds-cost-optimization/">
-        <div class="tool-title">RDS cost optimization</div>
-        <div class="tool-desc">Right-size compute, control growth, and tune retention.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-dynamodb-pricing/">
-        <div class="tool-title">DynamoDB pricing (what to include)</div>
-        <div class="tool-desc">Reads, writes, storage, and the common cost pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-dynamodb-rcu-wcu-explained/">
-        <div class="tool-title">DynamoDB RCU/WCU explained</div>
-        <div class="tool-desc">Understand capacity drivers for better estimates.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-dynamodb-cost-optimization/">
-        <div class="tool-title">DynamoDB cost optimization</div>
-        <div class="tool-desc">Reduce request volume, item size, and retries.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-pricing/">
-        <div class="tool-title">EBS pricing (what to include)</div>
-        <div class="tool-desc">Storage, performance charges, snapshots, and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-gp2-vs-gp3-cost/">
-        <div class="tool-title">gp2 vs gp3 cost</div>
-        <div class="tool-desc">When gp3 saves money and how to avoid unused performance spend.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-snapshot-cost/">
-        <div class="tool-title">EBS snapshot cost</div>
-        <div class="tool-desc">Estimate snapshot storage from churn and retention.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-gp3-iops-throughput/">
-        <div class="tool-title">EBS gp3 IOPS and throughput</div>
-        <div class="tool-desc">How to budget performance without overpaying.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-ebs-cost-optimization/">
-        <div class="tool-title">EBS cost optimization</div>
-        <div class="tool-desc">Right-size volumes, performance, and snapshots.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sqs-pricing/">
-        <div class="tool-title">SQS pricing (what to include)</div>
-        <div class="tool-desc">Requests, retries, Receive/Delete patterns, and pitfalls.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sqs-vs-sns-cost/">
-        <div class="tool-title">SQS vs SNS cost</div>
-        <div class="tool-desc">Compare unit economics, fan-out, retries, and payload size.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sqs-estimate-requests/">
-        <div class="tool-title">Estimate SQS requests</div>
-        <div class="tool-desc">Convert messages and retries into billable requests.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-sqs-cost-optimization/">
-        <div class="tool-title">SQS cost optimization</div>
-        <div class="tool-desc">Reduce requests per message and avoid retry storms.</div>
-      </a>
-      <a class="card2 tool col-6" href="/guides/aws-cost-checklist/">
-        <div class="tool-title">AWS cost checklist</div>
-        <div class="tool-desc">A one-page checklist for budgeting.</div>
-      </a>
+    <p>This page is an AWS routing layer: use it to choose the next estimating job, not to replace the deeper service guide you actually need.</p>
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn btn-primary" href="/calculators/aws/">AWS calculators</a>
+      <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Estimation checklist</a>
+      <a class="btn" href="/methodology/">Methodology</a>
+      <a class="btn" href="/editorial-policy/">Editorial policy</a>
     </div>
   </section>
+
+  <section class="grid" style="margin-top:18px">
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">What this hub is for</h2>
+      <p class="muted" style="margin:0">
+        Start here when you already know the problem is AWS-specific, but you do not yet know which billing path is the
+        one that needs the next review.
+      </p>
+      <ul class="muted" style="margin:12px 0 0; padding-left:18px">
+        <li>Use it to pick the next guide by cost shape, not by keyword similarity.</li>
+        <li>Use the deeper service guide once the main line item is clear.</li>
+        <li>Switch to the calculator when you have measurable drivers and need a first-pass number.</li>
+      </ul>
+    </section>
+    <section class="card section prose col-6">
+      <h2 style="margin-top:0">What usually breaks AWS estimates</h2>
+      <p class="muted" style="margin:0">
+        AWS estimates usually fail when traffic boundaries, retries, observability growth, or backup/replication
+        effects are added after the service price instead of before it.
+      </p>
+      <ul class="muted" style="margin:12px 0 0; padding-left:18px">
+        <li>Transfer is mixed together before internet, cross-AZ, cross-region, and endpoint paths are separated.</li>
+        <li>Runtime comparisons ignore the line items around the runtime: logs, load balancers, storage, and idle waste.</li>
+        <li>Storage estimates use end-of-month size and skip churn, retention, or replica copies.</li>
+        <li>Request-heavy systems hide retries, polling, fan-out, and incident amplification inside one blended average.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Start with the bill shape that is already causing uncertainty</h2>
+    <p class="muted" style="margin:0">Start with the bill shape that is already causing uncertainty: transfer-heavy, runtime-heavy, storage-growth-heavy, observability-heavy, or request-heavy.</p>
+    <div class="guide-cluster-grid" style="margin-top:14px">
+      {routeCards.map((card) => (
+        <div class="card2 guide-cluster-card">
+          <div class="guide-cluster-copy">
+            <div class="tool-title">{card.title}</div>
+            <div class="tool-desc">{card.description}</div>
+          </div>
+          <div class="btn-row guide-cluster-actions" style="margin-top:12px">
+            <a class="btn" href={card.guideHref}>{card.guideLabel}</a>
+            <a class="btn" href={card.toolHref}>{card.toolLabel}</a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {awsGuideGroups.map((group) => (
+    <section class="card section" style="margin-top:18px">
+      <div class="prose">
+        <h2 style="margin-top:0">{group.title}</h2>
+        <p class="muted" style="margin:0">{group.description}</p>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        {group.items.map((guide) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(guide.canonicalPath)}>
+            <div class="tool-title">{guide.title}</div>
+            <div class="tool-desc">{guide.description}</div>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
 
   <section class="section">
     <AdSlot slot={slots.guidesMid} minHeight={280} />
   </section>
 
   <section class="card section prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Related calculators</h2>
-    <p class="muted" style="margin:0">
-      Browse <a href="/calculators/aws/">AWS calculators</a> for hands-on estimates.
-    </p>
+    <h2 style="margin-top:0">When to skip this hub</h2>
+    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
+      <li>If a service-specific page already matches your real billing question, go there directly.</li>
+      <li>If you already have inputs and need a number, start with <a href="/calculators/aws/">AWS calculators</a>.</li>
+      <li>If the real issue is not provider-specific yet, start from <a href="/guides/">all guides</a> or a general category page.</li>
+    </ul>
   </section>
 </BaseLayout>
+
+<style>
+  .guide-cluster-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .guide-cluster-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .guide-cluster-copy {
+    flex: 1 1 auto;
+  }
+
+  .guide-cluster-actions {
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  .guide-cluster-actions .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .guide-cluster-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
