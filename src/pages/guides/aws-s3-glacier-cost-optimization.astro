@@ -30,18 +30,29 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    Archive storage is optimized for rare reads. If you frequently restore, you may be better served by a warmer tier or
-    by changing workflow patterns so you do fewer restores.
-  </p>
-
-  <h2>Start with the real lever: reduce restores</h2>
   <p>
-    Glacier/Deep Archive is not "cheap storage" if you repeatedly rehydrate the same data. Cost optimization is mostly a workflow problem:
-    avoid restores, reduce restored GB, and reduce the number of objects you retrieve.
+    Optimization starts only after you know whether restore frequency, small-object fan-out, minimum-duration churn, or wrong-tier placement is the real archive cost driver; otherwise teams batch or re-tier blindly without removing the real waste.
+  </p>
+  <p>
+    This page is for production intervention: restore discipline, object packaging, lifecycle control, tier placement, and restore-SLA protection.
   </p>
 
-  <h2>1) Reduce restores and rehydration</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
+  <ul>
+    <li><strong>Restore frequency dominates</strong>: the same datasets are repeatedly brought back because workflow demand is too frequent for archive storage.</li>
+    <li><strong>Small-object fan-out dominates</strong>: request counts are exploding because retrieval touches too many tiny objects.</li>
+    <li><strong>Minimum-duration churn dominates</strong>: short-lived archived data is paying cold-tier penalties without staying cold long enough.</li>
+    <li><strong>Wrong-tier placement dominates</strong>: a workload that behaves like warm storage is living in an archive tier.</li>
+  </ul>
+
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether restore frequency, object fan-out, minimum-duration churn, or tier fit is the larger driver.</li>
+    <li>You only have one blended archive number with no split between storage, retrieval volume, request count, and duration exposure.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing retrieval evidence.</li>
+  </ul>
+
+  <h2>1) Reduce unnecessary restores and rehydration</h2>
   <ul>
     <li>Cache restored datasets for a short time instead of re-restoring repeatedly.</li>
     <li>For frequent analytics, consider a warmer storage class or a separate analysis copy.</li>
@@ -51,7 +62,7 @@ const faqs = [
     Practical pattern: keep "hot last 30 days" in a warm tier, keep long retention in archive, and only restore when you have a concrete job that needs it.
   </p>
 
-  <h2>2) Reduce small-object request volume</h2>
+  <h2>2) Reduce small-object request fan-out</h2>
   <ul>
     <li>Package small files into larger objects when it fits the access pattern.</li>
     <li>Batch retrieval and avoid per-file interactive restores.</li>
@@ -61,27 +72,27 @@ const faqs = [
     Retrieval is billed on both GB and requests. The same 1 TB restored can be a few hundred objects or tens of millions of objects - and the request bill is very different.
   </p>
 
-  <h2>3) Avoid minimum duration and early deletion penalties</h2>
+  <h2>3) Control minimum-duration churn</h2>
   <ul>
     <li>Be mindful of minimum storage duration rules when deleting/overwriting.</li>
     <li>Use lifecycle policies intentionally to avoid churn-driven early deletion.</li>
     <li>Keep short-lived data out of tiers with long minimum duration.</li>
   </ul>
 
-  <h2>4) Choose a retrieval strategy (do not treat restores as "free")</h2>
+  <h2>4) Fix wrong-tier placement</h2>
   <ul>
     <li>
       <strong>Batch work</strong>: do restores as a scheduled job, not ad-hoc clicks that restore the same data repeatedly.
     </li>
     <li>
-      <strong>Restore scope</strong>: restore only the prefixes/partitions you need for the job, not the entire archive.
+      <strong>Restore scope</strong>: restore only the prefixes or partitions you need for the job, not the entire archive.
     </li>
     <li>
       <strong>Restore frequency</strong>: if you restore weekly, you may not be an archive workload anymore.
     </li>
   </ul>
 
-  <h2>5) Quantify changes (before you implement)</h2>
+  <h2>Quantify changes before you implement them</h2>
   <p>
     Use <a href="/calculators/aws-s3-glacier-cost-calculator/">S3 Glacier / Deep Archive Cost Calculator</a> to estimate
     savings from fewer restores or fewer retrieval requests.
@@ -97,6 +108,14 @@ const faqs = [
       Use the calculator's <strong>Save scenario</strong> to compare the two without losing inputs.
     </li>
   </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across restore frequency, object fan-out, minimum-duration churn, and tier placement.</li>
+    <li>Make one production change at a time, such as reducing restore cadence, repackaging objects, changing lifecycle rules, or moving one workflow to a warmer tier.</li>
+    <li>Re-measure the same restore and request windows and confirm the bill moved for the reason you expected.</li>
+    <li>Verify restore SLA, downstream analysis workflow, and operator usability still meet requirements before keeping the change.</li>
+  </ol>
 
   <h2>Common pitfalls (what breaks cost savings)</h2>
   <ul>
