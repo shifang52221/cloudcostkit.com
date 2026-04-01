@@ -22,99 +22,77 @@ const description =
   ]}
 >
   <p>
-    ECR costs are easiest to estimate with a two-part model: <strong>storage (GB-month)</strong> plus{" "}
-    <strong>transfer</strong>. The right answer depends heavily on your retention policy and where your workloads run
-    (same region vs cross-region vs internet).
+    Use this page when you need to decide what belongs inside the ECR bill before you debate retention policy, image slimming, or pull reduction.
+  </p>
+  <p class="muted">
+    This guide is about bill boundaries: registry storage, ECR-native transfer, replication-linked storage duplication, and the adjacent NAT, workload-side, or network-path costs that should be tracked beside the ECR bill rather than blended into it.
   </p>
 
-  <h2>1) Storage (GB-month): how many images you keep</h2>
+  <h2>Inside the ECR bill vs beside the ECR bill</h2>
   <ul>
     <li>
-      Storage grows with tags retained and average image size, not with how often you deploy.
+      <strong>Inside the ECR bill</strong>: registry storage, ECR transfer charges, and storage duplication created by replication strategy.
     </li>
     <li>
-      CI pipelines that push many tags/day create fast growth without retention policies.
+      <strong>Beside the ECR bill</strong>: NAT gateway processing, internet or inter-region network path costs outside the registry line item, and workload-side pull amplification.
     </li>
     <li>
-      Multi-arch images can duplicate stored bytes if you keep separate variants per architecture.
+      <strong>Why this distinction matters</strong>: teams often blame ECR for architecture-side network costs that should be budgeted beside the registry bill, not hidden inside it.
     </li>
   </ul>
-  <p class="muted">
-    Guide: <a href="/guides/aws-ecr-estimate-storage-gb-month/">estimate ECR storage (GB-month)</a>.
-  </p>
 
-  <h2>2) Transfer: where pulls happen matters</h2>
+  <h2>What to model on the registry bill itself</h2>
   <ul>
     <li>
-      Pulls in the <strong>same region</strong> are usually cheaper than cross-region pulls.
+      <strong>Stored GB-month</strong>: how many retained image bytes live in the registry over the month.
     </li>
     <li>
-      Cross-region replication can reduce pull transfer but increases storage (you store multiple copies).
+      <strong>Transfer inside the ECR scope</strong>: image movement that the registry itself bills for, tied to where workloads and replicas pull from.
     </li>
     <li>
-      Internet paths and NAT gateways can add additional cost layers in real architectures.
+      <strong>Replication-linked storage duplication</strong>: copies created because you keep the same artifacts in more than one place.
+    </li>
+    <li>
+      <strong>Bill ownership</strong>: whether the spend belongs to the registry bill itself or to the workload and network path consuming that registry.
     </li>
   </ul>
-  <p class="muted">
-    If you use private subnets, include NAT gateway processed GB as a separate line item.
-  </p>
 
-  <h2>A fast estimation workflow</h2>
-  <ol>
-    <li>Estimate storage: average image size × retained images (by repo class).</li>
-    <li>Estimate pull volume: pulls/day × average image size (and cache hit behavior).</li>
-    <li>Apply your effective $/GB-month and $/GB transfer for the actual traffic path.</li>
-    <li>Validate with a real week of pull patterns (CI + cluster autoscaling days).</li>
-  </ol>
+  <h2>Boundary choices that change ownership</h2>
+  <ul>
+    <li>
+      <strong>Pull path</strong>: same-region pulls, cross-region pulls, internet paths, and private-subnet paths do not belong to the same budget bucket.
+    </li>
+    <li>
+      <strong>Replication strategy</strong>: replication can reduce some pull-path costs while increasing registry-side storage duplication.
+    </li>
+    <li>
+      <strong>Runner and cluster location</strong>: where CI runners and workloads live determines whether the cost story is registry-native, network-adjacent, or both.
+    </li>
+  </ul>
+
+  <h2>How to gather inputs without mixing jobs</h2>
+  <ul>
+    <li><strong>Storage input</strong>: bring in the defendable GB-month model from the estimate page instead of counting repo history here.</li>
+    <li><strong>Transfer input</strong>: separate registry-side transfer from workload-side network costs before assigning ownership.</li>
+    <li><strong>Adjacency list</strong>: list NAT, cross-region network, and rollout-side pull amplification beside the ECR bill instead of hiding them in one blended number.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>Go to <a href="/guides/aws-ecr-estimate-storage-gb-month/">estimate ECR storage (GB-month)</a> if you still need to measure repo classes, image sizes, push frequency, or retention windows.</li>
+    <li>Go to <a href="/guides/aws-ecr-cost-optimization/">ECR cost optimization</a> if you already know the cost owner and need production changes such as retention enforcement or pull-path cleanup.</li>
+  </ul>
+
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-ecr-cost-calculator/">ECR cost calculator</a>
-    <a class="btn" href="/guides/aws-ecr-cost-optimization/">ECR cost optimization</a>
+    <a class="btn" href="/guides/aws-ecr-estimate-storage-gb-month/">Estimate storage</a>
   </div>
-
-  <h2>Common spike drivers</h2>
-  <ul>
-    <li>
-      <strong>No retention</strong>: old tags accumulate forever.
-    </li>
-    <li>
-      <strong>Frequent rebuilds</strong>: pushing many images/day grows storage quickly.
-    </li>
-    <li>
-      <strong>Cluster scaling</strong>: new nodes pull images repeatedly (cold cache).
-    </li>
-    <li>
-      <strong>Cross-region pulls</strong>: replication and multi-region clusters change transfer costs.
-    </li>
-  </ul>
-
-  <h2>How to estimate pull transfer (fast model)</h2>
-  <ul>
-    <li>
-      Pull GB/day ~= (pulls/day) × (avg image size GB) × (1 - cache hit rate)
-    </li>
-    <li>
-      If nodes re-pull on every deploy, your effective cache hit rate can be near zero during busy windows.
-    </li>
-    <li>
-      Include CI separately: CI often pulls more frequently than production.
-    </li>
-  </ul>
-  <p class="muted">
-    Transfer is a boundary problem. If your pulls go through NAT or cross-region, model those paths explicitly.
-  </p>
-
-  <h2>Retention policy vs rollback needs (practical)</h2>
-  <ul>
-    <li>CI tags: keep a short window (days) and rely on rebuildability.</li>
-    <li>Release tags: keep a longer window (weeks/months) for rollbacks.</li>
-    <li>Base images: pin carefully; a few large images can dominate storage.</li>
-  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate storage with a few representative repos (image size and retention window).</li>
-    <li>Validate transfer boundary: same region vs cross-region vs internet makes a huge difference.</li>
-    <li>Validate pull behavior during autoscaling and CI bursts (not just steady state).</li>
+    <li>Validate that storage and transfer inputs belong to the ECR bill rather than to an adjacent network or workload bill.</li>
+    <li>Validate transfer boundary explicitly: same region vs cross-region vs internet vs private-subnet NAT changes ownership and attribution.</li>
+    <li>Validate replication assumptions so duplicated storage is not mistaken for ordinary retention drift.</li>
   </ul>
 
   <h2>Sources</h2>
