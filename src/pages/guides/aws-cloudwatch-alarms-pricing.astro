@@ -22,32 +22,32 @@ const description =
   ]}
 >
   <p>
-    CloudWatch alarms pricing is straightforward once you model the right unit: <strong>alarm-month</strong>. Most
-    estimation mistakes come from mixing alarm types or ignoring short-lived environments that still generate billable
-    alarm-months.
+    Use this page when you need to decide what belongs inside the CloudWatch alarms bill before you debate alarm deletion, consolidation, or notification cleanup.
+  </p>
+  <p class="muted">
+    This guide is about bill boundaries: standard alarms, high-resolution alarms, composite alarms, and the adjacent notification, metrics, and dashboard costs that should be tracked beside the alarm bill rather than blended into it.
   </p>
 
-  <h2>Alarm pricing inputs</h2>
+  <h2>Inside the alarms bill vs beside the alarms bill</h2>
   <ul>
-    <li><strong>Standard alarms</strong>: count per metric and dimension.</li>
-    <li><strong>High-res</strong>: 1-minute or 10-second alarms.</li>
-    <li><strong>Composite</strong>: add-on charges by count.</li>
+    <li><strong>Inside the alarms bill</strong>: standard alarm-months, high-resolution alarm-months, and composite alarm-months.</li>
+    <li><strong>Beside the alarms bill</strong>: SNS delivery, SMS/email, chat routing, extra metrics, dashboards, and other observability plumbing triggered by the alarming setup.</li>
+    <li><strong>Why this distinction matters</strong>: teams often blame alarm pricing for downstream alert-delivery or metric costs that belong to adjacent services.</li>
   </ul>
 
-
-  <h2>What to include in an estimate</h2>
+  <h2>What to model on the bill itself</h2>
   <ul>
     <li>
-      <strong>Standard alarm-months</strong>
+      <strong>Standard alarm-months</strong>: baseline alarm inventory at the default evaluation level.
     </li>
     <li>
-      <strong>High-resolution alarm-months</strong> (if used)
+      <strong>High-resolution alarm-months</strong>: a separate bucket when faster detection materially changes outcomes.
     </li>
     <li>
-      <strong>Composite alarm-months</strong> (if used)
+      <strong>Composite alarm-months</strong>: rollups that can reduce paging noise but still create billable inventory.
     </li>
     <li>
-      <strong>Downstream notifications</strong>: SNS topics, SMS, email, chat webhooks (separate services)
+      <strong>Bill ownership</strong>: whether the real spend belongs to CloudWatch alarm inventory or to the delivery and observability stack around it.
     </li>
   </ul>
   <div class="btn-row">
@@ -55,13 +55,35 @@ const description =
     <a class="btn" href="/guides/aws-cloudwatch-alarms-estimate-alarm-count/">Estimate alarm count</a>
   </div>
 
-  <h2>A fast modeling workflow</h2>
-  <ol>
-    <li>Count current alarms by type (standard/high-res/composite).</li>
-    <li>Convert ephemeral environments into time-weighted alarm-months.</li>
-    <li>Apply your region pricing to each alarm type.</li>
-    <li>Add notification delivery costs separately (if meaningful for your volume).</li>
-  </ol>
+  <h2>Scope choices that change the bill boundary</h2>
+  <ul>
+    <li><strong>Alarm type mix</strong>: standard, high-resolution, and composite alarms should be budgeted in separate buckets.</li>
+    <li><strong>Environment policy</strong>: production and non-production inventories should not be blended before you understand who owns the spend.</li>
+    <li><strong>Notification path</strong>: alert delivery belongs beside the alarm bill once SNS, SMS, email, or chat integrations take over.</li>
+  </ul>
+
+  <h2>How to get inputs without mixing jobs</h2>
+  <ul>
+    <li><strong>Alarm inventory</strong>: bring in a defendable alarm-month model from the estimate page instead of doing the full counting workflow here.</li>
+    <li><strong>Environment weighting</strong>: keep ephemeral and non-prod alarm packs visible before deciding whether they belong in the same budget bucket.</li>
+    <li><strong>Adjacent services</strong>: list SNS, dashboards, and extra metrics separately so the alarms bill stays clean.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li><strong>You still need inventory evidence</strong>: go to <a href="/guides/aws-cloudwatch-alarms-estimate-alarm-count/">Estimate CloudWatch alarm count</a> if the real problem is turning inventory, IaC, template rules, and ephemeral environments into a defendable alarm-month model.</li>
+    <li><strong>You already know the dominant driver</strong>: go to <a href="/guides/aws-cloudwatch-alarms-cost-optimization/">CloudWatch alarms cost optimization</a> if the real question is what to change in production.</li>
+  </ul>
+
+  <h2>A fast pricing structure (alarms + adjacent services)</h2>
+  <p class="muted">
+    Use <a href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarm cost calculator</a> for CloudWatch-native alarm inventory, then add notification and observability costs separately.
+  </p>
+  <ul>
+    <li>CloudWatch-native: standard, high-resolution, and composite alarm-months by your effective regional pricing.</li>
+    <li>Adjacent services: SNS delivery, SMS/email/chat, extra metrics, and dashboards.</li>
+    <li>Scenario split: keep stable months separate from PR-heavy or experimentation-heavy months.</li>
+  </ul>
 
   <h2>How to separate alarm types (so rates are applied correctly)</h2>
   <ul>
@@ -72,19 +94,9 @@ const description =
       <strong>Composite alarms</strong>: count them separately; composites are useful to reduce paging noise but still add alarm-months.
     </li>
     <li>
-      <strong>Non-prod</strong>: model prod and non-prod separately; many teams can reduce non-prod alarm packs safely.
+      <strong>Non-prod</strong>: budget prod and non-prod separately before you start asking which alarms should survive optimization.
     </li>
   </ul>
-
-  <h2>Worked example (alarm-month math)</h2>
-  <ul>
-    <li>Production: 300 standard alarms active all month -> 300 alarm-months</li>
-    <li>PR envs: 40 alarms per env, ~10 envs active per day -> 400 alarms/day</li>
-    <li>Monthly PR alarm-months ~= 400 * 30.4 / 30.4 ~= 400 alarm-months</li>
-  </ul>
-  <p class="muted">
-    This is why “small” PR environments can dominate alarm-months if they create the full production alarm pack.
-  </p>
 
   <h2>Don't forget adjacent costs</h2>
   <ul>
@@ -96,36 +108,27 @@ const description =
     </li>
   </ul>
 
-  <h2>Common pitfalls</h2>
+  <h2>Common bill-boundary mistakes</h2>
   <ul>
-    <li>
-      <strong>Per-instance alarms at scale</strong>: alarm count grows with fleet size.
-    </li>
-    <li>
-      <strong>Full alarm packs in PR environments</strong>: short-lived stacks still add alarm-months.
-    </li>
-    <li>
-      <strong>Duplicate monitoring stacks</strong>: two tools create equivalent alarms for the same incident.
-    </li>
-    <li>
-      <strong>Ignoring notification plumbing</strong>: SMS and high-volume messaging can be a separate cost driver.
-    </li>
+    <li>Using the pricing page to do the full alarm inventory workflow instead of separating scope from measurement.</li>
+    <li>Blending SNS delivery, metrics, or dashboards into the core alarm line item.</li>
+    <li>Ignoring non-production ownership and then comparing mixed alarm inventories to a production-only budget.</li>
+    <li>Treating high-resolution and composite alarms as if they were interchangeable with standard alarms.</li>
   </ul>
 
-  <h2>Optimization direction</h2>
-  <p class="muted">
-    If cost is high, do not start by deleting critical alarms. Start by removing unused alarms and replacing per-resource
-    alarms with service-level signals.
-  </p>
-  <p>
-    Guide: <a href="/guides/aws-cloudwatch-alarms-cost-optimization/">CloudWatch alarms cost optimization</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
+  <h2>Worked pricing template</h2>
   <ul>
-    <li>Validate alarm counts from inventory and from IaC (two sources if possible).</li>
-    <li>Separate prod vs non-prod and pro-rate ephemeral environments.</li>
-    <li>Confirm alarm type usage (standard vs high-res vs composite) before applying rates.</li>
+    <li>Standard alarms cost = standard alarm-months * standard regional rate</li>
+    <li>High-resolution alarms cost = high-resolution alarm-months * high-resolution regional rate</li>
+    <li>Composite alarms cost = composite alarm-months * composite regional rate</li>
+    <li>Total alarms bill = CloudWatch-native alarm charges + adjacent notification and observability costs tracked beside it</li>
+  </ul>
+
+  <h2>How to validate the bill model</h2>
+  <ul>
+    <li>Reconcile your alarm inventory against a measured alarm-month model rather than a rough count.</li>
+    <li>Confirm which costs are CloudWatch-native and which begin once alerts flow into SNS, dashboards, or extra metrics.</li>
+    <li>Validate type usage and environment ownership before you compare months or teams.</li>
   </ul>
 
   <h2>Sources</h2>
