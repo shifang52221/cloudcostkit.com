@@ -22,17 +22,25 @@ const description =
   ]}
 >
   <p>
-    ECR cost reduction is mostly about two drivers: <strong>stored GB-month</strong> and <strong>transfer</strong>. The
-    highest impact changes are operational: retention, image size, and avoiding redundant pulls.
+    Optimization starts only after you know whether retention drift, oversized images, duplicate tags, repeated pull paths, or unnecessary replication is the real ECR cost driver; otherwise teams delete tags blindly without reducing the real bill.
+  </p>
+  <p>
+    This page is for production intervention: retention enforcement, image slimming, pull-path discipline, replication control, and rollback safety.
   </p>
 
-  <h2>Step 0: identify your dominant driver</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
     <li>
-      <strong>Storage dominates</strong>: lots of tags, long retention, large images, multi-arch duplication.
+      <strong>Retention drift dominates</strong>: old tags, untagged artifacts, and over-deep rollback windows are filling the registry.
     </li>
     <li>
-      <strong>Transfer dominates</strong>: frequent pulls from CI and autoscaling clusters, especially across boundaries.
+      <strong>Oversized images dominate</strong>: heavy layers are inflating both storage and pull cost.
+    </li>
+    <li>
+      <strong>Repeated pull paths dominate</strong>: CI and autoscaling keep re-pulling the same bytes across expensive network paths.
+    </li>
+    <li>
+      <strong>Unnecessary replication dominates</strong>: multi-region or multi-arch copies exist without enough workload value.
     </li>
   </ul>
   <div class="btn-row">
@@ -40,7 +48,14 @@ const description =
     <a class="btn" href="/guides/aws-ecr-pricing/">ECR pricing</a>
   </div>
 
-  <h2>1) Enforce retention policies (highest leverage)</h2>
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether retention drift, image size, repeated pulls, or replication is the larger driver.</li>
+    <li>You only have one blended ECR number with no split between stored GB-month and pull-path behavior.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing storage evidence.</li>
+  </ul>
+
+  <h2>1) Enforce retention on the real drift sources</h2>
   <ul>
     <li>Keep only last N tags per repo (or last D days) for CI images.</li>
     <li>Delete untagged images and old build artifacts.</li>
@@ -51,7 +66,7 @@ const description =
     If you are unsure, start with a conservative retention window and expand only for repos that need rollback depth.
   </p>
 
-  <h2>2) Shrink images (reduces both storage and transfer)</h2>
+  <h2>2) Shrink images where bytes really matter</h2>
   <ul>
     <li>Use multi-stage builds and slim base images.</li>
     <li>Remove build tools and caches from runtime images.</li>
@@ -59,7 +74,7 @@ const description =
     <li>Audit large artifacts (node_modules, debug symbols, logs) that accidentally end up in images.</li>
   </ul>
 
-  <h2>3) Reduce redundant pulls (CI and autoscaling are the usual source)</h2>
+  <h2>3) Fix repeated pull paths</h2>
   <ul>
     <li>Use node-level caching and avoid re-pulling identical tags unnecessarily.</li>
     <li>Prefer immutable tags/digests so caching is reliable.</li>
@@ -67,7 +82,7 @@ const description =
     <li>During cluster scale-out, confirm new nodes are not pulling multiple times per deployment.</li>
   </ul>
 
-  <h2>4) Avoid duplication (multi-arch and multi-region)</h2>
+  <h2>4) Keep only replication that has operational value</h2>
   <ul>
     <li>Multi-arch builds can store multiple variants; validate whether you need all architectures.</li>
     <li>Multi-region replication can reduce transfer but increases storage (multiple copies of the same images).</li>
@@ -81,6 +96,14 @@ const description =
     <li>Track top repos by stored GB-month and review quarterly.</li>
     <li>During incidents and big deploys, watch for pull storms from fresh nodes.</li>
   </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across retention drift, image size, repeated pull paths, and replication.</li>
+    <li>Make one production change at a time, such as tightening retention, slimming one image family, reducing re-pulls, or removing one replication path.</li>
+    <li>Re-measure the same storage and pull windows and confirm the bill moved for the reason you expected.</li>
+    <li>Verify rollback depth, deployment reliability, and cross-region availability still meet operational needs before keeping the change.</li>
+  </ol>
 
   <h2>Validation checklist</h2>
   <ul>

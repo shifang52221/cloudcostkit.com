@@ -22,10 +22,20 @@ const description =
   ]}
 >
   <p>
-    Registry storage cost is usually driven by how many images you keep and how large they are. You can get a good
-    estimate with a simple model (average size × images retained), then refine it using push frequency and retention
-    windows.
+    This page is the storage-measurement workflow, not the bill-boundary page: the goal is to turn repo classes, image sizes, push frequency, retention windows, and multi-arch duplication into a defendable GB-month model.
   </p>
+  <p>
+    If you are still deciding which costs belong inside the ECR bill versus beside it, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you estimate anything</h2>
+  <ul>
+    <li><strong>Repo classes</strong>: CI artifact repos, release repos, and large shared base-image repos.</li>
+    <li><strong>Image sizes</strong>: representative sizes by repo class instead of one blended average.</li>
+    <li><strong>Push frequency</strong>: how many new tags are created per day or per release window.</li>
+    <li><strong>Retention windows</strong>: days, tag counts, and whether untagged images are actually deleted.</li>
+    <li><strong>Multi-arch duplication</strong>: whether one logical release becomes two or more retained variants.</li>
+  </ul>
 
   <h2>Step 1: define repo classes (do not use one average)</h2>
   <ul>
@@ -79,6 +89,14 @@ const description =
     <li><strong>Environment duplication</strong>: separate repos/tags for prod/staging/dev with independent retention.</li>
   </ul>
 
+  <h2>Separate baseline storage from growth windows</h2>
+  <ul>
+    <li><strong>Baseline storage</strong>: stable release repos, shared base images, and predictable retention windows.</li>
+    <li><strong>CI growth windows</strong>: bursts from frequent builds, temporary branches, and test environments.</li>
+    <li><strong>Release growth windows</strong>: rollout weeks where rollback depth and parallel versions both increase retained bytes.</li>
+    <li><strong>Architecture growth windows</strong>: temporary multi-arch duplication or replicated rollout patterns that inflate stored GB-month for a limited period.</li>
+  </ul>
+
   <h2>What to measure first (so your estimate converges)</h2>
   <ul>
     <li>Average image size by repo class (CI vs release vs base images).</li>
@@ -93,12 +111,18 @@ const description =
     your effective $/GB-month.
   </p>
 
+  <h2>When the GB-month model is ready to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-ecr-pricing/">ECR pricing</a> if you still are not sure which costs belong to the registry bill versus the surrounding network path.</li>
+    <li>Move to <a href="/guides/aws-ecr-cost-optimization/">ECR cost optimization</a> when you can defend the dominant driver and want to change retention, image size, pull behavior, or replication strategy.</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Pick 3 representative repos and measure average image size and retained tags.</li>
     <li>Validate retention policies actually delete old tags (and untagged images).</li>
     <li>Validate multi-arch behavior (are variants stored separately and retained equally?).</li>
-    <li>After changes, compare predicted GB-month to registry-reported storage.</li>
+    <li>After changes, compare predicted GB-month to registry-reported storage and separate baseline months from burst months.</li>
   </ul>
 
   <h2>Sources</h2>
