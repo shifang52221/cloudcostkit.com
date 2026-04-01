@@ -25,21 +25,34 @@ const description =
     },
   ]}
 >
-  <p class="muted">
-    RDS spend is often predictable. That's good news: a few simple levers usually deliver meaningful savings without risky
-    architecture changes.
+  <p>
+    Optimization starts only after you know whether compute headroom, storage growth, backup retention, or I/O-heavy query patterns are the real RDS cost driver; otherwise teams downsize or shorten retention blindly without reducing the real bill.
+  </p>
+  <p>
+    This page is for production intervention: instance right-sizing, storage-growth control, backup-policy tuning, I/O pattern cleanup, and reliability-safe architecture decisions.
   </p>
 
-  <h2>0) Identify the real driver first (billing → metrics)</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
     <li>
-      In Cost Explorer, filter to <strong>Amazon RDS</strong> and group by <strong>Usage type</strong>. Identify the top 2–3
-      line items (compute, storage, backup storage, I/O).
+      <strong>Compute headroom dominates</strong>: instance-hours are higher than the workload actually needs.
     </li>
     <li>
-      For the top line items, confirm the operational drivers from a representative 30–90 day window (CPU, storage growth,
-      read/write IOPS, connections).
+      <strong>Storage growth dominates</strong>: allocated or retained database volume is the real recurring driver.
     </li>
+    <li>
+      <strong>Backup retention dominates</strong>: churn and retention are creating a steady backup-storage line item.
+    </li>
+    <li>
+      <strong>I/O-heavy query patterns dominate</strong>: expensive access paths or query behavior are inflating the billed storage model or forcing oversized capacity.
+    </li>
+  </ul>
+
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether compute, storage growth, backup retention, or I/O behavior is the larger driver.</li>
+    <li>You only have one blended RDS number with no split between compute, DB storage, backup storage, and I/O exposure.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing backup evidence.</li>
   </ul>
 
   <h2>1) Right-size instances (and use schedules where possible)</h2>
@@ -61,6 +74,7 @@ const description =
   <ul>
     <li>Set clear storage SLOs: growth rate, maximum allocated storage, and alert thresholds.</li>
     <li>Delete or archive cold data (especially in non-prod) before buying larger instances.</li>
+    <li>Separate ordinary growth from migration or incident windows so you do not size long-term capacity from a temporary spike.</li>
   </ul>
 
   <h2>3) Treat backups as a first-class cost</h2>
@@ -88,7 +102,7 @@ const description =
     <li>If you change storage type/IOPS, validate latency and throughput under peak load.</li>
   </ul>
 
-  <h2>5) Compare architecture options (only when the simple levers are done)</h2>
+  <h2>5) Compare architecture options only after the basics are clean</h2>
   <ul>
     <li>
       If read scaling is the pain point, compare read replicas vs moving to an architecture that fits your scaling model.
@@ -99,7 +113,15 @@ const description =
     </li>
   </ul>
 
-  <h2>6) Sanity-check with a simple calculator</h2>
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across compute headroom, storage growth, backup retention, and I/O behavior.</li>
+    <li>Make one production change at a time, such as downsizing one class, tightening one retention policy, or fixing one expensive query path.</li>
+    <li>Re-measure the same workload window and confirm the bill moved for the reason you expected.</li>
+    <li>Verify restore readiness, performance SLOs, and operational safety still hold before keeping the change.</li>
+  </ol>
+
+  <h2>Sanity-check with a simple calculator</h2>
   <p>
     Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> to break your budget into compute,
     storage, backups, and I/O so you can see which lever matters most.

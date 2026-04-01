@@ -30,10 +30,21 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    RDS backup costs are commonly billed as <strong>backup storage (GB-month)</strong>. The hard part is not pricing - it
-    is estimating how much backup data accumulates with retention and churn.
+  <p>
+    This page is the backup-storage measurement workflow, not the bill-boundary page: the goal is to turn churn, retention, manual snapshot behavior, copy policies, and long-term retention windows into a defendable backup GB-month model.
   </p>
+  <p>
+    If you are still deciding which costs belong inside the RDS bill versus beside it, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you estimate anything</h2>
+  <ul>
+    <li><strong>Churn</strong>: daily changed GB from write activity, WAL or binlog behavior, and batch windows.</li>
+    <li><strong>Retention</strong>: automated backup retention days plus any environment-specific differences.</li>
+    <li><strong>Manual snapshot behavior</strong>: operational or incident-driven snapshots that persist beyond automated retention.</li>
+    <li><strong>Copy policies</strong>: cross-region or cross-account snapshot copies that create additional backup footprint.</li>
+    <li><strong>Long-term retention windows</strong>: monthly or yearly snapshots that should not be mixed with steady-state operational retention.</li>
+  </ul>
 
   <h2>Method A (best): Start from billing data if you already have usage</h2>
   <ul>
@@ -62,6 +73,14 @@ const faqs = [
     This model estimates the <strong>steady-state</strong> backup storage footprint after retention “fills up”. It’s a
     planning approximation, but it’s usually directionally correct for budgeting and for comparing retention policies.
   </p>
+
+  <h2>Separate steady-state backup exposure from spike windows</h2>
+  <ul>
+    <li><strong>Steady-state exposure</strong>: operational retention under normal daily churn.</li>
+    <li><strong>Incident windows</strong>: unusual backup growth caused by emergency snapshots, restore drills, or investigation work.</li>
+    <li><strong>Migration windows</strong>: temporary spikes from snapshot copies, cutovers, or long-lived rollback checkpoints.</li>
+    <li><strong>Policy-change windows</strong>: months where a new retention setting has not yet reached steady state.</li>
+  </ul>
 
   <h2>Method B step 3: Add long-term snapshots separately</h2>
   <p>
@@ -104,6 +123,12 @@ const faqs = [
     <li>Use Cost Explorer to confirm the backup storage line item for Amazon RDS over a representative month.</li>
     <li>Correlate spikes with retention changes, incident windows, backfills, or snapshot copy jobs.</li>
     <li>After policy changes, compare backup GB-month before/after (same workload window) to confirm impact.</li>
+  </ul>
+
+  <h2>When the backup model is ready to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-rds-pricing/">RDS pricing</a> if you still are not sure which backup-related costs belong inside the RDS bill versus adjacent workflow budgets.</li>
+    <li>Move to <a href="/guides/aws-rds-cost-optimization/">RDS cost optimization</a> when you can defend the dominant driver and want to change retention, snapshot policy, or churn-heavy behavior.</li>
   </ul>
 
   <h2>Next steps</h2>
