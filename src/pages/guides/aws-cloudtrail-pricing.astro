@@ -26,65 +26,73 @@ const description =
   ]}
 >
   <p>
-    CloudTrail estimates are easiest when you split <strong>event volume</strong> by type and then apply your effective
-    per-event pricing. The single most important split is <strong>management vs data events</strong>.
+    Use this page when you need to decide what belongs inside the CloudTrail bill before you debate selector tuning, retention changes, or downstream log reduction.
+  </p>
+  <p class="muted">
+    This guide is about bill boundaries: management events, data events, CloudTrail Insights, and the adjacent storage, scan, and SIEM costs that should be tracked beside CloudTrail rather than blended into it.
   </p>
 
-  <h2>CloudTrail pricing inputs</h2>
+  <h2>Inside the CloudTrail bill vs beside the CloudTrail bill</h2>
   <ul>
-    <li><strong>Management events</strong>: baseline event volume.</li>
-    <li><strong>Data events</strong>: S3/Lambda events per resource.</li>
-    <li><strong>Insights</strong>: anomaly detection add-on if enabled.</li>
+    <li><strong>Inside the CloudTrail bill</strong>: management events, data events, and CloudTrail Insights where enabled.</li>
+    <li><strong>Beside the CloudTrail bill</strong>: S3 retention, Athena scans, SIEM ingestion, copied pipelines, and any duplicate audit storage path created after delivery.</li>
+    <li><strong>Why this distinction matters</strong>: teams often blame CloudTrail for downstream storage or analysis spend that should be tracked as a separate logging decision.</li>
   </ul>
 
-
-  <h2>What to model</h2>
+  <h2>What to model on the bill itself</h2>
   <ul>
     <li>
-      <strong>Management events</strong>: control-plane actions (API calls that create/modify resources)
+      <strong>Management events</strong>: control-plane actions and baseline audit volume.
     </li>
     <li>
-      <strong>Data events</strong>: high-volume data-plane operations (can grow rapidly)
+      <strong>Data events</strong>: high-volume data-plane operations that usually become the dominant CloudTrail-native charge when enabled too broadly.
     </li>
     <li>
-      <strong>Insights events</strong> (if enabled): additional detections with their own pricing model
+      <strong>Insights events</strong>: anomaly-detection style add-ons that should stay separate from raw event counting assumptions.
     </li>
     <li>
-      <strong>Downstream</strong>: storage + query + external ingest costs (S3/Athena/SIEM/CloudWatch)
+      <strong>Bill ownership</strong>: whether the real spend belongs to CloudTrail-native events or to the delivery, retention, and analysis path around them.
     </li>
   </ul>
 
-  <h2>Before pricing: define scope (this changes everything)</h2>
+  <h2>Scope choices that change the bill boundary</h2>
   <ul>
     <li>
-      <strong>Accounts and regions</strong>: multi-account footprints multiply audit volume and downstream storage.
+      <strong>Accounts and regions</strong>: the trail footprint changes how much CloudTrail-native event volume you own.
     </li>
     <li>
-      <strong>Data event resources</strong>: which buckets/prefixes/functions are in scope (avoid "all resources" defaults).
+      <strong>Data event resources</strong>: the difference between scoped selectors and broad enablement often decides whether data events become the main bill driver.
     </li>
     <li>
-      <strong>Retention expectations</strong>: how long you keep raw logs vs derived signals.
+      <strong>Delivery and retention path</strong>: raw retention belongs beside CloudTrail once logs land in S3 or another analysis system.
     </li>
   </ul>
   <p class="muted">
-    If you are doing a budget for the first time, start with a narrow scope and expand with measurement.
+    Keep CloudTrail-native charges and downstream log-pipeline choices separated before you build the first budget.
   </p>
 
-  <h2>A fast estimation workflow</h2>
-  <ol>
-    <li>
-      <strong>Estimate events/month</strong> for each bucket (management, data, insights).
-    </li>
-    <li>
-      <strong>Apply region pricing</strong> to each bucket (use official pricing for your region).
-    </li>
-    <li>
-      <strong>Add downstream costs</strong>: storage retention and query scans (often larger than expected).
-    </li>
-  </ol>
+  <h2>How to get inputs without mixing jobs</h2>
+  <ul>
+    <li><strong>CloudTrail event volume</strong>: bring in a defendable monthly event model from the estimate page instead of doing the counting workflow here.</li>
+    <li><strong>Selector intent</strong>: note which resources and event types are in scope so the bill boundary is explicit before optimization work starts.</li>
+    <li><strong>Downstream path</strong>: identify where retention, scans, and SIEM forwarding begin so you do not hide them inside the CloudTrail estimate.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li><strong>You still need event evidence</strong>: go to <a href="/guides/aws-cloudtrail-estimate-events/">Estimate CloudTrail events per month</a> if the real problem is turning Lake counts, S3 log queries, eventCategory splits, and busy weeks into a defendable event model.</li>
+    <li><strong>You already know the dominant cost driver</strong>: go to <a href="/guides/aws-cloudtrail-cost-optimization/">CloudTrail cost optimization</a> if the real question is what to change in production.</li>
+  </ul>
+
+  <h2>A fast pricing structure (CloudTrail + downstream)</h2>
   <p class="muted">
-    Related: <a href="/guides/aws-cloudtrail-estimate-events/">estimate CloudTrail events/month</a>.
+    Use <a href="/calculators/aws-cloudtrail-cost-calculator/">AWS CloudTrail Cost Calculator</a> for CloudTrail-native events, then add downstream storage and scan assumptions separately.
   </p>
+  <ul>
+    <li>CloudTrail-native: management events, data events, and Insights by your effective regional pricing.</li>
+    <li>Downstream: S3 retention, Athena scans, SIEM ingestion, and any duplicated delivery path.</li>
+    <li>Scenario split: keep baseline months separate from incident or automation-heavy months.</li>
+  </ul>
 
   <h2>Downstream costs (frequently larger than expected)</h2>
   <ul>
@@ -106,21 +114,20 @@ const description =
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Query scan cost</a>
   </div>
 
-  <h2>Common pitfalls</h2>
+  <h2>Common bill-boundary mistakes</h2>
   <ul>
-    <li>Enabling data events broadly without a volume estimate (volume can be orders of magnitude higher).</li>
-    <li>Forgetting automation and retries (deploys and incidents inflate event counts).</li>
-    <li>Ignoring downstream costs (S3 retention, Athena scans, SIEM ingestion).</li>
-    <li>Mixing environments/accounts in one estimate when governance differs.</li>
-    <li>Building dashboards that scan months of logs when a day-level query would answer the question.</li>
+    <li>Using the pricing page to do the full event-counting workflow instead of separating scope from measurement.</li>
+    <li>Blending S3 retention, Athena scans, and SIEM ingestion into the core CloudTrail line item.</li>
+    <li>Ignoring how selector scope changes the CloudTrail-native bill before optimization decisions begin.</li>
+    <li>Comparing narrow CloudTrail pricing to broad downstream log-platform spend as if they were one service.</li>
   </ul>
 
-  <h2>Validation checklist</h2>
+  <h2>How to validate the bill model</h2>
   <ul>
-    <li>Measure event counts for at least 7 days and split by management vs data vs insight.</li>
-    <li>Confirm which resources and event types are included in your selectors.</li>
-    <li>Measure query scan sizes using your real investigations and dashboards.</li>
-    <li>Confirm retention and lifecycle policies (including any replicated copies).</li>
+    <li>Confirm which costs are CloudTrail-native and which begin after delivery to S3, Athena, CloudWatch, or a SIEM.</li>
+    <li>Reconcile your event assumptions against a measured monthly event model rather than a rough guess.</li>
+    <li>Validate retention and query assumptions as downstream logging decisions, not hidden CloudTrail pricing inputs.</li>
+    <li>Keep incident windows and automation spikes separate from normal budget assumptions.</li>
   </ul>
 
   <h2>Sources</h2>
