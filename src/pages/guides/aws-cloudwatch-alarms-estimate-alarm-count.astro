@@ -22,10 +22,20 @@ const description =
   ]}
 >
   <p>
-    To estimate CloudWatch alarm cost, you need one input per alarm type: <strong>alarm-month count</strong>. The tricky
-    part is that alarm counts are rarely stable: autoscaling, ephemeral environments, and copy-paste monitoring packs can
-    change the number by 2–10× over time.
+    This page is the alarm-inventory measurement workflow, not the bill-boundary page: the goal is to turn CloudWatch inventory, IaC counts, template expansion rules, ephemeral environments, and scaling multipliers into a defendable monthly alarm-month model.
   </p>
+  <p>
+    If you are still deciding which line items belong inside the CloudWatch alarms bill, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you estimate anything</h2>
+  <ul>
+    <li><strong>CloudWatch inventory</strong>: current live alarm counts by type and environment.</li>
+    <li><strong>IaC counts</strong>: Terraform or CloudFormation definitions that explain intended inventory.</li>
+    <li><strong>Template expansion rules</strong>: alarms-per-service, alarms-per-instance, alarms-per-queue, or other generation logic.</li>
+    <li><strong>Ephemeral environments</strong>: PR, sandbox, and test stacks that create time-weighted alarm-months.</li>
+    <li><strong>Scaling multipliers</strong>: fleet size, tenant count, dimensions, or service count that make alarm inventory grow over time.</li>
+  </ul>
 
   <h2>Step 1: count current alarms by type (baseline)</h2>
   <ul>
@@ -88,6 +98,14 @@ const description =
     </li>
   </ul>
 
+  <h2>Separate baseline inventory from growth windows</h2>
+  <ul>
+    <li><strong>Baseline month</strong>: stable production alarm inventory and long-lived non-prod alarms.</li>
+    <li><strong>Busy month</strong>: PR-heavy periods, experiments, migrations, or temporary scaling that add alarm packs.</li>
+    <li><strong>Template growth</strong>: new services or tenants that automatically create more alarms without explicit review.</li>
+    <li><strong>Fleet-driven growth</strong>: per-instance or per-dimension alarms that rise with infrastructure scale.</li>
+  </ul>
+
   <h2>Model growth scenarios (so you don't re-estimate every month)</h2>
   <ul>
     <li>
@@ -104,6 +122,12 @@ const description =
     Even a simple scenario (baseline month vs busy month) is better than a single point estimate for planning.
   </p>
 
+  <h2>When the inventory model is good enough to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-cloudwatch-alarms-pricing/">CloudWatch alarms pricing</a> if you still are not sure which costs belong inside the alarms bill versus beside it.</li>
+    <li>Move to <a href="/guides/aws-cloudwatch-alarms-cost-optimization/">CloudWatch alarms cost optimization</a> when you can defend the dominant inventory driver and want to change production behavior.</li>
+  </ul>
+
   <h2>Cross-check: does the number make operational sense?</h2>
   <ul>
     <li>How many alarms fired in the last 30 days vs total alarm count?</li>
@@ -118,7 +142,7 @@ const description =
   <ul>
     <li>Count by type (standard/high-res/composite) and by environment (prod/staging/dev).</li>
     <li>Pro-rate ephemeral environments by days active per month.</li>
-    <li>Identify scaling multipliers (fleet size, tenants, regions) and model growth scenarios.</li>
+    <li>Identify scaling multipliers (fleet size, tenants, regions) and model baseline versus busy-month scenarios.</li>
   </ul>
 
   <h2>Sources</h2>

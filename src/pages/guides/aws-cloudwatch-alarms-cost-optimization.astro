@@ -26,41 +26,43 @@ const description =
   ]}
 >
   <p>
-    CloudWatch alarm costs scale with <strong>alarm-month</strong> and alarm type. Most orgs overspend because alarms
-    accumulate over time: experiments, old environments, and duplicated alarms per resource. The goal is not “fewer
-    alarms”, it’s <strong>fewer low-value alarms</strong>.
+    Optimization starts only after you know whether stale inventory, per-resource duplication, high-resolution overuse, or non-production sprawl is the real CloudWatch alarms cost driver; otherwise teams delete alarms blindly without removing the real waste.
+  </p>
+  <p>
+    This page is for production intervention: alarm hygiene, duplication reduction, resolution policy, and incident-coverage preservation.
   </p>
 
-  <h2>Alarm cost reductions</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
-    <li><strong>Consolidate</strong>: reduce duplicate alarms per service.</li>
-    <li><strong>Resolution</strong>: avoid high-res where it is not needed.</li>
-    <li><strong>Retire</strong>: remove stale alarms from old projects.</li>
+    <li><strong>Stale inventory dominates</strong>: old services, retired environments, and forgotten experiments are the highest-leverage cleanup target.</li>
+    <li><strong>Per-resource duplication dominates</strong>: instance-, tenant-, or dimension-level alarms are multiplying faster than operational value.</li>
+    <li><strong>High-resolution overuse dominates</strong>: fast evaluation is being used on signals that do not need it.</li>
+    <li><strong>Non-production sprawl dominates</strong>: PR or test stacks are carrying production-sized alarm packs.</li>
   </ul>
 
-
-  <h2>Step 0: identify your top cost drivers</h2>
+  <h2>Do not optimize yet if these are still unclear</h2>
   <ul>
-    <li>
-      <strong>Total alarm count</strong> by type: standard vs high-resolution vs composite.
-    </li>
-    <li>
-      <strong>Orphaned alarms</strong>: alarms referencing deleted resources or old environments.
-    </li>
-    <li>
-      <strong>Duplicate intent</strong>: multiple alarms trying to detect the same incident in different ways.
-    </li>
+    <li>You still cannot explain which driver is larger: stale inventory, duplication, high-resolution usage, or non-prod sprawl.</li>
+    <li>You only have one blended alarm total with no split by type or environment.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing inventory evidence.</li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarm cost calculator</a>
     <a class="btn" href="/guides/aws-cloudwatch-alarms-pricing/">Alarm pricing</a>
   </div>
 
-  <h2>High-leverage savings levers</h2>
+  <h2>1) Remove stale inventory</h2>
   <ul>
     <li>
       <strong>Delete unused alarms</strong>: remove alarms for retired services, test stacks, and one-off experiments.
     </li>
+    <li>
+      <strong>Retire old environment packs</strong>: tear down the full alarm set when the environment no longer exists.
+    </li>
+  </ul>
+
+  <h2>2) Reduce per-resource duplication</h2>
+  <ul>
     <li>
       <strong>Prefer outcome-based alarms</strong>: keep a small set of service-level alarms (availability, error rate,
       latency) instead of hundreds of per-instance alarms.
@@ -69,6 +71,10 @@ const description =
       <strong>Reduce per-resource duplication</strong>: alert on a fleet aggregate or percent-bad instead of one alarm
       per instance/container.
     </li>
+  </ul>
+
+  <h2>3) Right-size resolution and composites</h2>
+  <ul>
     <li>
       <strong>Right-size resolution</strong>: high-resolution evaluation is useful for “fast failure” paths, but wasteful
       for slow-moving signals.
@@ -77,6 +83,13 @@ const description =
       <strong>Consolidate composite alarms</strong>: use composites to reduce pager noise, but avoid “composite on top of
       composite” sprawl.
     </li>
+  </ul>
+
+  <h2>4) Cut non-production sprawl safely</h2>
+  <ul>
+    <li><strong>Tier alarm packs</strong>: production can keep the full pack while PR or dev environments keep only essential coverage.</li>
+    <li><strong>Time-box experiment alarms</strong>: temporary observability work should expire automatically.</li>
+    <li><strong>Require ownership</strong>: if nobody owns an alarm pack, it usually should not live forever.</li>
   </ul>
 
   <h2>Common patterns that create runaway alarm counts</h2>
@@ -110,6 +123,14 @@ const description =
       <strong>Event-based alerting</strong>: use a single alarm for “deployment failed” instead of many symptoms.
     </li>
   </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across stale inventory, duplication, resolution usage, and non-production sprawl.</li>
+    <li>Make one production change at a time, such as retiring an alarm pack, replacing per-resource alarms, or downgrading resolution.</li>
+    <li>Re-measure the same inventory window and confirm the alarm-month reduction came from the driver you targeted.</li>
+    <li>Verify that the incidents you still care about remain detectable before keeping the change.</li>
+  </ol>
 
   <h2>Validation checklist (do not break your on-call)</h2>
   <ul>
