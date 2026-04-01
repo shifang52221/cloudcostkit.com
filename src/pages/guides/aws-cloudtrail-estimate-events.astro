@@ -26,9 +26,20 @@ const description =
   ]}
 >
   <p>
-    For an audit-log cost model, you mainly need one number: <strong>events/month</strong>. The best estimates break it
-    down by event type so you can see what actually drives cost and where to optimize.
+    This page is the CloudTrail event-measurement workflow, not the bill-boundary page: the goal is to turn CloudTrail Lake counts, S3 log queries, eventCategory splits, eventSource hotspots, and busy-week evidence into a defendable monthly event model.
   </p>
+  <p>
+    If you are still deciding which line items belong inside the CloudTrail bill, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you estimate anything</h2>
+  <ul>
+    <li><strong>CloudTrail Lake counts</strong>: the fastest direct source when an event data store exists.</li>
+    <li><strong>S3 log queries</strong>: Athena-style counting for delivered CloudTrail records when Lake is not the primary path.</li>
+    <li><strong>eventCategory split</strong>: management, data, and insight buckets should never be blended into one opaque total.</li>
+    <li><strong>eventSource hotspots</strong>: the loudest services and APIs usually explain the real driver faster than the grand total.</li>
+    <li><strong>Busy-week evidence</strong>: deploys, automation churn, and incidents need their own scenario instead of hiding inside an average week.</li>
+  </ul>
 
   <h2>Step 0: pick the counting source</h2>
   <ul>
@@ -44,7 +55,7 @@ const description =
   <ul>
     <li>Query a representative time window (7 to 30 days).</li>
     <li>Split by event category (management vs data vs insight) if available in your schema.</li>
-    <li>Scale to a month (average day * 30.4) and keep a "busy month" scenario for deploy/incident spikes.</li>
+    <li>Separate baseline windows from busy-week evidence so deploys and incident retries do not disappear into one monthly average.</li>
   </ul>
 
   <h2>Method 2: count events from S3 logs (Athena-style)</h2>
@@ -70,7 +81,7 @@ ORDER BY 1, 2;`}</code></pre>
   <ul>
     <li>Group by eventSource (service) and eventName to find the highest volume APIs.</li>
     <li>For data events, identify the resource scope (which bucket/prefix/function is generating volume).</li>
-    <li>Keep a separate bucket for "deploy spike" and "incident spike" weeks.</li>
+    <li>Keep a separate bucket for "deploy spike", "automation churn", and "incident spike" weeks.</li>
   </ul>
 
   <h2>Method 3: estimate before telemetry exists</h2>
@@ -87,16 +98,30 @@ ORDER BY 1, 2;`}</code></pre>
   </ul>
   <p class="muted">Use this only as a starting point and validate as soon as you can measure real events.</p>
 
+  <h2>Separate baseline demand from spike behavior</h2>
+  <ul>
+    <li><strong>Baseline weeks</strong>: normal management events and expected data-event coverage.</li>
+    <li><strong>Deploy-driven spikes</strong>: rollout waves, migration weekends, and release-heavy periods.</li>
+    <li><strong>Automation-driven spikes</strong>: CI/CD loops, reconciliations, scanners, and scheduled jobs.</li>
+    <li><strong>Incident-driven spikes</strong>: retries, timeouts, and human investigation traffic during partial outages.</li>
+  </ul>
+
   <h2>Turn volume into a cost estimate</h2>
   <p>
     Use <a href="/calculators/aws-cloudtrail-cost-calculator/">AWS CloudTrail Cost Calculator</a> to translate monthly
     event volume into an estimate using your effective per-event rates.
   </p>
 
+  <h2>When the event model is good enough to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-cloudtrail-pricing/">CloudTrail pricing</a> if you still are not sure which costs belong inside the CloudTrail bill versus beside it.</li>
+    <li>Move to <a href="/guides/aws-cloudtrail-cost-optimization/">CloudTrail cost optimization</a> when you can defend which driver is dominant and want to change production behavior.</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>Separate management vs data vs insight and model them independently.</li>
-    <li>Compare "normal" and "busy" weeks; deploys and incidents often dominate event counts.</li>
+    <li>Compare baseline weeks and busy weeks; deploys, automation churn, and incidents often dominate event counts.</li>
     <li>Confirm which resources and event selectors are enabled (scope changes event volume dramatically).</li>
     <li>Confirm whether you are counting only the accounts/regions you intend to budget for.</li>
   </ul>

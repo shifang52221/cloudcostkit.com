@@ -26,22 +26,27 @@ const description =
   ]}
 >
   <p>
-    CloudTrail costs are typically driven by <strong>event volume</strong> plus downstream storage and analysis. Most
-    savings come from narrowing the highest-volume event streams (usually data events) and keeping downstream analysis
-    efficient.
+    Optimization starts only after you know whether data event scope, management-event churn, or downstream storage and query waste is the real CloudTrail cost driver; otherwise teams tighten selectors or retention blindly without moving the right bill.
+  </p>
+  <p>
+    This page is for production intervention: selector discipline, automation-noise reduction, retention policy, and scan reduction.
   </p>
 
-  <h2>Step 1: measure before you optimize</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
-    <li>Count events/day for at least 7 days and split management vs data vs insight.</li>
-    <li>Identify the top event sources (which services and resources generate most volume).</li>
-    <li>Model a "busy week" scenario for deploy spikes and incident retries.</li>
+    <li><strong>Data event scope dominates</strong>: selector discipline is probably the highest-leverage intervention.</li>
+    <li><strong>Management-event churn dominates</strong>: automation noise, retries, and repetitive control-plane workflows need attention.</li>
+    <li><strong>Downstream storage and query waste dominates</strong>: retention, scan size, and SIEM routing are the real cost levers.</li>
   </ul>
-  <p class="muted">
-    Related: <a href="/guides/aws-cloudtrail-estimate-events/">estimate CloudTrail events/month</a>.
-  </p>
 
-  <h2>Step 2: control data event scope (highest leverage)</h2>
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether CloudTrail-native events or downstream analysis is the larger cost bucket.</li>
+    <li>You only have one blended event total with no baseline versus busy-week split.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing evidence.</li>
+  </ul>
+
+  <h2>1) Control data event scope (highest leverage when selectors are the problem)</h2>
   <p>
     Data events can be orders of magnitude higher than management events. Treat data event enablement as a scoped audit
     decision, not a default checkbox.
@@ -68,7 +73,7 @@ const description =
     The goal is not to disable audit coverage blindly, but to scope it to what you truly need and can afford to analyze.
   </p>
 
-  <h2>Step 3: reduce automated churn and retries</h2>
+  <h2>2) Reduce management-event churn and retries</h2>
   <ul>
     <li>
       <strong>Fix retry storms</strong>: timeouts and transient failures multiply API calls and therefore audit events.
@@ -81,7 +86,7 @@ const description =
     </li>
   </ul>
 
-  <h2>Step 4: reduce downstream waste (often overlooked)</h2>
+  <h2>3) Reduce downstream waste (often overlooked)</h2>
   <ul>
     <li>
       <strong>Retention tiers</strong>: keep raw logs short; retain aggregated/security signals longer.
@@ -101,9 +106,18 @@ const description =
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Query scan cost</a>
   </div>
 
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across data event scope, management-event churn, and downstream analysis waste.</li>
+    <li>Make one production change at a time, such as selector scope, noisy automation, retention policy, or query pattern.</li>
+    <li>Re-measure the same event and scan windows and confirm the bill moved for the reason you expected.</li>
+    <li>Verify that required audit coverage still exists before keeping the change.</li>
+  </ol>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>After selector changes, re-measure data event volume to confirm the expected drop.</li>
+    <li>After automation fixes, re-measure management-event churn instead of only checking total volume.</li>
     <li>Compare downstream scan GB for your top dashboards/queries before vs after.</li>
     <li>Confirm you did not remove required audit coverage for regulated resources.</li>
   </ul>
