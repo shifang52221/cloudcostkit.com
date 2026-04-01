@@ -30,11 +30,30 @@ const description =
   ]}
 >
   <p>
-    Route 53-style costs are typically a combination of <strong>hosted zone fees</strong> plus <strong>DNS query charges</strong>
-    and (optionally) <strong>health checks</strong>. The best cost model starts with measured query volume.
+    Use this page when you need to decide what belongs inside the Route 53 bill before you debate TTL tuning or query reduction.
+  </p>
+  <p class="muted">
+    This guide is about bill boundaries: hosted zones, DNS queries, health checks, and the adjacent resolver, CDN, and incident-side costs that should be tracked beside Route 53 rather than blended into it.
   </p>
 
-  <h2>What to model (the 3 line items)</h2>
+  <h2>Inside the Route 53 bill vs beside the Route 53 bill</h2>
+  <ul>
+    <li>
+      <strong>Inside the Route 53 bill</strong>: hosted zone charges, authoritative DNS query charges, and Route 53
+      health checks.
+    </li>
+    <li>
+      <strong>Beside the Route 53 bill</strong>: resolver-side churn, CDN cache behavior, application retry storms,
+      downstream logging, and incident response work that may explain the spike but do not belong inside the core Route
+      53 line items.
+    </li>
+    <li>
+      <strong>Why the distinction matters</strong>: teams often try to lower the Route 53 number by tuning DNS before
+      they have separated billable Route 53 usage from adjacent traffic or reliability symptoms.
+    </li>
+  </ul>
+
+  <h2>What to model (the 3 core line items)</h2>
   <ul>
     <li>
       <strong>Hosted zones</strong>: how many zones you maintain across environments/accounts
@@ -47,7 +66,7 @@ const description =
     </li>
   </ul>
 
-  <h2>How to get the inputs (without guessing)</h2>
+  <h2>How to scope each line item without mixing jobs</h2>
   <ul>
     <li>
       <strong>Zones</strong>: list public and private zones separately. In multi-account setups, zones often get duplicated across
@@ -63,10 +82,22 @@ const description =
     </li>
   </ul>
 
-  <h2>A fast estimate (2 scenarios, not 1)</h2>
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>
+      <strong>You still need the traffic evidence</strong>: go to <a href="/guides/aws-route-53-estimate-dns-queries/">Estimate DNS queries</a>
+      if the real problem is turning metrics, logs, TTL posture, and retry behavior into a defendable monthly query number.
+    </li>
+    <li>
+      <strong>You already know the bill driver</strong>: go to <a href="/guides/aws-route-53-cost-optimization/">Route 53 cost optimization</a>
+      if the real question is what to change in production.
+    </li>
+  </ul>
+
+  <h2>Budget with baseline and peak bill scenarios</h2>
   <p class="muted">
     Use <a href="/calculators/aws-route-53-cost-calculator/">AWS Route 53 Cost Calculator</a> for a simple zones + queries + health checks model.
-    Then refine query volume using metrics/logs from a representative time window.
+    Then bring in measured query volume from the estimate guide rather than guessing from generic application traffic.
   </p>
   <ul>
     <li>
@@ -78,47 +109,30 @@ const description =
     </li>
   </ul>
 
-  <h2>Query estimation methods</h2>
-  <h3>Method A: From query logs (best)</h3>
-  <ul>
-    <li>Enable Route 53 query logging and sample at least 7 days.</li>
-    <li>Compute: queries/day by hosted zone and top record names.</li>
-    <li>Use the peak day as a sanity check for incident windows.</li>
-  </ul>
-
   <h2>Fast DNS cost formula</h2>
   <ul>
     <li><strong>Total monthly Route 53 cost</strong> = hosted zone fees + DNS query charges + health checks.</li>
     <li><strong>DNS query charges</strong> = queries/month x effective query unit rate.</li>
     <li><strong>Peak protection</strong>: budget with both baseline and incident retry scenarios.</li>
   </ul>
-  <h3>Method B: From request rate (good first pass)</h3>
-  <ul>
-    <li>
-      Convert RPS/QPS to monthly queries using{" "}
-      <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.
-    </li>
-    <li>Apply a multiplier for retries and cache misses (use a separate peak scenario rather than one inflated average).</li>
-  </ul>
 
-  <h2>What usually causes surprise bills (and how to prevent them)</h2>
+  <h2>What usually causes surprise bills at the bill-boundary level</h2>
   <ul>
     <li>
-      <strong>Very low TTLs</strong>: every resolver cache refresh becomes a paid query. Low TTLs have a purpose, but treat them as a
-      cost decision.
+      <strong>Hosted zone duplication</strong>: public/private splits and multi-account copies can increase zone count
+      more than teams expect.
     </li>
     <li>
-      <strong>Service scale-out</strong>: more pods/instances often means more DNS lookups (especially with chatty clients or short DNS
-      caches in runtimes).
+      <strong>Authoritative query growth</strong>: traffic growth, low TTL posture, or resolver churn can lift the paid
+      query line item.
     </li>
     <li>
-      <strong>Retry storms</strong>: outages can multiply DNS queries as clients retry or fail over. Keep a peak scenario in your model.
+      <strong>Health check sprawl</strong>: checks per endpoint and per environment add steady monthly cost and are easy
+      to miss in budgets.
     </li>
     <li>
-      <strong>Health check sprawl</strong>: checks per endpoint and per environment add steady monthly cost and can be missed in budgets.
-    </li>
-    <li>
-      <strong>CNAME chains</strong>: not always a cost problem, but they can increase lookup behavior and worsen incident sensitivity.
+      <strong>Incident-side confusion</strong>: retry storms and failovers may explain why query charges jumped, but the
+      operational fix belongs on the estimate and optimization pages.
     </li>
   </ul>
 
@@ -138,24 +152,16 @@ const description =
   <h2>How to validate the estimate</h2>
   <ul>
     <li>In Cost Explorer / CUR, confirm you see distinct line items for hosted zones, queries, and health checks.</li>
-    <li>Compare baseline vs peak: if peak is not materially higher, you may be missing incident behavior in your model.</li>
-    <li>Audit the top record names from query logs and look for noisy internal service discovery patterns.</li>
-  </ul>
-
-  <h2>TTL and query-volume decision guide</h2>
-  <ul>
-    <li><strong>Need fast failover</strong>: lower TTL only for critical records; keep default TTL higher elsewhere.</li>
-    <li><strong>Stable services</strong>: raise TTL to reduce resolver refresh frequency and query cost.</li>
-    <li><strong>Frequent deploys</strong>: use staged TTL changes during rollout windows, then restore normal values.</li>
-    <li><strong>Incident response</strong>: capture retry multipliers and include them in the peak scenario.</li>
+    <li>Compare baseline vs peak: if peak is not materially higher, the estimate workflow may still be missing incident behavior.</li>
+    <li>Check whether the bill is query-led, zone-led, or health-check-led before choosing an optimization plan.</li>
   </ul>
 
   <h2>Failure patterns</h2>
   <ul>
-    <li>Applying one low TTL policy to every record type.</li>
-    <li>Using traffic RPS as DNS query volume without resolver behavior checks.</li>
+    <li>Using this pricing page as the only source of truth for query measurement.</li>
+    <li>Folding resolver-side or CDN-side behavior directly into the Route 53 bill without separating ownership.</li>
     <li>Ignoring health-check sprawl across environments.</li>
-    <li>Estimating only baseline and skipping retry-storm budgets.</li>
+    <li>Estimating only baseline and skipping peak bill scenarios.</li>
   </ul>
 
   <h2>Related tools</h2>
