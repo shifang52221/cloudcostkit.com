@@ -22,10 +22,20 @@ const description =
   ]}
 >
   <p>
-    DynamoDB pricing is often described as “RCU/WCU”, but the part that trips teams up is that units are not “one request
-    equals one unit”. The effective units depend on <strong>item size</strong>, <strong>access pattern</strong>, and
-    whether you scan or query targeted keys.
+    This page is the capacity-measurement explainer, not the bill-boundary page: the goal is to turn item size, consistency, query shape, scan behavior, and index updates into a defendable read and write unit model.
   </p>
+  <p>
+    If you are still deciding which costs belong inside the DynamoDB bill versus beside it, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you size anything</h2>
+  <ul>
+    <li><strong>Item size</strong>: average and p95 item sizes for the read and write paths that matter.</li>
+    <li><strong>Consistency</strong>: where strong reads, transactional patterns, or other higher-cost behaviors are used.</li>
+    <li><strong>Query shape</strong>: which paths are targeted queries versus broad or exploratory reads.</li>
+    <li><strong>Scan behavior</strong>: where scans still exist and how much hidden read exposure they create.</li>
+    <li><strong>Index updates</strong>: which write paths also update GSIs or replicated copies.</li>
+  </ul>
 
   <h2>RCU/WCU quick sizing</h2>
   <ul>
@@ -61,6 +71,14 @@ const description =
     <li>Small items: per-request units are closer to the minimum.</li>
     <li>Large items: per-request units increase; scans become especially expensive.</li>
     <li>Indexes: writing one item can mean writing multiple index entries.</li>
+  </ul>
+
+  <h2>Separate raw request counts from billable unit exposure</h2>
+  <ul>
+    <li><strong>Raw request counts</strong>: useful as a starting point, but not enough to price DynamoDB accurately.</li>
+    <li><strong>Unit exposure</strong>: requests after size, consistency, scan behavior, and index amplification are applied.</li>
+    <li><strong>Busy-window exposure</strong>: incident retries, scans, and hot partitions can move billable units much faster than traffic averages suggest.</li>
+    <li><strong>Write-path exposure</strong>: one logical write may update multiple indexes or replicas, so the billable unit story is larger than one API call.</li>
   </ul>
 
   <h2>Step 3: sizing examples (planning)</h2>
@@ -102,6 +120,12 @@ const description =
     <li>Validate what percent of reads are scans vs queries.</li>
     <li>Validate GSI count and projections; quantify amplification.</li>
     <li>After changes, compare a real week of usage and adjust your model.</li>
+  </ul>
+
+  <h2>When the unit model is ready to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-dynamodb-pricing/">DynamoDB pricing</a> if you still are not sure which costs belong inside the bill versus beside it.</li>
+    <li>Move to <a href="/guides/aws-dynamodb-cost-optimization/">DynamoDB cost optimization</a> when you can defend whether reads, writes, storage, or index amplification is the dominant driver.</li>
   </ul>
 
   <h2>Sources</h2>

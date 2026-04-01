@@ -22,102 +22,74 @@ const description =
   ]}
 >
   <p>
-    DynamoDB pricing is easiest when you model it as a few buckets: <strong>reads</strong>, <strong>writes</strong>,
-    <strong>storage</strong>, and <strong>extras</strong>. Most estimation errors come from ignoring item size effects or
-    forgetting secondary indexes and replication features.
+    Use this page when you need to decide what belongs inside the DynamoDB bill before you debate schema changes, caching, or retry control.
+  </p>
+  <p class="muted">
+    This guide is about bill boundaries: read exposure, write exposure, table storage, index amplification, backups, streams, global tables, and the adjacent cache, stream-consumer, or application-side costs that should be tracked beside the DynamoDB bill rather than blended into it.
   </p>
 
-  <h2>1) Reads and writes: count the billable units</h2>
+  <h2>Inside the DynamoDB bill vs beside the DynamoDB bill</h2>
   <ul>
     <li>
-      <strong>Request volume</strong>: reads/day and writes/day (or requests/second by workload type).
+      <strong>Inside the DynamoDB bill</strong>: read exposure, write exposure, table storage, and GSI-driven amplification.
     </li>
     <li>
-      <strong>Item size</strong>: larger items consume more units per operation.
+      <strong>Also inside the DynamoDB bill</strong>: backups or PITR, streams, and global-table replication where DynamoDB itself is creating the line item.
     </li>
     <li>
-      <strong>Access pattern</strong>: strongly consistent reads, scans, and transactional ops can cost more.
+      <strong>Beside the DynamoDB bill</strong>: cache layers, downstream stream consumers, and application retry overhead that may accompany DynamoDB spend but should not be blended into it.
     </li>
   </ul>
-  <p class="muted">
-    Related: <a href="/guides/aws-dynamodb-rcu-wcu-explained/">RCU/WCU explained</a>.
-  </p>
+
+  <h2>What to model on the bill itself</h2>
+  <ul>
+    <li>
+      <strong>Read exposure</strong>: billable read behavior after item size, consistency, and access pattern are accounted for.
+    </li>
+    <li>
+      <strong>Write exposure</strong>: writes plus the write amplification caused by GSIs, transactions, or replication features.
+    </li>
+    <li>
+      <strong>Storage</strong>: base table footprint plus projected or duplicated index storage.
+    </li>
+    <li>
+      <strong>Operational extras</strong>: PITR, streams, and global tables where they create their own DynamoDB-native line items.
+    </li>
+    <li>
+      <strong>Bill ownership</strong>: whether a cost is native to DynamoDB itself or belongs to the systems wrapped around it.
+    </li>
+  </ul>
+
+  <h2>Boundary choices that change ownership</h2>
+  <ul>
+    <li><strong>Cache behavior</strong>: repeated hot reads may be a cache-design problem even when DynamoDB is absorbing the request volume.</li>
+    <li><strong>Stream consumers</strong>: stream processing cost belongs beside the DynamoDB bill unless the DynamoDB-native stream line item itself is what you are measuring.</li>
+    <li><strong>Retry storms</strong>: application-side failures can inflate DynamoDB usage, but ownership may still sit with the caller or workflow design.</li>
+  </ul>
+
+  <h2>How to gather inputs without mixing jobs</h2>
+  <ul>
+    <li><strong>Unit mechanics</strong>: use the <a href="/guides/aws-dynamodb-rcu-wcu-explained/">RCU/WCU explainer</a> to turn request shape into billable exposure instead of rebuilding that logic here.</li>
+    <li><strong>Adjacency list</strong>: keep cache, consumer, and application-side costs beside the DynamoDB bill rather than folding them into one total.</li>
+    <li><strong>Optimization handoff</strong>: only move to the optimization page once you know which bill bucket actually dominates.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>Go to <a href="/guides/aws-dynamodb-rcu-wcu-explained/">RCU/WCU explained</a> if you still need to understand how request volume becomes billable read and write exposure.</li>
+    <li>Go to <a href="/guides/aws-dynamodb-cost-optimization/">DynamoDB cost optimization</a> if you already know the bill owner and need production changes such as scan cleanup, index control, or retry reduction.</li>
+  </ul>
+
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost calculator</a>
-    <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to requests</a>
+    <a class="btn" href="/guides/aws-dynamodb-rcu-wcu-explained/">RCU/WCU explained</a>
   </div>
-
-  <h2>2) Storage: GB-month and data shape</h2>
-  <ul>
-    <li>
-      <strong>Table storage</strong>: GB-month based on item size and item count.
-    </li>
-    <li>
-      <strong>Indexes</strong>: global secondary indexes (GSIs) can multiply stored bytes.
-    </li>
-    <li>
-      <strong>Retention policies</strong>: TTL and archival strategies reduce long-term storage growth.
-    </li>
-  </ul>
-
-  <h2>How to estimate item size (so the model matches reality)</h2>
-  <ul>
-    <li>Measure average and p95 item size from real items (not just schema guesses).</li>
-    <li>Separate "hot path" items from "cold path" items (their sizes can differ significantly).</li>
-    <li>Estimate index storage separately: projected attributes often create an extra copy of data.</li>
-  </ul>
-  <p class="muted">
-    If you cannot measure yet, build a conservative range and validate as soon as you have real table data.
-  </p>
-
-  <h2>3) Common extras (do not forget these)</h2>
-  <ul>
-    <li>
-      <strong>Backups / PITR</strong>: continuous backup and restore requirements can add a meaningful baseline.
-    </li>
-    <li>
-      <strong>Streams</strong>: if enabled, include downstream processing and storage.
-    </li>
-    <li>
-      <strong>Global tables</strong>: replication can add write/transfer/storage effects across regions.
-    </li>
-  </ul>
-
-  <h2>Provisioned vs on-demand (what changes in the estimate)</h2>
-  <ul>
-    <li>
-      <strong>Provisioned</strong>: model sustained capacity (and autoscaling behavior) and include headroom for busy months.
-    </li>
-    <li>
-      <strong>On-demand</strong>: model request volume and include incident multipliers (retries increase cost).
-    </li>
-    <li>
-      For either mode, item size and index amplification still matter.
-    </li>
-  </ul>
-
-  <h2>A fast estimation workflow</h2>
-  <ol>
-    <li>Measure read and write request volume (baseline + busy month).</li>
-    <li>Measure typical item sizes (average and p95).</li>
-    <li>Model indexes (how many and what attributes they project).</li>
-    <li>Add extras: backups/PITR, streams, replication.</li>
-  </ol>
-
-  <h2>Common pitfalls</h2>
-  <ul>
-    <li>Using “requests” without converting to RCU/WCU based on item size and consistency.</li>
-    <li>Ignoring scans and large responses (they can dominate read units).</li>
-    <li>Forgetting that GSIs add storage and write amplification.</li>
-    <li>Modeling only steady state and ignoring incident retry storms.</li>
-  </ul>
 
   <h2>Validation checklist</h2>
   <ul>
-    <li>Validate request counts from a real week of usage (not only peak RPS).</li>
-    <li>Validate item sizes from real items (average and p95).</li>
-    <li>Validate index count and projections; treat them as separate storage/write multipliers.</li>
-    <li>Validate whether you require PITR, streams, or multi-region replication.</li>
+    <li>Validate that reads, writes, storage, and extras belong to the DynamoDB bill rather than to adjacent cache, consumer, or application systems.</li>
+    <li>Validate that GSI and replication amplification are treated as first-class bill multipliers, not buried inside one generic request number.</li>
+    <li>Validate that PITR, streams, and global tables are modeled explicitly whenever they materially change the bill.</li>
   </ul>
 
   <h2>Sources</h2>
