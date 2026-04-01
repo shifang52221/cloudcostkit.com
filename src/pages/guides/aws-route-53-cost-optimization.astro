@@ -35,8 +35,10 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    Route 53 savings are usually about reducing query volume and controlling zone sprawl. Query spikes often indicate
-    misconfiguration or an incident that also impacts reliability.
+    Optimization starts only after you know whether queries, hosted zones, or health checks are the real Route 53 cost driver; otherwise teams tune TTLs and clean up records without changing the bill.
+  </p>
+  <p>
+    This page is for production intervention: TTL policy, query amplification fixes, health-check discipline, and zone-sprawl cleanup.
   </p>
 
   <h2>0) Identify your cost driver (queries vs zones vs health checks)</h2>
@@ -48,6 +50,13 @@ const faqs = [
       If query charges dominate, focus on caching/TTL and “chatty” patterns. If zone-month dominates, focus on consolidating
       and cleaning up zones. If health checks dominate, audit checks and intervals.
     </li>
+  </ul>
+
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether the bill is query-led, zone-led, or health-check-led.</li>
+    <li>You only have one blended traffic number and no baseline versus incident comparison.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather evidence.</li>
   </ul>
 
   <h2>1) Use sane TTLs</h2>
@@ -103,6 +112,14 @@ const faqs = [
       queries).
     </li>
   </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across zones, queries, or health checks.</li>
+    <li>Make one change at a time, such as TTL policy, resolver behavior, or zone cleanup.</li>
+    <li>Re-measure the same window and confirm the bill moved for the reason you expected.</li>
+    <li>Check failover, rollout, and discovery behavior before keeping the change.</li>
+  </ol>
 
   <h2>Validation checklist</h2>
   <ul>

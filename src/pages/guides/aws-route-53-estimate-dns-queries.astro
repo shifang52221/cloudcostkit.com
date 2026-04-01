@@ -35,19 +35,24 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    DNS query charges are volume-based, so the key input is queries per month. The best estimates come from measured
-    query counts, not guesswork.
+    This page is the DNS measurement workflow, not the bill-boundary page: the goal is to turn authoritative query metrics, query logs, resolver evidence, TTL posture, and retry behavior into a defendable monthly query model.
+  </p>
+  <p>
+    If you are still deciding which line items belong inside the Route 53 bill, go back to the pricing guide first.
+  </p>
+  <p class="muted">
+    Then use <a href="/guides/aws-route-53-pricing/">Route 53 pricing</a> to separate bill scope before you work on the query model.
   </p>
 
-  <h2>Quick DNS query estimate</h2>
+  <h2>Evidence pack before you estimate anything</h2>
   <ul>
-    <li><strong>Baseline QPS</strong>: average resolver queries per second.</li>
-    <li><strong>Cache hit rate</strong>: effective queries = total x (1 - hit rate).</li>
-    <li><strong>Health checks</strong>: add query volume from health checks and routing.</li>
+    <li><strong>Authoritative query metrics</strong>: the fastest starting point for zone-level query counts.</li>
+    <li><strong>Query or resolver logs</strong>: the attribution layer for noisy names, NXDOMAIN bursts, and chatty services.</li>
+    <li><strong>TTL posture</strong>: what records are deliberately short-lived versus accidentally expensive.</li>
+    <li><strong>Incident windows</strong>: retries, failover, bot traffic, or deployment churn that can distort the model.</li>
   </ul>
 
-
-  <h2>Method 1: From Route 53 hosted zone metrics (fastest)</h2>
+  <h2>Method 1: Start with authoritative Route 53 metrics</h2>
   <ul>
     <li>Use query count metrics per hosted zone and roll up to a month.</li>
     <li>Choose a window that represents typical load (for example, last 30 days).</li>
@@ -56,7 +61,7 @@ const faqs = [
     </li>
   </ul>
 
-  <h2>Method 2: From resolver logs (best for attribution)</h2>
+  <h2>Method 2: Use logs when you need attribution</h2>
   <ul>
     <li>Count DNS requests from resolver logs, then roll up by day.</li>
     <li>Segment by domain/service to identify top query drivers.</li>
@@ -67,7 +72,7 @@ const faqs = [
     <li>Rank by FQDN so you can fix the top 5–10 names instead of guessing.</li>
   </ul>
 
-  <h2>Method 3: From request rate (when you don’t have DNS telemetry)</h2>
+  <h2>Method 3: Use request rate only as a temporary fallback</h2>
   <p>
     If you know average request rate, you can approximate DNS queries as:
     <br />
@@ -77,6 +82,14 @@ const faqs = [
     This method is crude but useful early. Tighten it later using metrics/logs because caching and TTL can change lookups
     dramatically.
   </p>
+
+  <h2>Separate baseline demand from spike behavior</h2>
+  <ul>
+    <li><strong>Baseline demand</strong>: normal user and service traffic in a representative window.</li>
+    <li><strong>Retry-driven spikes</strong>: timeout loops, failovers, and degraded upstreams that multiply lookups.</li>
+    <li><strong>Resolver amplification</strong>: search-domain issues, Kubernetes churn, or cache misses that inflate queries without user growth.</li>
+    <li><strong>NXDOMAIN bursts</strong>: repeated misses that usually signal configuration debt, not healthy demand.</li>
+  </ul>
 
   <h2>Worked example (convert telemetry to a budget input)</h2>
   <ul>
@@ -96,6 +109,18 @@ const faqs = [
     pattern (timeouts/retries) that needs fixing anyway.
   </p>
 
+  <h2>When the estimate is good enough to hand off</h2>
+  <ul>
+    <li>
+      Go back to <a href="/guides/aws-route-53-pricing/">Route 53 pricing</a> if you still are not sure whether a cost
+      belongs to hosted zones, queries, health checks, or an adjacent system.
+    </li>
+    <li>
+      Move to <a href="/guides/aws-route-53-cost-optimization/">Route 53 cost optimization</a> when the model is stable
+      enough that TTL or resolver changes can be measured against it.
+    </li>
+  </ul>
+
   <h2>Turn volume into cost</h2>
   <p>
     Use <a href="/calculators/aws-route-53-cost-calculator/">AWS Route 53 Cost Calculator</a> with your query volume and
@@ -106,6 +131,7 @@ const faqs = [
   <div class="btn-row">
     <a class="btn" href="/guides/aws-route-53-pricing/">Route 53 pricing</a>
     <a class="btn" href="/guides/aws-route-53-cost-optimization/">Cost optimization</a>
+    <a class="btn" href="/calculators/aws-route-53-cost-calculator/">Route 53 cost</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
 
