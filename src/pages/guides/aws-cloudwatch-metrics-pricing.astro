@@ -22,27 +22,35 @@ const description =
   ]}
 >
   <p>
-    CloudWatch metrics pricing often looks like "a few small line items" until metric sprawl and polling add up. A useful
-    cost model separates <strong>metric volume</strong> (time series) from <strong>metric access</strong> (API requests
-    and dashboards), and then adds <strong>alarms</strong> as a related bucket.
+    Use this page when you need to decide what belongs inside the CloudWatch metrics bill before you debate cardinality cleanup, polling reduction, or dashboard pruning.
+  </p>
+  <p class="muted">
+    This guide is about bill boundaries: custom metrics, high-resolution metrics, metrics API requests, dashboards, and the adjacent alarm and external observability costs that should be tracked beside the metrics bill rather than blended into it.
   </p>
 
-  <h2>What to include in a metrics estimate</h2>
+  <h2>Inside the metrics bill vs beside the metrics bill</h2>
+  <ul>
+    <li><strong>Inside the metrics bill</strong>: custom metrics, high-resolution metrics, metrics API requests, and dashboard-month charges.</li>
+    <li><strong>Beside the metrics bill</strong>: alarms created from the metrics, external polling tools, and other observability systems that use CloudWatch as an input.</li>
+    <li><strong>Why this distinction matters</strong>: teams often blame CloudWatch metrics for downstream alarming or third-party observability costs that should be budgeted separately.</li>
+  </ul>
+
+  <h2>What to model on the bill itself</h2>
   <ul>
     <li>
-      <strong>Custom metrics time series</strong>: metric names * dimension combinations * environments
+      <strong>Custom metrics time series</strong>: the active-series inventory created by names, dimensions, and environments.
     </li>
     <li>
-      <strong>Resolution</strong>: standard vs high-resolution where applicable
+      <strong>Resolution</strong>: standard vs high-resolution metrics where applicable.
     </li>
     <li>
-      <strong>Metrics API requests</strong>: dashboard refresh + tooling polling
+      <strong>Metrics API requests</strong>: dashboard refresh plus CloudWatch-native request usage.
     </li>
     <li>
-      <strong>Dashboards</strong>: dashboard-month charges (and their polling effects)
+      <strong>Dashboards</strong>: dashboard-month charges and their CloudWatch-native polling footprint.
     </li>
     <li>
-      <strong>Alarms</strong>: alarm-months created from metrics (separate pricing bucket)
+      <strong>Bill ownership</strong>: whether the spend belongs to CloudWatch metrics itself or to the systems consuming those metrics.
     </li>
   </ul>
   <div class="btn-row">
@@ -50,27 +58,41 @@ const description =
     <a class="btn" href="/calculators/aws-cloudwatch-alarms-cost-calculator/">Alarms cost</a>
   </div>
 
-  <h2>Fast modeling workflow</h2>
-  <ol>
-    <li>Estimate custom metric time series (baseline + growth scenario).</li>
-    <li>Estimate metrics API requests from dashboards and tooling polling.</li>
-    <li>Count dashboards and alarms (prod vs non-prod).</li>
-    <li>Apply your region pricing and validate against a real week of usage.</li>
-  </ol>
+  <h2>Scope choices that change the bill boundary</h2>
+  <ul>
+    <li><strong>Metric type mix</strong>: custom and high-resolution metrics should be budgeted as separate buckets when they price differently.</li>
+    <li><strong>Access pattern</strong>: CloudWatch-native dashboards and API requests belong inside the metrics bill, while external tools should be tracked beside it.</li>
+    <li><strong>Alarm coupling</strong>: alarm-month charges belong to the alarms bill even when they are triggered by metrics.</li>
+  </ul>
 
-  <h2>How to estimate the two core drivers</h2>
+  <h2>How to get inputs without mixing jobs</h2>
+  <ul>
+    <li><strong>Active series</strong>: bring in a defendable time-series model from the estimate page instead of doing the full counting workflow here.</li>
+    <li><strong>API request posture</strong>: keep CloudWatch-native polling separate from third-party access patterns before assigning cost ownership.</li>
+    <li><strong>Adjacent services</strong>: list alarms and external observability systems beside the metrics bill instead of hiding them in one blended estimate.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
   <ul>
     <li>
-      <strong>Custom metrics</strong>: count time series and identify high-cardinality dimensions.
-      Guide: <a href="/guides/aws-cloudwatch-metrics-estimate-custom-metrics/">estimate custom metrics</a>.
+      <strong>You still need time-series evidence</strong>: go to <a href="/guides/aws-cloudwatch-metrics-estimate-custom-metrics/">Estimate CloudWatch custom metrics</a> if the real problem is turning inventory, instrumentation, exporters, and dimensions into a defendable active-series model.
     </li>
     <li>
-      <strong>API requests</strong>: model dashboard refresh and tool polling.
-      Guide: <a href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">estimate API requests</a>.
+      <strong>You already know the dominant driver</strong>: go to <a href="/guides/aws-cloudwatch-metrics-cost-optimization/">CloudWatch metrics cost optimization</a> if the real question is what to change in production.
     </li>
   </ul>
 
-  <h2>Worked example (why this grows fast)</h2>
+  <h2>A fast pricing structure (metrics + adjacent services)</h2>
+  <p class="muted">
+    Use <a href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a> for CloudWatch-native metrics, API requests, and dashboards, then keep alarms and external systems in separate buckets.
+  </p>
+  <ul>
+    <li>CloudWatch-native: custom metrics, high-resolution metrics, API requests, and dashboards by your effective regional pricing.</li>
+    <li>Adjacent services: CloudWatch alarms, external polling tools, and downstream observability systems.</li>
+    <li>Scenario split: keep baseline months separate from growth months where cardinality or polling rises.</li>
+  </ul>
+
+  <h2>Worked pricing example (why boundary matters)</h2>
   <p class="muted">
     Suppose you publish 30 metrics per service, each with 2 dimensions (service and status), and you have 12 services and
     2 environments. If status has 5 values, a rough series estimate is:
@@ -83,31 +105,20 @@ const description =
     increase.
   </p>
 
-  <h2>Common pitfalls</h2>
+  <h2>Common bill-boundary mistakes</h2>
   <ul>
-    <li>Adding unbounded dimensions (tenantId, userId, podId) and creating runaway series counts.</li>
-    <li>Copying full dashboard packs into every environment and keeping them forever.</li>
-    <li>Multiple tools polling CloudWatch in parallel (duplicated API request volume).</li>
-    <li>Publishing per-instance metrics when service-level aggregates would work for alerting.</li>
-    <li>Not separating prod vs non-prod (non-prod is often the safest cost reduction).</li>
+    <li>Using the pricing page to do the full active-series counting workflow instead of separating scope from measurement.</li>
+    <li>Blending alarms and external polling tools into the core CloudWatch metrics bill.</li>
+    <li>Treating third-party observability polling as if it were a native CloudWatch dashboard cost.</li>
+    <li>Assigning one blended bill to “metrics” without separating CloudWatch-native inventory from adjacent consumers.</li>
   </ul>
 
-  <h2>Optimization direction</h2>
+  <h2>How to validate the bill model</h2>
   <ul>
-    <li>Control cardinality with a dimension budget and explicit review.</li>
-    <li>Aggregate by default; use per-instance only for deep debugging.</li>
-    <li>Reduce polling overlap and slow down refresh for slow-moving metrics.</li>
-  </ul>
-  <p class="muted">
-    Guide: <a href="/guides/aws-cloudwatch-metrics-cost-optimization/">CloudWatch metrics cost optimization</a>.
-  </p>
-
-  <h2>Validation checklist</h2>
-  <ul>
-    <li>Measure active series by namespace and identify top dimensions.</li>
-    <li>Measure API request volume for at least 7 days (include a busy/incident day if possible).</li>
-    <li>Confirm dashboard time ranges and refresh intervals match the decision speed you need.</li>
-    <li>Validate alarms: do you have many per-resource alarms that scale with fleet size?</li>
+    <li>Reconcile your active-series and API-request assumptions against measured CloudWatch-native usage.</li>
+    <li>Confirm which charges are CloudWatch-native and which begin once alarms or external tools consume the metrics.</li>
+    <li>Validate dashboard, request, and alarm ownership before comparing teams or environments.</li>
+    <li>Keep growth windows separate from normal budgeting assumptions.</li>
   </ul>
 
   <h2>Sources</h2>

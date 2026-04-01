@@ -22,10 +22,20 @@ const description =
   ]}
 >
   <p>
-    For CloudWatch custom metrics, the key planning input is the number of <strong>unique time series</strong>. A time
-    series is typically one metric name plus one specific set of dimension values. If you add a dimension that has many
-    unique values, you multiply your series count quickly.
+    This page is the time-series measurement workflow, not the bill-boundary page: the goal is to turn CloudWatch inventory, instrumentation config, exporters, dimension combinations, and growth multipliers into a defendable active-series model.
   </p>
+  <p>
+    If you are still deciding which line items belong inside the CloudWatch metrics bill, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you estimate anything</h2>
+  <ul>
+    <li><strong>CloudWatch inventory</strong>: active series by namespace and environment.</li>
+    <li><strong>Instrumentation config</strong>: metric names and dimension sets defined in code or monitoring templates.</li>
+    <li><strong>Exporters</strong>: agents and collectors that can duplicate or multiply emitted series.</li>
+    <li><strong>Dimension combinations</strong>: the actual value sets that expand one metric into many active series.</li>
+    <li><strong>Growth multipliers</strong>: fleet size, tenant count, services, endpoints, and environments that cause expansion over time.</li>
+  </ul>
 
   <h2>Custom metrics count inputs</h2>
   <ul>
@@ -87,6 +97,14 @@ const description =
     </li>
   </ul>
 
+  <h2>Separate baseline series from growth windows</h2>
+  <ul>
+    <li><strong>Baseline series</strong>: stable namespaces, dimensions, and environments.</li>
+    <li><strong>Fleet-growth series</strong>: per-instance or per-pod dimensions that rise with infrastructure scale.</li>
+    <li><strong>Tenant-growth series</strong>: customer or tenant dimensions that expand as the business grows.</li>
+    <li><strong>Busy-month series</strong>: migrations, experiments, or temporary environments that expand active series for a limited window.</li>
+  </ul>
+
   <h2>Worked example (why dimensions matter)</h2>
   <ul>
     <li>Metric: <code>http_requests</code> with dimensions service and status</li>
@@ -102,10 +120,16 @@ const description =
     <a class="btn" href="/calculators/cloudwatch-metrics-cost-calculator/">CloudWatch metrics cost</a>
   </div>
 
+  <h2>When the active-series model is good enough to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-cloudwatch-metrics-pricing/">CloudWatch metrics pricing</a> if you still are not sure which costs belong inside the metrics bill versus beside it.</li>
+    <li>Move to <a href="/guides/aws-cloudwatch-metrics-cost-optimization/">CloudWatch metrics cost optimization</a> when you can defend the dominant driver and want to change production behavior.</li>
+  </ul>
+
   <h2>Validation checklist</h2>
   <ul>
     <li>List the top namespaces and the top dimensions used (those explain most series).</li>
-    <li>Model baseline vs busy month (fleet size and tenant growth scenarios).</li>
+    <li>Model baseline vs growth windows (fleet size, tenant growth, and temporary environment scenarios).</li>
     <li>Confirm you don't have duplicated exporters emitting equivalent series.</li>
     <li>Once deployed, compare estimate vs measured active series from a real week.</li>
   </ul>
