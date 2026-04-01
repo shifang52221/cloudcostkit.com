@@ -30,11 +30,21 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
-  <p class="muted">
-    Retrieval cost is often the surprise with archival storage. Model both GB retrieved and request count (objects
-    retrieved). The same GB retrieved can have very different cost depending on whether it is a few large objects or
-    millions of small objects.
+  <p>
+    This page is the retrieval-measurement workflow, not the bill-boundary page: the goal is to turn restore events, job frequency, object counts, backfill windows, and object packaging into a defendable retrieval model.
   </p>
+  <p>
+    If you are still deciding which costs belong inside the archive bill versus beside it, go back to the pricing guide first.
+  </p>
+
+  <h2>Evidence pack before you estimate anything</h2>
+  <ul>
+    <li><strong>Restore events</strong>: how often restores are triggered and how much data each restore touches.</li>
+    <li><strong>Job frequency</strong>: recurring analytics, audits, backfills, or incident-driven retrieval workflows.</li>
+    <li><strong>Object counts</strong>: how many objects are restored per workflow, not just how many GB are returned.</li>
+    <li><strong>Backfill windows</strong>: exceptional months where one-off restore events dominate the bill.</li>
+    <li><strong>Object packaging</strong>: whether the same data is stored in many small objects or fewer large objects.</li>
+  </ul>
 
   <h2>Define "retrieval" for your workflow</h2>
   <ul>
@@ -82,6 +92,14 @@ const faqs = [
     <li>Repeated rehydration suggests you may need a warmer tier or cached analysis copy.</li>
   </ul>
 
+  <h2>Separate baseline retrieval from peak windows</h2>
+  <ul>
+    <li><strong>Baseline retrieval</strong>: ordinary compliance checks, occasional restores, and predictable monthly jobs.</li>
+    <li><strong>Peak retrieval windows</strong>: audits, backfills, or reprocessing events that can dominate one billing month.</li>
+    <li><strong>Request-heavy windows</strong>: months where small-object fan-out matters more than restored GB.</li>
+    <li><strong>Workflow-change windows</strong>: temporary migrations or new analytics patterns that alter restore behavior.</li>
+  </ul>
+
   <h2>Worked estimate template (copy/paste)</h2>
   <ul>
     <li>
@@ -111,6 +129,12 @@ const faqs = [
     <li>After the first month, reconcile your model with actual restore events and billing usage types.</li>
     <li>Check whether your restores were concentrated in a few days (peaky usage) and keep the peak scenario.</li>
     <li>Verify object-count assumptions by sampling one representative job and counting restored objects.</li>
+  </ul>
+
+  <h2>When the retrieval model is ready to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-s3-glacier-pricing/">archive pricing</a> if you still are not sure which retrieval and duration costs belong to the archive bill versus adjacent workflow costs.</li>
+    <li>Move to <a href="/guides/aws-s3-glacier-cost-optimization/">Glacier cost optimization</a> when you can defend the dominant driver and want to change restore behavior, packaging, lifecycle rules, or tier placement.</li>
   </ul>
 
   <h2>Related reading and tools</h2>

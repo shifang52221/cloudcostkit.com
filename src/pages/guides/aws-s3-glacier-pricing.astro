@@ -30,104 +30,75 @@ const description =
   ]}
 >
   <p>
-    Archive storage is cheap for data you rarely read. But total cost depends on <strong>how often you restore</strong>
-    and how your data is packaged (large objects vs many small objects).
+    Use this page when you need to decide what belongs inside the archive bill before you debate restore batching, object repackaging, or tier changes.
   </p>
-
-  <h2>What to model (the full archive cost picture)</h2>
-  <ul>
-    <li>
-      <strong>Stored GB-month</strong>: average stored GB over the month
-    </li>
-    <li>
-      <strong>Retrieval GB/month</strong>: how much data you restore and read back
-    </li>
-    <li>
-      <strong>Retrieval requests/month</strong>: how many objects you retrieve
-    </li>
-    <li>
-      <strong>Minimum duration / early deletion</strong>: if you delete/overwrite before the minimum duration
-    </li>
-    <li>
-      <strong>Transitions</strong>: how often objects move into archive (and whether you churn objects between tiers)
-    </li>
-  </ul>
-
-  <h2>How to estimate without copying price tables</h2>
-  <p>
-    You do not need a full price matrix to build a good budget. Build a model with stable inputs and validate with billing after one cycle:
-    average stored GB-month, restored GB/month, and objects restored/month (requests).
-  </p>
-
-  <h2>A fast estimate (baseline + peak)</h2>
   <p class="muted">
-    Use <a href="/calculators/aws-s3-glacier-cost-calculator/">AWS S3 Glacier / Deep Archive Cost Calculator</a> for a
-    storage + retrieval model. If your workload frequently deletes or replaces objects, add minimum-duration effects to
-    your estimate.
+    This guide is about bill boundaries: stored GB-month, retrieval GB, retrieval requests, transition exposure, minimum-duration exposure, and the adjacent compute, analysis-copy, or workflow costs that should be tracked beside the archive bill rather than blended into it.
   </p>
+
+  <h2>Inside the archive bill vs beside the archive bill</h2>
   <ul>
     <li>
-      <strong>Baseline</strong>: typical month restores and object counts.
+      <strong>Inside the archive bill</strong>: stored GB-month, retrieval volume, retrieval requests, transitions, and minimum-duration exposure.
     </li>
     <li>
-      <strong>Peak</strong>: audits, backfills, reprocessing, incident-driven restores.
+      <strong>Beside the archive bill</strong>: downstream compute on restored data, temporary analysis copies, and operator-side workflow costs that happen after retrieval.
+    </li>
+    <li>
+      <strong>Why this distinction matters</strong>: teams often blame Glacier for the workload they run after restore, even though the restored-data processing cost belongs to a different budget bucket.
     </li>
   </ul>
 
-  <h2>Common pitfalls</h2>
-  <ul>
-    <li>Using "total archive size" as the retrieval input (retrieval is about restored volume, not stored volume).</li>
-    <li>Ignoring object counts when archives contain many small files.</li>
-    <li>Short-lived data in tiers with minimum duration.</li>
-    <li>Frequent rehydration workflows that turn archive into a warm tier by accident.</li>
-    <li>Assuming all restores look like the average (backfills are usually the outlier).</li>
-  </ul>
-
-  <h2>How to validate the estimate</h2>
-  <ul>
-    <li>Validate retrieval GB/month and retrieval request counts from restore jobs or access patterns.</li>
-    <li>Watch for small-object amplification: many objects means many retrieval requests.</li>
-    <li>Check minimum duration rules if data is short-lived or overwritten frequently.</li>
-    <li>After one billing cycle, reconcile usage types in CUR/Cost Explorer against your baseline and peak scenarios.</li>
-  </ul>
-
-  <h2>How to choose an archival class (latency vs retrieval frequency)</h2>
-  <p>
-    "Archive" is not one thing. The right class depends on how often you restore and how fast you need the data. If restores are part of a weekly workflow,
-    you may want a warmer tier or a cached analysis copy instead of treating restores as a routine operation.
-  </p>
+  <h2>What to model on the archive bill itself</h2>
   <ul>
     <li>
-      <strong>Latency requirement</strong>: seconds/minutes/hours to first byte changes your operational workflow (and what a "failed restore" means).
+      <strong>Stored GB-month</strong>: average archived data held over the billing window.
     </li>
     <li>
-      <strong>Restore volume</strong>: large backfills are usually the peak month; model that peak explicitly.
+      <strong>Retrieval GB</strong>: restored data volume that actually re-enters the workflow.
     </li>
     <li>
-      <strong>Object count</strong>: packaging many small files into fewer objects can reduce request-like fees and make restores operationally simpler.
+      <strong>Retrieval requests</strong>: object-count-driven request exposure that can grow faster than restored GB.
     </li>
     <li>
-      <strong>Data lifetime</strong>: if you delete or overwrite frequently, minimum duration can erase savings.
+      <strong>Transition exposure</strong>: movement into archive when lifecycle rules or churn create extra archive-side activity.
+    </li>
+    <li>
+      <strong>Minimum-duration exposure</strong>: early deletion or overwrite patterns that erase cold-storage savings.
     </li>
   </ul>
 
-  <h2>Glacier vs Deep Archive (quick comparison)</h2>
+  <h2>Boundary choices that change ownership</h2>
   <ul>
-    <li><strong>Deep Archive</strong>: lowest storage price, longest retrieval times, highest penalty for frequent restores.</li>
-    <li><strong>Glacier</strong>: higher storage price, faster retrieval, better fit for occasional restores.</li>
-    <li><strong>Cost trade-off</strong>: frequent restores usually favor Glacier or a warmer tier even if storage is higher.</li>
+    <li><strong>Restore workflow</strong>: the archive bill covers getting data back, not the analysis systems or compute you run after restore completes.</li>
+    <li><strong>Warm-copy strategy</strong>: if you keep a cached or warm analysis copy, that copy belongs beside the archive bill rather than inside it.</li>
+    <li><strong>Tier churn</strong>: frequent moves and short-lived archived objects can change whether cost is really a Glacier problem or a lifecycle-policy problem.</li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>How to gather inputs without mixing jobs</h2>
+  <ul>
+    <li><strong>Retrieval exposure</strong>: bring in defendable retrieval GB and request counts from the estimate page instead of counting restore jobs here.</li>
+    <li><strong>Bill adjacency</strong>: list downstream compute, restored-data cache, and analysis-copy costs beside the archive bill instead of hiding them in one blended estimate.</li>
+    <li><strong>Duration risk</strong>: keep minimum-duration exposure visible so short-lived archive use is not mistaken for ordinary retrieval cost.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>Go to <a href="/guides/aws-s3-glacier-estimate-retrieval/">estimate retrieval</a> if you still need to measure restore events, object counts, backfills, or peak windows.</li>
+    <li>Go to <a href="/guides/aws-s3-glacier-cost-optimization/">Glacier cost optimization</a> if you already know the cost owner and need production changes such as restore discipline, repackaging, or tier changes.</li>
+  </ul>
+
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Archive cost</a>
     <a class="btn" href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate retrieval</a>
-    <a class="btn" href="/guides/aws-s3-glacier-retrieval-time/">Retrieval time</a>
-    <a class="btn" href="/guides/aws-s3-glacier-retrieval-pricing/">Retrieval pricing</a>
-    <a class="btn" href="/guides/s3-to-glacier-transfer-cost/">Transfer cost</a>
-    <a class="btn" href="/guides/aws-s3-glacier-cost-optimization/">Reduce archive costs</a>
-    <a class="btn" href="/guides/storage-costs/">Storage costs</a>
   </div>
+
+  <h2>Validation checklist</h2>
+  <ul>
+    <li>Validate that retrieval, transition, and minimum-duration inputs belong to the archive bill rather than to downstream processing or cache systems.</li>
+    <li>Validate object-count exposure explicitly so request-heavy archives are not mistaken for pure storage problems.</li>
+    <li>Validate short-lived archive behavior so minimum-duration penalties are not hidden inside general storage assumptions.</li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>
