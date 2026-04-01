@@ -22,24 +22,25 @@ const description =
   ]}
 >
   <p>
-    CloudWatch metrics cost typically grows from <strong>custom metrics</strong>, <strong>high-cardinality dimensions</strong>,
-    and <strong>API polling</strong>. The best savings come from reducing metric sprawl while keeping the signals that
-    actually detect incidents.
+    Optimization starts only after you know whether high-cardinality dimensions, duplicate exporters, high-resolution overuse, or metrics API polling is the real CloudWatch metrics cost driver; otherwise teams prune metrics blindly without removing the real waste.
+  </p>
+  <p>
+    This page is for production intervention: cardinality control, exporter dedupe, resolution policy, polling discipline, and observability preservation.
   </p>
 
-  <h2>Step 0: identify the dominant driver</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
     <li>
-      <strong>Custom metric count</strong>: how many unique time series you publish (names × dimensions).
+      <strong>High-cardinality dimensions dominate</strong>: series count is expanding faster than operational value.
     </li>
     <li>
-      <strong>Resolution</strong>: standard vs high-resolution metrics where applicable.
+      <strong>Duplicate exporters dominate</strong>: multiple agents or pipelines are emitting equivalent metrics.
     </li>
     <li>
-      <strong>API requests</strong>: dashboards and tools polling GetMetricData, etc.
+      <strong>High-resolution overuse dominates</strong>: fast granularity is being used where slower signals are enough.
     </li>
     <li>
-      <strong>Coupled costs</strong>: alarms and dashboards created to “use” the metrics.
+      <strong>Metrics API polling dominates</strong>: dashboards and tools are refreshing more often than the decision speed requires.
     </li>
   </ul>
   <div class="btn-row">
@@ -47,7 +48,14 @@ const description =
     <a class="btn" href="/calculators/metrics-timeseries-cost-calculator/">Time series cost</a>
   </div>
 
-  <h2>High-leverage savings levers</h2>
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain which driver is larger: cardinality, exporter duplication, high-resolution usage, or API polling.</li>
+    <li>You only have one blended metrics number with no split between active series and access patterns.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing series evidence.</li>
+  </ul>
+
+  <h2>1) Control high-cardinality dimensions</h2>
   <ul>
     <li>
       <strong>Control cardinality</strong>: avoid dimensions like userId/tenantId/podId unless you truly need per-entity alerting.
@@ -55,14 +63,29 @@ const description =
     <li>
       <strong>Aggregate by default</strong>: publish service-level metrics (rate, error rate, latency) instead of per-instance metrics for dashboards.
     </li>
+  </ul>
+
+  <h2>2) Deduplicate exporters and metric sources</h2>
+  <ul>
     <li>
-      <strong>Right-size resolution</strong>: high-resolution is valuable for fast failure, but wasteful for slow-moving metrics.
-    </li>
-    <li>
-      <strong>Reduce polling</strong>: avoid multiple tools polling the same metrics at high frequency.
+      <strong>One source of truth</strong>: avoid multiple agents exporting the same metrics under different names.
     </li>
     <li>
       <strong>Prune unused metrics</strong>: stop emitting metrics that are not used by dashboards/alerts or incident response.
+    </li>
+  </ul>
+
+  <h2>3) Right-size resolution</h2>
+  <ul>
+    <li>
+      <strong>Right-size resolution</strong>: high-resolution is valuable for fast failure, but wasteful for slow-moving metrics.
+    </li>
+  </ul>
+
+  <h2>4) Reduce metrics API polling</h2>
+  <ul>
+    <li>
+      <strong>Reduce polling</strong>: avoid multiple tools polling the same metrics at high frequency.
     </li>
   </ul>
 
@@ -91,9 +114,6 @@ const description =
       <strong>Metric lifecycle</strong>: new metrics must have an owner and an expiration/review date.
     </li>
     <li>
-      <strong>One source of truth</strong>: avoid multiple agents exporting the same metrics under different names.
-    </li>
-    <li>
       <strong>Dashboards-first is risky</strong>: keep dashboards focused on a small operational set; explore in logs/traces when needed.
     </li>
   </ul>
@@ -105,6 +125,14 @@ const description =
   <p>
     Related: <a href="/guides/aws-cloudwatch-metrics-estimate-api-requests/">estimate metrics API requests</a>.
   </p>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across cardinality, exporter duplication, high-resolution usage, and API polling.</li>
+    <li>Make one production change at a time, such as dropping a dimension, retiring an exporter, lowering resolution, or slowing refresh.</li>
+    <li>Re-measure the same series and request windows and confirm the cost moved for the reason you expected.</li>
+    <li>Verify that incident detection, dashboards, and alerting still work before keeping the change.</li>
+  </ol>
 
   <h2>Validation checklist (do not break observability)</h2>
   <ul>
