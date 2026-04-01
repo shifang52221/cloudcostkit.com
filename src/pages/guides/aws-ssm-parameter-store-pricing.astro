@@ -26,40 +26,42 @@ const description =
   ]}
 >
   <p>
-    Parameter Store cost is often a mix of <strong>advanced parameter-month</strong> charges plus <strong>API request</strong>
-    charges. The main risk is request-driven spend from chatty application patterns.
+    Use this page when you need to decide what belongs inside the Parameter Store bill before you debate caching strategy or request reduction.
   </p>
+  <p class="muted">
+    This guide is about bill boundaries: advanced parameter-months, Parameter Store API requests, and the adjacent polling, deploy, and secret-management costs that should be tracked beside Parameter Store rather than blended into it.
+  </p>
+
+  <h2>Inside the Parameter Store bill vs beside the Parameter Store bill</h2>
+  <ul>
+    <li><strong>Inside the Parameter Store bill</strong>: advanced parameter-month charges and Parameter Store API requests.</li>
+    <li><strong>Beside the Parameter Store bill</strong>: app polling behavior, deploy churn, retry storms, and secret-management choices that may explain request spikes without being core Parameter Store line items.</li>
+    <li><strong>Why this distinction matters</strong>: teams often jump into caching debates before they have separated the actual Parameter Store bill from the runtime behavior around it.</li>
+  </ul>
 
   <h2>What to model (the 2 primary drivers)</h2>
   <ul>
-    <li>
-      <strong>Standard vs advanced parameters</strong>: advanced parameters often have a monthly per-parameter charge
-    </li>
-    <li>
-      <strong>API calls/month</strong>: GetParameter(s), PutParameter, List*, and related calls
-    </li>
-    <li>
-      <strong>Caller patterns</strong>: per-request fetches vs per-startup fetches
-    </li>
+    <li><strong>Standard vs advanced parameters</strong>: advanced parameters can add a monthly per-parameter baseline.</li>
+    <li><strong>API calls/month</strong>: requests once you have measured or defended the request model separately.</li>
+    <li><strong>Bill ownership</strong>: whether the expensive behavior truly belongs to Parameter Store or to deploy, polling, or secret-boundary choices around it.</li>
   </ul>
 
-  <h2>How to get inputs (without guessing)</h2>
+  <h2>How to get inputs without mixing jobs</h2>
   <ul>
-    <li>
-      <strong>Parameter count</strong>: inventory parameters by environment (prod/staging) and identify which ones are advanced.
-    </li>
-    <li>
-      <strong>API calls</strong>: measure from a representative week (best) or estimate from startups/month * calls/startup.
-    </li>
-    <li>
-      <strong>Peak</strong>: keep a separate scenario for deploy waves and incidents (retries and churn).
-    </li>
+    <li><strong>Parameter count</strong>: inventory parameters by environment and identify which ones are advanced.</li>
+    <li><strong>API calls</strong>: bring in a measured or defendable request model from the estimate page instead of doing the full workflow here.</li>
+    <li><strong>Peak</strong>: keep rollout and incident behavior separate from baseline budgeting.</li>
+  </ul>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li><strong>You still need the request evidence</strong>: go to <a href="/guides/aws-ssm-parameter-store-estimate-api-calls/">Estimate API calls</a> if the real problem is turning CloudTrail, startup counts, refresh TTL, polling, and retries into a defendable request model.</li>
+    <li><strong>You already know the cost driver</strong>: go to <a href="/guides/aws-ssm-parameter-store-cost-optimization/">Parameter Store cost optimization</a> if the real question is what to change in production.</li>
   </ul>
 
   <h2>A fast estimate (baseline + peak)</h2>
   <p class="muted">
-    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">AWS SSM Parameter Store Cost Calculator</a> to model
-    advanced parameters + API calls with your effective pricing.
+    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">AWS SSM Parameter Store Cost Calculator</a> to model advanced parameters + API calls with your effective pricing.
   </p>
   <ul>
     <li>Baseline: typical month calls/day and advanced parameter count.</li>
@@ -79,36 +81,27 @@ const description =
     </li>
   </ul>
 
-  <h2>Common usage patterns (and what they do to the bill)</h2>
+  <h2>What usually creates surprise bills at the bill-boundary level</h2>
   <ul>
-    <li>
-      <strong>Startup config load</strong>: services read a small set of parameters on startup, then cache in memory. Cost is mostly startups/month * calls/startup.
-    </li>
-    <li>
-      <strong>TTL refresh</strong>: services refresh every N minutes. Cost is steady and predictable, but gets expensive fast if TTL is too short across a large fleet.
-    </li>
-    <li>
-      <strong>Per-request lookups</strong>: feature flags or routing keys fetched on every request. Cost scales with traffic and can spike during incidents.
-    </li>
+    <li><strong>Advanced parameter sprawl</strong>: more parameters and more environments quietly raise the baseline.</li>
+    <li><strong>Request-led spikes</strong>: chatty polling, per-request fetches, or churn-heavy deploys dominate the variable line item.</li>
+    <li><strong>Boundary confusion</strong>: teams use Parameter Store like a secret vault, then compare it to the wrong workload shape.</li>
   </ul>
-  <p class="muted">
-    If you are doing many reads, batching (GetParameters/GetParametersByPath) plus caching is the biggest difference between a small bill and a noisy, traffic-driven bill.
-  </p>
 
   <h2>Common pitfalls</h2>
   <ul>
-    <li>Fetching parameters on every request (traffic-driven API calls).</li>
-    <li>Over-short refresh TTLs that create constant background calls.</li>
-    <li>Deploy churn: restarting the fleet frequently without batching or caching.</li>
-    <li>Prefix scans (List*/Describe) run repeatedly instead of caching a resolved map.</li>
+    <li>Using this pricing page as the only source of truth for request modeling.</li>
+    <li>Blending polling or deploy behavior directly into the core bill without separating ownership.</li>
+    <li>Ignoring advanced parameter growth across environments.</li>
     <li>Mixing pricing units (Parameter Store often uses per-10k request units).</li>
   </ul>
 
-  <h2>How to validate the estimate</h2>
+  <h2>How to validate the bill model</h2>
   <ul>
     <li>In Cost Explorer / CUR, reconcile request-related usage against your modeled API calls/month.</li>
-    <li>Spot-check one service: measure calls on startup vs steady state to validate your assumptions.</li>
-    <li>Confirm that deploy and incident windows are represented by a separate peak scenario.</li>
+    <li>Confirm whether the cost is inventory-led, request-led, or being driven by adjacent runtime behavior.</li>
+    <li>Use the estimate workflow if the request side is still based on assumptions rather than evidence.</li>
+    <li>Keep deploy and incident windows separate from normal budget assumptions.</li>
   </ul>
 
   <h2>Related tools</h2>

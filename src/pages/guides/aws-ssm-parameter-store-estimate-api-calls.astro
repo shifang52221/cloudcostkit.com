@@ -31,22 +31,19 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    Parameter Store costs are frequently request-driven, so the key input is <strong>API calls per month</strong> (often
-    dominated by GetParameter, GetParameters, and related reads). This page gives you three estimation methods and a
-    template you can copy/paste into a budget review.
+    This page is the Parameter Store API-call measurement workflow, not the bill-boundary page: the goal is to turn CloudTrail evidence, startup counts, refresh TTL, polling loops, batch-read behavior, and retry patterns into a defendable monthly request model.
+  </p>
+  <p>
+    If you are still deciding which line items belong inside the Parameter Store bill, go back to the pricing guide first.
   </p>
 
-  <h2>What counts as an API call (so you don't miscount)</h2>
+  <h2>Evidence pack before you estimate anything</h2>
   <ul>
-    <li>
-      <strong>GetParameter</strong>: one call per parameter read (worst-case if you read many keys individually)
-    </li>
-    <li>
-      <strong>GetParameters / GetParametersByPath</strong>: one call can return multiple values (best-case if you batch and cache)
-    </li>
-    <li>
-      <strong>DescribeParameters / List*</strong>: control-plane style calls that can accidentally run in loops
-    </li>
+    <li><strong>CloudTrail or equivalent evidence</strong>: the fastest starting point for operation counts and noisy callers.</li>
+    <li><strong>Startup counts</strong>: pods, tasks, jobs, and cold starts that explain clustered reads.</li>
+    <li><strong>Refresh TTL behavior</strong>: how often long-running services re-read config in steady state.</li>
+    <li><strong>Polling loops and batch behavior</strong>: whether services use GetParameters effectively or call single-key reads in loops.</li>
+    <li><strong>Incident windows</strong>: retries, throttling, and deploy waves that should be separated from baseline.</li>
   </ul>
 
   <h2>Method 1: From measured usage (best)</h2>
@@ -88,12 +85,13 @@ const faqs = [
     </li>
   </ul>
 
-  <h2>Common multipliers (the spike drivers)</h2>
+  <h2>Separate baseline demand from spike behavior</h2>
   <ul>
-    <li>Over-short TTL refresh loops (refreshing far more frequently than needed).</li>
-    <li>Deploy waves that restart the fleet in a narrow window (churn peaks).</li>
-    <li>Retry storms on timeouts and throttling (missing jitter and backoff).</li>
-    <li>Prefix scans (Describe/List) run repeatedly instead of caching resolved values.</li>
+    <li><strong>Baseline demand</strong>: normal startup reads and expected refreshes.</li>
+    <li><strong>Deploy-driven spikes</strong>: rollout waves, autoscaling bursts, and short-lived jobs.</li>
+    <li><strong>Refresh-driven spikes</strong>: over-short TTL loops or too many instances refreshing at once.</li>
+    <li><strong>Retry-driven spikes</strong>: timeouts, throttling, and missing jitter/backoff.</li>
+    <li><strong>Polling inflation</strong>: repeated GetParameter, Describe, or path scans in loops that should be cached or batched.</li>
   </ul>
 
   <h2>Turn calls into cost</h2>
@@ -108,6 +106,12 @@ const faqs = [
     <li>After rollout, compare your modeled calls/month to actual usage types in Cost Explorer / CUR.</li>
     <li>Spot-check one service: count calls on startup and during steady state to confirm your calls/startup assumption.</li>
     <li>Confirm pricing units (Parameter Store requests are typically priced per 10k).</li>
+  </ul>
+
+  <h2>When the estimate is good enough to hand off</h2>
+  <ul>
+    <li>Go back to <a href="/guides/aws-ssm-parameter-store-pricing/">Parameter Store pricing</a> if you still are not sure whether the cost belongs to advanced parameters, API requests, or an adjacent runtime pattern.</li>
+    <li>Move to <a href="/guides/aws-ssm-parameter-store-cost-optimization/">Parameter Store cost optimization</a> when the request model is stable enough that caching or polling changes can be measured against it.</li>
   </ul>
 
   <h2>Related tools</h2>

@@ -31,24 +31,27 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    Parameter Store cost reduction is mostly about reducing GetParameter volume while keeping configuration handling safe
-    and reliable.
+    Optimization starts only after you know whether advanced parameter-months or API requests are the real Parameter Store cost driver; otherwise teams change caching and refresh logic without moving the bill.
+  </p>
+  <p>
+    This page is for production intervention: caching policy, batch reads, refresh discipline, polling reduction, and churn control.
   </p>
 
-  <h2>What drives Parameter Store cost</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
-    <li>
-      <strong>API calls</strong>: the main variable driver (GetParameter/GetParameters, PutParameter, List*).
-    </li>
-    <li>
-      <strong>Parameter tier</strong>: advanced parameter count can add a steady baseline in some setups.
-    </li>
-    <li>
-      <strong>Churn events</strong>: deploys, autoscaling, and cold starts can multiply startup fetches.
-    </li>
+    <li><strong>Advanced parameter-months dominate</strong>: the next win is inventory discipline and tier control, not request tuning.</li>
+    <li><strong>API requests dominate</strong>: the next win is caching, batch reads, polling reduction, and churn control.</li>
+    <li><strong>Adjacent runtime behavior dominates</strong>: if deploy storms or app loops are the real driver, do not blame the whole bill on Parameter Store itself.</li>
   </ul>
 
-  <h2>1) Cache parameters (the biggest lever)</h2>
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether advanced parameter-months or API requests dominate the bill.</li>
+    <li>You only have one blended request number with no baseline versus deploy or incident split.</li>
+    <li>You are still using the pricing page to define scope or the estimate page to gather missing evidence.</li>
+  </ul>
+
+  <h2>1) Cache parameters (the biggest lever when requests dominate)</h2>
   <ul>
     <li>Fetch parameters once per process startup and cache in memory.</li>
     <li>Add a TTL refresh for long-running services (minutes, not seconds), and refresh before expiry.</li>
@@ -77,19 +80,6 @@ const faqs = [
     <li>Keep write churn (PutParameter) intentional: unnecessary updates can trigger reload waves.</li>
   </ul>
 
-  <h2>Worked estimate template (copy/paste)</h2>
-  <ul>
-    <li>
-      <strong>Calls/month</strong> = (startup fetches/month * params per startup) + (refresh fetches/month * params per refresh) + (writes/month)
-    </li>
-    <li>
-      <strong>Peak multiplier</strong> = incident retries + deployment churn + autoscaling churn
-    </li>
-  </ul>
-  <p class="muted">
-    Use <a href="/calculators/aws-ssm-parameter-store-cost-calculator/">Parameter Store cost calculator</a> to turn calls/month into dollars with your effective $ per 10k requests.
-  </p>
-
   <h2>Common pitfalls (cost + reliability)</h2>
   <ul>
     <li>Fetching parameters on every HTTP request.</li>
@@ -98,6 +88,14 @@ const faqs = [
     <li>Retry storms when SSM is throttled or temporarily unavailable.</li>
     <li>Scanning parameter prefixes repeatedly (List* loops) instead of caching a resolved map.</li>
   </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across advanced parameter-months, API requests, and adjacent runtime behavior.</li>
+    <li>Make one change at a time, such as cache TTL, batch reads, polling frequency, or deploy behavior.</li>
+    <li>Re-measure the same request and deploy window and confirm the bill moved for the reason you expected.</li>
+    <li>Verify config freshness, deploy reloads, and failure handling before keeping the change.</li>
+  </ol>
 
   <h2>How to validate the optimization</h2>
   <ul>
