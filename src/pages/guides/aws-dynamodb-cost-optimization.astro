@@ -22,27 +22,38 @@ const description =
   ]}
 >
   <p>
-    DynamoDB costs typically scale with <strong>reads</strong>, <strong>writes</strong>, and <strong>stored bytes</strong>.
-    The highest leverage savings come from reducing wasted reads/writes (especially scans) and controlling data and index
-    amplification.
+    Optimization starts only after you know whether reads, writes, storage, or index amplification is the real DynamoDB cost driver; otherwise teams cache, compress, or drop indexes blindly without removing the real waste.
+  </p>
+  <p>
+    This page is for production intervention: read-path cleanup, write amplification control, storage shaping, index hygiene, and correctness-safe query changes.
   </p>
 
-  <h2>Step 0: identify your dominant driver</h2>
+  <h2>Start by confirming the dominant cost driver</h2>
   <ul>
     <li>
-      <strong>Reads dominate</strong>: high read request volume, scan-heavy workloads, or strong consistency requirements.
+      <strong>Reads dominate</strong>: scan-heavy access, oversized reads, or repeated hot reads are the real bill driver.
     </li>
     <li>
-      <strong>Writes dominate</strong>: high write volume or many secondary indexes.
+      <strong>Writes dominate</strong>: item size, transactional behavior, or index updates are multiplying write exposure.
     </li>
     <li>
-      <strong>Storage dominates</strong>: large items, many projected attributes, or long-lived data without TTL.
+      <strong>Storage dominates</strong>: data shape, retention, or projected attributes are growing the table footprint faster than traffic.
+    </li>
+    <li>
+      <strong>Index amplification dominates</strong>: GSIs are multiplying writes and storage more than the base table workload itself.
     </li>
   </ul>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-dynamodb-cost-calculator/">DynamoDB cost calculator</a>
     <a class="btn" href="/guides/aws-dynamodb-pricing/">DynamoDB pricing</a>
   </div>
+
+  <h2>Do not optimize yet if these are still unclear</h2>
+  <ul>
+    <li>You still cannot explain whether reads, writes, storage, or indexes are the larger driver.</li>
+    <li>You only have one blended DynamoDB number with no split between read exposure, write exposure, storage, and extras.</li>
+    <li>You are still using the pricing page to define scope or the RCU/WCU page to gather missing unit evidence.</li>
+  </ul>
 
   <h2>1) Reduce read cost (avoid scans and oversized reads)</h2>
   <ul>
@@ -73,7 +84,7 @@ const description =
     </li>
   </ul>
 
-  <h2>Index and data model hygiene (often the real cost lever)</h2>
+  <h2>3) Fix index and data model hygiene</h2>
   <ul>
     <li>
       <strong>Every GSI is a multiplier</strong>: treat new GSIs like new tables from a cost perspective.
@@ -89,7 +100,7 @@ const description =
     </li>
   </ul>
 
-  <h2>3) Reduce storage cost (data shape and retention)</h2>
+  <h2>4) Reduce storage cost (data shape and retention)</h2>
   <ul>
     <li>
       <strong>Use TTL intentionally</strong>: expire data that does not need to be retained indefinitely.
@@ -102,7 +113,7 @@ const description =
     </li>
   </ul>
 
-  <h2>4) Choose the right capacity mode (and validate)</h2>
+  <h2>5) Choose the right capacity mode only after the workload is understood</h2>
   <ul>
     <li>
       <strong>Spiky workloads</strong>: on-demand can be simpler, but still needs request volume validation.
@@ -114,6 +125,14 @@ const description =
       <strong>Busy month modeling</strong>: include deploy/incident spikes so you don’t under-provision and trigger retries.
     </li>
   </ul>
+
+  <h2>Change-control loop for safe optimization</h2>
+  <ol>
+    <li>Measure the current dominant driver across reads, writes, storage, and index amplification.</li>
+    <li>Make one production change at a time, such as removing one scan path, shrinking one item shape, or retiring one GSI.</li>
+    <li>Re-measure the same workload window and confirm the bill moved for the reason you expected.</li>
+    <li>Verify latency, correctness, and query behavior still meet requirements before keeping the change.</li>
+  </ol>
 
   <h2>Validation checklist</h2>
   <ul>
