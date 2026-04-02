@@ -31,6 +31,14 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    Optimization starts only after you know whether idle task-hours, oversized task definitions, logging overhead, or
+    networking drag are the real Fargate cost driver; otherwise teams tune the wrong lever.
+  </p>
+  <p>
+    This page is for production intervention: task right-sizing, idle reduction, scaling cleanup, log control, and
+    networking-cost containment.
+  </p>
+  <p>
     Fargate cost optimization is usually about two things: <strong>reduce idle</strong> (average running tasks) and{" "}
     <strong>avoid hidden line items</strong> (logs and networking). Use this checklist to find the biggest levers first,
     then validate savings in billing after you ship.
@@ -47,6 +55,10 @@ const faqs = [
   </ul>
   <p class="muted">
     Tool: <a href="/calculators/aws-fargate-cost-calculator/">Fargate cost calculator</a>
+  </p>
+  <p class="muted">
+    If the bill boundary is still fuzzy, go back to <a href="/guides/aws-fargate-pricing/">Fargate pricing</a> before
+    changing production settings.
   </p>
 
   <h2>1) Reduce average running tasks (the biggest lever for many teams)</h2>
@@ -149,6 +161,13 @@ const faqs = [
     <li>Verify log ingestion GB/day and retention costs didn’t grow after changes.</li>
     <li>Re-check NAT processed GB and cross-AZ transfer after routing changes.</li>
   </ul>
+
+  <h2>Use a simple measure-change-remeasure loop</h2>
+  <ol>
+    <li>Measure the baseline for average running tasks, task size, log ingestion, and networking lines.</li>
+    <li>Change one production lever at a time so the next billing comparison is readable.</li>
+    <li>Remeasure the same workload window and keep only the changes that reduce spend without hurting scaling or latency behavior.</li>
+  </ol>
 
   <h2>Next steps</h2>
   <div class="btn-row">
