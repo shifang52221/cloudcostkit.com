@@ -31,10 +31,18 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    Load balancer optimization is usually about two levers: <strong>how many LBs you run</strong> (LB-hours) and{" "}
-    <strong>how busy each LB is</strong> (LCU/NLCU). The best results come from reducing always-on LB count and removing
-    traffic amplification patterns that inflate connections and bytes.
+    Optimization starts only after you know whether load balancer-hours, unit-hours, bytes processed, connection churn,
+    or retry-driven spikes are the real cost driver; otherwise teams consolidate, compress, or tune the wrong path. This
+    page is for production intervention: load balancer consolidation, connection-pattern cleanup, byte reduction, rule
+    simplification, and retry control.
   </p>
+
+  <h2>Do not optimize yet if the model is still weak</h2>
+  <ul>
+    <li>If you do not know whether LB-hours or unit-hours dominate, go back to the pricing page.</li>
+    <li>If you do not know which usage dimension is dominant, go back to the estimate page.</li>
+    <li>If you only need to understand how LCU or NLCU works, use the explainer page.</li>
+  </ul>
 
   <h2>Fast optimization checks</h2>
   <ul>
@@ -118,6 +126,10 @@ const faqs = [
     <li>Incident windows: did retries and errors drop after fixes?</li>
     <li>Related side effects: cross-AZ transfer and NAT/egress if routing changed</li>
   </ul>
+  <p class="muted">
+    The safest loop is measure, change one lever, re-measure, then confirm the bill moved where you expected instead of
+    simply shifting cost into another network surface.
+  </p>
   <p class="muted">
     Related cost domains: <a href="/guides/aws-nat-gateway-cost/">NAT gateway costs</a> and{" "}
     <a href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>.

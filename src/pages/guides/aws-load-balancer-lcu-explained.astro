@@ -27,9 +27,15 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    Many load balancers charge (1) a fixed hourly fee plus (2) a usage fee billed in capacity unit-hours. For budgeting,
-    you don’t need perfect precision—you need a defendable <strong>average units/hour</strong> and a <strong>peak
-    scenario</strong> so incident hours don’t blow up the plan.
+    This page is the support explainer for the load balancer cluster, not the bill-boundary page and not the measurement
+    workflow page: it exists to make LCU and NLCU unit logic easier to reason about once you know which page job you
+    actually need. Many load balancers charge (1) a fixed hourly fee plus (2) a usage fee billed in capacity unit-hours.
+  </p>
+  <p class="muted">
+    If you need to decide what belongs inside the load balancer bill, go back to the pricing guide first; if you need to
+    turn metrics into a defendable units-per-hour model, use the estimate guide.
+    <a href="/guides/aws-load-balancer-cost/">Open the pricing guide</a> or{" "}
+    <a href="/guides/aws-load-balancer-estimate-lcu/">open the estimate guide</a>.
   </p>
 
   <h2>What “capacity unit-hours” means</h2>
@@ -83,6 +89,7 @@ const faqs = [
     <li>Price units/hour + fixed LB hourly fee, then validate after a week.</li>
   </ol>
   <div class="btn-row">
+    <a class="btn" href="/guides/aws-load-balancer-cost/">Load balancer pricing guide</a>
     <a class="btn" href="/guides/aws-load-balancer-estimate-lcu/">Estimate LCU/NLCU from metrics</a>
     <a class="btn" href="/calculators/aws-load-balancer-lcu-calculator/">LCU/NLCU calculator</a>
     <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost calculator</a>
