@@ -21,14 +21,24 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-fargate-pricing" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
-    Fargate pricing is easiest to model as <strong>capacity x time</strong>: you pay for vCPU-hours and memory GB-hours
-    for running tasks. The hard part is estimating <strong>average</strong> running tasks over the month and remembering
-    the non-compute line items that show up in real bills.
+    Use this page when you need to decide what belongs inside the Fargate bill before you debate EC2 comparisons, EKS
+    comparisons, or optimization actions.
+  </p>
+  <p>
+    This guide is the Fargate bill-boundary page: task-level vCPU-hours, memory GB-hours, and adjacent load balancer,
+    logging, and networking lines should be modeled as separate cost surfaces instead of one generic container total.
   </p>
   <div class="btn-row">
     <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate pricing calculator</a>
     <a class="btn" href="/calculators/aws-load-balancer-cost-calculator/">LB cost calculator</a>
   </div>
+
+  <h2>Start here: separate the Fargate bill surfaces</h2>
+  <ul>
+    <li><strong>Fargate compute</strong>: task-level vCPU-hours and memory GB-hours for running tasks.</li>
+    <li><strong>Adjacent infrastructure</strong>: load balancers, logs, NAT, cross-AZ transfer, and internet egress.</li>
+    <li><strong>Why the split matters</strong>: teams make worse platform and optimization decisions when they blend compute, logging, and networking into one "service cost" number.</li>
+  </ul>
 
   <h2>What to include (minimum viable cost model)</h2>
   <ul>
@@ -126,6 +136,11 @@ const faqs = [
     <a class="btn" href="/guides/aws-fargate-vs-ec2-cost/">Fargate vs EC2</a>
     <a class="btn" href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate</a>
   </div>
+  <p class="muted">
+    Once the bill boundary is clear, use <a href="/guides/aws-fargate-cost-optimization/">Fargate cost optimization</a>
+    for production changes, <a href="/guides/aws-fargate-vs-ec2-cost/">Fargate vs EC2</a> for host-model decisions,
+    and <a href="/guides/aws-fargate-vs-eks-cost/">Fargate vs EKS</a> for orchestration-platform decisions.
+  </p>
 
   <h2>Sources</h2>
   <ul>
