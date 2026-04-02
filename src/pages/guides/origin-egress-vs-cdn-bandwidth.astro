@@ -22,10 +22,18 @@ const faqs = [
   lastUpdated="2026-01-21"
   faqs={faqs}
 >
+  <p class="muted">
+    This page is the edge-versus-origin concept clarifier page, not the full CDN bill-boundary page: the goal is to
+    explain why CDN bandwidth and origin egress are related but different cost surfaces.
+  </p>
   <p>
     If you are building a <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a> model, the easiest mistake
     is mixing up two similar-sounding line items: <strong>origin egress</strong> and <strong>CDN bandwidth</strong>.
     They are related, but they are not the same thing.
+  </p>
+  <p class="muted">
+    If you need the full CDN delivery model after this distinction is clear, go back to the CDN pricing guide; if you
+    need traffic evidence, go to the bandwidth-measurement page.
   </p>
 
   <h2>Quick definitions</h2>
@@ -86,6 +94,10 @@ const faqs = [
   </ul>
   <p>
     This is a simplification. It's a good starting point for budgeting, and you can refine it later with real metrics.
+  </p>
+  <p class="muted">
+    This page deliberately stays on concept separation. Full delivery-bill modeling belongs on the CDN cost guide, and
+    GB measurement belongs on the bandwidth-estimation page.
   </p>
 
   <h2>Common pitfalls</h2>

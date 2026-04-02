@@ -35,9 +35,17 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
+    This page is the CDN provider comparison page, not the CDN bill-boundary page: the goal is to compare two or more
+    providers with one normalized traffic profile after the cost surfaces are already defined.
+  </p>
+  <p class="muted">
     If you searched for <em>CDN cost comparison</em>, <em>CDN pricing comparison</em>, or a provider question such as{" "}
     <em>CloudFront vs Cloudflare cost</em>, start with one normalized traffic profile. A reliable CDN comparison is not
     about a single $/GB number. You need bandwidth, requests, regions, and cache fill in the same worksheet.
+  </p>
+  <p class="muted">
+    If you still need to define the delivery bill or work out blended bandwidth and request math before comparing
+    providers, go back to the relevant pricing pages first.
   </p>
 
   <h2>Use this page when your question is really "which CDN is cheaper?"</h2>
@@ -78,6 +86,10 @@ const faqs = [
   <p class="muted">
     If your search was closer to <em>CDN costs per GB</em> or <em>CDN cost per gigabyte</em>, use{" "}
     <a href="/guides/cdn-cost-per-gigabyte/">CDN cost per GB</a> first, then return here for the full provider comparison.
+  </p>
+  <p class="muted">
+    Keep this page on the provider-choice layer. Full bill structure belongs on the CDN cost guide, and detailed
+    request-pricing math belongs on the request-fee page.
   </p>
 
   <h2>Step 3: Adjust for tiering and discounts</h2>

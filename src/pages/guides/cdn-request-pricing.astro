@@ -31,9 +31,17 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p class="muted">
+    This page is the CDN request-fee page, not the full CDN bill-boundary page: the job is to define billable
+    requests, monthly request volume, and unit-safe request pricing without pretending requests are the whole bill.
+  </p>
   <p>
     When people search for "CDN cost", they focus on bandwidth ($/GB). But for many workloads, <strong>request fees</strong>{" "}
     are a real line item. The key is to model request fees as a separate bill component and keep units explicit.
+  </p>
+  <p class="muted">
+    If you still need bandwidth or origin-egress assumptions before the total model is credible, go back to the broader
+    pricing pages first.
   </p>
 
   <h2>0) Define "billable request" for your CDN</h2>
@@ -75,6 +83,10 @@ const faqs = [
   <p class="muted">
     Do not ignore bots, health checks, and retries. Those are often the "hidden request volume" that makes request fees
     dominate.
+  </p>
+  <p class="muted">
+    Monthly request evidence lives here; full delivery-bill structure still belongs on the CDN cost guide, and traffic
+    volume measurement belongs on the bandwidth-estimation page.
   </p>
 
   <h2>2) Apply per-10k vs per-1M pricing (keep units explicit)</h2>
