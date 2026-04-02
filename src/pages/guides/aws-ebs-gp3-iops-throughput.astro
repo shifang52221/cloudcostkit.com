@@ -22,9 +22,17 @@ const description =
   ]}
 >
   <p>
+    This page is the gp3 performance-measurement page, not the full EBS bill-boundary page: the job is to turn workload
+    IO patterns, latency behavior, and p95 demand into a defendable IOPS and throughput configuration.
+  </p>
+  <p>
     With gp3, you can often choose performance more explicitly. That is great for cost control, but it also means you can
     accidentally over-provision IOPS and throughput. The safest sizing workflow starts from measured utilization and
     validates performance under realistic load.
+  </p>
+  <p class="muted">
+    If you still are not sure what belongs inside the EBS bill versus the retained snapshot budget, go back to the pricing guide first.
+    Then use <a href="/guides/aws-ebs-pricing/">EBS pricing</a> to lock the bill boundary.
   </p>
 
   <h2>gp3 sizing cues</h2>
@@ -59,6 +67,11 @@ const description =
     <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
     <a class="btn" href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>
   </div>
+  <p class="muted">
+    When you already know the dominant cost driver and need production changes, move to
+    <a href="/guides/aws-ebs-cost-optimization/"> EBS cost optimization</a> instead of stretching this page into a
+    general savings checklist.
+  </p>
 
   <h2>Workload patterns (why IOPS vs throughput matters)</h2>
   <ul>

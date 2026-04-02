@@ -22,7 +22,15 @@ const description =
   ]}
 >
   <p>
-    EBS snapshots are incremental. That means the “billable snapshot storage” is usually dominated by how much data
+    This page is the retained backup-storage modeling page for EBS snapshots: the goal is to translate change rate,
+    retention, and copy policy into stored snapshot GB, not to restate live volume pricing.
+  </p>
+  <p>
+    Snapshot growth is a separate storage-accumulation problem from live volume GB-month, so treat it as its own model
+    before you make optimization changes.
+  </p>
+  <p>
+    EBS snapshots are incremental. That means the "billable snapshot storage" is usually dominated by how much data
     changes over time and how long you retain snapshots, not just the raw size of the volume. A simple planning model is
     enough to avoid surprises.
   </p>
@@ -83,6 +91,10 @@ const description =
     <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost calculator</a>
     <a class="btn" href="/guides/aws-ebs-pricing/">EBS pricing</a>
   </div>
+  <p class="muted">
+    If the question has shifted from modeling retained storage to deleting snapshots, changing retention, or cleaning up
+    waste, move to <a href="/guides/aws-ebs-cost-optimization/">EBS cost optimization</a>.
+  </p>
 
   <h2>Cost control levers (safe order)</h2>
   <ul>
