@@ -21,10 +21,22 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-load-balancer-cost" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Load balancers become a major line item when you have many always-on LBs or when traffic patterns drive high capacity
-    unit usage. A good estimate separates <strong>LB-hours</strong> (how many) from <strong>usage</strong> (how busy) and
-    validates both with real metrics.
+    Use this page when you need to decide what belongs inside the load balancer bill before you debate connection tuning,
+    CDN offload, or retry behavior. Load balancers become a major line item when you have many always-on LBs or when
+    traffic patterns drive high capacity unit usage, but this page is about bill scope before workflow or optimization.
   </p>
+
+  <h2>What belongs inside the load balancer bill</h2>
+  <p>
+    This guide is about bill boundaries: load balancer-hours, LCU or NLCU unit-hours, and the adjacent CDN, cross-AZ
+    transfer, WAF, NAT, and downstream costs that should be tracked beside the load balancer bill rather than blended into
+    it.
+  </p>
+  <ul>
+    <li><strong>Inside the bill</strong>: LB-hours, listener-bound usage, and capacity-unit hours.</li>
+    <li><strong>Beside the bill</strong>: CDN offload, transfer spillover, security tooling, and origin-side infrastructure.</li>
+    <li><strong>Decision point</strong>: separate the bill first, then decide whether measurement or optimization is next.</li>
+  </ul>
 
   <h2>The cost model (simple and reliable)</h2>
   <ul>
@@ -58,6 +70,13 @@ const faqs = [
     Deep dive: <a href="/guides/aws-load-balancer-lcu-explained/">LCU/NLCU explained</a> and{" "}
     <a href="/guides/aws-load-balancer-estimate-lcu/">estimate LCU from metrics</a>.
   </p>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If you need to turn metrics into a defendable units-per-hour model, go to the estimate guide.</li>
+    <li>If you already know the dominant driver and need to change production behavior, go to the optimization guide.</li>
+    <li>If you only need the conceptual meaning of LCU or NLCU, use the explainer page.</li>
+  </ul>
 
   <h2>Common architecture patterns that inflate LB spend</h2>
   <ul>
@@ -103,7 +122,9 @@ const faqs = [
 
   <h2>Next steps</h2>
   <div class="btn-row">
+    <a class="btn" href="/guides/aws-load-balancer-estimate-lcu/">Estimate LCU from metrics</a>
     <a class="btn" href="/guides/aws-load-balancer-cost-optimization/">Optimize load balancer cost</a>
+    <a class="btn" href="/guides/aws-load-balancer-lcu-explained/">LCU/NLCU explained</a>
     <a class="btn" href="/guides/aws-alb-vs-nlb-cost/">ALB vs NLB cost</a>
     <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
   </div>

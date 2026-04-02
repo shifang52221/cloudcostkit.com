@@ -27,9 +27,14 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    LCU/NLCU bills are hard to predict until you translate metrics into <strong>capacity units per hour</strong>. The
-    most reliable approach is: pull the driver metrics, compute average + p95, then estimate units/hour (LCU/NLCU) and
-    price them. This guide focuses on getting to a defensible estimate quickly.
+    This page is the measurement workflow, not the bill-boundary page: the goal is to turn CloudWatch metrics for new
+    connections, active connections, processed bytes, and rule activity into a defendable units-per-hour model. LCU/NLCU
+    bills are hard to predict until you translate metrics into <strong>capacity units per hour</strong>.
+  </p>
+  <p class="muted">
+    If you still are not sure which costs belong inside the load balancer bill versus beside it, go back to the pricing
+    guide first.
+    <a href="/guides/aws-load-balancer-cost/">Open the pricing guide</a>.
   </p>
 
   <h2>Step 1: choose a representative window (and define peak hours)</h2>
@@ -99,6 +104,14 @@ const faqs = [
     <li>Include retries/timeouts: incident traffic often multiplies connections and bytes.</li>
   </ul>
 
+  <h2>Evidence pack before you trust the model</h2>
+  <ul>
+    <li><strong>Average hours</strong>: a normal week of metrics for baseline unit-hours.</li>
+    <li><strong>Peak hours</strong>: p95 or incident-hour samples so repeat spikes do not disappear in the monthly average.</li>
+    <li><strong>Driver attribution</strong>: identify whether bytes, new connections, active connections, or rules are dominant.</li>
+    <li><strong>Non-prod separation</strong>: keep staging or dev behavior out of the production model unless it truly shares the bill.</li>
+  </ul>
+
   <h2>Common mistakes</h2>
   <ul>
     <li>Using peak-only metrics for the whole month (overestimates baseline).</li>
@@ -107,6 +120,13 @@ const faqs = [
     <li>Estimating from request rate only and forgetting payload size and connection churn.</li>
     <li>Not validating after changes (routing tweaks and retries can shift the dominant driver).</li>
   </ul>
+
+  <h2>Next step after the model is believable</h2>
+  <p>
+    Once you know which dimension dominates and whether peak behavior is normal or incident-driven, move to{" "}
+    <a href="/guides/aws-load-balancer-cost-optimization/">load balancer cost optimization</a>. Keep the pricing guide
+    nearby when bill scope questions reappear.
+  </p>
 
   <h2>Sources</h2>
   <ul>
