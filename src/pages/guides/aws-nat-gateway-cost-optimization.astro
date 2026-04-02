@@ -31,10 +31,18 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    NAT Gateway optimization is unusually measurable: almost everything comes down to <strong>gateway-hours</strong> and{" "}
-    <strong>GB processed</strong>. The best savings usually come from keeping AWS-service traffic private and eliminating
-    recurring downloads and retry storms that silently multiply outbound traffic.
+    Optimization starts only after you know whether gateway-hours, processed GB, download storms, external API traffic,
+    or retry-driven spikes are the real NAT Gateway cost driver; otherwise teams privatize, cache, or schedule the wrong
+    path. This page is for production intervention: private-path adoption, download control, retry cleanup, non-prod
+    scheduling, and validation of what actually moved off NAT.
   </p>
+
+  <h2>Do not optimize yet if the model is still weak</h2>
+  <ul>
+    <li>If you do not know what belongs inside the NAT Gateway bill, go back to the pricing guide.</li>
+    <li>If you do not know which traffic source is driving processed GB, go back to the estimate guide.</li>
+    <li>If you only know that NAT is expensive but cannot name the dominant path, avoid architecture changes for now.</li>
+  </ul>
 
   <h2>Step 0: baseline the two drivers</h2>
   <ul>
@@ -111,6 +119,10 @@ const faqs = [
     <li>Check cross-AZ transfer and internet egress costs after routing changes.</li>
     <li>Re-check incident windows; if retries still spike, monthly savings will erode.</li>
   </ul>
+  <p class="muted">
+    The safest loop is measure, change one traffic path, re-measure NAT, then confirm that the cost did not simply move
+    into another network line item.
+  </p>
 
   <h2>Tools and next steps</h2>
   <div class="btn-row">
