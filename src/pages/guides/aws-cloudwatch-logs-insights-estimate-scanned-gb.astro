@@ -22,9 +22,13 @@ const description =
   ]}
 >
   <p>
-    Logs Insights is typically priced by <strong>GB scanned</strong>. If you don’t have measured “GB scanned” numbers yet,
-    you can get a planning estimate from three inputs: <strong>log volume (GB/day)</strong>,{" "}
-    <strong>time range per query</strong>, and <strong>query frequency</strong>.
+    This page is the scanned-GB measurement workflow, not the bill-boundary page: the goal is to turn log volume, query
+    time range, query frequency, and incident behavior into a defendable scanned-GB-per-month model. Logs Insights is
+    typically priced by <strong>GB scanned</strong>.
+  </p>
+  <p class="muted">
+    If you still are not sure which costs belong inside the Logs Insights bill versus beside it, go back to the pricing
+    guide first. <a href="/guides/aws-cloudwatch-logs-insights-pricing/">Open the pricing guide</a>.
   </p>
 
   <h2>Step 1: estimate log volume (GB/day)</h2>
@@ -86,6 +90,14 @@ const description =
     <li>Incident add-on ~= (scanned/day during incidents - normal scanned/day) × incident days</li>
   </ul>
 
+  <h2>Evidence pack before you trust the model</h2>
+  <ul>
+    <li><strong>Volume baseline</strong>: measured or estimated GB/day for the queried log groups.</li>
+    <li><strong>Time-window evidence</strong>: the default range used by dashboards and ad-hoc queries.</li>
+    <li><strong>Query-frequency evidence</strong>: views, refreshes, scheduled jobs, and human query habits.</li>
+    <li><strong>Incident evidence</strong>: how much wider and more frequent queries become during outages or investigations.</li>
+  </ul>
+
   <h2>Common pitfalls</h2>
   <ul>
     <li>Using a “last 30 days” default window for routine dashboards.</li>
@@ -100,6 +112,9 @@ const description =
     <li>Validate dashboards: time range, refresh rate, and number of queries executed per view.</li>
     <li>Validate which log groups are included in common queries (scope is the main lever).</li>
   </ul>
+  <p class="muted">
+    Once the scanned-GB model is believable, move to the optimization guide and change one scan driver at a time.
+  </p>
 
   <h2>Sources</h2>
   <ul>
