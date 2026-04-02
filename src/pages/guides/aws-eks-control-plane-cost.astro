@@ -35,6 +35,15 @@ const faqs = [
     production cluster, but they become meaningful when cluster count explodes (teams × environments × regions). This
     guide shows how to model the cost and when it’s worth paying for more clusters.
   </p>
+  <p class="muted">
+    This page is the fixed platform-overhead page for EKS: the goal is to model the per-cluster fee and
+    cluster-sprawl economics without pretending control plane cost is the whole Kubernetes bill.
+  </p>
+  <p class="muted">
+    Use this page when the open question is cluster count or environment sprawl; if you need the full EKS budget
+    boundary, go back to the pricing guide.
+    <a href="/guides/aws-eks-pricing/"> Pricing guide</a>.
+  </p>
 
   <h2>Quick estimation formula</h2>
   <ul>
@@ -60,6 +69,10 @@ const faqs = [
   </ul>
   <p class="muted">
     A quick mental model: 5 teams × 3 env × 2 regions = 30 clusters. Fixed fees add up even if nodes are tiny.
+  </p>
+  <p class="muted">
+    That is why this page stays narrow: it helps you decide whether fixed platform overhead is the real issue before
+    you rework node sizing, traffic paths, or observability assumptions.
   </p>
 
   <h2>When paying for more clusters is worth it</h2>

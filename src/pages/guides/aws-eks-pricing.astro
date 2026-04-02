@@ -29,6 +29,37 @@ const faqs = [
     realistic budget includes a fixed per-cluster fee, storage and snapshots, load balancers, networking transfer, and
     observability volume. Use this page as a checklist and a template for a first-pass estimate.
   </p>
+  <p class="muted">
+    Use this page when you need to decide what belongs inside the full EKS bill before you tune node shape, cluster
+    count, or adjacent infrastructure assumptions.
+  </p>
+  <p class="muted">
+    This guide is the EKS bill-boundary page: node-driven compute, fixed platform overhead, and adjacent
+    infrastructure or observability lines should be modeled as separate cost surfaces instead of one blurred
+    Kubernetes total.
+  </p>
+
+  <h2>How to split the EKS bill before you estimate it</h2>
+  <ul>
+    <li>
+      <strong>Node-driven compute</strong>: worker node-hours, attached node storage, and the packing assumptions that
+      change node count.
+    </li>
+    <li>
+      <strong>Fixed platform overhead</strong>: the per-cluster control plane fee that grows with cluster count even if
+      workloads are small.
+    </li>
+    <li>
+      <strong>Adjacent infrastructure and observability</strong>: load balancers, NAT, cross-AZ transfer, internet
+      egress, persistent volumes, snapshots, logs, and metrics.
+    </li>
+  </ul>
+  <p class="muted">
+    If the open question is how many nodes you really need, use the{" "}
+    <a href="/guides/aws-eks-node-sizing/">EKS node sizing guide</a>. If the open question is whether too many clusters
+    are inflating fixed overhead, use the{" "}
+    <a href="/guides/aws-eks-control-plane-cost/">EKS control plane cost guide</a>.
+  </p>
 
   <h2>1) Control plane (fixed fee per cluster)</h2>
   <ul>
