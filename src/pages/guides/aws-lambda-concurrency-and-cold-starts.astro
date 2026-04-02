@@ -27,9 +27,17 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    This page is the capacity-and-latency measurement page, not the bill-boundary page: the goal is to turn concurrency
+    shape, cold-start frequency, and provisioned-concurrency windows into a defendable duration and baseline-cost model.
+  </p>
+  <p>
     Concurrency and cold starts matter for both <strong>latency</strong> and <strong>cost</strong>. Cold starts often
     increase duration, which increases GB-seconds. Provisioned concurrency can reduce cold starts, but it adds a baseline
-    “always-on” cost. This page explains how to think about the trade-off and what to measure.
+    "always-on" cost that should be justified by the latency path you are protecting.
+  </p>
+  <p class="muted">
+    If you still are not sure which costs belong inside the Lambda bill versus beside it, go back to the pricing guide first.
+    Then use <a href="/guides/aws-lambda-pricing/">Lambda pricing</a> to lock the budget boundary.
   </p>
 
   <h2>Concurrency model inputs</h2>
@@ -37,6 +45,14 @@ const faqs = [
     <li><strong>Peak RPS</strong>: highest sustained traffic window.</li>
     <li><strong>Avg duration</strong>: ms per request drives concurrency.</li>
     <li><strong>Provisioned window</strong>: hours where cold starts hurt.</li>
+  </ul>
+
+  <h2>Use this page to measure, not to guess</h2>
+  <ul>
+    <li><strong>Measure concurrency shape</strong>: identify whether bursts are sharp, sustained, or tied to a small number of business hours.</li>
+    <li><strong>Measure cold-start frequency</strong>: note how often new execution environments appear during those windows.</li>
+    <li><strong>Measure duration impact</strong>: capture how much initialization time actually stretches billed duration on the affected path.</li>
+    <li><strong>Measure warm-capacity need</strong>: estimate the minimum provisioned window that protects the SLA without turning the whole workload into baseline spend.</li>
   </ul>
 
 
@@ -73,7 +89,8 @@ const faqs = [
     <li>Decide if the SLA/UX improvement is worth the baseline.</li>
   </ol>
   <p class="muted">
-    Tip: apply provisioned concurrency only during business hours for endpoints that need it; don’t blanket-enable.
+    Tip: apply provisioned concurrency only during business hours for endpoints that need it; do not blanket-enable it
+    before you have a measurement story.
   </p>
 
   <h2>Cost pitfalls to watch for</h2>
@@ -99,6 +116,10 @@ const faqs = [
     <a class="btn" href="/calculators/aws-lambda-cost-calculator/">Lambda cost calculator</a>
     <a class="btn" href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate</a>
   </div>
+  <p class="muted">
+    When you already know the dominant driver and need production changes, move to the optimization guide instead of
+    reusing this page as an action checklist.
+  </p>
 
   <h2>Sources</h2>
   <ul>

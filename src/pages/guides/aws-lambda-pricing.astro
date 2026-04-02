@@ -21,9 +21,22 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-lambda-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Lambda pricing looks simple on paper, but budgets get surprised by the surrounding line items: logs, data transfer,
-    retries, and downstream services. Use this checklist to build a realistic estimate and validate it after you deploy.
+    Use this page when you need to decide what belongs inside the Lambda bill before you debate cold starts, retries,
+    or runtime tuning. Lambda pricing looks simple on paper, but budgets get surprised by the surrounding line items:
+    logs, data transfer, retries, and downstream services.
   </p>
+  <p>
+    This guide is about bill boundaries: request charges, GB-seconds, provisioned concurrency baseline cost, and the
+    adjacent logging, networking, and downstream service costs that should be tracked beside Lambda rather than blended
+    into it.
+  </p>
+
+  <h2>Start here: what belongs inside the Lambda bill</h2>
+  <ul>
+    <li><strong>Inside the Lambda bill</strong>: requests, billed duration, configured memory, and provisioned concurrency when enabled.</li>
+    <li><strong>Beside the Lambda bill</strong>: log ingestion and retention, NAT or egress transfer, queue traffic, database reads, and storage activity.</li>
+    <li><strong>Why the split matters</strong>: teams make worse budget decisions when they hide CloudWatch, VPC transfer, or downstream database spend inside a single "Lambda" bucket.</li>
+  </ul>
 
   <h2>1) Start with the two core line items</h2>
   <ul>
@@ -59,7 +72,8 @@ const faqs = [
     capacity” and model it separately from on-demand invocations.
   </p>
   <p class="muted">
-    Guide: <a href="/guides/aws-lambda-concurrency-and-cold-starts/">concurrency and cold starts</a>
+    If you need to model cold-start frequency, warm capacity windows, or duration inflation, continue with the
+    <a href="/guides/aws-lambda-concurrency-and-cold-starts/">concurrency and cold starts guide</a>.
   </p>
 
   <h2>5) Common Lambda-adjacent costs</h2>
@@ -80,7 +94,8 @@ const faqs = [
     obvious and helps compare to always-on compute.
   </p>
   <p class="muted">
-    Related: <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate cost</a>
+    Once the bill boundary is clear, use the <a href="/guides/aws-lambda-cost-optimization/">Lambda cost optimization guide</a>
+    for production changes, or compare deployment shapes with <a href="/guides/aws-lambda-vs-fargate-cost/">Lambda vs Fargate cost</a>.
   </p>
 
   <h2>Common pitfalls</h2>
