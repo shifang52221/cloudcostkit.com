@@ -22,9 +22,20 @@ const description =
   ]}
 >
   <p>
+    Autoscaling fixes start only after you know whether noisy scaling, retry multiplication, oversized tasks, or
+    traffic-driven side costs are the real ECS cost driver; otherwise teams tune the wrong system.
+  </p>
+  <p>
+    This page is for production intervention: signal cleanup, cooldown tuning, retry control, and scaling-safe validation.
+  </p>
+  <p>
     Autoscaling should reduce cost by matching capacity to demand. When costs go up, it usually means one of three
     things: <strong>oscillation</strong>, <strong>retry storms</strong>, or <strong>non-compute line items</strong> are
     growing with traffic.
+  </p>
+  <p class="muted">
+    If the main uncertainty is still task shape or bill scope, go back to
+    <a href="/guides/aws-ecs-task-sizing/"> ECS task sizing</a> or <a href="/guides/aws-ecs-pricing/">ECS pricing</a> first.
   </p>
 
   <h2>1) Noisy signals cause oscillation</h2>
@@ -89,6 +100,13 @@ const description =
     <li>Track log ingestion GB/day and NAT processed GB during scaling events.</li>
     <li>After changes, validate p95 latency and error rate during a busy window.</li>
   </ul>
+
+  <h2>Use a simple measure-change-remeasure loop</h2>
+  <ol>
+    <li>Measure baseline desired tasks, running tasks, retries, and traffic-driven side costs during a representative week.</li>
+    <li>Change one scaling lever at a time so the next cost comparison stays readable.</li>
+    <li>Remeasure the same busy window and keep only the changes that reduce spend without hurting latency or reliability.</li>
+  </ol>
 
   <h2>Sources</h2>
   <ul>
