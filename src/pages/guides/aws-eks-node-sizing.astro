@@ -35,6 +35,15 @@ const faqs = [
     overhead, reserve headroom, and accept that scheduling is not a perfect bin-packing problem. This page gives you a
     workflow that produces a defendable node count for budgeting and capacity planning.
   </p>
+  <p class="muted">
+    This page is the EKS capacity-measurement page, not the full EKS bill-boundary page: the job is to turn requests,
+    allocatable capacity, DaemonSet overhead, pod density, and headroom into a defendable node count.
+  </p>
+  <p class="muted">
+    If you still are not sure what belongs inside the total EKS bill before you size nodes, go back to the pricing
+    guide first.
+    <a href="/guides/aws-eks-pricing/"> Pricing guide</a>.
+  </p>
 
   <h2>Step 0: collect the inputs you actually need</h2>
   <ul>
@@ -120,6 +129,10 @@ const faqs = [
   <p class="muted">
     Cost follow-up: once you have node count, estimate spend with{" "}
     <a href="/calculators/kubernetes-node-cost-calculator/">node cost</a>.
+  </p>
+  <p class="muted">
+    This workflow deliberately stays on capacity evidence. Full-bill questions such as control plane fees, load
+    balancers, storage, logs, and transfer still belong on the pricing page.
   </p>
 
   <h2>Common pitfalls</h2>
