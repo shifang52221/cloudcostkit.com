@@ -22,9 +22,22 @@ const description =
   ]}
 >
   <p>
-    Logs Insights pricing usually boils down to one number: <strong>GB scanned</strong>. A cost model should separate
-    “routine” scanning (dashboards and daily debugging) from “incident” scanning (wide searches and repeated queries).
+    Use this page when you need to decide what belongs inside the Logs Insights bill before you debate query habits,
+    dashboard refreshes, or log-organization fixes. Logs Insights pricing usually boils down to one number:
+    <strong>GB scanned</strong>, but this page is about bill scope before workflow or optimization.
   </p>
+
+  <h2>What belongs inside the Logs Insights bill</h2>
+  <p>
+    This guide is about bill boundaries: scanned-GB charges from Logs Insights queries, and the adjacent log ingestion,
+    retention, export, and wider observability costs that should be tracked beside Logs Insights rather than blended into
+    it.
+  </p>
+  <ul>
+    <li><strong>Inside the bill</strong>: scan charges driven by query scope, time range, and query frequency.</li>
+    <li><strong>Beside the bill</strong>: log ingestion, storage, exports, and downstream analytics platforms.</li>
+    <li><strong>Decision point</strong>: separate the scan bill first, then decide whether you need measurement or intervention.</li>
+  </ul>
 
   <h2>Logs Insights pricing inputs</h2>
   <ul>
@@ -50,6 +63,13 @@ const description =
     <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights cost calculator</a>
     <a class="btn" href="/guides/aws-cloudwatch-logs-insights-estimate-scanned-gb/">Estimate scanned GB</a>
   </div>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If you need to build a defendable scanned-GB model, go to the estimate guide.</li>
+    <li>If you already know the dominant scan driver and need to change dashboard or query behavior, go to the optimization guide.</li>
+    <li>If you are modeling the wider logging bill, treat that as a separate log-cost question.</li>
+  </ul>
 
   <h2>Fast modeling workflow</h2>
   <ol>

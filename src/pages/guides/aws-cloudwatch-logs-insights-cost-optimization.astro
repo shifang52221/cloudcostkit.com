@@ -22,10 +22,18 @@ const description =
   ]}
 >
   <p>
-    Logs Insights pricing is usually a function of <strong>GB scanned</strong>. To reduce cost, you reduce how many bytes
-    your queries scan. The highest leverage fixes are almost always about <strong>query shape</strong> and
-    <strong>log organization</strong>, not about deleting logs blindly.
+    Optimization starts only after you know whether wide time ranges, repeated dashboards, noisy log-group scope, or
+    incident query behavior are the real Logs Insights cost driver; otherwise teams trim the wrong query path. This page
+    is for production intervention: time-range control, query-shape cleanup, log-group scope reduction, dashboard
+    guardrails, and repeat-scan discipline.
   </p>
+
+  <h2>Do not optimize yet if the model is still weak</h2>
+  <ul>
+    <li>If you do not know what belongs inside the Logs Insights bill, go back to the pricing guide.</li>
+    <li>If you do not know whether dashboards, ad-hoc queries, or incidents dominate scan spend, go back to the estimate guide.</li>
+    <li>If you only know that the bill is high but cannot name the dominant scan pattern, avoid broad changes for now.</li>
+  </ul>
 
   <h2>Step 0: measure before optimizing</h2>
   <ul>
@@ -110,6 +118,10 @@ const description =
     <li>Confirm noisy logs are separated or sampled so routine queries scan high-signal data.</li>
     <li>After changes, validate incident workflows still work (debug ability preserved).</li>
   </ul>
+  <p class="muted">
+    The safest loop is measure, change one query or dashboard lever, re-measure scanned GB, then confirm the cost fell
+    where you expected instead of just shifting searches elsewhere.
+  </p>
 
   <h2>Sources</h2>
   <ul>
