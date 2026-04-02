@@ -27,9 +27,19 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    This page is the non-node completeness checklist page for Kubernetes: node count should already be credible, and
+    the goal here is to catch the control plane, storage, load balancer, observability, and transfer lines that a
+    node-only model misses.
+  </p>
+  <p>
     A <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a> often starts with node spend
     because compute is usually the biggest line item. But for many real clusters, <strong>everything around nodes</strong>{" "}
     adds up. This guide is a checklist for those missing costs so your budget is closer to reality.
+  </p>
+  <p class="muted">
+    If you still are not confident in requests, allocatable headroom, or node count, go back to the sizing workflow
+    first before you use this checklist.
+    <a href="/guides/kubernetes-requests-limits/"> Sizing workflow</a>.
   </p>
 
   <h2>Beyond-nodes cost inputs</h2>
@@ -45,6 +55,10 @@ const faqs = [
     The baseline: size your node count from workload requests, then apply a blended $/hour. Tools:{" "}
     <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; Limits</a> and{" "}
     <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost</a>.
+  </p>
+  <p class="muted">
+    This page assumes that baseline is already credible. It is for completeness after sizing, not for repeating the
+    full sizing workflow.
   </p>
 
   <h2>2) Managed control plane</h2>
