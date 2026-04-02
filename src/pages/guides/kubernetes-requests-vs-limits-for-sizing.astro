@@ -28,10 +28,20 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    This page is the requests-vs-limits concept clarifier page, not the full sizing workflow page: the goal is to
+    explain why requests drive node count, why limits do not define the baseline, and how teams accidentally inflate
+    estimates.
+  </p>
+  <p>
     If you search for a <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a>, you will quickly
     see "requests" and "limits". The short version: <strong>requests</strong> are what the scheduler uses for capacity
     planning; <strong>limits</strong> are guardrails for bursting and safety. Mixing them up often leads to oversized
     clusters (or unpredictable performance risk).
+  </p>
+  <p class="muted">
+    If you already understand the concept and need the step-by-step node sizing sequence, go back to the sizing
+    workflow page.
+    <a href="/guides/kubernetes-requests-limits/"> Sizing workflow</a>.
   </p>
 
   <h2>Sizing decision rules</h2>
@@ -92,6 +102,10 @@ const faqs = [
     Tool: <a href="/calculators/kubernetes-requests-limits-calculator/">Kubernetes Requests &amp; Limits Calculator</a>.
     Once you have node count, price it with{" "}
     <a href="/calculators/kubernetes-node-cost-calculator/">Kubernetes Node Cost</a>.
+  </p>
+  <p class="muted">
+    This page stays on concept clarification. The full workflow sequence should live on the dedicated sizing page
+    instead of being duplicated here.
   </p>
 
   <h2>Related tools</h2>
