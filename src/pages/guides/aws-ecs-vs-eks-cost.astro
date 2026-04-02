@@ -27,9 +27,19 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    This page is the AWS orchestration-platform comparison page, not the ECS or EKS bill-boundary page: the goal is to
+    compare two AWS operating models under the same workload, traffic, and overhead assumptions.
+  </p>
+  <p>
     ECS vs EKS comparisons are often wrong because teams compare “service A” to “service B” without modeling the
     surrounding infrastructure. Use this checklist to compare consistently: normalize workload assumptions, pick the
     compute model, add platform overhead, then add the line items that dominate in production.
+  </p>
+  <p class="muted">
+    If you still need to decide what belongs inside the ECS bill or the EKS bill before you compare platforms, go back
+    to the relevant pricing guide first.
+    <a href="/guides/aws-ecs-pricing/"> ECS pricing</a>.
+    <a href="/guides/aws-eks-pricing/"> EKS pricing</a>.
   </p>
 
   <h2>Step 0: normalize workload assumptions (the part most comparisons skip)</h2>
@@ -50,6 +60,10 @@ const faqs = [
   <p class="muted">
     Helpful helpers: <a href="/calculators/unit-converter/">units converter</a> and{" "}
     <a href="/calculators/rps-to-monthly-requests-calculator/">RPS → monthly requests</a>.
+  </p>
+  <p class="muted">
+    Keep this page on the platform-choice layer. Generic Kubernetes routing belongs on the hub, and provider bill
+    scope belongs on the ECS or EKS pricing pages.
   </p>
 
   <h2>Step 1: pick the compute model for ECS</h2>
