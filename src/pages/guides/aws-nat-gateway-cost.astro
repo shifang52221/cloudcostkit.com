@@ -21,10 +21,22 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-nat-gateway-cost" lastUpdated="2026-02-07" faqs={faqs}>
   <p>
-    NAT gateway bills are often surprising because they combine a fixed hourly baseline with traffic-based processing
-    charges. If you put high-throughput or “chatty outbound” workloads behind NAT, costs can scale faster than compute.
-    This page shows a simple model and a workflow to estimate and validate the drivers.
+    Use this page when you need to decide what belongs inside the NAT Gateway bill before you debate endpoints, retries,
+    or traffic-shape fixes. NAT gateway bills are often surprising because they combine a fixed hourly baseline with
+    traffic-based processing charges, but this page is about bill scope before workflow or optimization.
   </p>
+
+  <h2>What belongs inside the NAT Gateway bill</h2>
+  <p>
+    This guide is about bill boundaries: gateway-hours, processed-GB charges, and the adjacent cross-AZ transfer,
+    internet egress, private-connectivity, and downstream traffic costs that should be tracked beside NAT Gateway rather
+    than blended into it.
+  </p>
+  <ul>
+    <li><strong>Inside the bill</strong>: NAT Gateway hourly charges and processed traffic charges.</li>
+    <li><strong>Beside the bill</strong>: egress, transfer spillover, endpoint alternatives, and downstream service costs.</li>
+    <li><strong>Decision point</strong>: separate the bill first, then decide whether you need measurement or intervention.</li>
+  </ul>
 
   <h2>NAT cost inputs</h2>
   <ul>
@@ -69,6 +81,13 @@ const faqs = [
     Step-by-step: <a href="/guides/aws-nat-gateway-estimate-gb-processed/">estimate NAT GB processed</a>
   </p>
 
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If you need to build a defendable processed-GB model, go to the estimate guide.</li>
+    <li>If you already know the dominant driver and need to change production behavior, go to the optimization guide.</li>
+    <li>If you are comparing NAT against private alternatives, treat that as a separate decision after the bill boundary is clear.</li>
+  </ul>
+
   <h2>Architecture gotchas (where costs hide)</h2>
   <ul>
     <li>
@@ -99,6 +118,7 @@ const faqs = [
 
   <h2>Next steps</h2>
   <div class="btn-row">
+    <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate processed GB</a>
     <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a>
     <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints optimization</a>
     <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>

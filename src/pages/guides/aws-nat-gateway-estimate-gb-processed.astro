@@ -31,9 +31,14 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    NAT Gateway processing charges scale with <strong>GB processed</strong>, so your budget depends on getting this number
-    roughly right. The goal isn’t perfection — it’s a defensible baseline plus a peak/incident scenario. Use the method
-    that matches the data you have today, then validate with metrics later.
+    This page is the processed-GB measurement workflow, not the bill-boundary page: the goal is to turn NAT metrics,
+    flow logs, throughput charts, and traffic-source evidence into a defendable GB-per-month model. NAT Gateway
+    processing charges scale with <strong>GB processed</strong>, so your budget depends on getting this number roughly
+    right.
+  </p>
+  <p class="muted">
+    If you still are not sure which costs belong inside the NAT Gateway bill versus beside it, go back to the pricing
+    guide first. <a href="/guides/aws-nat-gateway-cost/">Open the pricing guide</a>.
   </p>
 
   <h2>Method 1) From NAT metrics (best)</h2>
@@ -86,6 +91,14 @@ const faqs = [
     This is crude but helps you avoid pretending it’s zero.
   </p>
 
+  <h2>Evidence pack before you trust the model</h2>
+  <ul>
+    <li><strong>Measured baseline</strong>: a representative period from NAT metrics.</li>
+    <li><strong>Attribution evidence</strong>: flow logs or destination summaries that explain what produced the GB.</li>
+    <li><strong>Fallback estimate</strong>: throughput charts or source-bucket math when direct telemetry is incomplete.</li>
+    <li><strong>Incident scenario</strong>: retries, autoscaling, or download surges that can dominate monthly peaks.</li>
+  </ul>
+
   <h2>Worked example (structure, not provider-specific rates)</h2>
   <ul>
     <li>Representative week metrics: 1.2 TB processed in 7 days</li>
@@ -107,6 +120,9 @@ const faqs = [
     <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT optimization</a>
     <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs endpoints</a>
   </div>
+  <p class="muted">
+    Once the processed-GB model is believable, move to the optimization guide and change one traffic lever at a time.
+  </p>
 
   <h2>Sources</h2>
   <ul>
