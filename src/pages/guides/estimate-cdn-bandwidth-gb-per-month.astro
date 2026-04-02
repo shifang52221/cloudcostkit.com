@@ -31,10 +31,18 @@ const faqs = [
   lastUpdated="2026-02-23"
   faqs={faqs}
 >
+  <p class="muted">
+    This page is the CDN bandwidth-measurement page, not the full CDN pricing page: the job is to turn analytics, RPS
+    plus response size, or Mbps into defendable monthly edge GB.
+  </p>
   <p>
     CDN pricing is often expressed as <strong>$ per GB</strong>. That means your first job is to estimate{" "}
     <strong>GB per month</strong> delivered from edge to users. This guide gives three practical methods and a validation
     checklist so your estimate is usable for budgeting.
+  </p>
+  <p class="muted">
+    Once you know monthly GB, go back to the CDN pricing pages to price bandwidth, requests, and origin egress
+    separately.
   </p>
 
   <h2>0) Decide what you are measuring (edge bandwidth)</h2>
@@ -131,6 +139,9 @@ const faqs = [
     <a href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost calculator</a>, then add request fees with{" "}
     <a href="/calculators/cdn-request-cost-calculator/">CDN request cost calculator</a>. If you want a single page that
     bundles both, use <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a>.
+  </p>
+  <p class="muted">
+    This page stays on measurement evidence. It does not replace the bill-boundary page or the request-fee page.
   </p>
 
   <h2>How to validate</h2>

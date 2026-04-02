@@ -45,6 +45,15 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   lastUpdated="2026-03-12"
   faqs={faqs}
 >
+  <p class="muted">
+    This guide is the CDN bill-boundary page: edge bandwidth, request fees, and origin egress should be modeled as
+    separate cost surfaces instead of one blurred delivery number.
+  </p>
+  <p class="muted">
+    Use this page when you need to decide what belongs inside the full CDN delivery bill before you compare providers,
+    simplify to per-GB math, price requests, estimate traffic volume, or untangle origin egress.
+  </p>
+
   <h2>Short answer: what decides CDN cost first?</h2>
   <ul>
     <li>If responses are large, bandwidth usually dominates.</li>
@@ -62,6 +71,13 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     <li><strong>Request fees</strong>: request-based charges (common on some plans).</li>
     <li><strong>Origin egress (cache fill)</strong>: bytes pulled from your origin to the CDN (billed by your origin provider).</li>
   </ul>
+  <p class="muted">
+    Provider choice belongs on <a href="/guides/cdn-cost-comparison/">comparison</a>. Blended bandwidth-rate math
+    belongs on <a href="/guides/cdn-cost-per-gigabyte/">per-GB pricing</a>. Request-fee math belongs on{" "}
+    <a href="/guides/cdn-request-pricing/">request pricing</a>. Traffic evidence belongs on{" "}
+    <a href="/guides/estimate-cdn-bandwidth-gb-per-month/">bandwidth measurement</a>. Concept confusion belongs on{" "}
+    <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.
+  </p>
 
   <h2>CDN pricing guide vs CDN cost calculator</h2>
   <ul>
