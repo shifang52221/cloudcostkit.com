@@ -27,9 +27,17 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    Optimization starts only after you know whether GB-seconds, memory sizing, retry storms, logging overhead, or
+    provisioned concurrency baseline cost are the real Lambda cost driver; otherwise teams tune the wrong path.
+  </p>
+  <p>
+    This page is for production intervention: duration reduction, memory right-sizing, retry cleanup, logging control,
+    and selective concurrency tuning.
+  </p>
+  <p>
     Lambda cost optimization is mostly about reducing <strong>GB-seconds</strong> (duration × memory) and preventing
-    accidental multipliers (retries, verbose logs, and expensive networking paths). Use this checklist to find the biggest
-    wins first, then validate savings with billing.
+    accidental multipliers (retries, verbose logs, and expensive networking paths). Use this checklist only after the
+    billing model and measurement story are credible.
   </p>
 
   <h2>High-leverage Lambda knobs</h2>
@@ -37,6 +45,13 @@ const faqs = [
     <li><strong>Memory vs duration</strong>: right-size to reduce total GB-seconds.</li>
     <li><strong>Provisioned concurrency</strong>: use only for latency-critical paths.</li>
     <li><strong>Request volume</strong>: reduce retries and noisy clients first.</li>
+  </ul>
+
+  <h2>Before you touch production knobs</h2>
+  <ul>
+    <li><strong>Confirm the bill boundary</strong>: keep Lambda charges separate from logging, transfer, and downstream service cost.</li>
+    <li><strong>Name the dominant driver</strong>: duration, memory, retries, logging, or baseline warm capacity should each lead to different fixes.</li>
+    <li><strong>Freeze a baseline window</strong>: compare against a representative period so you can tell whether the intervention helped.</li>
   </ul>
 
 
@@ -90,6 +105,13 @@ const faqs = [
     <li>Check duration distribution (p50/p95) and error/retry rate; spikes usually correlate with these.</li>
     <li>Verify log ingestion GB/day and retention dropped if that was a target.</li>
   </ul>
+
+  <h2>Use a simple measure-change-remeasure loop</h2>
+  <ol>
+    <li>Measure the baseline for requests, GB-seconds, retries, log volume, and any provisioned concurrency window.</li>
+    <li>Change one production lever at a time so the next billing comparison is readable.</li>
+    <li>Remeasure the same window and keep only the interventions that improve both spend clarity and operational behavior.</li>
+  </ol>
 
   <h2>Common pitfalls</h2>
   <ul>
