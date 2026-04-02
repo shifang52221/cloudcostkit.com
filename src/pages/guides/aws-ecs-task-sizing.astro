@@ -26,9 +26,17 @@ const description =
   ]}
 >
   <p>
+    This page is the ECS resource-measurement page, not the full ECS bill-boundary page: the job is to turn measured
+    CPU, memory, and traffic behavior into defendable task size and average task count assumptions.
+  </p>
+  <p>
     ECS task sizing is a balancing act: too small and you thrash (restarts, timeouts, throttling), too large and you pay
     for idle capacity. The best approach is to size from <strong>measured averages</strong>, keep headroom with a
     deliberate utilization target, and validate the result with a busy-week scenario.
+  </p>
+  <p class="muted">
+    If you still are not sure what belongs inside the ECS bill before you size tasks, go back to the pricing guide first.
+    Then use <a href="/guides/aws-ecs-pricing/">ECS pricing</a> to lock the bill boundary.
   </p>
 
   <h2>Step 1: measure demand (use a representative window)</h2>
@@ -113,6 +121,11 @@ const description =
   </ul>
   <p class="muted">
     Full model: <a href="/guides/aws-ecs-cost-model-beyond-compute/">ECS cost model beyond compute</a>.
+  </p>
+  <p class="muted">
+    When the problem is scaling behavior rather than task shape, move to
+    <a href="/guides/aws-ecs-autoscaling-cost-pitfalls/"> ECS autoscaling cost pitfalls</a> instead of stretching this
+    page into a production-fix checklist.
   </p>
 
   <h2>Validation checklist</h2>

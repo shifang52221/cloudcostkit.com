@@ -22,9 +22,12 @@ const description =
   ]}
 >
   <p>
-    ECS cost is mainly the cost of the <strong>compute you run on</strong> plus the infrastructure around it. The two
-    common models are ECS on <strong>EC2 launch type</strong> (you pay for instances) and ECS on{" "}
-    <strong>Fargate</strong> (you pay for vCPU-hours + memory GB-hours per running task).
+    Use this page when you need to decide what belongs inside the ECS bill before you debate task sizing, support line
+    items, or scaling fixes.
+  </p>
+  <p>
+    This guide is the ECS bill-boundary page: launch-type compute, surrounding infrastructure, and launch-type-specific
+    storage or network lines should be modeled as separate cost surfaces rather than one generic service total.
   </p>
 
   <div class="btn-row">
@@ -32,6 +35,13 @@ const description =
     <a class="btn" href="/calculators/aws-fargate-cost-calculator/">Fargate cost</a>
     <a class="btn" href="/calculators/ec2-cost-calculator/">EC2 cost</a>
   </div>
+
+  <h2>Start here: separate the ECS bill surfaces</h2>
+  <ul>
+    <li><strong>Launch-type compute</strong>: EC2 instance-hours or Fargate vCPU-hours and memory GB-hours.</li>
+    <li><strong>Surrounding infrastructure</strong>: load balancers, logs, metrics, NAT, egress, and cross-AZ transfer.</li>
+    <li><strong>Launch-type-specific lines</strong>: EBS and snapshots matter on EC2-backed services; task-hour billing matters on Fargate-backed services.</li>
+  </ul>
 
   <h2>1) Compute (baseline)</h2>
   <ul>
@@ -106,6 +116,11 @@ const description =
   <p class="muted">
     If your service is quiet but your bill is high, look for baselines: load balancer hourly, NAT hourly, and retention
     (logs, snapshots, registry). If your traffic spikes, look for variable drivers: logs, transfer, and capacity units.
+  </p>
+  <p class="muted">
+    Once the bill boundary is clear, use <a href="/guides/aws-ecs-task-sizing/">ECS task sizing</a> for measured task
+    assumptions, <a href="/guides/aws-ecs-cost-model-beyond-compute/">ECS cost model beyond compute</a> for missed line
+    items, and <a href="/guides/aws-ecs-autoscaling-cost-pitfalls/">ECS autoscaling cost pitfalls</a> for production fixes.
   </p>
 
   <h2>Validation checklist</h2>

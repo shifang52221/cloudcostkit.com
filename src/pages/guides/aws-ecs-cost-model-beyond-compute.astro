@@ -22,6 +22,14 @@ const description =
   ]}
 >
   <p>
+    This page is the support total-cost checklist page for ECS: baseline compute should already be modeled, and the goal
+    here is to catch the load balancer, logging, networking, storage, and registry lines that budgets often miss.
+  </p>
+  <p>
+    Use this page after the compute baseline is credible, not as a replacement for the ECS bill-boundary page or the
+    production intervention page.
+  </p>
+  <p>
     ECS cost surprises usually happen when teams budget only for compute (EC2 instance-hours or Fargate vCPU/GB-hours).
     In real services, the big costs often come from <strong>load balancers</strong>, <strong>logs</strong>, and{" "}
     <strong>networking</strong>. Use this checklist to build a more accurate total cost model.
@@ -104,6 +112,11 @@ const description =
     <li>Add networking (NAT/egress/cross-AZ) for the real traffic paths.</li>
     <li>Add storage (EBS + snapshots) and registry behavior (ECR storage + pulls) where relevant.</li>
   </ol>
+  <p class="muted">
+    If you still need to establish the core compute boundary, return to <a href="/guides/aws-ecs-pricing/">ECS pricing</a>.
+    If you already know the waste is coming from scaling behavior, go to
+    <a href="/guides/aws-ecs-autoscaling-cost-pitfalls/"> ECS autoscaling cost pitfalls</a>.
+  </p>
 
   <h2>Validation checklist</h2>
   <ul>
