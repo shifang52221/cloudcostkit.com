@@ -22,9 +22,17 @@ const description =
   ]}
 >
   <p>
-    EBS cost is usually not “mysterious”: it’s mostly <strong>GB-month</strong>, plus <strong>IOPS/throughput</strong>
-    for some volume types, plus <strong>snapshots</strong>. The waste comes from unattached volumes, oversized volumes,
-    and default performance settings that are higher than required.
+    Optimization starts only after you know whether unused volume GB, over-provisioned gp3 performance, snapshot
+    retention growth, or orphaned disks are the real EBS cost driver; otherwise teams cut the wrong thing.
+  </p>
+  <p>
+    This page is for production intervention: volume cleanup, right-sizing, gp2 to gp3 migration, performance rollback,
+    and snapshot lifecycle control.
+  </p>
+  <p>
+    EBS cost is usually not "mysterious": it is mostly <strong>GB-month</strong>, plus
+    <strong>IOPS/throughput</strong> for some volume types, plus <strong>snapshots</strong>. The waste comes from
+    unattached volumes, oversized volumes, and default performance settings that are higher than required.
   </p>
 
   <h2>EBS savings checklist</h2>
@@ -51,6 +59,10 @@ const description =
     <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
     <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost</a>
   </div>
+  <p class="muted">
+    If the bill boundary is still fuzzy, go back to <a href="/guides/aws-ebs-pricing/">EBS pricing</a> before changing
+    production settings.
+  </p>
 
   <h2>High-leverage savings levers</h2>
   <ul>
@@ -106,6 +118,13 @@ const description =
     Related: <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3 cost</a>,{" "}
     <a href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS and throughput sizing</a>.
   </p>
+
+  <h2>Use a simple measure-change-remeasure loop</h2>
+  <ol>
+    <li>Measure the baseline for active volume GB, gp3 IOPS and throughput settings, retained snapshot GB, and orphaned disks.</li>
+    <li>Change one production lever at a time so the next billing comparison is readable.</li>
+    <li>Remeasure the same workload window and keep only the changes that improve spend without creating latency or restore risk.</li>
+  </ol>
 
   <h2>Validation checklist</h2>
   <ul>

@@ -22,10 +22,20 @@ const description =
   ]}
 >
   <p>
-    EBS pricing is easy to estimate once you separate three buckets: <strong>volume storage</strong>,
-    <strong>provisioned performance</strong> (when applicable), and <strong>snapshots</strong>. Most underestimates come
-    from treating snapshots as “included” or forgetting performance settings on gp3/io1/io2 style volumes.
+    Use this page when you need to decide what belongs inside the EBS bill before you debate gp3 sizing, snapshot
+    retention, or cleanup actions.
   </p>
+  <p>
+    This guide is the EBS bill-boundary page: live volume GB-month, provisioned performance charges when applicable, and
+    retained snapshot storage should be modeled as separate cost surfaces rather than blended into one storage number.
+  </p>
+
+  <h2>Start here: separate the EBS bill surfaces</h2>
+  <ul>
+    <li><strong>Live volume charges</strong>: provisioned GB-month for active volumes by type.</li>
+    <li><strong>Performance charges</strong>: gp3 or provisioned IOPS and throughput add-ons when they apply.</li>
+    <li><strong>Retained snapshot storage</strong>: backup storage accumulated from churn, retention, and copies.</li>
+  </ul>
 
   <h2>EBS pricing inputs</h2>
   <ul>
@@ -65,8 +75,9 @@ const description =
     </li>
   </ul>
   <p class="muted">
-    Related: <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3</a>,{" "}
-    <a href="/guides/aws-ebs-gp3-iops-throughput/">gp3 IOPS and throughput sizing</a>.
+    If you need to turn workload metrics into a defendable configuration, continue with
+    <a href="/guides/aws-ebs-gp3-iops-throughput/"> gp3 IOPS and throughput sizing</a>. For type-selection trade-offs,
+    compare <a href="/guides/aws-ebs-gp2-vs-gp3-cost/">gp2 vs gp3</a>.
   </p>
 
   <h2>3) Snapshots (separate storage line item)</h2>
@@ -82,7 +93,8 @@ const description =
     </li>
   </ul>
   <p class="muted">
-    Guide: <a href="/guides/aws-ebs-snapshot-cost/">EBS snapshot cost</a>.
+    If snapshot growth is the unclear part of the budget, go to the
+    <a href="/guides/aws-ebs-snapshot-cost/"> EBS snapshot cost guide</a> next.
   </p>
 
   <h2>A fast estimation workflow</h2>
@@ -96,6 +108,10 @@ const description =
     <a class="btn" href="/calculators/aws-ebs-cost-calculator/">EBS cost calculator</a>
     <a class="btn" href="/calculators/aws-ebs-snapshot-cost-calculator/">EBS snapshot cost calculator</a>
   </div>
+  <p class="muted">
+    Once the dominant driver is credible, use <a href="/guides/aws-ebs-cost-optimization/">EBS cost optimization</a>
+    for production cleanup and right-sizing actions.
+  </p>
 
   <h2>Common pitfalls</h2>
   <ul>
