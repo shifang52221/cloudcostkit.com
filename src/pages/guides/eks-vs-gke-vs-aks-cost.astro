@@ -32,9 +32,18 @@ const faqs = [
   faqs={faqs}
 >
   <p>
+    This page is the cross-cloud managed Kubernetes comparison page, not the generic Kubernetes hub or a provider
+    bill-boundary page: the goal is to normalize the same workload across EKS, GKE, and AKS before debating winners.
+  </p>
+  <p>
     The best way to compare EKS vs GKE vs AKS cost is to normalize capacity first (node count) and then add the costs that
     live "around the cluster": load balancers, egress/NAT, storage, and observability. This avoids apples-vs-oranges
     comparisons like "node price only".
+  </p>
+  <p class="muted">
+    If you still need to define provider-specific bill scope before you compare clouds, go back to the relevant
+    provider pricing page or start from the Kubernetes cost hub.
+    <a href="/guides/kubernetes-costs/"> Kubernetes cost hub</a>.
   </p>
 
   <h2>0) Start with the same line items (for every provider)</h2>
@@ -68,6 +77,10 @@ const faqs = [
     Tools: <a href="/calculators/kubernetes-requests-limits-calculator/">Requests &amp; limits</a>,{" "}
     <a href="/calculators/kubernetes-node-cost-calculator/">Node cost</a>,{" "}
     <a href="/calculators/kubernetes-cost-calculator/">Cluster cost</a>.
+  </p>
+  <p class="muted">
+    Stay at this layer only when the question is provider comparison. If you are still sorting out one provider's bill
+    boundary, drop back into that provider page before you compare winners.
   </p>
   <ul>
     <li>

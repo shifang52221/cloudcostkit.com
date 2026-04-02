@@ -35,9 +35,35 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
   faqs={faqs}
 >
   <p class="muted">
+    This page is the Kubernetes cost navigation hub, not the provider-specific pricing page or the platform-comparison
+    page: the job is to route you from generic cluster budgeting to the right next guide before you overfit one
+    estimate.
+  </p>
+  <p class="muted">
     Kubernetes bills are rarely just nodes. A planning-safe estimate includes: node baseline + network (egress/NAT) + load
     balancers + logs/metrics. This hub links the key guides and calculators to avoid thin compute-only models.
   </p>
+  <p class="muted">
+    Use this hub when you still need to decide whether the next question is generic Kubernetes budgeting, AWS platform
+    choice, or cross-cloud managed Kubernetes comparison.
+  </p>
+
+  <h2>Choose the next path before you model too much detail</h2>
+  <ul>
+    <li>
+      <strong>Generic Kubernetes budgeting</strong>: stay here when you are still framing nodes, traffic, load
+      balancers, and observability as cost surfaces.
+    </li>
+    <li>
+      <strong>AWS platform choice</strong>: go to <a href="/guides/aws-ecs-vs-eks-cost/">ECS vs EKS</a> when the open
+      question is which AWS operating model fits the same workload better.
+    </li>
+    <li>
+      <strong>Cross-cloud managed Kubernetes comparison</strong>: go to{" "}
+      <a href="/guides/eks-vs-gke-vs-aks-cost/">EKS vs GKE vs AKS</a> when the open question is how to normalize the
+      same cluster across providers.
+    </li>
+  </ul>
 
   <h2>1) Nodes (the baseline)</h2>
   <ul>
