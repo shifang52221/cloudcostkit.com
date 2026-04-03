@@ -36,12 +36,12 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    If you are trying to budget Cloud Run from a simple "price per request" idea, the faster path is to stop treating
-    traffic as one number. A reliable estimate comes from modeling the service the way it behaves in production:
-    request volume, execution time, concurrency, outbound transfer, and logging. That sounds heavier than a quick
-    calculator shortcut, but in practice it prevents the two mistakes that break most first-pass budgets: assuming all
-    requests behave the same, and forgetting that slow periods, retries, and large responses change the bill shape at
-    the same time.
+    This is the Cloud Run service behavior and pricing decision page. Use it when you are budgeting Cloud Run from the
+    way the service behaves in production: request volume, execution time, concurrency, outbound transfer, and logging.
+  </p>
+  <p class="muted">
+    Go back to the serverless parent guide if the broader architecture model is still unclear and you still need to map
+    retries, downstream amplification, and observability before narrowing the estimate to Cloud Run.
   </p>
 
   <h2>What Cloud Run teams usually pay for in the real world</h2>

@@ -28,9 +28,9 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    This page is the cross-provider serverless architecture guide inside the broader{" "}
-    <a href="/guides/compute-costs/">compute cost model</a>. Its job is to help you estimate the full serverless system
-    bill: function compute, event amplification, downstream services, observability, and transfer, not just invocation math.
+    This is the cross-provider serverless architecture budgeting parent page inside the broader{" "}
+    <a href="/guides/compute-costs/">compute cost model</a>. Use it to shape the full serverless system bill before you
+    drop into a provider-specific pricing page.
   </p>
 
   <h2>When this page should be your main guide</h2>
@@ -40,8 +40,8 @@ const faqs = [
     <li>You need a cross-provider workflow before drilling into Lambda, Cloud Run, or Azure Functions pricing.</li>
   </ul>
   <p class="muted">
-    If you already know the exact provider and product, use this page to structure the estimate, then hand off to the
-    provider-specific pricing guide for final assumptions.
+    Route into provider-specific pricing pages only after the workload shape is clear. If you already know the exact
+    provider and product, use this page to structure the estimate first, then hand off for final pricing assumptions.
   </p>
 
   <h2>1) Compute billing shape: invocations, duration, and allocation</h2>
