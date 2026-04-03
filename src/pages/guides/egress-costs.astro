@@ -49,16 +49,20 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   </ul>
 
   <p class="muted">
-    If you searched for <em>AWS egress cost</em>, <em>AWS egress pricing</em>, <em>AWS egress charges</em>, or{" "}
-    <em>AWS egress cost calculator</em>, the first job is to identify the transfer boundary before you touch rates.
-    Egress is the data your cloud sends out. For many products, it is the "silent" line item that grows with usage.
-    This guide helps you estimate it quickly, pick the right unit, and avoid common double-counting traps.
+    This is the egress decision and billing page. Use it when you already believe the traffic is an outbound transfer
+    charge and need to decide which egress bill you are modeling, how to estimate GB/month, and when to go straight to
+    pricing.
   </p>
   <div class="btn-row" style="margin-top:12px">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">AWS egress calculator</a>
     <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
   </div>
+
+  <p class="muted">
+    Go back to the network transfer boundary guide if you still have not identified the transfer path and need to sort
+    internet egress, cross-AZ, cross-region, CDN edge delivery, or origin-to-CDN traffic before pricing.
+  </p>
 
   <h2>Fast answer: which egress bill are you trying to explain?</h2>
   <ul>
@@ -104,7 +108,7 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
 
   <h2>Guide first or calculator first?</h2>
   <ul>
-    <li><strong>Use this guide first</strong> when "AWS egress" still means several possible transfer paths.</li>
+    <li><strong>Use the boundary guide first</strong> when "AWS egress" still means several possible transfer paths.</li>
     <li><strong>Use the calculator first</strong> when you already know the GB/month and effective $/GB for a specific path.</li>
     <li><strong>Use provider guides next</strong> when the path is known but the provider-specific billing rule is still unclear.</li>
   </ul>
