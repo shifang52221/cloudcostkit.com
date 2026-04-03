@@ -34,10 +34,16 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
   faqs={faqs}
 >
   <p class="muted">
-    Storage cost estimates often fail because teams only price "stored GB". This guide gives a simple framework to model
-    storage like a real bill: capacity (GB-month) plus activity (requests) plus copies (replication/backup) plus
-    transfer.
+    This is the capacity and lifecycle budgeting parent page. Use it to model stored data as a real operating system:
+    capacity, copies, retrieval, and lifecycle transitions all belong here before you trust a storage total.
   </p>
+
+  <h2>Start here when stored data changes class, copy count, or access pattern</h2>
+  <ul>
+    <li>Use this parent guide first when the bill depends on how data moves between hot, warm, archive, and replica states.</li>
+    <li>Stay here if copies, retrieval, and lifecycle transitions are part of the decision instead of treating storage as only GB-month.</li>
+    <li>Move to narrower tools after the capacity and lifecycle shape is defined.</li>
+  </ul>
 
   <h2>1) Start with stored GB-month (capacity)</h2>
   <ul>
@@ -105,6 +111,10 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
     <li><strong>Archive and compliance data</strong>: model retrieval fees before deep archive transitions.</li>
     <li><strong>Replication-heavy workloads</strong>: split steady writes from one-time migrations.</li>
   </ul>
+  <p class="muted">
+    The common miss at this layer is pricing only stored bytes while copies, retrieval, and lifecycle transitions do the
+    real damage later.
+  </p>
 
   <h2>Storage validation checklist</h2>
   <ol>
