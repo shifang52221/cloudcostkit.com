@@ -47,6 +47,10 @@ const description =
     { href: "/calculators/unit-converter", label: "Units converter" },
   ]}
 >
+  <p class="muted">
+    This helper estimates monthly request volume from RPS. Feed the result into the API request calculator before
+    pricing, because that calculator owns the billable-request logic and pricing-ready units.
+  </p>
   <RpsToMonthlyRequestsCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">How to get your inputs</h2>

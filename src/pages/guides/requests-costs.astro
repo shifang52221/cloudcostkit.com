@@ -35,8 +35,9 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
   faqs={faqs}
 >
   <p class="muted">
-    Request-based pricing looks simple until retries, fan-out, and peak traffic show up. This hub connects the main
-    estimation workflows and tools so your model survives real production traffic.
+    This is the request boundary page: edge retries, bots, cache misses, and other traffic amplifiers belong in this
+    model before you price the bill. Use the calculators only after the boundary is defined so every estimate inherits
+    the same definition of billable requests.
   </p>
 
   <h2>1) Convert traffic to monthly requests</h2>
