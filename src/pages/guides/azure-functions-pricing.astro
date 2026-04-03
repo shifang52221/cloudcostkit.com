@@ -32,9 +32,12 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    Serverless bills are rarely "just compute". A solid Azure Functions estimate separates measurable drivers:
-    <strong>invocations</strong>, <strong>duration</strong>, <strong>data transfer</strong>, and <strong>logs</strong>. If
-    you do one thing, do this: model <strong>baseline + peak</strong> instead of one average month.
+    This is the Azure Functions execution and pricing boundary page. Use it when you need to estimate Functions from
+    the real execution model instead of from a generic serverless average.
+  </p>
+  <p class="muted">
+    Go back to the serverless parent guide if the event-system model is still unclear and you have not yet separated
+    retries, fan-out, downstream dependencies, and observability from the Functions bill itself.
   </p>
 
   <h2>0) Pick the right unit of analysis (what triggers what)</h2>

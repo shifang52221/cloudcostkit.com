@@ -21,14 +21,17 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-lambda-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Use this page when you need to decide what belongs inside the Lambda bill before you debate cold starts, retries,
-    or runtime tuning. Lambda pricing looks simple on paper, but budgets get surprised by the surrounding line items:
-    logs, data transfer, retries, and downstream services.
+    This is the AWS Lambda bill-boundary page. Use it when you need to decide what belongs inside the Lambda bill
+    before you debate cold starts, retries, or runtime tuning.
   </p>
   <p>
     This guide is about bill boundaries: request charges, GB-seconds, provisioned concurrency baseline cost, and the
     adjacent logging, networking, and downstream service costs that should be tracked beside Lambda rather than blended
     into it.
+  </p>
+  <p class="muted">
+    Go back to the serverless parent guide if the broader system model is still unclear and you still need to map event
+    amplification, observability, downstream services, or transfer before pricing Lambda itself.
   </p>
 
   <h2>Start here: what belongs inside the Lambda bill</h2>
