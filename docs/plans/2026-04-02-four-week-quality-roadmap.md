@@ -38,33 +38,31 @@ That limitation is acceptable for weekly sequencing because the main decisions a
   - `npm run build`
   - live phrase verification on the changed pages after merge
 
-## Week 2: Reduce residual thin-page and parent-page fragility
+## Week 2: Re-audit pages that were improved once but still need a stronger second pass
 
-- Target layer: `Layer A`, then selective `Layer B`
+- Target layer: `Layer B`
 - Expected number of rounds: `2`
 - Expected page clusters:
-  - generic topic-parent guide cluster
-    - likely first slice:
-      - `src/pages/guides/serverless-costs.astro`
-      - `src/pages/guides/compute-costs.astro`
-      - `src/pages/guides/messaging-costs.astro`
-      - `src/pages/guides/database-costs.astro`
-  - short utility calculator cluster
-    - likely first slice:
-      - `src/pages/calculators/rps-to-monthly-requests-calculator.astro`
-      - `src/pages/calculators/compute-instance-cost-calculator.astro`
-      - `src/pages/calculators/api-request-cost-calculator.astro`
-      - `src/pages/calculators/api-response-size-transfer-calculator.astro`
+  - storage and replication re-audit cluster
+    - `src/pages/guides/storage-costs.astro`
+    - `src/pages/guides/s3-pricing-explained.astro`
+    - `src/pages/guides/s3-replication-cost.astro`
+    - `src/pages/calculators/storage-replication-cost-calculator.astro`
+  - compute and runtime re-audit cluster
+    - `src/pages/guides/aws-ec2-cost-estimation.astro`
+    - `src/pages/calculators/ec2-cost-calculator.astro`
+    - `src/pages/calculators/aws-ecs-task-sizing-calculator.astro`
+    - one adjacent runtime guide such as `src/pages/guides/aws-fargate-pricing.astro`
 - Why this week second:
-  - after the broadest guide overlaps are reduced, the next approval risk is the impression of too many slight parent or helper URLs
-  - this week should decide which pages deserve independent prominence and which should become support utilities
-  - this is the week where "deepen vs de-emphasize vs noindex" decisions become explicit
+  - the plan for Week 2 is not another first-pass cleanup; it is a second-pass re-audit of pages that already received attention but may still have overlap, weak first-screen framing, or weak routing
+  - these clusters sit close to commercial intent and can improve materially once the most obvious overlap risks are reduced in Week 1
+  - this is the point where "good enough" pages become clearly stronger pages instead of just surviving review
 - Expected verification output:
-  - diff review proving the round stayed within one topic group
+  - one short written checklist per round stating what remained weak after the first pass and what the second pass corrected
   - `git diff --check`
-  - non-ASCII audit on touched files
   - `npm run check`
   - `npm run build`
+  - live phrase verification on the pages whose first-screen promise was changed
 
 ## Week 3: Strengthen routing and discovery once the weak edges are cleaner
 
@@ -101,11 +99,12 @@ That limitation is acceptable for weekly sequencing because the main decisions a
     - `src/pages/editorial-policy.astro`
     - `src/pages/methodology.astro`
   - high-opportunity search cluster
-    - `src/pages/guides/cdn-costs.astro`
-    - `src/pages/guides/egress-costs.astro`
-    - `src/pages/guides/gcp-cloud-run-pricing.astro`
-    - `src/pages/guides/azure-container-registry-pricing.astro`
-    - optional calculator companions if the batch still stays bounded
+    - default priority slice:
+      - `src/pages/guides/cdn-costs.astro`
+      - `src/pages/guides/egress-costs.astro`
+      - `src/pages/guides/gcp-cloud-run-pricing.astro`
+      - `src/pages/guides/azure-container-registry-pricing.astro`
+    - optional calculator companions only if the round still stays bounded
 - Why this week fourth:
   - trust parity should be strongest immediately before any re-review attempt
   - the final week can then safely re-activate the best search opportunities after the site-quality posture is cleaner
