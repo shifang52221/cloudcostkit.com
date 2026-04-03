@@ -35,9 +35,16 @@ const messagingGuides = GUIDES.filter((g) => (g.topics || []).includes("messagin
   faqs={faqs}
 >
   <p class="muted">
-    Messaging bills look small until they scale. The reliable model is: volume (messages/month) x deliveries (including
-    retries) x payload size. This hub links the key pricing checklists and estimation helpers.
+    This is the event and delivery budgeting parent page. Use it when the real question is how publishes become
+    deliveries, retries, fan-out, and payload amplification before the message system ever looks expensive on paper.
   </p>
+
+  <h2>Start here when message flow multiplies after publish</h2>
+  <ul>
+    <li>Use this parent guide first when the budget depends on publishes turning into many deliveries.</li>
+    <li>Stay here if retries, fan-out, and payload amplification are more important than the headline request unit.</li>
+    <li>Move to request and transfer tools only after the event and delivery pattern is defined.</li>
+  </ul>
 
   <h2>1) Define your unit (publish vs delivery)</h2>
   <ul>

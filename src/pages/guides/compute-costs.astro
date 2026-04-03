@@ -28,11 +28,16 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    Compute-only estimates are almost always too optimistic. A planning-safe model includes compute time plus at least
-    one scenario for networking, load balancing, and observability. This page is the parent framework for that model:
-    instances, containers, serverless, idle waste, adjacent spend, and the validation rules that decide whether the
-    budget is believable.
+    This is the runtime budgeting parent page. Start here before choosing deeper compute paths so you separate baseline
+    capacity, peak headroom, idle waste, and adjacent spend before diving into a provider-specific calculator or guide.
   </p>
+
+  <h2>Start here when the workload shape is still the real question</h2>
+  <ul>
+    <li>Use this parent guide first when you still need to decide how the system consumes compute over time.</li>
+    <li>Stay here if the budgeting risk is utilization, idle waste, or hidden adjacent costs around the runtime fleet.</li>
+    <li>Move to deeper compute tools only after the runtime shape is clear.</li>
+  </ul>
 
   <h2>Start with the billing shape, not with the product name</h2>
   <p>

@@ -35,9 +35,16 @@ const databaseGuides = GUIDES.filter((g) => (g.topics || []).includes("database"
   faqs={faqs}
 >
   <p class="muted">
-    Database estimates fail when you model only instance-hours. Real bills are usually: compute baseline + storage GB-month
-    + backups/snapshots retention + replication and network patterns. This hub links the most useful checklists and tools.
+    This is the stateful service budgeting parent page. Use it when the question is not just storage growth, but how a
+    database keeps compute, data retention, backups, and replication alive together in one operating budget.
   </p>
+
+  <h2>Start here when the bill belongs to an always-on stateful system</h2>
+  <ul>
+    <li>Use this parent guide first when database uptime, retention, and replication are driving the conversation.</li>
+    <li>Stay here when you need a database budget, not just a lighter storage page for stored bytes.</li>
+    <li>Move to deeper engine or provider guides after the stateful service shape is clear.</li>
+  </ul>
 
   <h2>1) Compute baseline</h2>
   <ul>
