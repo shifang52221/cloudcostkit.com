@@ -31,13 +31,37 @@ const securityGuides = GUIDES.filter((g) => (g.topics || []).includes("security"
   title={title}
   description={description}
   canonicalPath="/guides/security-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
     Security spend tends to be request-driven. If traffic spikes, your security line items often spike first (WAF, keys,
-    secrets, logs). This hub links the pricing checklists and calculators that keep models grounded in measurable drivers.
+    secrets, logs). This is the security system budgeting parent page.
   </p>
+  <p class="muted">
+    Use it to separate WAF, key management, secrets access, and audit logging before you budget them in detail. Only
+    move into the WAF, KMS, or Secrets Manager specialist pages only after the broader security cost shape is clear.
+  </p>
+
+  <h2>When this page should be your main guide</h2>
+  <ul>
+    <li>You know security spend is rising but have not yet isolated which subsystem is actually driving it.</li>
+    <li>You need to separate request-driven spikes from baseline security configuration costs.</li>
+    <li>You want to route into WAF, KMS, or Secrets Manager only after the wider cost shape is clear.</li>
+  </ul>
+
+  <h2>Start by splitting the security system into cost surfaces</h2>
+  <p>
+    Security bills often look like one bucket during incidents, but the underlying drivers are different. WAF is shaped
+    by evaluated traffic, KMS is shaped by keys plus request volume, Secrets Manager is shaped by secret inventory plus
+    API access, and logs are shaped by ingestion, retention, and investigation behavior.
+  </p>
+  <ul>
+    <li><strong>WAF</strong>: request spikes, attacks, bot traffic, ACL sprawl, and downstream log analysis.</li>
+    <li><strong>KMS</strong>: key-month baseline, cryptographic API requests, caller behavior, and retry amplification.</li>
+    <li><strong>Secrets</strong>: secret-month baseline, runtime fetch patterns, restart storms, and rotation-side effects.</li>
+    <li><strong>Audit and logs</strong>: ingestion, retention, and incident-time search behavior.</li>
+  </ul>
 
   <h2>1) WAF and bot traffic</h2>
   <ul>
@@ -47,6 +71,9 @@ const securityGuides = GUIDES.filter((g) => (g.topics || []).includes("security"
       Tool: <a href="/calculators/aws-waf-cost-calculator/">WAF cost calculator</a>
     </li>
   </ul>
+  <p class="muted">
+    Specialist path after the broader security cost shape is clear: <a href="/guides/aws-waf-pricing/">AWS WAF pricing</a>.
+  </p>
 
   <h2>2) Key management (KMS / Key Vault)</h2>
   <ul>
@@ -56,6 +83,9 @@ const securityGuides = GUIDES.filter((g) => (g.topics || []).includes("security"
       Tool: <a href="/calculators/aws-kms-cost-calculator/">KMS cost calculator</a>
     </li>
   </ul>
+  <p class="muted">
+    Specialist path after the broader security cost shape is clear: <a href="/guides/aws-kms-pricing/">AWS KMS pricing</a>.
+  </p>
 
   <h2>3) Secrets access patterns</h2>
   <ul>
@@ -65,6 +95,9 @@ const securityGuides = GUIDES.filter((g) => (g.topics || []).includes("security"
       Tool: <a href="/calculators/aws-secrets-manager-cost-calculator/">Secrets Manager cost</a>
     </li>
   </ul>
+  <p class="muted">
+    Specialist path after the broader security cost shape is clear: <a href="/guides/aws-secrets-manager-pricing/">Secrets Manager pricing</a>.
+  </p>
 
   <h2>4) Logging and audit trails</h2>
   <ul>
