@@ -31,13 +31,37 @@ const networkingGuides = GUIDES.filter((g) => (g.topics || []).includes("egress"
   title={title}
   description={description}
   canonicalPath="/guides/networking-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
-    Most teams under-estimate networking because they model only internet egress. The reliable workflow is to list each
-    boundary and price it separately: internet, cross-zone, cross-region, CDN origin egress, plus NAT/private endpoints.
+    This is the cross-provider networking system budgeting parent page. Use it before you jump into one provider or one
+    transfer path in isolation.
   </p>
+  <p class="muted">
+    Most teams under-estimate networking because they model only internet egress. The reliable workflow is to list each
+    boundary and price it separately: internet, cross-zone, cross-region, CDN origin egress, plus NAT/private
+    endpoints. Move into provider-specific networking pages only after the broader network cost shape is clear.
+  </p>
+
+  <h2>When this page should be your main guide</h2>
+  <ul>
+    <li>You still need to separate internet egress, transfer, NAT, private endpoints, and CDN-origin paths as distinct cost surfaces.</li>
+    <li>You know networking is the problem but have not yet decided whether the next step is cross-provider or provider-specific.</li>
+    <li>You want the broader system map before moving into AWS, Azure, or GCP network pages.</li>
+  </ul>
+
+  <h2>The biggest budgeting mistake is treating networking as one egress line</h2>
+  <p>
+    Network bills often become unpredictable because several boundaries expand together. Internet egress, cross-zone
+    traffic, cross-region replication, NAT processed GB, and endpoint-hour charges do not behave the same way even if
+    teams see them as one "network" bucket.
+  </p>
+  <ul>
+    <li><strong>Boundary confusion</strong>: teams pick rates before they have identified which path is billed.</li>
+    <li><strong>Topology drift</strong>: retries, cache misses, or routing changes quietly move traffic onto more expensive paths.</li>
+    <li><strong>Provider jump too early</strong>: readers often need the system map before a provider-specific deep dive is useful.</li>
+  </ul>
 
   <h2>1) List your boundaries</h2>
   <ul>
@@ -79,6 +103,10 @@ const networkingGuides = GUIDES.filter((g) => (g.topics || []).includes("egress"
     <a class="btn" href="/guides/azure-bandwidth-egress-costs/">Azure egress</a>
     <a class="btn" href="/guides/gcp-vpc-egress-costs/">GCP VPC egress</a>
   </div>
+  <p class="muted">
+    Start with a provider page only after the broader network cost shape is clear. AWS readers should move next to{" "}
+    <a href="/guides/aws-network-costs/">AWS network costs</a>.
+  </p>
 
   <h2>Spike triage checklist</h2>
   <ol>

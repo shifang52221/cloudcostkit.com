@@ -31,13 +31,19 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-network-costs"
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
-  <p>
+  <p class="muted">
     If you searched for <em>AWS data transfer cost calculator</em> or <em>AWS data transfer pricing calculator</em>, the
     first move is to decide whether you only need transfer out, or the broader AWS network model. AWS networking cost
-    modeling is simpler than it looks if you treat it as a set of consistent line items.
+    modeling is simpler than it looks if you treat it as a set of consistent line items. This is the AWS networking
+    budgeting parent page.
+  </p>
+  <p class="muted">
+    Stay here when NAT, endpoints, PrivateLink, cross-AZ, cross-region, and internet egress still need to be separated
+    as one AWS system. Go back to the networking parent page if the broader cross-provider networking model is still
+    unclear.
   </p>
 
   <h2>Use this page when "AWS data transfer" is bigger than one line item</h2>
@@ -127,6 +133,10 @@ const faqs = [
     <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ transfer</a>
     <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC data transfer</a>
   </div>
+  <p class="muted">
+    Move into <a href="/guides/aws-vpc-data-transfer/">AWS VPC data transfer</a> only after the broader AWS network
+    system model is clear and the remaining question is the transfer path itself.
+  </p>
 
   <h2>Decision table (which lever to pull)</h2>
   <div class="table-wrap">
