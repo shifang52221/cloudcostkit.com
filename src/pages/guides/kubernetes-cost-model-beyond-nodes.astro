@@ -23,13 +23,13 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-cost-model-beyond-nodes"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
-  <p>
-    This page is the non-node completeness checklist page for Kubernetes: node count should already be credible, and
-    the goal here is to catch the control plane, storage, load balancer, observability, and transfer lines that a
-    node-only model misses.
+  <p class="muted">
+    This is the Kubernetes non-node completeness checklist page. Node count should already be credible, and the goal
+    here is to catch the control plane, storage, load balancer, observability, and transfer lines that a node-only
+    model misses.
   </p>
   <p>
     A <a href="/calculators/kubernetes-cost-calculator/">Kubernetes cost calculator</a> often starts with node spend
@@ -40,6 +40,11 @@ const faqs = [
     If you still are not confident in requests, allocatable headroom, or node count, go back to the sizing workflow
     first before you use this checklist.
     <a href="/guides/kubernetes-requests-limits/"> Sizing workflow</a>.
+  </p>
+  <p class="muted">
+    Go back to the Kubernetes parent page if you still need the broader Kubernetes budget map and have not yet
+    separated node baseline, network, load balancers, and observability.
+    <a href="/guides/kubernetes-costs/"> Kubernetes costs</a>.
   </p>
 
   <h2>Beyond-nodes cost inputs</h2>

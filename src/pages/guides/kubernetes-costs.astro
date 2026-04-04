@@ -31,17 +31,17 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
   title={title}
   description={description}
   canonicalPath="/guides/kubernetes-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
-    This page is the Kubernetes cost navigation hub, not the provider-specific pricing page or the platform-comparison
-    page: the job is to route you from generic cluster budgeting to the right next guide before you overfit one
-    estimate.
+    This is the Kubernetes system budgeting parent page. Use it before you optimize node count, non-node completeness,
+    or platform comparisons in isolation.
   </p>
   <p class="muted">
-    Kubernetes bills are rarely just nodes. A planning-safe estimate includes: node baseline + network (egress/NAT) + load
-    balancers + logs/metrics. This hub links the key guides and calculators to avoid thin compute-only models.
+    Kubernetes bills are rarely just nodes. A planning-safe estimate includes: node baseline + network (egress/NAT) +
+    load balancers + logs/metrics. Move into the sizing workflow or the non-node completeness page only after the
+    broader Kubernetes cost shape is clear.
   </p>
   <p class="muted">
     Use this hub when you still need to decide whether the next question is generic Kubernetes budgeting, AWS platform
@@ -51,8 +51,17 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
   <h2>Choose the next path before you model too much detail</h2>
   <ul>
     <li>
-      <strong>Generic Kubernetes budgeting</strong>: stay here when you are still framing nodes, traffic, load
-      balancers, and observability as cost surfaces.
+      <strong>System budgeting parent</strong>: stay here when you are still framing nodes, traffic, load balancers,
+      and observability as connected cost surfaces.
+    </li>
+    <li>
+      <strong>Node sizing workflow</strong>: go to <a href="/guides/kubernetes-requests-limits/">requests and limits</a>{" "}
+      when the real question is allocatable headroom, requests, and defendable node count.
+    </li>
+    <li>
+      <strong>Non-node completeness</strong>: go to{" "}
+      <a href="/guides/kubernetes-cost-model-beyond-nodes/">cost model beyond nodes</a> when node count is already
+      credible and the missing lines are elsewhere.
     </li>
     <li>
       <strong>AWS platform choice</strong>: go to <a href="/guides/aws-ecs-vs-eks-cost/">ECS vs EKS</a> when the open
@@ -65,6 +74,18 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
     </li>
   </ul>
 
+  <h2>The biggest budgeting mistake is letting nodes swallow the whole story</h2>
+  <p>
+    Teams often jump straight from workload demand to node cost and assume the rest is secondary. That misses the real
+    behavior of many clusters, where traffic, load balancers, retries, metrics growth, and log retention quietly become
+    the second budget.
+  </p>
+  <ul>
+    <li><strong>Node-only bias</strong>: good node math does not mean the full cluster budget is credible.</li>
+    <li><strong>Incident amplification</strong>: retries, pull storms, and noisy observability often expand together.</li>
+    <li><strong>Workflow confusion</strong>: sizing questions and non-node completeness questions need different pages and different inputs.</li>
+  </ul>
+
   <h2>1) Nodes (the baseline)</h2>
   <ul>
     <li>Translate app demand into node-hours (CPU + memory), then apply headroom and allocatable percent.</li>
@@ -74,6 +95,10 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
       <a href="/calculators/kubernetes-requests-limits-calculator/">requests vs limits</a>
     </li>
   </ul>
+  <p class="muted">
+    Deeper workflow after the broader Kubernetes budget map is clear:{" "}
+    <a href="/guides/kubernetes-requests-limits/">Kubernetes requests and limits</a>.
+  </p>
 
   <h2>2) Egress, NAT, and cross-AZ traffic (the surprise bucket)</h2>
   <ul>
@@ -103,6 +128,10 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
       <a href="/calculators/metrics-timeseries-cost-calculator/">metrics series</a>
     </li>
   </ul>
+  <p class="muted">
+    If node count already looks solid and you now need the missing lines around it, move to{" "}
+    <a href="/guides/kubernetes-cost-model-beyond-nodes/">Kubernetes cost model beyond nodes</a>.
+  </p>
 
   <h2>Role-based optimization path</h2>
   <ul>
