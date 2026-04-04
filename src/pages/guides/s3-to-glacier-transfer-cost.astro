@@ -23,13 +23,25 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-to-glacier-transfer-cost"
-  lastUpdated="2026-01-30"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
     Moving data from S3 to Glacier is usually cheap, but the workflow can create extra costs. Use this checklist to
-    model transition requests, minimum duration rules, and any transfer overhead.
+    model transition requests, minimum duration rules, and any transfer overhead. This is the archive-transition
+    boundary page.
   </p>
+  <p class="muted">
+    Stay here when the main question is archive migration and restore readiness. Go back to the storage parent page if
+    the broader storage budget shape is still unclear.
+  </p>
+
+  <h2>Use this page when lifecycle moves are the real risk</h2>
+  <ul>
+    <li>Use this guide when archive transitions, minimum duration rules, and restore behavior are the main cost question.</li>
+    <li>Stay here if the workflow is about moving objects into colder tiers, not understanding the full storage budget.</li>
+    <li>Move back to the storage parent if you still need the broader map of capacity, copies, retrieval, and lifecycle.</li>
+  </ul>
 
   <h2>What to include in the transfer cost</h2>
   <ul>
@@ -68,6 +80,12 @@ const faqs = [
   </ul>
   <p class="muted">
     The goal is to ensure the storage savings exceed the transition and early deletion penalties.
+  </p>
+
+  <h2>The biggest mistake on this page is treating archive moves as pure storage savings</h2>
+  <p>
+    Archive transitions are workflow boundaries, not just cheaper GB-month. Request volume, duration rules, restores,
+    and object churn decide whether the move actually saves money.
   </p>
 
   <h2>Example: lifecycle migration for log archives</h2>
@@ -119,4 +137,8 @@ const faqs = [
     <a class="btn" href="/guides/aws-s3-glacier-pricing/">Glacier pricing</a>
     <a class="btn" href="/guides/aws-s3-storage-classes/">S3 storage classes</a>
   </div>
+  <p class="muted">
+    If the larger storage system budget is still unclear, go back to <a href="/guides/storage-costs/">storage costs</a>
+    before narrowing into archive workflow planning.
+  </p>
 </GuideLayout>
