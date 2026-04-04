@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-rds-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-04-04"
   faqs={[
     {
       q: "What are the core RDS cost components?",
@@ -27,14 +27,25 @@ const description =
       q: "How should I model prices if I don't know the region yet?",
       a: "Pick one target region as the default and run a sensitivity check (±20–30%). Most cost planning errors come from wrong usage assumptions, not small region price differences.",
     },
-  ]}
+]}
 >
-  <p>
+  <p class="muted">
     Use this page when you need to decide what belongs inside the RDS bill before you debate instance right-sizing, backup retention changes, or storage tuning.
+    This is the AWS RDS bill-boundary page.
   </p>
   <p class="muted">
     This guide is about bill boundaries: instance-hours, DB storage, backup storage, I/O-priced storage exposure, Multi-AZ and replica capacity, and the adjacent monitoring, transfer, or application-side costs that should be tracked beside the RDS bill rather than blended into it.
   </p>
+  <p class="muted">
+    Stay here when the job is bill ownership. Go back to the database parent page if the broader database budget shape is still unclear.
+  </p>
+
+  <h2>Use this page when bill ownership is the real question</h2>
+  <ul>
+    <li>Use this guide when you need to separate RDS-native line items from adjacent monitoring, transfer, and application-side costs.</li>
+    <li>Stay here if the main problem is what belongs inside the RDS bill, not the full database operating budget.</li>
+    <li>Move back to the parent page when compute, retention, replicas, and network still need to be framed as one broader system.</li>
+  </ul>
 
   <h2>Inside the RDS bill vs beside the RDS bill</h2>
   <ul>
@@ -75,6 +86,12 @@ const description =
     <li><strong>Application-side failures</strong>: retries can increase demand on RDS, but the owning problem may still be the app or query pattern, not the core database line items.</li>
   </ul>
 
+  <h2>The biggest mistake on this page is confusing bill boundaries with database strategy</h2>
+  <p>
+    This page should answer ownership questions, not replace the broader database system model. If you still have not
+    decided how compute, backups, replicas, and transfer fit together, the parent page is still the correct entry point.
+  </p>
+
   <h2>How to gather inputs without mixing jobs</h2>
   <ul>
     <li><strong>Bill scope</strong>: decide ownership first, then bring in measured numbers from the estimate or optimization pages.</li>
@@ -92,6 +109,10 @@ const description =
     <a class="btn" href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a>
     <a class="btn" href="/guides/aws-rds-backup-storage-gb-month-estimate/">Estimate backup GB-month</a>
   </div>
+  <p class="muted">
+    If the bigger database budget is still unclear, go back to <a href="/guides/database-costs/">database costs</a>
+    before narrowing into bill-boundary decisions.
+  </p>
 
   <h2>Validation checklist</h2>
   <ul>
