@@ -24,13 +24,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/metrics-costs"
-  lastUpdated="2026-03-27"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
     Metrics bills are usually a cardinality problem, not a "how many hosts do we have?" problem. This page is the
-    metrics-specific deep dive inside the broader <a href="/guides/observability-costs/">observability cost model</a>:
-    it focuses on how series are created, how labels multiply cost, and how to cut spend without blinding the team.
+    metrics-specific deep dive inside the broader <a href="/guides/observability-costs/">observability cost model</a>.
+    This is the metrics cardinality and monitoring economics page.
+  </p>
+  <p class="muted">
+    Stay here when you already know metrics are the expensive signal family and need to fix series growth, labels,
+    dashboards, or alert pressure. Go back to the observability parent page if the broader signal split is still
+    unclear.
   </p>
 
   <h2>When this page should be your main guide</h2>
@@ -41,7 +46,8 @@ const faqs = [
   </ul>
   <p class="muted">
     If the bigger question is "logs vs metrics vs traces, which signal family is driving the bill?", start with{" "}
-    <a href="/guides/observability-costs/">observability costs</a> first.
+    <a href="/guides/observability-costs/">observability costs</a> first rather than treating this page as a full
+    observability overview.
   </p>
 
   <h2>1) Build the series count correctly</h2>

@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Log Cost Guide (ingestion, retention, search)";
+const title = "Log costs explained: ingestion, retention, scan, and incident spikes";
 const description =
-  "Estimate log costs from ingestion volume, retention, and query/scan fees. Includes common pitfalls and sizing tips.";
+  "Estimate log costs from ingestion volume, retention, and query or scan fees, with practical guidance for noisy sources, retention tiers, and incident-time query spikes.";
 const faqs = [
   {
     q: "What are the main drivers of log cost?",
@@ -30,13 +30,31 @@ const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") 
   title={title}
   description={description}
   canonicalPath="/guides/log-costs"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
-  <p>
+  <p class="muted">
     Most log platforms charge for <strong>ingestion</strong> (GB ingested), <strong>retention</strong> (stored GB-month),
     and sometimes <strong>scan/search</strong> (GB scanned by queries). If your bill surprised you, it's usually because
-    volume, retention, or query behavior drifted upward.
+    volume, retention, or query behavior drifted upward. This is the log ingestion, retention, and scan economics page.
+  </p>
+
+  <p class="muted">
+    Stay on this page when you already know logs are the signal family driving the bill and need to break apart volume,
+    retention tiers, and search behavior. Go back to the observability parent page if the broader signal split is still
+    unclear.
+  </p>
+
+  <h2>When this page should be your main guide</h2>
+  <ul>
+    <li>You need to understand whether ingestion, retention, or scan behavior is the real log cost driver.</li>
+    <li>You want a log-specific workflow instead of a broader logs-versus-metrics-versus-traces comparison.</li>
+    <li>You are reviewing noisy logging classes, retention defaults, or incident-time search habits.</li>
+  </ul>
+
+  <p class="muted">
+    If you are still deciding whether logs, metrics, or traces are the real budget problem, start with{" "}
+    <a href="/guides/observability-costs/">observability costs</a> first.
   </p>
 
   <h2>1) Separate ingestion from storage</h2>
@@ -76,6 +94,18 @@ const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") 
     <li><strong>Reduce volume</strong>: drop or sample high-volume debug logs.</li>
     <li><strong>Shorten retention</strong>: keep low-value logs for fewer days; tier hot vs cold.</li>
     <li><strong>Query smarter</strong>: narrow time ranges and filter early to reduce scanned GB.</li>
+  </ul>
+
+  <h2>The most common budgeting mistake is blending calm weeks with incident behavior</h2>
+  <p>
+    Log estimates often look acceptable during steady-state weeks, then break during incidents when teams widen time
+    ranges, search repeatedly, and enable extra debug output. That means the log bill has both a storage problem and a
+    behavior problem.
+  </p>
+  <ul>
+    <li><strong>Debug expansion</strong>: temporary logging changes can multiply daily ingestion far beyond the baseline.</li>
+    <li><strong>Search amplification</strong>: repeated broad queries can make scan fees spike during the exact hours when discipline is weakest.</li>
+    <li><strong>Hot retention drift</strong>: retention defaults often keep incident-heavy data around longer than its operational value justifies.</li>
   </ul>
 
   <h2>Retention policy by log class</h2>

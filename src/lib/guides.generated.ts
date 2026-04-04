@@ -2149,8 +2149,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Log Cost Guide (ingestion, retention, search)",
-    "description": "Estimate log costs from ingestion volume, retention, and query/scan fees. Includes common pitfalls and sizing tips.",
+    "title": "Log costs explained: ingestion, retention, scan, and incident spikes",
+    "description": "Estimate log costs from ingestion volume, retention, and query or scan fees, with practical guidance for noisy sources, retention tiers, and incident-time query spikes.",
     "canonicalPath": "/guides/log-costs",
     "category": "Logging",
     "slug": "log-costs",
