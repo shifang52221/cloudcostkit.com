@@ -31,12 +31,16 @@ const databaseGuides = GUIDES.filter((g) => (g.topics || []).includes("database"
   title={title}
   description={description}
   canonicalPath="/guides/database-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
-    This is the stateful service budgeting parent page. Use it when the question is not just storage growth, but how a
+    This is the database system budgeting parent page. Use it when the question is not just storage growth, but how a
     database keeps compute, data retention, backups, and replication alive together in one operating budget.
+  </p>
+  <p class="muted">
+    Stay here while you still need the broader database budget map. Move into RDS bill-boundary, backup workflow, or
+    engine-comparison pages only after the broader database budget shape is clear.
   </p>
 
   <h2>Start here when the bill belongs to an always-on stateful system</h2>
@@ -44,6 +48,17 @@ const databaseGuides = GUIDES.filter((g) => (g.topics || []).includes("database"
     <li>Use this parent guide first when database uptime, retention, and replication are driving the conversation.</li>
     <li>Stay here when you need a database budget, not just a lighter storage page for stored bytes.</li>
     <li>Move to deeper engine or provider guides after the stateful service shape is clear.</li>
+  </ul>
+
+  <h2>The biggest budgeting mistake is treating databases as one compute plus storage line</h2>
+  <p>
+    Database budgets drift because several stateful surfaces expand together. Compute headroom, storage growth, backup
+    retention, replicas, and network behavior do not move the same way even if teams price them as one database total.
+  </p>
+  <ul>
+    <li><strong>Always-on blind spots</strong>: non-prod uptime, standby capacity, and replicas quietly multiply baseline cost.</li>
+    <li><strong>Retention confusion</strong>: backup and snapshot policy often grows faster than primary storage.</li>
+    <li><strong>Workflow jump too early</strong>: readers often need the full database budget map before a narrower RDS page is useful.</li>
   </ul>
 
   <h2>1) Compute baseline</h2>
@@ -86,6 +101,13 @@ const databaseGuides = GUIDES.filter((g) => (g.topics || []).includes("database"
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress cost</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
   </div>
+
+  <h2>Choose the right next page</h2>
+  <ul>
+    <li><strong>RDS bill boundary</strong>: use <a href="/guides/aws-rds-pricing/">AWS RDS pricing</a> when the main issue is what belongs inside the bill versus beside it.</li>
+    <li><strong>Backup workflow</strong>: use <a href="/guides/aws-rds-backups-and-snapshots/">RDS backups and snapshots</a> when retention, churn, and snapshot behavior are the problem.</li>
+    <li><strong>Engine choice</strong>: use <a href="/guides/aws-rds-vs-aurora-cost/">RDS vs Aurora cost</a> when you are comparing normalized workload economics across engine options.</li>
+  </ul>
 
   {databaseGuides.length ? (
     <>

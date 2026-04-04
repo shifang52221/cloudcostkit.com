@@ -27,13 +27,25 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-rds-vs-aurora-cost"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
-  <p>
+  <p class="muted">
     RDS vs Aurora comparisons go wrong when teams compare list prices without normalizing the workload. Use this checklist
-    to compare apples-to-apples: compute hours, average storage, retention, and at least one peak scenario.
+    to compare apples-to-apples: compute hours, average storage, retention, and at least one peak scenario. This is the
+    engine-choice comparison page.
   </p>
+  <p class="muted">
+    Stay here when the main question is which engine model fits the same workload better. Go back to the database parent
+    page if the broader database budget shape is still unclear.
+  </p>
+
+  <h2>Use this page when engine choice is the decision</h2>
+  <ul>
+    <li>Use this guide when you are comparing normalized workload economics across RDS and Aurora options.</li>
+    <li>Stay here if the issue is engine choice under the same assumptions, not basic database budget ownership.</li>
+    <li>Move back to the parent page when compute, retention, backups, and network still need to be framed as one broader system.</li>
+  </ul>
 
   <h2>1) Normalize compute usage (baseline + peak)</h2>
   <ul>
@@ -101,6 +113,13 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>The biggest mistake on this page is comparing engines before the workload is normalized</h2>
+  <p>
+    Engine comparisons fail when teams compare list prices without holding workload shape constant. Baseline compute,
+    peak behavior, retention, storage growth, and backup exposure all need to be normalized before one option means more
+    than the other.
+  </p>
+
   <h2>Practical next step</h2>
   <p>
     Use <a href="/calculators/aws-rds-cost-calculator/">AWS RDS Cost Calculator</a> for a baseline compute + storage +
@@ -120,6 +139,10 @@ const faqs = [
     <a class="btn" href="/guides/aws-aurora-serverless-v2-pricing/">Aurora Serverless v2</a>
     <a class="btn" href="/guides/aws-rds-pricing/">RDS pricing</a>
   </div>
+  <p class="muted">
+    If the wider database budget is still unclear, go back to <a href="/guides/database-costs/">database costs</a>
+    before narrowing into engine choice.
+  </p>
 
   <h2>Sources</h2>
   <ul>

@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-rds-backups-and-snapshots"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-04-04"
   faqs={[
     {
       q: "What's the simplest way to estimate backup storage?",
@@ -23,12 +23,23 @@ const description =
       q: "Do manual snapshots need a lifecycle policy?",
       a: "Yes. Manual snapshots can accumulate indefinitely unless you delete them or manage them with an automated policy (for example, AWS Backup).",
     },
-  ]}
+]}
 >
   <p class="muted">
     Backup costs often surprise teams because they grow silently with retention and data churn. Plan backups as a separate
-    storage bucket, not "part of the instance".
+    storage bucket, not "part of the instance". This is the backup-retention workflow page.
   </p>
+  <p class="muted">
+    Stay here when the main problem is retention, churn, and snapshot behavior. Go back to the database parent page if
+    the broader database budget shape is still unclear.
+  </p>
+
+  <h2>Use this page when backup behavior is the budget risk</h2>
+  <ul>
+    <li>Use this guide when retention windows, churn, manual snapshots, and copied backups are driving the surprise.</li>
+    <li>Stay here if the task is measuring backup footprint, not deciding the whole database cost structure.</li>
+    <li>Move back to the parent page when compute, replicas, and network still need to be framed as one full database budget.</li>
+  </ul>
 
   <h2>1) Separate three concepts (so you don’t mix costs)</h2>
   <ul>
@@ -87,6 +98,12 @@ const description =
     <li>Forgetting snapshot copies (cross-region, cross-account) when modeling “total backup footprint”.</li>
   </ul>
 
+  <h2>The biggest mistake on this page is treating backups as a side note</h2>
+  <p>
+    Backup storage is a workflow problem with its own growth logic. Churn, retention, copied snapshots, and manual
+    snapshot sprawl can reshape the bill even when primary storage looks stable.
+  </p>
+
   <h2>Retention patterns that work in practice (examples)</h2>
   <ul>
     <li>
@@ -108,6 +125,10 @@ const description =
     <a class="btn" href="/guides/aws-rds-snapshot-retention-policy-cost/">Snapshot retention policy (cost)</a>
     <a class="btn" href="/guides/aws-rds-cost-optimization/">RDS cost optimization</a>
   </div>
+  <p class="muted">
+    If the wider database budget is still unclear, go back to <a href="/guides/database-costs/">database costs</a>
+    before narrowing into backup workflow decisions.
+  </p>
 
   <h2>Sources</h2>
   <ul>
