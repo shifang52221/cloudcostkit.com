@@ -20,10 +20,10 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/kubernetes-requests-limits" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/kubernetes-requests-limits" lastUpdated="2026-04-04" faqs={faqs}>
   <p class="muted">
-    This page is the Kubernetes sizing workflow page, not the concept-only requests-vs-limits explainer: the job is
-    to move from requests to allocatable capacity, headroom, and a defendable node count in sequence.
+    This is the Kubernetes node-sizing workflow page. Its job is to move from requests to allocatable capacity,
+    headroom, and a defendable node count in sequence.
   </p>
   <p>
     Scheduling is based on <strong>requests</strong>. That is why most capacity planning starts with requests and then uses
@@ -34,6 +34,11 @@ const faqs = [
     If the open question is simply why requests and limits play different roles, go to the concept clarifier page first
     and then come back to this workflow.
     <a href="/guides/kubernetes-requests-vs-limits-for-sizing/"> Concept clarifier</a>.
+  </p>
+  <p class="muted">
+    Go back to the Kubernetes parent page if the wider budget map is still unclear and you have not yet separated node
+    sizing from traffic, load balancers, and observability.
+    <a href="/guides/kubernetes-costs/"> Kubernetes costs</a>.
   </p>
 
   <h2>1) Requests drive node count</h2>
