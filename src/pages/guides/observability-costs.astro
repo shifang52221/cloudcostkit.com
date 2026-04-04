@@ -24,14 +24,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/observability-costs"
-  lastUpdated="2026-03-28"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
     Observability is one of the most common sources of surprise cloud bills. A planning-safe model includes log
     ingestion and retention, metrics series growth, traces volume, and a scenario for incident windows where queries,
-    retries, and dashboards all become more expensive at the same time. This page is the parent framework for that
-    model.
+    retries, and dashboards all become more expensive at the same time. This is the observability system budgeting
+    parent page.
+  </p>
+  <p class="muted">
+    Use it to separate logs, metrics, traces, and incident amplification before you budget them in detail. Only move
+    into the metrics or log specialist pages only after the broader signal split is clear.
   </p>
 
   <h2>Start by separating the signal families before you budget them</h2>
@@ -62,7 +66,7 @@ const faqs = [
     <li><strong>Query and scan behavior</strong>: broad searches, large default time ranges, and incident-time exploration can turn expensive storage into expensive usage.</li>
   </ul>
   <p class="muted">
-    Deeper path: <a href="/guides/log-costs/">log costs</a>.
+    Specialist path after the signal split is clear: <a href="/guides/log-costs/">log costs</a>.
   </p>
 
   <h2>Metrics are usually a cardinality governance problem</h2>
@@ -76,7 +80,7 @@ const faqs = [
     <li><strong>Metric duplication</strong>: copy-paste instrumentation across services can create several near-identical series families that add cost without adding much signal.</li>
   </ul>
   <p class="muted">
-    Deeper path: <a href="/guides/metrics-costs/">metrics costs and cardinality governance</a>.
+    Specialist path after the signal split is clear: <a href="/guides/metrics-costs/">metrics costs and cardinality governance</a>.
   </p>
 
   <h2>Traces and incident behavior reveal the real peak month</h2>
