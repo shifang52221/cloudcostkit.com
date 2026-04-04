@@ -30,12 +30,16 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
   title={title}
   description={description}
   canonicalPath="/guides/storage-costs"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
-    This is the capacity and lifecycle budgeting parent page. Use it to model stored data as a real operating system:
+    This is the storage system budgeting parent page. Use it to model stored data as a real operating system:
     capacity, copies, retrieval, and lifecycle transitions all belong here before you trust a storage total.
+  </p>
+  <p class="muted">
+    Stay here while you still need the broader storage budget map. Move into S3 pricing, replication, or
+    archive-transition pages only after the broader storage budget shape is clear.
   </p>
 
   <h2>Start here when stored data changes class, copy count, or access pattern</h2>
@@ -43,6 +47,18 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
     <li>Use this parent guide first when the bill depends on how data moves between hot, warm, archive, and replica states.</li>
     <li>Stay here if copies, retrieval, and lifecycle transitions are part of the decision instead of treating storage as only GB-month.</li>
     <li>Move to narrower tools after the capacity and lifecycle shape is defined.</li>
+  </ul>
+
+  <h2>The biggest budgeting mistake is treating storage as only stored bytes</h2>
+  <p>
+    Storage budgets drift because multiple cost surfaces move together. Stored GB-month, request activity, replica
+    copies, archive retrieval, lifecycle transitions, and egress do not behave the same way even when teams bucket them
+    together as one storage line.
+  </p>
+  <ul>
+    <li><strong>Capacity-only planning</strong>: teams price stored bytes but ignore requests, retrieval, and copy behavior.</li>
+    <li><strong>Lifecycle blind spots</strong>: archive moves look cheap until restores, minimum durations, or transitions appear.</li>
+    <li><strong>Workflow jump too early</strong>: readers often need the system budget map before one S3 workflow page is useful.</li>
   </ul>
 
   <h2>1) Start with stored GB-month (capacity)</h2>
@@ -116,6 +132,13 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
     real damage later.
   </p>
 
+  <h2>Choose the right next page</h2>
+  <ul>
+    <li><strong>S3 pricing anatomy</strong>: use <a href="/guides/s3-pricing-explained/">S3 pricing explained</a> when you need the base bill structure.</li>
+    <li><strong>Copy-path economics</strong>: use <a href="/guides/s3-replication-cost/">S3 replication cost</a> when the main problem is changed data becoming copies and transfer.</li>
+    <li><strong>Archive-transition boundary</strong>: use <a href="/guides/s3-to-glacier-transfer-cost/">S3 to Glacier transfer cost</a> when the main problem is lifecycle moves, duration rules, and restore readiness.</li>
+  </ul>
+
   <h2>Storage validation checklist</h2>
   <ol>
     <li>Confirm average GB-month, not only end-of-month snapshots.</li>
@@ -131,6 +154,13 @@ const storageGuides = GUIDES.filter((g) => (g.topics || []).includes("storage") 
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/database-storage-growth-cost-calculator/">Storage growth</a>
   </div>
+  <p class="muted">
+    Specialist pages work best after the wider storage budget map is clear. Start with{" "}
+    <a href="/guides/s3-pricing-explained/">S3 pricing explained</a>,{" "}
+    <a href="/guides/s3-replication-cost/">S3 replication cost</a>, or{" "}
+    <a href="/guides/s3-to-glacier-transfer-cost/">S3 to Glacier transfer cost</a> only when you already know which
+    workflow is actually driving the bill.
+  </p>
 
   {storageGuides.length ? (
     <>

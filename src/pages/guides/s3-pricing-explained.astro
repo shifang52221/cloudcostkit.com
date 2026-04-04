@@ -23,14 +23,26 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-pricing-explained"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
-  <p>
+  <p class="muted">
     If you are searching for a <a href="/calculators/storage-pricing-calculator/">storage pricing calculator</a>, you are
     usually trying to estimate S3-like object storage cost. The good news: most object storage bills can be explained by
-    three buckets: <strong>storage</strong>, <strong>requests</strong>, and <strong>egress</strong>.
+    three buckets: <strong>storage</strong>, <strong>requests</strong>, and <strong>egress</strong>. This is the S3
+    pricing anatomy page.
   </p>
+  <p class="muted">
+    Stay here when the main question is how one S3-style bill breaks apart. Go back to the storage parent page if the
+    broader storage budget shape is still unclear.
+  </p>
+
+  <h2>Use this page when the bill structure matters more than the workflow</h2>
+  <ul>
+    <li>Use this guide when you need the base storage, request, egress, and storage-class anatomy of one S3 bill.</li>
+    <li>Stay here if the issue is understanding line items, not designing the broader storage operating budget.</li>
+    <li>Move to replication or archive-transition pages only after the base bill structure is clear.</li>
+  </ul>
 
   <h2>1) Storage (GB-month)</h2>
   <p>
@@ -79,6 +91,12 @@ const faqs = [
     </li>
   </ul>
 
+  <h2>The biggest mistake on this page is turning S3 anatomy into a full storage strategy</h2>
+  <p>
+    This page should explain how one S3-style bill is assembled. It should not replace the broader storage parent page
+    when copies, archive policy, or lifecycle workflow decisions are still driving the budget.
+  </p>
+
   <h2>Storage classes: treat retrieval as a separate scenario</h2>
   <p>
     Colder storage classes often look cheap on GB-month, but they can add retrieval and minimum duration costs. The safest
@@ -101,6 +119,10 @@ const faqs = [
   <p>
     If you want a single page that ties these together, start with{" "}
     <a href="/calculators/storage-pricing-calculator/">storage pricing calculator</a>.
+  </p>
+  <p class="muted">
+    If the real problem is still the wider storage budget map, go back to{" "}
+    <a href="/guides/storage-costs/">storage costs</a> before choosing a narrower workflow page.
   </p>
 
   <h2>Related tools</h2>

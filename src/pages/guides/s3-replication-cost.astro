@@ -23,13 +23,25 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-replication-cost"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
-  <p>
+  <p class="muted">
     Replication is rarely "free". Even when the feature itself is simple, the bill usually combines a few different
-    charges: data copied, extra replica storage, and sometimes request fees and transfer.
+    charges: data copied, extra replica storage, and sometimes request fees and transfer. This is the storage copy-path
+    economics page.
   </p>
+  <p class="muted">
+    Stay here when the main question is how changed data becomes copy-path cost. Go back to the storage parent page if
+    the broader storage budget shape is still unclear.
+  </p>
+
+  <h2>Use this page when replication is the workflow, not just another storage line</h2>
+  <ul>
+    <li>Use this guide when the bill depends on changed data, replica storage, transfer directionality, and copy requests.</li>
+    <li>Stay here if the replication path is the cost problem, not the full storage system budget.</li>
+    <li>Move back to the storage parent if you still need the wider capacity, retrieval, and lifecycle map.</li>
+  </ul>
 
   <h2>What volume should you count?</h2>
   <p>
@@ -83,6 +95,12 @@ const faqs = [
     <li><strong>Request fees</strong>: many small objects can create high request volume.</li>
   </ul>
 
+  <h2>The biggest mistake on this page is forgetting that replication is a path problem</h2>
+  <p>
+    Replication cost is not just "more storage." It is the economics of a copy path: changed bytes, object count,
+    destination class, and transfer directionality all need to line up before the estimate is trustworthy.
+  </p>
+
   <h2>How to validate (avoid billing surprises)</h2>
   <ul>
     <li>Validate replication GB/month from source write volume and churn (not from bucket size).</li>
@@ -98,6 +116,10 @@ const faqs = [
     <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
   </div>
+  <p class="muted" style="margin-top:14px">
+    If the main issue is still the wider storage budget model rather than the copy path itself, go back to{" "}
+    <a href="/guides/storage-costs/">storage costs</a>.
+  </p>
 
   <p class="muted" style="margin-top:14px">
     Educational use only. S3 and compatible services have provider-specific rules (directionality, request classes,
