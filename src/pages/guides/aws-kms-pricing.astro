@@ -19,9 +19,15 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-kms-pricing" lastUpdated="2026-02-07" faqs={faqs}>
-  <p class="muted">Use this page when you need to decide what belongs inside the KMS bill model before you argue about optimization.</p>
-  <p class="muted">This guide is about bill boundaries: key-months, request charges, service-triggered KMS calls, and the adjacent costs that should be tracked beside KMS rather than confused with it.</p>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-kms-pricing" lastUpdated="2026-04-04" faqs={faqs}>
+  <p class="muted">
+    Use this page when you need to decide what belongs inside the KMS bill model before you argue about optimization.
+    This is the AWS KMS request and key-boundary page.
+  </p>
+  <p class="muted">
+    Stay here when the question is keys, request volume, and caller behavior rather than the wider security system. Go
+    back to the security parent page if the broader security spend diagnosis is still unclear.
+  </p>
 
   <h2>KMS pricing inputs</h2>
   <ul>
@@ -107,6 +113,7 @@ const faqs = [
 
   <h2>When this is not the right page</h2>
   <ul>
+    <li>If you still need to decide whether WAF, KMS, secrets, or audit logging is the main security cost surface, go back to <a href="/guides/security-costs/">security costs</a> first.</li>
     <li>If your main problem is turning workload units and caller behavior into a defendable request model, go to <a href="/guides/aws-kms-estimate-requests/">Estimate KMS requests per month</a>.</li>
     <li>If the request model is already believable and you now need production changes, go to <a href="/guides/aws-kms-cost-optimization/">KMS cost optimization</a>.</li>
     <li>If the real question is which caller or service is creating the volume, use the estimate workflow before treating KMS pricing as solved.</li>

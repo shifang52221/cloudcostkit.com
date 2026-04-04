@@ -9,7 +9,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/guides/aws-waf-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-04-04"
   faqs={[
     {
       q: "What typically drives WAF cost?",
@@ -21,8 +21,15 @@ const description =
     },
   ]}
 >
-  <p class="muted">Use this page when you need to decide what belongs inside the WAF bill model before you argue about optimization.</p>
-  <p class="muted">This guide is about budget boundaries: Web ACLs, rules, evaluated requests, and the downstream logging or SIEM costs that should be tracked beside WAF rather than confused with it.</p>
+  <p class="muted">
+    Use this page when you need to decide what belongs inside the WAF bill model before you argue about optimization.
+    This is the AWS WAF bill-boundary page.
+  </p>
+  <p class="muted">
+    Stay here when the open question is Web ACLs, rules, evaluated requests, and the downstream logging or SIEM costs
+    that should be tracked beside WAF rather than confused with it. Go back to the security parent page if the broader
+    security spike question is still unclear.
+  </p>
 
   <h2>What to model (baseline + variable)</h2>
   <ul>
@@ -108,6 +115,7 @@ const description =
 
   <h2>When this is not the right page</h2>
   <ul>
+    <li>If you still need to separate WAF from KMS, secrets, or audit logging as the main security cost surface, go back to <a href="/guides/security-costs/">security costs</a> first.</li>
     <li>If your main problem is turning real traffic and attack windows into a defendable evaluated-request model, go to <a href="/guides/aws-waf-estimate-requests/">Estimate WAF requests</a>.</li>
     <li>If the model is already believable and you now need operational changes, go to <a href="/guides/aws-waf-cost-optimization/">WAF cost optimization</a>.</li>
     <li>If you are investigating a specific surge window, use <a href="/guides/aws-waf-cost-spikes-during-attacks/">WAF cost spikes during attacks</a> instead of treating every month like the same pattern.</li>
