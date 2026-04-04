@@ -31,12 +31,16 @@ const messagingGuides = GUIDES.filter((g) => (g.topics || []).includes("messagin
   title={title}
   description={description}
   canonicalPath="/guides/messaging-costs"
-  lastUpdated="2026-01-22"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
     This is the event and delivery budgeting parent page. Use it when the real question is how publishes become
     deliveries, retries, fan-out, and payload amplification before the message system ever looks expensive on paper.
+  </p>
+  <p class="muted">
+    Stay here while you still need the broader event and delivery budget map. Move into generic request math only after
+    the event and delivery pattern is clear.
   </p>
 
   <h2>Start here when message flow multiplies after publish</h2>
@@ -44,6 +48,17 @@ const messagingGuides = GUIDES.filter((g) => (g.topics || []).includes("messagin
     <li>Use this parent guide first when the budget depends on publishes turning into many deliveries.</li>
     <li>Stay here if retries, fan-out, and payload amplification are more important than the headline request unit.</li>
     <li>Move to request and transfer tools only after the event and delivery pattern is defined.</li>
+  </ul>
+
+  <h2>The biggest mistake is treating messaging as generic request pricing</h2>
+  <p>
+    Messaging systems often look simple because each publish feels like a request. The budget breaks when teams ignore
+    how one publish expands into many deliveries, retries, replays, dead-letter movement, and payload amplification.
+  </p>
+  <ul>
+    <li><strong>Publish-only math</strong>: readers count messages sent and forget downstream deliveries.</li>
+    <li><strong>Retry blindness</strong>: failure paths multiply delivery volume far beyond steady-state publishes.</li>
+    <li><strong>Math jump too early</strong>: request calculators help only after the event and delivery system shape is clear.</li>
   </ul>
 
   <h2>1) Define your unit (publish vs delivery)</h2>
@@ -75,6 +90,10 @@ const messagingGuides = GUIDES.filter((g) => (g.topics || []).includes("messagin
     <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly</a>
     <a class="btn" href="/calculators/api-response-size-transfer-calculator/">Transfer</a>
   </div>
+  <p class="muted">
+    Use <a href="/guides/request-based-pricing/">request-based pricing explained</a> only when the next problem is
+    generic request math and billing units rather than event and delivery behavior.
+  </p>
 
   {messagingGuides.length ? (
     <>

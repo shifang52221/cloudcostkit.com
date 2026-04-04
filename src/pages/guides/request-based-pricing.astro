@@ -23,13 +23,25 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/request-based-pricing"
-  lastUpdated="2026-03-27"
+  lastUpdated="2026-04-04"
   faqs={faqs}
 >
   <p class="muted">
     Request pricing looks small until volume grows. This page gives you a quick workflow to estimate requests/month,
-    translate request units correctly, and sanity check the number before you trust it.
+    translate request units correctly, and sanity check the number before you trust it. This is the generic
+    request-math and billing-unit guide.
   </p>
+  <p class="muted">
+    Stay here when the main job is traffic-to-billing math across APIs, CDN, messaging, or security products. Go back
+    to the messaging parent page if the broader event and delivery budget is still unclear.
+  </p>
+
+  <h2>Use this page when the math is the job</h2>
+  <ul>
+    <li>Use this guide when you need requests/month, request-class splits, or billable-unit mapping.</li>
+    <li>Stay here if the issue is pricing math across products, not one messaging system's delivery behavior.</li>
+    <li>Move back to parent guides when the bigger workload model is still unclear.</li>
+  </ul>
 
   <h2>Request pricing quick model</h2>
   <ul>
@@ -59,6 +71,12 @@ const faqs = [
     <li><strong>Logs</strong>: per-request logs and scans add a second bill.</li>
     <li><strong>Storage</strong>: retention or snapshots can be larger than request costs.</li>
   </ul>
+
+  <h2>The biggest mistake on this page is confusing billing math with workload structure</h2>
+  <p>
+    This page should solve the generic math problem: what counts as a request, how units are priced, and how retries
+    and traffic shape change totals. It should not replace parent pages that explain why the workload behaves that way.
+  </p>
 
   <h2>1) Get or estimate requests/month</h2>
   <ul>
@@ -204,4 +222,8 @@ const faqs = [
     <a class="btn" href="/guides/log-costs/">Log costs</a>
     <a class="btn" href="/guides/egress-costs/">Egress costs</a>
   </div>
+  <p class="muted">
+    If the issue is still how publishes turn into deliveries and retries, go back to{" "}
+    <a href="/guides/messaging-costs/">messaging costs</a> before continuing with request math.
+  </p>
 </GuideLayout>

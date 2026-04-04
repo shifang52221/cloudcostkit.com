@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "Request-based pricing explained: how to estimate requests and avoid surprises";
+const title = "Request Pricing Hub: calculators, guides, and next steps";
 const description =
-  "A practical framework for request-based cloud pricing: convert RPS to monthly requests, model retries and fan-out, and avoid unit mistakes (per 10k vs per 1M).";
+  "A lightweight hub for request pricing: choose the right guide or calculator for request math, retries, payload transfer, and adjacent cost checks.";
 
 const faqs = [
   {
@@ -36,9 +36,12 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
   robots="noindex,follow"
 >
   <p class="muted">
-    Use this page as a quick orientation hub. For the full estimation workflow, start with{" "}
-    <a href="/guides/request-based-pricing/">request-based pricing explained</a>, which is the stronger step-by-step guide
-    for estimating monthly volume, request classes, retries, and adjacent spend.
+    This is the lightweight request routing hub. Use it to decide where to go next, not as a second full request
+    pricing guide.
+  </p>
+  <p class="muted">
+    Start with <a href="/guides/request-based-pricing/">request-based pricing explained</a> for the full workflow. Stay
+    here only if you want the shortest route to the right calculator or neighboring guide.
   </p>
 
   <div class="btn-row">
@@ -47,41 +50,37 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
     <a class="btn" href="/calculators/api-request-cost-calculator/">Request cost calculator</a>
   </div>
 
-  <h2>1) Convert traffic to monthly requests</h2>
+  <h2>Choose your next step</h2>
   <ul>
-    <li>Start from RPS (average and peak) and convert to monthly requests.</li>
-    <li>Keep units explicit: per 10k vs per 1M is a common order-of-magnitude error.</li>
-    <li>
-      Tool: <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
-    </li>
+    <li><strong>Need the full request workflow?</strong> Start with <a href="/guides/request-based-pricing/">request-based pricing explained</a>.</li>
+    <li><strong>Need quick monthly volume?</strong> Use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>.</li>
+    <li><strong>Need direct request cost math?</strong> Use <a href="/calculators/api-request-cost-calculator/">request cost calculator</a>.</li>
+    <li><strong>Need event and delivery budgeting?</strong> Go to <a href="/guides/messaging-costs/">messaging costs</a>.</li>
   </ul>
 
-  <h2>2) Model retries and spikes separately</h2>
+  <h2>Use this hub when you only need routing</h2>
   <ul>
-    <li>Retry storms can multiply request volume 5x to 50x during incidents.</li>
-    <li>Bot traffic can create request spikes that dominate WAF/API/CDN bills.</li>
-    <li>
-      Hub: <a href="/guides/security-costs/">security costs</a>
-    </li>
+    <li>Use this page when you already know the topic and just need the shortest path to the stronger guide or tool.</li>
+    <li>Do not use this page as your main explainer if you still need unit mapping, traffic-shape modeling, or validation steps.</li>
+    <li>That full job belongs to <a href="/guides/request-based-pricing/">request-based pricing explained</a>.</li>
   </ul>
 
-  <h2>3) Include payload and transfer when relevant</h2>
-  <ul>
-    <li>Requests correlate with bandwidth; large payloads amplify egress and logging.</li>
-    <li>
-      Tool: <a href="/calculators/api-response-size-transfer-calculator/">response size transfer</a>
-    </li>
-  </ul>
+  <h2>The biggest mistake on this page is reading a hub like a full guide</h2>
+  <p>
+    This page exists to reduce confusion, not to reteach the whole request-pricing workflow. If you still need a
+    complete estimate method, jump to the main request guide instead of trying to piece the workflow together from a hub.
+  </p>
 
-  <h2>When to stop here and jump to the main guide</h2>
+  <h2>Fast exits by problem type</h2>
   <ul>
-    <li>If you need to decide what the provider actually bills as a request.</li>
-    <li>If your workload mixes API, CDN, queue, and security products in one estimate.</li>
-    <li>If you need a validation checklist before trusting the monthly total.</li>
+    <li><strong>Retries and incidents</strong>: <a href="/guides/request-based-pricing/">request-based pricing explained</a></li>
+    <li><strong>Payload and transfer</strong>: <a href="/calculators/api-response-size-transfer-calculator/">response size transfer</a></li>
+    <li><strong>Security spike context</strong>: <a href="/guides/security-costs/">security costs</a></li>
+    <li><strong>Messaging fan-out and deliveries</strong>: <a href="/guides/messaging-costs/">messaging costs</a></li>
   </ul>
   <p class="muted">
-    In those cases, continue with <a href="/guides/request-based-pricing/">request-based pricing explained</a> and keep
-    this page as a lightweight navigation stop.
+    For the full workflow, continue with <a href="/guides/request-based-pricing/">request-based pricing explained</a>.
+    This page should stay a lightweight navigation stop.
   </p>
 
   <h2>Related tools</h2>
