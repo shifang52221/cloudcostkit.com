@@ -35,8 +35,12 @@ const k8sGuides = GUIDES.filter((g) => (g.topics || []).includes("kubernetes") &
   faqs={faqs}
 >
   <p class="muted">
-    This is the Kubernetes system budgeting parent page. Use it before you optimize node count, non-node completeness,
-    or platform comparisons in isolation.
+    This is the Kubernetes system budgeting parent page inside the broader compute hierarchy. Use it before you
+    optimize node count, non-node completeness, or platform comparisons in isolation.
+  </p>
+  <p class="muted">
+    Go back to the compute parent guide if the broader runtime-model choice is still unclear.
+    <a href="/guides/compute-costs/">Return to compute costs.</a>
   </p>
   <p class="muted">
     Kubernetes bills are rarely just nodes. A planning-safe estimate includes: node baseline + network (egress/NAT) +

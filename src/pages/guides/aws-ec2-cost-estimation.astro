@@ -29,6 +29,14 @@ const description =
     },
   ]}
 >
+  <p class="muted">
+    This is the VM and instance-fleet estimation page inside the broader compute hierarchy. Use it when the runtime
+    model is already known and the remaining job is to estimate a real EC2-style fleet with compute, storage, transfer,
+    and surrounding AWS lines.
+  </p>
+  <p class="muted">
+    Go back to the compute parent guide if the broader runtime-model choice is still unclear.
+  </p>
   <p>
     If you searched for <em>EC2 calculator</em>, <em>EC2 cost calculator</em>, <em>EC2 pricing calculator</em>, or{" "}
     <em>EC2 cost estimator</em>, start with compute hours first. EC2 cost estimation works best when you model a small
@@ -40,6 +48,7 @@ const description =
   <ul>
     <li><strong>Use the EC2 calculator</strong> when you already know average instances, uptime, and a blended $/hour.</li>
     <li><strong>Use this guide</strong> when the estimate still misses EBS, transfer, NAT, load balancers, or logs.</li>
+    <li><strong>Go back to compute planning</strong> when you still need to choose between VM, Kubernetes, or serverless runtime shapes.</li>
     <li><strong>Use EC2 vs Fargate comparison</strong> when your real question is runtime choice, not EC2-only pricing.</li>
   </ul>
   <div class="btn-row">
