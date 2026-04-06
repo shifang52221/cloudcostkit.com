@@ -26,6 +26,13 @@ const faqs = [
 
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-27" faqs={faqs}>
+  <p class="muted">
+    This is the S3 pricing anatomy page. Use it when the main job is to separate storage, requests, transfer, and
+    replication inside one S3 bill before you optimize one narrower driver in isolation.
+  </p>
+  <p class="muted">
+    Go back to the storage parent page if the broader storage budget shape is still unclear.
+  </p>
   <p>
     S3-like object storage pricing looks simple until you add data movement. A solid model covers four common buckets:
     <strong>storage</strong>, <strong>requests</strong>, <strong>egress</strong>, and <strong>replication/copy</strong>.

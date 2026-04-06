@@ -30,6 +30,13 @@ const faqs = [
   lastUpdated="2026-02-07"
   faqs={faqs}
 >
+  <p class="muted">
+    This is the request-cost boundary page. Use it when GET, PUT, LIST, and metadata-heavy behavior are the real
+    driver, not the full storage-system budget or the whole S3 bill anatomy.
+  </p>
+  <p class="muted">
+    Go back to the storage parent page if the broader storage budget shape is still unclear.
+  </p>
   <p>
     Many teams ignore S3 request costs because storage and egress usually dominate. But requests become meaningful when
     you have millions of small objects, frequent LIST/HEAD calls, or chatty pipelines.
