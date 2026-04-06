@@ -52,6 +52,10 @@ const description =
     { href: "/guides/request-based-pricing", label: "Guide: request-based pricing" },
   ]}
 >
+  <p class="muted">
+    This calculator maps API call volume into billable requests. Confirm the request boundary first, then carry the
+    monthly count into the request-fee pricing guide once the billable unit is clear.
+  </p>
   <ApiRequestCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Billable requests are the real unit, not raw traffic</h2>
