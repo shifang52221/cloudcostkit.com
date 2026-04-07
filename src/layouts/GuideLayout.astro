@@ -12,9 +12,10 @@ type Props = {
   lastUpdated: string;
   faqs?: { q: string; a: string }[];
   robots?: string;
+  openingAssist?: false | { message?: string; toolSlugs?: string[] };
 };
 
-const { title, description, canonicalPath, lastUpdated, faqs, robots } = Astro.props;
+const { title, description, canonicalPath, lastUpdated, faqs, robots, openingAssist } = Astro.props;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
 const normalizedCanonicalPath = withTrailingSlash(canonicalPath);
 const canonical = new URL(normalizedCanonicalPath, siteUrl).toString();
@@ -155,6 +156,26 @@ const relatedTools = desiredToolSlugs
   .map((slug) => TOOLS.find((t) => t.slug === slug))
   .filter((t): t is (typeof TOOLS)[number] => Boolean(t))
   .slice(0, 6);
+
+const openingAssistConfig = openingAssist === false ? null : openingAssist ?? null;
+
+const openingAssistToolSlugs =
+  openingAssistConfig?.toolSlugs?.length
+    ? openingAssistConfig.toolSlugs
+    : desiredToolSlugs;
+
+const openingAssistTools =
+  openingAssist === false
+    ? []
+    : openingAssistToolSlugs
+        .map((slug) => TOOLS.find((t) => t.slug === slug))
+        .filter((t): t is (typeof TOOLS)[number] => Boolean(t))
+        .slice(0, 4);
+
+const openingAssistMessage =
+  openingAssistConfig?.message
+    ? openingAssistConfig.message
+    : "Start with a calculator if you need a first-pass estimate, then use this guide to validate the assumptions and catch the billing traps.";
 ---
 <BaseLayout title={title} description={description} canonicalPath={normalizedCanonicalPath} robots={robots}>
   <script
@@ -173,14 +194,13 @@ const relatedTools = desiredToolSlugs
       Reviewed by {SITE.editorial.teamName}. Last updated: {lastUpdated}.{" "}
       <a href="/editorial-policy/">Editorial policy</a> and <a href="/methodology/">methodology</a>.
     </div>
-    {relatedTools.length ? (
+    {openingAssist !== false && openingAssistTools.length ? (
       <>
         <p class="muted" style="margin:8px 0 12px">
-          Start with a calculator if you need a first-pass estimate, then use this guide to validate the assumptions and
-          catch the billing traps.
+          {openingAssistMessage}
         </p>
         <div class="btn-row" style="margin-top:0">
-          {relatedTools.slice(0, 4).map((t) => (
+          {openingAssistTools.map((t) => (
             <a class="btn" href={withTrailingSlash(`/calculators/${t.slug}`)}>
               {t.title}
             </a>

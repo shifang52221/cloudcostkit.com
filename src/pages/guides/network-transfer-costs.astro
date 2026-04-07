@@ -25,6 +25,7 @@ const faqs = [
   canonicalPath="/guides/network-transfer-costs"
   lastUpdated="2026-01-27"
   faqs={faqs}
+  openingAssist={false}
 >
   <p class="muted">
     This is the network transfer boundary page: define the transfer path before you choose rates. Separate internet
@@ -37,6 +38,14 @@ const faqs = [
     <li>Use this parent guide when you still need to decide which transfer boundary the traffic belongs to.</li>
     <li>Move to calculators and narrower guides only after the transfer path is defined.</li>
     <li>If the question is specifically about outbound transfer pricing, continue to the egress guide after the boundary is clear.</li>
+  </ul>
+
+  <h2>Choose the next step by transfer boundary</h2>
+  <ul>
+    <li>If the traffic goes to end users or external systems, continue with the <a href="/guides/egress-costs/">egress guide</a> or the <a href="/calculators/data-egress-cost-calculator/">egress calculator</a>.</li>
+    <li>If the question is CDN edge bandwidth versus origin cache fill, use <a href="/guides/origin-egress-vs-cdn-bandwidth/">origin egress vs CDN bandwidth</a>.</li>
+    <li>If the main uncertainty is cross-region replication or failover sync, continue with <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>.</li>
+    <li>If the traffic stays inside your architecture but crosses zones, keep modeling the cross-AZ path before you trust an internet-egress rate.</li>
   </ul>
 
   <h2>1) Split transfer into clear buckets</h2>
@@ -150,7 +159,7 @@ const faqs = [
     </li>
   </ul>
 
-  <h2>Related tools</h2>
+  <h2>Next tools after the path is clear</h2>
   <div class="btn-row">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth</a>
