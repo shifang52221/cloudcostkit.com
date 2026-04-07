@@ -40,6 +40,16 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   canonicalPath="/guides/egress-costs"
   lastUpdated="2026-03-12"
   faqs={faqs}
+  openingAssist={{
+    message:
+      "Use these AWS-focused tools when you already suspect the bill is an outbound transfer charge and want to validate the billing surface before modeling prices.",
+    toolSlugs: [
+      "data-egress-cost-calculator",
+      "cross-region-transfer-cost-calculator",
+      "vpc-data-transfer-cost-calculator",
+      "api-response-size-transfer-calculator",
+    ],
+  }}
 >
   <h2>Short answer: why egress estimates fail</h2>
   <ul>
@@ -64,7 +74,7 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     internet egress, cross-AZ, cross-region, CDN edge delivery, or origin-to-CDN traffic before pricing.
   </p>
 
-  <h2>Fast answer: which egress bill are you trying to explain?</h2>
+  <h2>Fast answer: which AWS outbound charge are you trying to explain?</h2>
   <ul>
     <li><strong>Internet egress</strong>: data leaving AWS to users or external systems.</li>
     <li><strong>Cross-region transfer</strong>: replication, DR, and multi-region reads.</li>
@@ -85,12 +95,12 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     boundary first.
   </p>
 
-  <h2>1) Identify what kind of transfer you have</h2>
+  <h2>1) Match the estimate to an AWS billing surface</h2>
   <ul>
-    <li><strong>Internet egress</strong>: data leaving your provider to end users.</li>
-    <li><strong>Cross-region transfer</strong>: replication, multi-region reads, DR traffic.</li>
-    <li><strong>CDN bandwidth</strong>: edge delivery (may be priced separately from origin egress).</li>
-    <li><strong>Cross-AZ transfer</strong>: east-west traffic across Availability Zones (often a surprise).</li>
+    <li><strong>Internet egress</strong>: check whether the billed path is data transfer out to the internet or to external consumers.</li>
+    <li><strong>Cross-region transfer</strong>: confirm whether replication, failover sync, or remote reads are being billed separately from internet delivery.</li>
+    <li><strong>Cross-AZ transfer</strong>: check whether east-west traffic inside AWS is inflating the bill before you call it egress.</li>
+    <li><strong>Origin-to-CDN</strong>: confirm whether the AWS-origin path is the billed outbound charge instead of CDN edge bandwidth.</li>
   </ul>
 
   <h2>2) Pick the right unit (GB vs GiB)</h2>
@@ -104,6 +114,13 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li><strong>Monthly egress cost</strong> = sum(each transfer path GB x path-specific $/GB).</li>
     <li><strong>Path examples</strong>: internet egress, cross-region replication, cross-AZ east-west traffic, origin-to-CDN transfer.</li>
     <li><strong>Rule</strong>: do not blend all traffic into one rate unless your billing data proves it.</li>
+  </ul>
+
+  <h2>AWS billing usage types to check before you trust the estimate</h2>
+  <ul>
+    <li><strong>AWS billing usage types</strong>: match the outbound charge to the actual service and direction before you copy a headline $/GB rate.</li>
+    <li><strong>Service-level pricing rules</strong>: check whether the charge belongs to EC2 data transfer, VPC transfer, CloudFront-origin traffic, or another AWS billing surface.</li>
+    <li><strong>Boundary mismatches</strong>: if the usage type suggests intra-AZ or cross-region movement, go back to the boundary guide before treating it as plain internet egress.</li>
   </ul>
 
   <h2>Guide first or calculator first?</h2>
@@ -173,6 +190,14 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li><strong>Path B</strong>: cross-region replication and failover sync.</li>
     <li><strong>Path C</strong>: cross-AZ service-to-service traffic.</li>
     <li><strong>Path D</strong>: origin-to-CDN cache fill traffic.</li>
+  </ul>
+
+  <h2>What to check when AWS egress spikes</h2>
+  <ul>
+    <li>Compare a normal week to the spike window before trusting a single monthly average.</li>
+    <li>Check whether cache misses, failover traffic, retries, or chatty multi-AZ paths drove the increase.</li>
+    <li>Verify that the spike came from the same AWS billing usage type you are modeling now.</li>
+    <li>If the spike source is unclear, go back to the network transfer boundary guide before changing the price model.</li>
   </ul>
 
   <h2>Failure patterns that create 2x to 10x errors</h2>
