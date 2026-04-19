@@ -38,11 +38,11 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-04-19"
   faqs={faqs}
   openingAssist={{
     message:
-      "Use these AWS-focused tools when you already suspect the bill is an outbound transfer charge and want to validate the billing surface before modeling prices.",
+      "Use these AWS-focused tools when you need to diagnose which outbound transfer line moved, then model one boundary at a time.",
     toolSlugs: [
       "data-egress-cost-calculator",
       "cross-region-transfer-cost-calculator",
@@ -51,6 +51,22 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     ],
   }}
 >
+  <h2>First-screen triage: the bill went up, what changed first?</h2>
+  <ol>
+    <li><strong>What changed</strong> first: transfer volume, transfer boundary, or effective rate.</li>
+    <li><strong>Which bill path moved</strong> and what AWS usage type drove the increase.</li>
+    <li>
+      Confirm whether the cost belongs to <strong>internet egress</strong>, <strong>cross-region</strong>,{" "}
+      <strong>cross-AZ</strong>, or <strong>CDN origin fill</strong>.
+    </li>
+    <li>
+      <strong>How to check first</strong>: billing usage types and service-specific transfer lines.
+    </li>
+    <li>
+      <strong>What to validate next</strong>: traffic source, unit assumptions, and peak-window behavior.
+    </li>
+  </ol>
+
   <h2>Short answer: why egress estimates fail</h2>
   <ul>
     <li>Traffic boundaries are mixed into one blended rate.</li>
@@ -70,27 +86,21 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   </div>
 
   <p class="muted">
-    Go back to the network transfer boundary guide if you still have not identified the transfer path and need to sort
-    internet egress, cross-AZ, cross-region, CDN edge delivery, or origin-to-CDN traffic before pricing.
+    Go back to the network transfer boundary guide if you still have not identified the transfer path.
+    <a href="/guides/network-transfer-costs/"> Back to transfer boundary guide</a> if you need to sort internet
+    egress, cross-AZ, cross-region, CDN edge delivery, or origin-to-CDN traffic before pricing.
   </p>
 
-  <h2>Fast answer: which AWS outbound charge are you trying to explain?</h2>
+  <h2>Fast answer: which AWS outbound charge are you actually explaining?</h2>
   <ul>
     <li><strong>Internet egress</strong>: data leaving AWS to users or external systems.</li>
     <li><strong>Cross-region transfer</strong>: replication, DR, and multi-region reads.</li>
     <li><strong>Cross-AZ transfer</strong>: east-west traffic between Availability Zones.</li>
     <li><strong>Origin-to-CDN</strong>: cache-fill traffic from AWS origin to CDN.</li>
   </ul>
-
-  <h2>AWS egress pricing: what users usually mean</h2>
-  <ul>
-    <li><strong>Internet egress</strong>: data leaving AWS to users or third-party systems.</li>
-    <li><strong>Cross-region transfer</strong>: replication, DR traffic, or multi-region reads.</li>
-    <li><strong>Cross-AZ transfer</strong>: east-west traffic between services in different Availability Zones.</li>
-    <li><strong>Origin-to-CDN transfer</strong>: AWS-origin traffic sent to a CDN during cache fill.</li>
-  </ul>
   <p>
-    If you already know which one you are modeling, jump straight to the{" "}
+    This is what teams usually mean by AWS egress pricing. If you already know which one you are modeling, jump
+    straight to the{" "}
     <a href="/calculators/data-egress-cost-calculator/">egress cost calculator</a>. If not, keep reading and map the
     boundary first.
   </p>
@@ -120,13 +130,23 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   <ul>
     <li><strong>AWS billing usage types</strong>: match the outbound charge to the actual service and direction before you copy a headline $/GB rate.</li>
     <li><strong>Service-level pricing rules</strong>: check whether the charge belongs to EC2 data transfer, VPC transfer, CloudFront-origin traffic, or another AWS billing surface.</li>
-    <li><strong>Boundary mismatches</strong>: if the usage type suggests intra-AZ or cross-region movement, go back to the boundary guide before treating it as plain internet egress.</li>
+    <li>
+      <strong>Boundary mismatches</strong>: if the usage type suggests intra-AZ or cross-region movement, go back to
+      the <a href="/guides/network-transfer-costs/">boundary guide</a> before treating it as plain internet egress.
+    </li>
   </ul>
 
   <h2>Guide first or calculator first?</h2>
   <ul>
-    <li><strong>Use the boundary guide first</strong> when "AWS egress" still means several possible transfer paths.</li>
-    <li><strong>Use the calculator first</strong> when you already know the GB/month and effective $/GB for a specific path.</li>
+    <li>
+      <strong>Use the calculator first</strong> when you already know the boundary or path and can model a known rate
+      with confidence.
+    </li>
+    <li><strong>Use this guide first</strong> when the bill is still unclear and you need diagnosis before modeling.</li>
+    <li>
+      <strong>Use the <a href="/guides/network-transfer-costs/">boundary guide</a> first</strong> when "AWS egress"
+      still means several possible transfer paths.
+    </li>
     <li><strong>Use provider guides next</strong> when the path is known but the provider-specific billing rule is still unclear.</li>
   </ul>
   <div class="btn-row">
@@ -168,21 +188,33 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>Re-check during incident windows: retries/timeouts can multiply traffic and create spikes.</li>
   </ul>
 
-  <h2>Common pitfalls</h2>
+  <h2>High-value mistakes that break egress estimates</h2>
   <ul>
-    <li>Tiered pricing: your average $/GB changes as traffic grows.</li>
-    <li>Double counting: CDN bandwidth may not equal origin egress.</li>
-    <li>Replication direction: some services bill only outbound, others have nuances.</li>
-    <li>Cross-AZ traffic: load balancers and multi-AZ clients can create steady east-west transfer.</li>
+    <li>
+      Mixing <strong>CDN edge bandwidth</strong> and <strong>origin egress</strong> as one stream, then applying a
+      single rate to both.
+    </li>
+    <li>
+      Using one blended $/GB across internet, cross-region, and cross-AZ traffic instead of separate boundary-specific
+      rows.
+    </li>
+    <li>
+      Ignoring retry storms, launch traffic, or failover windows and trusting only calm-week averages.
+    </li>
+    <li>
+      Assuming billing exports and app telemetry share the same unit without checking GB vs GiB conversions.
+    </li>
+    <li>Skipping usage-type validation and mapping the wrong service line to your egress model.</li>
   </ul>
 
-  <h2>AWS egress charges checklist before you trust the number</h2>
-  <ul>
-    <li>Match each transfer path to an AWS billing usage type or service-level pricing rule.</li>
-    <li>Keep internet, cross-region, cross-AZ, and CDN-origin traffic in separate rows.</li>
-    <li>Test a baseline week and a peak week before using one blended monthly rate.</li>
-    <li>Re-check after architecture changes, CDN changes, or failover drills.</li>
-  </ul>
+  <h2>Monthly planning checklist before you trust the number</h2>
+  <ol>
+    <li>Identify the billable boundary for each row (internet, cross-region, cross-AZ, or origin-to-CDN).</li>
+    <li>Confirm the unit and source of volume (billing exports, service metrics, or request-size estimation).</li>
+    <li>Split baseline and peak periods instead of using one blended monthly average.</li>
+    <li>Validate each row against AWS billing usage types or service-specific transfer line items.</li>
+    <li>Only then move to calculator scenarios and interpretation for budget decisions.</li>
+  </ol>
 
   <h2>Boundary map template (do this before modeling rates)</h2>
   <ul>
@@ -197,24 +229,26 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>Compare a normal week to the spike window before trusting a single monthly average.</li>
     <li>Check whether cache misses, failover traffic, retries, or chatty multi-AZ paths drove the increase.</li>
     <li>Verify that the spike came from the same AWS billing usage type you are modeling now.</li>
-    <li>If the spike source is unclear, go back to the network transfer boundary guide before changing the price model.</li>
+    <li>
+      If the spike source is unclear, <a href="/guides/network-transfer-costs/">go back to the network transfer
+      boundary guide</a> before changing the price model.
+    </li>
   </ul>
 
-  <h2>Failure patterns that create 2x to 10x errors</h2>
+  <h2>Warning signals before monthly sign-off</h2>
   <ul>
-    <li>Using a single $/GB for internet and private transfer paths.</li>
-    <li>Counting CDN edge bandwidth and origin egress as the same stream.</li>
-    <li>Ignoring retry storms and timeout loops during incidents.</li>
-    <li>Estimating with daily averages only and missing burst windows.</li>
+    <li>If one blended rate still covers multiple boundaries, stop and split the model into separate rows.</li>
+    <li>If the spike month still uses calm-week averages, rerun with baseline and peak windows separated.</li>
+    <li>If usage types do not map cleanly to your rows, pause and re-classify the billed path before pricing.</li>
+    <li>If units are mixed across telemetry and billing, reconcile GB vs GiB before finalizing the estimate.</li>
   </ul>
 
-  <h2>Validation checklist for monthly planning</h2>
-  <ol>
-    <li>Match each transfer path to a specific billing usage type.</li>
-    <li>Verify units (GB vs GiB) and conversion assumptions.</li>
-    <li>Compare baseline and peak windows separately.</li>
-    <li>Recalculate effective $/GB for each boundary every month.</li>
-  </ol>
+  <h2>Guide vs calculator: keep the workflow clean</h2>
+  <ul>
+    <li><strong>This guide owns</strong>: diagnosis, mistake prevention, workflow routing, and boundary clarification.</li>
+    <li><strong>The calculator owns</strong>: inputs, scenarios, result interpretation, and next-step actions after calculation.</li>
+    <li>If boundary or bill mapping is unclear, stay in guide mode. If the boundary is known, move to calculator mode.</li>
+  </ul>
 
   <h2>Optimization order by boundary</h2>
   <ul>

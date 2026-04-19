@@ -2,194 +2,116 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from "../../components/calculators/DataEgressCost";
 
-const title = "AWS Egress Cost Calculator: Estimate Data Transfer Charges Fast";
+const title = "AWS Egress Cost Calculator: Model Baseline vs Peak Transfer Spend";
 const description =
-  "Estimate monthly AWS egress cost fast from transferred GB, $/GB pricing, and peak scenarios. Useful for AWS egress cost calculator, data transfer pricing, and charge-planning workflows.";
+  "Model monthly egress spend from GB, effective $/GB, and baseline-vs-peak scenarios. Built for practical planning before architecture, CDN, and transfer-boundary decisions.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/data-egress-cost-calculator"
-  intro="Use this AWS egress cost calculator when you already know which transfer path you are modeling: internet, cross-region, cross-AZ, or origin-to-CDN. Enter GB and the right $/GB for that boundary, then compare baseline vs peak without blending unrelated transfer paths together."
+  intro="Use this calculator to price one transfer boundary at a time, compare baseline and peak months, and decide what to optimize next. It is designed for estimation and action planning, not just formula output."
   examples={[
-    "If you send 2,500 GB/month and your effective price is $0.09/GB, estimated cost is $225/month.",
-    "If you have tiered pricing, enter the tier thresholds and compare baseline vs peak traffic.",
-    "Separate internet egress from cross-region transfer for more accurate blended rates.",
+    "Public API outbound transfer: 3,200 GB/month at $0.085/GB gives a baseline estimate near $272/month.",
+    "CDN origin fill traffic: tiered pricing with cache-miss spikes can double monthly transfer spend during launch windows.",
+    "Cross-region replication: model a stable month and a DR test month separately before committing a budget.",
   ]}
   includes={[
-    "Bandwidth-only cost estimate from transferred GB and $/GB pricing.",
-    "Optional Mbps to monthly GB estimator.",
-    "Optional peak Mbps estimator for spike scenarios.",
-    "Optional tiered pricing model with multiple rate steps.",
-    "Baseline vs peak comparison for traffic spikes.",
-    "Works for internet egress, service egress, or any scenario where you know an effective $/GB.",
-    "Simple scenarios to quantify the impact of architectural changes.",
+    "Baseline and peak monthly transfer estimates for one selected boundary.",
+    "Scenario presets for internet egress, CDN origin fill, cross-region replication, and launch bursts.",
+    "Tiered pricing support with per-tier breakdown.",
+    "Mbps-to-GB estimate helpers for teams that start from throughput metrics.",
+    "Decision-support summary with marginal peak impact and next actions.",
   ]}
   excludes={[
-    "Free allowances, minimums, and provider-specific rounding unless you model them explicitly.",
-    "Per-request fees and other service-specific charges.",
-    "CDN request fees and cache miss charges.",
+    "Provider-specific free allowances, enterprise discounts, and billing credits.",
+    "Per-request, per-connection, and other non-bandwidth service fees.",
+    "Business-side demand assumptions (marketing events, contract changes, product rollout behavior).",
   ]}
   how={[
-    "Monthly cost = egress GB x price per GB (or sum of tiers in tiered mode).",
-    "Enter your provider's effective $/GB for the region/path/tier you expect.",
-    "Compare a baseline month with a peak month to avoid under-budgeting.",
-    "If you have multiple paths, compute them separately and add them.",
+    "Model one transfer boundary per run (internet egress, CDN origin fill, cross-region replication, or another defined path).",
+    "Monthly cost = GB x effective $/GB, or the sum of tiers when tiered mode is enabled.",
+    "Turn on peak mode to compare baseline spend against launch or incident traffic.",
+    "Repeat for each major path and combine line items in your final budget sheet.",
   ]}
   faqs={[
     {
-      q: "Why does egress pricing vary so much?",
-      a: "Egress pricing often depends on destination (internet vs cross-region), tiered usage, service (CDN vs origin), and region."
+      q: "When should I use this calculator before reading the full guide?",
+      a: "Use this page first when you already know the transfer boundary and want a fast baseline-vs-peak estimate to support a planning decision."
     },
     {
-      q: "GB vs GiB: which unit should I use?",
-      a: "Cloud billing often uses decimal GB (1 GB = 1,000,000,000 bytes). Some tooling shows GiB (binary). Use the Units Converter to translate."
+      q: "Can I model multiple boundaries in one run?",
+      a: "You should not. Run one boundary at a time (for example internet egress vs cross-region replication) and sum the results later."
     },
     {
-      q: "Does this include request fees or CDN costs?",
-      a: "No. This tool estimates bandwidth-based egress only."
+      q: "Why keep a peak scenario if average traffic looks stable?",
+      a: "Peak months are where budgets fail. The marginal peak impact highlights how much extra transfer cost appears during launches, retries, or failover windows."
     },
     {
-      q: "Should I model internet and cross-region together?",
-      a: "No. Keep boundaries separate because rates and billing units often differ by destination path."
+      q: "What should I do after the first estimate?",
+      a: "Use the egress guide for boundary validation, then map AWS network charges and refine adjacent calculators like CDN origin and cross-region transfer."
     }
   ]}
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-04-19"
   related={[
-    { href: "/guides/egress-costs", label: "Guide: egress costs" },
-    { href: "/calculators/api-response-size-transfer-calculator", label: "API response transfer" },
-    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
-    { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer" },
-    { href: "/calculators/unit-converter", label: "Units converter" },
+    { href: "/guides/egress-costs", label: "Validate boundary assumptions (guide)" },
+    { href: "/guides/aws-network-costs", label: "Map AWS network line items (guide)" },
+    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "Estimate CDN origin + edge bandwidth" },
+    { href: "/calculators/cross-region-transfer-cost-calculator", label: "Estimate replication and DR transfer" },
+    { href: "/calculators/api-response-size-transfer-calculator", label: "Translate API payload to transfer GB" },
   ]}
 >
   <DataEgressCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:16px">
-    <h2 style="margin:0 0 10px">When this egress calculator is useful</h2>
+    <h2 style="margin:0 0 10px">When to use this calculator first</h2>
     <p class="muted" style="margin:0 0 10px">
-      This page works best when you already know the transfer boundary you want to price: internet, cross-region,
-      cross-AZ, or origin-to-CDN. It is designed for teams that need to isolate the expensive path first instead of
-      averaging all transfer together and hoping the number is close enough.
+      Start here when your team needs a planning number now and already knows the transfer boundary being modeled.
+      This page helps you turn traffic assumptions into a budget range quickly, then decide the highest-value follow-up.
     </p>
     <ul class="muted" style="margin:0 0 14px; padding-left:18px">
-      <li>How much will monthly internet egress cost at my effective $/GB?</li>
-      <li>How different is a normal month from a launch or incident month?</li>
-      <li>Which path should I model separately: internet, cross-region, cross-AZ, or origin-to-CDN?</li>
-    </ul>
-    <div class="btn-row" style="margin-top:12px">
-      <a class="btn" href="/guides/egress-costs/">Guide: AWS egress explained</a>
-      <a class="btn" href="/guides/aws-network-costs/">Guide: AWS network costs</a>
-      <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Next: cross-region transfer</a>
-    </div>
-    <ul class="muted" style="margin:0; padding-left:18px">
-      <li>Model multiple scenarios: baseline month vs peak month.</li>
-      <li>Consider a CDN: it can reduce origin egress and shift cost structure.</li>
-      <li>Watch for tiering and minimum charges in provider pricing.</li>
-      <li>Keep internet, cross-region, and cross-AZ traffic as separate line items.</li>
-    </ul>
-  </div>
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to map the transfer boundary and choose the right rate</h2>
-    <ul>
-      <li><strong>GB/month</strong>: start from billing exports/flow logs; if you only have throughput, convert Mbps to GB/month.</li>
-      <li><strong>Boundaries</strong>: separate cross-AZ vs cross-region vs internet egress as separate line items.</li>
-      <li><strong>Effective rates</strong>: use your blended $/GB for the traffic mix you expect.</li>
-      <li><strong>Sources</strong>: VPC flow logs, CDN logs, and cost exports provide the cleanest counts.</li>
-    </ul>
-    <ul>
-      <li><strong>Internet egress</strong>: use the provider rate for public outbound traffic.</li>
-      <li><strong>Cross-region transfer</strong>: use a separate rate and model replication paths independently.</li>
-      <li><strong>Cross-AZ transfer</strong>: keep east-west traffic out of your internet estimate.</li>
-      <li><strong>Origin to CDN</strong>: treat cache fill as its own line item if your origin is billed separately.</li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      Most egress estimate failures are not math errors. They happen because the wrong path gets priced with the wrong
-      rate. If the estimate looks strange, check the boundary first, then the unit, and only then the architecture.
-    </p>
-    <ul>
-      <li>Split egress by destination (internet, cross-region, cross-AZ).</li>
-      <li>Account for CDN cache hit rate to reduce origin egress.</li>
-      <li>Compression or image optimization can change GB materially.</li>
-      <li>Model one-time migrations separately from steady traffic.</li>
+      <li>You can name the boundary clearly (public internet, CDN origin fill, cross-region replication, or DR sync).</li>
+      <li>You need baseline and peak monthly spend for a launch, incident, or seasonal decision.</li>
+      <li>You want to compare optimization levers before changing architecture or contracts.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Scenario planning and boundary validation</h2>
+    <h2 style="margin-top:0">What this estimate still misses</h2>
     <p class="muted" style="margin-top:8px">
-      A usable egress estimate needs more than one month shape. Baseline and peak often behave very differently,
-      especially when retries, launches, replication bursts, or cache misses appear. Keep those scenarios visible so
-      you can tell whether the expensive path is stable or event-driven.
+      This tool is intentionally lightweight so teams can model quickly. Before final budget sign-off, reconcile the
+      estimate against billing exports and provider rules.
     </p>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>GB/month</th>
-          <th>Rate</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>Blended</td>
-          <td>Typical traffic mix</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>Blended</td>
-          <td>Incidents or launches</td>
-        </tr>
-      </tbody>
-    </table>
     <ul>
-      <li>Validate the top transfer paths and AZ/region locality after architecture changes.</li>
-      <li>Re-check during peak windows (that's when hidden multipliers show up).</li>
-      <li>Compare effective $/GB by path (internet, cross-region, cross-AZ) to catch wrong rate assumptions.</li>
-      <li><strong>Path A</strong>: internet egress from app/API endpoints.</li>
-      <li><strong>Path B</strong>: cross-region replication and failover traffic.</li>
-      <li><strong>Path C</strong>: cross-AZ east-west service chatter.</li>
-      <li><strong>Path D</strong>: origin to CDN cache fill (separate from edge delivery).</li>
+      <li>Credits, committed-use discounts, free tiers, and contracted rates.</li>
+      <li>Non-bandwidth charges such as requests, connection-minute fees, and service-specific pricing.</li>
+      <li>Operational behavior changes such as retry storms, regional failover policies, or unplanned cache churn.</li>
     </ul>
-    <p class="muted" style="margin-top:10px">
-      A simple sign-off check works well here: every major transfer path in the model should map back to a billable
-      usage type or a measurable network path. If you cannot explain that mapping, the estimate is still too soft.
-    </p>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Dominant-path levers and common failure patterns</h2>
-    <ul>
-      <li><strong>Internet egress dominates</strong>: compression, caching, and payload reduction usually win first.</li>
-      <li><strong>Cross-region dominates</strong>: reduce replication fan-out and narrow replicated datasets.</li>
-      <li><strong>Cross-AZ dominates</strong>: improve service locality and reduce chatty dependencies.</li>
-      <li><strong>Origin-to-CDN dominates</strong>: increase cache hit rate and review cache key strategy.</li>
-    </ul>
-    <ul>
-      <li>Peak scenario should be materially higher than baseline for internet-facing systems.</li>
-      <li>Each path must map to a billable usage type in your billing export.</li>
-      <li>Effective $/GB should be stable month over month for the same boundary.</li>
-      <li>If model and bill differ by more than 15%, isolate unit conversion and destination mix first.</li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      The most common failure pattern is blending unrelated transfer types into one average rate. The second most common
-      is treating peak retry or failover traffic like a normal month. Keep those two mistakes visible and the model gets
-      much more trustworthy.
+    <h2 style="margin-top:0">Next step after your estimate</h2>
+    <p class="muted" style="margin-top:8px">
+      Once you have a baseline and peak estimate, route to the next page by intent. This keeps the workflow fast and
+      prevents over-analysis on the calculator page.
     </p>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Next actions after the first estimate</h2>
-    <div class="btn-row" style="margin-top:10px">
-      <a class="btn" href="/guides/egress-costs/">Guide: egress costs</a>
-      <a class="btn" href="/guides/aws-network-costs/">Guide: AWS network costs</a>
-      <a class="btn" href="/calculators/api-response-size-transfer-calculator/">API response transfer</a>
-      <a class="btn" href="/calculators/cdn-bandwidth-cost-calculator/">CDN bandwidth cost</a>
-      <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+    <div class="grid">
+      <a class="card2 tool col-6" href="/guides/egress-costs/">
+        <div class="tool-title">Clarify boundary and rate assumptions</div>
+        <div class="tool-desc">Use the egress guide when you need confidence that the modeled path and rate logic are correct.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-network-costs/">
+        <div class="tool-title">Map estimate to AWS network bill lines</div>
+        <div class="tool-desc">Use the AWS network costs guide to align this estimate with line-item billing surfaces.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cdn-bandwidth-cost-calculator/">
+        <div class="tool-title">Model CDN-origin and edge delivery next</div>
+        <div class="tool-desc">Use when cache behavior likely drives your peak-month transfer costs.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cross-region-transfer-cost-calculator/">
+        <div class="tool-title">Model replication and DR transfer separately</div>
+        <div class="tool-desc">Use when cross-region traffic needs its own baseline and peak estimate.</div>
+      </a>
     </div>
   </div>
 </CalculatorLayout>

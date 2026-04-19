@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { useBooleanParamState, useNumberParamState } from "./useNumberParamState";
+import React, { useEffect, useMemo } from "react";
+import { useBooleanParamState, useNumberParamState, useStringParamState } from "./useNumberParamState";
 import { estimateEgressCost, estimateTieredEgressCost } from "../../lib/calc/egress";
 import { formatCurrency2, formatNumber } from "../../lib/format";
 import { clamp } from "../../lib/math";
@@ -11,6 +11,184 @@ type BandwidthCostProps = {
   defaultGbPerMonth?: number;
   defaultPricePerGbUsd?: number;
 };
+
+type CalculatorModelState = {
+  activeScenarioId: string;
+  gbPerMonth: number;
+  pricePerGbUsd: number;
+  tieredPricing: boolean;
+  tier1UpToGb: number;
+  tier1PricePerGbUsd: number;
+  tier2UpToGb: number;
+  tier2PricePerGbUsd: number;
+  tier3PricePerGbUsd: number;
+  showPeakScenario: boolean;
+  peakMultiplierPct: number;
+  avgMbpsInput: number;
+  peakMbpsInput: number;
+};
+
+type ScenarioPreset = {
+  id: string;
+  label: string;
+  boundary: string;
+  summary: string;
+  gbPerMonth: number;
+  pricePerGbUsd: number;
+  tieredPricing: boolean;
+  tier1UpToGb: number;
+  tier1PricePerGbUsd: number;
+  tier2UpToGb: number;
+  tier2PricePerGbUsd: number;
+  tier3PricePerGbUsd: number;
+  showPeakScenario: boolean;
+  peakMultiplierPct: number;
+  avgMbpsInput: number;
+  peakMbpsInput: number;
+  optimizationLevers: [string, string];
+};
+
+const DEFAULT_AVG_MBPS_INPUT = 75;
+const DEFAULT_PEAK_MBPS_INPUT = 180;
+
+const SCENARIO_PRESETS: ScenarioPreset[] = [
+  {
+    id: "public-api",
+    label: "Public API / SaaS internet egress",
+    boundary: "Public internet egress transfer",
+    summary: "For product API and dashboard traffic delivered directly to users.",
+    gbPerMonth: 3200,
+    pricePerGbUsd: 0.085,
+    tieredPricing: false,
+    tier1UpToGb: 10_000,
+    tier1PricePerGbUsd: 0.085,
+    tier2UpToGb: 50_000,
+    tier2PricePerGbUsd: 0.07,
+    tier3PricePerGbUsd: 0.06,
+    showPeakScenario: true,
+    peakMultiplierPct: 145,
+    avgMbpsInput: 95,
+    peakMbpsInput: 145,
+    optimizationLevers: [
+      "Reduce payload size (compression, pagination, selective fields) to lower internet egress GB.",
+      "Shift static and repeat traffic to CDN cache so API origin transfer stays flat.",
+    ],
+  },
+  {
+    id: "cdn-origin-fill",
+    label: "CDN origin fill / cache miss transfer",
+    boundary: "CDN origin fill transfer",
+    summary: "For traffic from origin to edge when cache misses or TTL churn increase.",
+    gbPerMonth: 14_000,
+    pricePerGbUsd: 0.065,
+    tieredPricing: true,
+    tier1UpToGb: 5_000,
+    tier1PricePerGbUsd: 0.08,
+    tier2UpToGb: 30_000,
+    tier2PricePerGbUsd: 0.06,
+    tier3PricePerGbUsd: 0.048,
+    showPeakScenario: true,
+    peakMultiplierPct: 185,
+    avgMbpsInput: 420,
+    peakMbpsInput: 775,
+    optimizationLevers: [
+      "Improve cache hit rate and cache-key stability to suppress origin fill transfer.",
+      "Pre-warm hot paths before campaigns to avoid launch-day miss storms.",
+    ],
+  },
+  {
+    id: "cross-region-dr",
+    label: "Cross-region replication / DR traffic",
+    boundary: "Cross-region replication transfer",
+    summary: "For replication, backup copy, and failover synchronization between regions.",
+    gbPerMonth: 18_500,
+    pricePerGbUsd: 0.02,
+    tieredPricing: false,
+    tier1UpToGb: 10_000,
+    tier1PricePerGbUsd: 0.02,
+    tier2UpToGb: 50_000,
+    tier2PricePerGbUsd: 0.018,
+    tier3PricePerGbUsd: 0.016,
+    showPeakScenario: true,
+    peakMultiplierPct: 160,
+    avgMbpsInput: 565,
+    peakMbpsInput: 910,
+    optimizationLevers: [
+      "Replicate only required datasets and tune replication windows instead of continuous full copy.",
+      "Review failover drills to cap burst transfer during DR tests.",
+    ],
+  },
+  {
+    id: "burst-launch",
+    label: "Burst month / launch month traffic",
+    boundary: "Public outbound transfer with launch spikes",
+    summary: "For launches, events, or seasonal windows where peak traffic dominates spend.",
+    gbPerMonth: 6_200,
+    pricePerGbUsd: 0.09,
+    tieredPricing: true,
+    tier1UpToGb: 10_000,
+    tier1PricePerGbUsd: 0.09,
+    tier2UpToGb: 40_000,
+    tier2PricePerGbUsd: 0.072,
+    tier3PricePerGbUsd: 0.058,
+    showPeakScenario: true,
+    peakMultiplierPct: 240,
+    avgMbpsInput: 185,
+    peakMbpsInput: 470,
+    optimizationLevers: [
+      "Split launch traffic assumptions into baseline and burst instead of one blended month.",
+      "Load-test high-response endpoints early to avoid emergency retries that inflate egress.",
+    ],
+  },
+];
+
+const SCENARIO_ID_OPTIONS = ["", ...SCENARIO_PRESETS.map((preset) => preset.id)];
+
+const responsivePairGrid: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: 10,
+  marginTop: 8,
+  alignItems: "end",
+};
+
+const responsivePresetGrid: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 8,
+  marginTop: 8,
+};
+
+const tierGrid: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: 10,
+  marginTop: 10,
+};
+
+const compactLabelStyle: React.CSSProperties = { fontSize: 13 };
+const fullWidthButtonStyle: React.CSSProperties = { width: "100%" };
+
+function modelStateFromPreset(preset: ScenarioPreset): Omit<CalculatorModelState, "activeScenarioId"> {
+  return {
+    gbPerMonth: preset.gbPerMonth,
+    pricePerGbUsd: preset.pricePerGbUsd,
+    tieredPricing: preset.tieredPricing,
+    tier1UpToGb: preset.tier1UpToGb,
+    tier1PricePerGbUsd: preset.tier1PricePerGbUsd,
+    tier2UpToGb: preset.tier2UpToGb,
+    tier2PricePerGbUsd: preset.tier2PricePerGbUsd,
+    tier3PricePerGbUsd: preset.tier3PricePerGbUsd,
+    showPeakScenario: preset.showPeakScenario,
+    peakMultiplierPct: preset.peakMultiplierPct,
+    avgMbpsInput: preset.avgMbpsInput,
+    peakMbpsInput: preset.peakMbpsInput,
+  };
+}
+
+function nearlyEqual(a: number, b: number): boolean {
+  return Math.abs(a - b) < 1e-6;
+}
 
 export function DataEgressCostCalculator({
   transferLabel = "Data transfer (GB / month)",
@@ -29,15 +207,91 @@ export function DataEgressCostCalculator({
   const [tier3PricePerGbUsd, setTier3PricePerGbUsd] = useNumberParamState("DataEgressCost.tier3PricePerGbUsd", defaultPricePerGbUsd);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("DataEgressCost.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("DataEgressCost.peakMultiplierPct", 150);
-  const [avgMbpsInput, setAvgMbpsInput] = useState(75);
-  const [peakMbpsInput, setPeakMbpsInput] = useState(180);
+  const [avgMbpsInput, setAvgMbpsInput] = useNumberParamState("DataEgressCost.avgMbpsInput", DEFAULT_AVG_MBPS_INPUT);
+  const [peakMbpsInput, setPeakMbpsInput] = useNumberParamState("DataEgressCost.peakMbpsInput", DEFAULT_PEAK_MBPS_INPUT);
+  const [activeScenarioId, setActiveScenarioId] = useStringParamState("DataEgressCost.activeScenarioId", "", SCENARIO_ID_OPTIONS);
+  const defaultModelState = useMemo<CalculatorModelState>(() => ({
+    activeScenarioId: "",
+    gbPerMonth: defaultGbPerMonth,
+    pricePerGbUsd: defaultPricePerGbUsd,
+    tieredPricing: false,
+    tier1UpToGb: 10_000,
+    tier1PricePerGbUsd: defaultPricePerGbUsd,
+    tier2UpToGb: 50_000,
+    tier2PricePerGbUsd: defaultPricePerGbUsd,
+    tier3PricePerGbUsd: defaultPricePerGbUsd,
+    showPeakScenario: false,
+    peakMultiplierPct: 150,
+    avgMbpsInput: DEFAULT_AVG_MBPS_INPUT,
+    peakMbpsInput: DEFAULT_PEAK_MBPS_INPUT,
+  }), [defaultGbPerMonth, defaultPricePerGbUsd]);
+
+  const applyModelState = (next: CalculatorModelState) => {
+    setActiveScenarioId(next.activeScenarioId);
+    setGbPerMonth(next.gbPerMonth);
+    setPricePerGbUsd(next.pricePerGbUsd);
+    setTieredPricing(next.tieredPricing);
+    setTier1UpToGb(next.tier1UpToGb);
+    setTier1PricePerGbUsd(next.tier1PricePerGbUsd);
+    setTier2UpToGb(next.tier2UpToGb);
+    setTier2PricePerGbUsd(next.tier2PricePerGbUsd);
+    setTier3PricePerGbUsd(next.tier3PricePerGbUsd);
+    setShowPeakScenario(next.showPeakScenario);
+    setPeakMultiplierPct(next.peakMultiplierPct);
+    setAvgMbpsInput(next.avgMbpsInput);
+    setPeakMbpsInput(next.peakMbpsInput);
+  };
+
   const secondsPerMonth = 30.4 * 24 * 3600;
   const avgMbps = (gbPerMonth * 8000) / secondsPerMonth;
-  const estimatedGbPerMonth = (clamp(avgMbpsInput, 0, 1e9) * secondsPerMonth) / 8000;
-  const peakMultiplierFromMbps = avgMbps > 0
-    ? (clamp(peakMbpsInput, 0, 1e9) / avgMbps) * 100
+  const clampedAvgMbpsInput = clamp(avgMbpsInput, 0, 1e9);
+  const clampedPeakMbpsInput = clamp(peakMbpsInput, 0, 1e9);
+  const estimatedGbPerMonth = (clampedAvgMbpsInput * secondsPerMonth) / 8000;
+  const peakMultiplierFromHelperMbps = clampedAvgMbpsInput > 0
+    ? (clampedPeakMbpsInput / clampedAvgMbpsInput) * 100
     : 0;
   const tierOrderOk = tier2UpToGb >= tier1UpToGb;
+  const inferredScenario = useMemo(
+    () =>
+      SCENARIO_PRESETS.find((preset) => {
+        const state = modelStateFromPreset(preset);
+        return (
+          nearlyEqual(state.gbPerMonth, gbPerMonth)
+          && nearlyEqual(state.pricePerGbUsd, pricePerGbUsd)
+          && state.tieredPricing === tieredPricing
+          && nearlyEqual(state.tier1UpToGb, tier1UpToGb)
+          && nearlyEqual(state.tier1PricePerGbUsd, tier1PricePerGbUsd)
+          && nearlyEqual(state.tier2UpToGb, tier2UpToGb)
+          && nearlyEqual(state.tier2PricePerGbUsd, tier2PricePerGbUsd)
+          && nearlyEqual(state.tier3PricePerGbUsd, tier3PricePerGbUsd)
+          && state.showPeakScenario === showPeakScenario
+          && nearlyEqual(state.peakMultiplierPct, peakMultiplierPct)
+          && nearlyEqual(state.avgMbpsInput, avgMbpsInput)
+          && nearlyEqual(state.peakMbpsInput, peakMbpsInput)
+        );
+      }) ?? null,
+    [
+      avgMbpsInput,
+      gbPerMonth,
+      peakMbpsInput,
+      peakMultiplierPct,
+      pricePerGbUsd,
+      showPeakScenario,
+      tier1PricePerGbUsd,
+      tier1UpToGb,
+      tier2PricePerGbUsd,
+      tier2UpToGb,
+      tier3PricePerGbUsd,
+      tieredPricing,
+    ],
+  );
+  useEffect(() => {
+    const inferredId = inferredScenario?.id ?? "";
+    if (activeScenarioId !== inferredId) setActiveScenarioId(inferredId);
+  }, [activeScenarioId, inferredScenario, setActiveScenarioId]);
+
+  const activeScenario = inferredScenario;
+  const resolvedActiveScenarioId = inferredScenario?.id ?? "";
 
   const buildResult = (gbPerMonthValue: number) => {
     if (tieredPricing) {
@@ -79,13 +333,25 @@ export function DataEgressCostCalculator({
     tier3PricePerGbUsd,
     tieredPricing,
   ]);
+  const peakDeltaUsd = peakResult ? peakResult.monthlyCostUsd - result.monthlyCostUsd : 0;
+  const activeOptimizationLevers = activeScenario?.optimizationLevers ?? [
+    "Validate the transfer boundary and effective rate before changing architecture assumptions.",
+    "Capture one baseline and one peak month to avoid hidden spike surprises.",
+  ];
+
+  const applyPreset = (preset: ScenarioPreset) => {
+    applyModelState({
+      activeScenarioId: preset.id,
+      ...modelStateFromPreset(preset),
+    });
+  };
 
   return (
     <div className="calc-grid">
       <div className="panel">
         <h3>Inputs</h3>
         <div className="form">
-          <div className="field field-3">
+          <div className="field field-6">
             <div className="label">{transferLabel}</div>
             <input
               type="number"
@@ -95,29 +361,31 @@ export function DataEgressCostCalculator({
               onChange={(e) => setGbPerMonth(+e.target.value)}
             />
             <div className="hint">Avg throughput: {formatNumber(avgMbps, 2)} Mbps.</div>
-          </div>
-          <div className="field field-3">
-            <div className="label">Avg throughput (Mbps)</div>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={avgMbpsInput}
-              min={0}
-              step={0.1}
-              onChange={(e) => setAvgMbpsInput(+e.target.value)}
-            />
-          </div>
-          <div className="field field-3" style={{ alignSelf: "end" }}>
-            <div className="btn-row">
-              <button
-                className="btn"
-                type="button"
-                onClick={() => setGbPerMonth(Math.round(estimatedGbPerMonth))}
-              >
-                Use estimate
-              </button>
+            <div style={responsivePairGrid}>
+              <div>
+                <div className="label" style={compactLabelStyle}>Avg throughput (Mbps)</div>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  value={avgMbpsInput}
+                  min={0}
+                  step={0.1}
+                  onChange={(e) => setAvgMbpsInput(+e.target.value)}
+                />
+              </div>
+              <div>
+                <div className="label" style={compactLabelStyle}>Estimate helper</div>
+                <button
+                  className="btn"
+                  type="button"
+                  style={fullWidthButtonStyle}
+                  onClick={() => setGbPerMonth(Math.round(estimatedGbPerMonth))}
+                >
+                  Use estimate as monthly GB
+                </button>
+                <div className="hint">Est {formatNumber(estimatedGbPerMonth, 0)} GB/month.</div>
+              </div>
             </div>
-            <div className="hint">Est {formatNumber(estimatedGbPerMonth, 0)} GB/month.</div>
           </div>
 
           <div className="field field-3">
@@ -153,13 +421,13 @@ export function DataEgressCostCalculator({
                   Tier 2 should be greater than tier 1.
                 </div>
               ) : null}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 10 }}>
+              <div style={tierGrid}>
                 <div>
-                  <div className="label" style={{ fontSize: 13 }}>Tier 1 up to (GB)</div>
+                  <div className="label" style={compactLabelStyle}>Tier 1 up to (GB)</div>
                   <input type="number" inputMode="numeric" value={tier1UpToGb} min={0} step={100} onChange={(e) => setTier1UpToGb(+e.target.value)} />
                 </div>
                 <div>
-                  <div className="label" style={{ fontSize: 13 }}>Tier 1 price ($/GB)</div>
+                  <div className="label" style={compactLabelStyle}>Tier 1 price ($/GB)</div>
                   <input
                     type="number"
                     inputMode="decimal"
@@ -169,14 +437,13 @@ export function DataEgressCostCalculator({
                     onChange={(e) => setTier1PricePerGbUsd(+e.target.value)}
                   />
                 </div>
-                <div />
 
                 <div>
-                  <div className="label" style={{ fontSize: 13 }}>Tier 2 up to (GB)</div>
+                  <div className="label" style={compactLabelStyle}>Tier 2 up to (GB)</div>
                   <input type="number" inputMode="numeric" value={tier2UpToGb} min={0} step={100} onChange={(e) => setTier2UpToGb(+e.target.value)} />
                 </div>
                 <div>
-                  <div className="label" style={{ fontSize: 13 }}>Tier 2 price ($/GB)</div>
+                  <div className="label" style={compactLabelStyle}>Tier 2 price ($/GB)</div>
                   <input
                     type="number"
                     inputMode="decimal"
@@ -186,14 +453,13 @@ export function DataEgressCostCalculator({
                     onChange={(e) => setTier2PricePerGbUsd(+e.target.value)}
                   />
                 </div>
-                <div />
 
                 <div>
-                  <div className="label" style={{ fontSize: 13 }}>Over tier 2 (GB)</div>
+                  <div className="label" style={compactLabelStyle}>Over tier 2 (GB)</div>
                   <div className="muted" style={{ fontSize: 13, marginTop: 10 }}>Remaining</div>
                 </div>
                 <div>
-                  <div className="label" style={{ fontSize: 13 }}>Over tier 2 price ($/GB)</div>
+                  <div className="label" style={compactLabelStyle}>Over tier 2 price ($/GB)</div>
                   <input
                     type="number"
                     inputMode="decimal"
@@ -203,7 +469,6 @@ export function DataEgressCostCalculator({
                     onChange={(e) => setTier3PricePerGbUsd(+e.target.value)}
                   />
                 </div>
-                <div />
               </div>
             </div>
           )}
@@ -220,89 +485,78 @@ export function DataEgressCostCalculator({
           </div>
 
           {showPeakScenario ? (
-            <div className="field field-3">
-              <div className="label">Peak multiplier (%)</div>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={peakMultiplierPct}
-                min={100}
-                max={1000}
-                step={5}
-                onChange={(e) => setPeakMultiplierPct(+e.target.value)}
-              />
-              <div className="hint">Model seasonal spikes or incident traffic.</div>
-            </div>
-          ) : null}
-          {showPeakScenario ? (
-            <div className="field field-3">
-              <div className="label">Peak Mbps</div>
-              <input
-                type="number"
-                inputMode="decimal"
-                value={peakMbpsInput}
-                min={0}
-                step={0.1}
-                onChange={(e) => setPeakMbpsInput(+e.target.value)}
-              />
-              <div className="hint">Use observed peak throughput.</div>
-            </div>
-          ) : null}
-          {showPeakScenario ? (
-            <div className="field field-3" style={{ alignSelf: "end" }}>
-              <div className="btn-row">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => {
-                    if (peakMultiplierFromMbps > 0) {
-                      setPeakMultiplierPct(Math.min(1000, Math.max(100, Math.round(peakMultiplierFromMbps))));
-                    }
-                  }}
-                >
-                  Use peak Mbps
-                </button>
+            <div className="field field-6">
+              <div className="label">Peak month settings</div>
+              <div style={responsivePairGrid}>
+                <div>
+                  <div className="label" style={compactLabelStyle}>Peak multiplier (%)</div>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    value={peakMultiplierPct}
+                    min={100}
+                    max={1000}
+                    step={5}
+                    onChange={(e) => setPeakMultiplierPct(+e.target.value)}
+                  />
+                  <div className="hint">Model seasonal spikes or launch traffic.</div>
+                </div>
+                <div>
+                  <div className="label" style={compactLabelStyle}>Peak Mbps</div>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={peakMbpsInput}
+                    min={0}
+                    step={0.1}
+                    onChange={(e) => setPeakMbpsInput(+e.target.value)}
+                  />
+                  <button
+                    className="btn"
+                    type="button"
+                    style={{ ...fullWidthButtonStyle, marginTop: 8 }}
+                    onClick={() => {
+                      if (peakMultiplierFromHelperMbps > 0) {
+                        setPeakMultiplierPct(Math.min(1000, Math.max(100, Math.round(peakMultiplierFromHelperMbps))));
+                      }
+                    }}
+                  >
+                    Use peak Mbps as multiplier
+                  </button>
+                  <div className="hint">
+                    Est {formatNumber(peakMultiplierFromHelperMbps, 0)}% multiplier from helper throughput values.
+                  </div>
+                </div>
               </div>
-              <div className="hint">Est {formatNumber(peakMultiplierFromMbps, 0)}% multiplier.</div>
             </div>
           ) : null}
 
           <div className="field field-6">
             <div className="label">Scenario presets</div>
-            <div className="btn-row">
-              <button
-                className="btn"
-                type="button"
-                onClick={() => {
-                  setGbPerMonth(1200);
-                  setShowPeakScenario(true);
-                  setPeakMultiplierPct(140);
-                }}
-              >
-                SaaS baseline
-              </button>
-              <button
-                className="btn"
-                type="button"
-                onClick={() => {
-                  setGbPerMonth(8000);
-                  setShowPeakScenario(true);
-                  setPeakMultiplierPct(180);
-                }}
-              >
-                Traffic spike
-              </button>
-              <button
-                className="btn"
-                type="button"
-                onClick={() => {
-                  setGbPerMonth(50000);
-                  setShowPeakScenario(true);
-                  setPeakMultiplierPct(200);
-                }}
-              >
-                Media heavy
-              </button>
+            <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>
+              Pick a boundary-first starter so the estimate reflects the right transfer path.
+            </div>
+            <div style={responsivePresetGrid}>
+              {SCENARIO_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  className="btn"
+                  type="button"
+                  aria-pressed={resolvedActiveScenarioId === preset.id}
+                  onClick={() => applyPreset(preset)}
+                  style={{
+                    textAlign: "left",
+                    whiteSpace: "normal",
+                    minHeight: 74,
+                    borderColor: resolvedActiveScenarioId === preset.id ? "rgba(122,227,255,0.8)" : undefined,
+                  }}
+                >
+                  <strong>{preset.label}</strong>
+                  <span className="muted" style={{ display: "block", marginTop: 4, fontSize: 12 }}>
+                    {preset.summary}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -311,18 +565,7 @@ export function DataEgressCostCalculator({
               <button
                 className="btn"
                 type="button"
-                onClick={() => {
-                  setGbPerMonth(defaultGbPerMonth);
-                  setPricePerGbUsd(defaultPricePerGbUsd);
-                  setTieredPricing(false);
-                  setTier1UpToGb(10_000);
-                  setTier1PricePerGbUsd(defaultPricePerGbUsd);
-                  setTier2UpToGb(50_000);
-                  setTier2PricePerGbUsd(defaultPricePerGbUsd);
-                  setTier3PricePerGbUsd(defaultPricePerGbUsd);
-                  setShowPeakScenario(false);
-                  setPeakMultiplierPct(150);
-                }}
+                onClick={() => applyModelState(defaultModelState)}
               >
                 Reset example
               </button>
@@ -348,6 +591,29 @@ export function DataEgressCostCalculator({
               <div className="v">{formatCurrency2(result.pricePerGbUsd)} / GB</div>
             </div>
           ) : null}
+        </div>
+
+        <div className="card2" style={{ padding: 12, marginTop: 12 }}>
+          <div className="label">Decision-support snapshot</div>
+          <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>
+            Scenario boundary: {activeScenario?.boundary ?? "Custom transfer boundary"}
+          </div>
+          <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+            Baseline monthly spend: {formatCurrency2(result.monthlyCostUsd)}
+          </div>
+          <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+            Peak monthly spend: {peakResult ? formatCurrency2(peakResult.monthlyCostUsd) : "Peak scenario disabled"}
+          </div>
+          <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+            Marginal peak impact: {peakResult ? formatCurrency2(peakDeltaUsd) : "Enable peak scenario to estimate delta"}
+          </div>
+          <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
+            Next action:
+          </div>
+          <ul className="muted" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
+            <li>{activeOptimizationLevers[0]}</li>
+            <li>{activeOptimizationLevers[1]}</li>
+          </ul>
         </div>
 
         {peakResult ? (
