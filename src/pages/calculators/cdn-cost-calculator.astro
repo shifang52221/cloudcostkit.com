@@ -1,247 +1,123 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { CdnRequestCostCalculator } from "../../components/calculators/CdnRequestCost";
-import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+import { CdnCostPlanner } from "../../components/calculators/CdnCostPlanner";
 
-const title = "CDN Cost Calculator: Estimate Bandwidth, Requests, and Monthly Pricing Fast";
+const title = "CDN Cost Calculator: Bandwidth, Requests, Origin Egress, and Peak-Month Planning";
 const description =
-  "Estimate CDN monthly cost fast from bandwidth, request pricing, and peak traffic scenarios. Built for CDN cost calculator, CDN pricing, and provider-comparison workflows.";
+  "Plan CDN cost across bandwidth, request fees, and origin egress in one model. Built for image-heavy storefront, video or download delivery, dynamic API edge traffic, and launch-month cache-miss scenarios.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-cost-calculator"
-  intro="Use this CDN cost calculator when you need a fast monthly estimate from the two line items that usually matter most: bandwidth and requests. Bring your GB, request volume, and effective rates, then compare baseline vs peak without mixing edge delivery and origin egress."
+  intro="Use the full CDN planner when one number is not enough. This page keeps edge bandwidth, request fees, and origin egress visible together so you can see which cost surface really dominates the month."
   examples={[
-    "Bandwidth: 4,000 GB/month at $0.06/GB -> $240/month; Requests: 300M/month at $0.0075 per 10k -> $225/month; Total -> ~$465/month.",
-    "Bandwidth dominates for large media; requests dominate for API-like traffic with small payloads.",
-    "Build a baseline and a peak scenario to avoid under-budgeting during launches or incidents.",
+    "Image-heavy storefront: bandwidth is often the largest cost surface, but campaign peaks can still shift the request and origin share.",
+    "Dynamic API at the edge: request share and origin egress share can overtake bandwidth even when delivered GB looks modest.",
+    "Launch month with lower cache hit rate: a peak window can raise all three surfaces together, especially origin exposure.",
   ]}
   includes={[
-    "Bandwidth estimate from GB/month and $/GB pricing.",
-    "Request-fee estimate from requests/month and $ per 10k pricing.",
+    "One planner for bandwidth share, request share, and origin egress share.",
+    "Scenario presets for storefront, video or download delivery, dynamic API edge traffic, and launch-month cache misses.",
+    "Peak-month comparison and next-action guidance after the estimate.",
   ]}
   excludes={[
-    "Origin egress and cache fill costs (model separately if billed).",
-    "Tiered pricing and regional blending (use effective blended rates or run scenarios).",
+    "Provider-specific rate cards or contract negotiation details.",
+    "Adjacent CDN add-ons such as WAF, logs, and image processing fees unless you add them separately.",
   ]}
   how={[
-    "Total CDN cost = bandwidth cost + request fees.",
-    "Bandwidth cost = GB/month x $/GB (edge bandwidth).",
-    "Request fees = (requests/month / 10,000) x $ per 10k requests (or convert if pricing is per 1M).",
-    "If your provider has tiered pricing, use a blended effective rate or run multiple scenarios and sum.",
+    "Modeled total = edge bandwidth cost + request-fee cost + estimated origin egress exposure.",
+    "Bandwidth share vs request share tells you whether bytes or request units dominate the edge bill.",
+    "Origin egress share shows how much cache misses or refill overhead still leak cost back to the origin.",
+    "Peak-month modeling keeps launch or incident traffic from disappearing into one average month.",
   ]}
   faqs={[
     {
-      q: "What keyword should I search for in pricing pages?",
-      a: "Look for \"data transfer\" or \"bandwidth\" ($/GB) and \"requests\" ($ per 10k or per 1M). Confirm units and regions.",
+      q: "When should I use the full planner instead of narrow calculators?",
+      a: "Use this page when you need to compare bandwidth, request fees, and origin egress together. Use narrow calculators when you already know which one line item moved first.",
     },
     {
-      q: "Where do I get GB/month and requests/month?",
-      a: "Use CDN analytics if you have them. If you only have throughput or RPS, use the Units Converter and RPS-to-monthly tool to convert.",
+      q: "Which number moved first on the CDN bill?",
+      a: "If viewer delivery jumped, start with bandwidth. If bots or small-object traffic jumped, request fees may have moved first. If cache hit rate fell, origin egress is usually the next number to inspect.",
     },
     {
-      q: "Does cache hit rate change the CDN bandwidth line item?",
-      a: "Edge bandwidth (to end users) is still billed as bandwidth. Cache hit rate mainly impacts origin egress and origin request volume.",
+      q: "What scenarios does this page model best?",
+      a: "Image-heavy storefront, video or download delivery, dynamic API at the edge, and launch-month traffic with lower cache hit rate.",
     },
     {
-      q: "How do I handle tiered pricing?",
-      a: "Use an effective blended $/GB and $ per 10k requests for your expected volume, or model multiple tiers/scenarios and add them up.",
-    },
-    {
-      q: "Do I need to include origin egress?",
-      a: "Sometimes. If your CDN pulls from an origin you pay for, cache fill and origin egress can be material. Model origin egress separately with the Data Egress calculator.",
-    },
-    {
-      q: "What if my provider includes free tiers or bundled requests?",
-      a: "Subtract free allowances from your GB/month or requests/month before applying rates, or use an effective blended rate after free tiers.",
+      q: "What should I validate before using the output in planning?",
+      a: "Confirm edge GB, request units, cache hit rate, and origin pricing against billing, analytics, or a written traffic assumption set. Then compare baseline and peak separately.",
     },
   ]}
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-04-19"
   related={[
-    { href: "/guides/cdn-costs", label: "Guide: CDN costs explained" },
-    { href: "/guides/cdn-cost-comparison", label: "Guide: CDN cost comparison" },
-    { href: "/guides/cdn-cost-per-gigabyte", label: "Guide: CDN cost per GB" },
-    { href: "/guides/cdn-request-pricing", label: "Guide: CDN request pricing" },
-    { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin egress vs CDN bandwidth" },
-    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "CDN bandwidth cost" },
-    { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
-    { href: "/calculators/cdn-origin-egress-calculator", label: "CDN origin egress" },
-    { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
-    { href: "/calculators/unit-converter", label: "Units converter" },
+    { href: "/guides/cdn-costs", label: "Guide: CDN cost diagnosis" },
+    { href: "/calculators/cdn-bandwidth-cost-calculator", label: "Edge bandwidth calculator" },
+    { href: "/calculators/cdn-request-cost-calculator", label: "Request-fee calculator" },
+    { href: "/calculators/cdn-origin-egress-calculator", label: "Origin leakage calculator" },
+    { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin vs edge guide" },
+    { href: "/guides/cdn-cost-comparison", label: "Provider comparison guide" },
   ]}
 >
   <div class="prose">
-    <h2 style="margin-top:0">When this CDN calculator is useful</h2>
-    <p class="muted" style="margin-top:8px">
-      Use this page when you need a fast monthly estimate, but you still want the estimate to reflect how CDN bills
-      actually behave in production. The page works best when you are doing one of three jobs: budgeting a new CDN,
-      comparing providers with the same traffic profile, or explaining why a recent spike came from requests,
-      bandwidth, or cache behavior.
-    </p>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Use one traffic profile across vendors if this is a provider comparison.</li>
-      <li>Keep baseline and peak scenarios separate if this is a budgeting exercise.</li>
-      <li>Model origin egress separately if your cache hit rate is unstable.</li>
+    <h2 style="margin-top:0">Which number moved first?</h2>
+    <ul>
+      <li><strong>Bandwidth moved</strong> when viewer-facing edge delivery or regional mix is the main issue.</li>
+      <li><strong>Request fees moved</strong> when small assets, bots, or cache-key sprawl inflate billable requests.</li>
+      <li><strong>Origin egress moved</strong> when lower cache hit rate or refill overhead leaves the origin paying more than expected.</li>
+      <li><strong>Use this page</strong> when you need to keep all three surfaces visible before deciding where to optimize.</li>
     </ul>
-    <div class="btn-row" style="margin-top:12px">
-      <a class="btn" href="/guides/cdn-costs/">Guide: CDN costs explained</a>
-      <a class="btn" href="/guides/cdn-cost-comparison/">Guide: CDN comparison</a>
-      <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
-    </div>
   </div>
 
   <div class="prose">
-    <h2 style="margin-top:0">What to model before you trust the number</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Edge bandwidth</strong>: GB delivered to users from the CDN edge.</li>
-      <li><strong>Request fees</strong>: billable request units, usually per 10k or per 1M.</li>
-      <li><strong>Origin egress</strong>: separate from edge delivery when cache fill or miss traffic is billed.</li>
-      <li><strong>Traffic mix</strong>: large media tends to be bandwidth-heavy; APIs and small assets often become request-heavy.</li>
+    <h2 style="margin-top:0">Scenario menu for real CDN planning</h2>
+    <ul>
+      <li><strong>Image-heavy storefront</strong>: asset weight and merchandising peaks shape the month.</li>
+      <li><strong>Video or download distribution</strong>: delivered GB dominates and peak release windows matter.</li>
+      <li><strong>Dynamic API at the edge</strong>: request share and origin leakage can outrank bandwidth.</li>
+      <li><strong>Launch month with lower cache hit rate</strong>: all three cost surfaces can move together.</li>
     </ul>
-    <p class="muted" style="margin-top:10px">
-      Most bad CDN estimates come from mixing those four ideas together. This page intentionally keeps the first-pass
-      model simple: estimate bandwidth and request fees here, then add origin-side transfer only if it is a real billed
-      line item for your setup.
-    </p>
   </div>
 
-  <div class="prose">
-    <h2 style="margin-top:0">1) Bandwidth</h2>
-    <p class="muted" style="margin-top:8px">
-      Use monthly GB delivered by the CDN to end users (edge bandwidth). If you only have Mbps, convert it to GB/month
-      with the Units Converter or this guide: <a href="/guides/estimate-cdn-bandwidth-gb-per-month/">estimate CDN bandwidth</a>.
-    </p>
-    <p class="muted" style="margin-top:8px">
-      This calculator is intentionally simple: bring your own pricing assumptions, then sanity-check the result against
-      provider billable units (GB vs GiB, per-10k vs per-1M requests, region tiers).
-    </p>
-  </div>
-  <DataEgressCostCalculator
-    transferLabel="CDN bandwidth (GB / month)"
-    priceLabel="CDN price ($ / GB)"
-    defaultGbPerMonth={4000}
-    defaultPricePerGbUsd={0.06}
-  client:load />
+  <CdnCostPlanner client:load />
 
   <div class="prose" style="margin-top:18px">
-    <h2>2) Requests</h2>
-    <p class="muted" style="margin-top:8px">
-      Some providers charge per request (often per 10k or per 1M). If you have RPS, convert it to requests/month first.
-    </p>
-    <p class="muted" style="margin-top:8px">
-      Use <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a> if you start from traffic
-      charts rather than a billing export. For pricing units and conversion tips, read{" "}
-      <a href="/guides/cdn-request-pricing/">CDN request pricing</a>.
-    </p>
-  </div>
-  <CdnRequestCostCalculator client:load />
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Build scenarios instead of relying on one average month</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Baseline</strong>: typical month (normal traffic, normal cache behavior).</li>
-      <li><strong>Peak</strong>: launches, incidents, seasonal spikes (often where request fees surprise teams).</li>
-      <li>
-        If pricing is tiered, run separate scenarios for each tier/region mix and sum the totals rather than using one
-        average rate.
-      </li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      Tip: use the new "Save scenario" button at the top to keep a baseline and peak link you can revisit.
-    </p>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Quick formula and worked example</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Total CDN cost</strong> = edge bandwidth cost + request fees.</li>
-      <li><strong>Edge bandwidth cost</strong> = GB/month x $/GB.</li>
-      <li><strong>Request fees</strong> = requests/month x ($ per 10k or $ per 1M converted to same unit).</li>
-      <li><strong>Complete cloud edge view</strong> = total CDN cost + origin egress (modeled separately).</li>
-    </ul>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Edge bandwidth: 6,000 GB/month x $0.05 = $300.</li>
-      <li>Requests: 400M/month x $0.0075 per 10k = $300.</li>
-      <li>Origin egress: 600 GB/month x $0.09 = $54 (modeled separately).</li>
+    <h2 style="margin-top:0">When to start here instead of a narrow calculator</h2>
+    <ul>
+      <li>Start here when you do not yet know whether bandwidth share, request share, or origin egress share is the dominant cost surface.</li>
+      <li>Start with the narrow calculators when one line item is already clearly isolated and you only need deeper math on that slice.</li>
+      <li>Keep this page tool-first: use it to compare surfaces, then route to the narrower calculator or guide for the next decision.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to compare providers without distorting the result</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Lock one traffic profile first, then swap only rates and free-tier assumptions.</li>
-      <li>Keep request units explicit so you do not confuse per-10k and per-1M pricing.</li>
-      <li>Do not hide region mix or tiering inside one vague blended rate if vendors price geography differently.</li>
-      <li>Keep origin egress outside the core CDN line unless every provider comparison handles it the same way.</li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      If the comparison gets noisy, stop adding more assumptions and normalize the traffic profile again. Most vendor
-      comparison mistakes come from changing traffic shape and pricing inputs at the same time.
-    </p>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Validate the estimate before you use it in a budget review</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Use billed edge GB and billed request units when available; analytics exports are second-best.</li>
-      <li>Check whether the bill spike came from bandwidth, request count, or cache behavior before changing architecture.</li>
-      <li>Track origin egress separately when cache hit rate changes, or you will misread the source of savings.</li>
-      <li>Revisit the model after launches, bot spikes, or image-optimization changes because request mix often shifts first.</li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      A simple quality check works well here: if you cannot point every major input back to either billing, CDN
-      analytics, or a written traffic assumption, the estimate is still too weak for procurement or finance review.
-    </p>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Common failure modes worth checking</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li><strong>The bill looks too high for the traffic</strong>: verify request unit conversion and bot/request bursts.</li>
-      <li><strong>The CDN estimate looks cheap but cloud spend stays high</strong>: add origin egress and cache-fill transfer.</li>
-      <li><strong>Optimization work changed little</strong>: check whether bandwidth or requests is the dominant line item first.</li>
-      <li><strong>Provider comparison changes every week</strong>: lock region mix, free tiers, and traffic profile before comparing again.</li>
+    <h2 style="margin-top:0">What this planner still misses</h2>
+    <ul>
+      <li>WAF, bot mitigation, edge functions, logs, and image-optimization add-ons.</li>
+      <li>Contracted discounts or provider-specific tier tables that require a vendor-specific worksheet.</li>
+      <li>Operational changes that affect cache hit rate abruptly, such as invalidation storms or launch-day cache churn.</li>
     </ul>
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Practical scenario worksheet</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Bandwidth</th>
-          <th>Requests</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Steady</td>
-          <td>Expected</td>
-          <td>Expected</td>
-          <td>Normal traffic</td>
-        </tr>
-        <tr>
-          <td>Launch</td>
-          <td>High</td>
-          <td>Burst</td>
-          <td>Launch/incident</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Next actions after the first estimate</h2>
-    <div class="btn-row" style="margin-top:10px">
-      <a class="btn" href="/guides/cdn-costs/">Guide: CDN costs explained</a>
-      <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare cost</a>
-      <a class="btn" href="/guides/cdn-request-pricing/">Guide: CDN request pricing</a>
-      <a class="btn" href="/guides/origin-egress-vs-cdn-bandwidth/">Origin egress vs CDN bandwidth</a>
-      <a class="btn" href="/calculators/cdn-origin-egress-calculator/">CDN origin egress</a>
+    <h2 style="margin-top:0">Next step by intent</h2>
+    <div class="grid">
+      <a class="card2 tool col-6" href="/calculators/cdn-bandwidth-cost-calculator/">
+        <div class="tool-title">Bandwidth is clearly dominant</div>
+        <div class="tool-desc">Go deeper on delivered edge GB, effective $/GB, and peak delivery windows.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cdn-request-cost-calculator/">
+        <div class="tool-title">Request fees are clearly dominant</div>
+        <div class="tool-desc">Go deeper on request-unit math, bots, cache-key sprawl, and request-class assumptions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cdn-origin-egress-calculator/">
+        <div class="tool-title">Origin egress is the next risk</div>
+        <div class="tool-desc">Go deeper on cache-hit decay, refill overhead, and how much traffic the origin still serves.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/cdn-costs/">
+        <div class="tool-title">Need diagnosis before more math</div>
+        <div class="tool-desc">Use the guide when you still need to define the bill boundary and decide what belongs in the model.</div>
+      </a>
     </div>
   </div>
 </CalculatorLayout>
-

@@ -1,171 +1,126 @@
 ---
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
-import { DataEgressCostCalculator } from "../../components/calculators/DataEgressCost";
+import { CdnBandwidthCostCalculator as CdnBandwidthCostCalculatorComponent } from "../../components/calculators/CdnBandwidthCost";
 
-const title = "CDN Bandwidth Cost Calculator";
+const title = "CDN Bandwidth Cost Calculator: Edge Delivery Planning for Media, Images, and Launch Peaks";
 const description =
-  "Estimate monthly CDN bandwidth cost (cost per GB) from transferred GB and your provider's $/GB pricing. Educational use only.";
+  "Model CDN bandwidth cost from delivered edge GB, effective $/GB, and peak-month traffic. Built for edge delivery planning across video, image-heavy storefront, download, and launch traffic.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/cdn-bandwidth-cost-calculator"
-  intro="CDN bandwidth charges can dominate costs for media-heavy and global traffic. Use this calculator to estimate monthly CDN bandwidth spend (cost per GB) using your own $/GB assumptions and compare baseline vs peak traffic."
+  intro="Use this calculator when the first question is edge delivery cost: how many GB the CDN serves to viewers, what effective $/GB you are really paying, and how much a launch or media spike can change the month."
   examples={[
-    "If your CDN serves 4,000 GB/month at $0.06/GB, estimated bandwidth cost is $240/month.",
-    "If you serve 30 TB/month at $0.05/GB, estimated bandwidth cost is about $1,536/month.",
+    "Image-heavy storefront: 9,500 GB/month at $0.055/GB -> about $523/month before request fees and origin leakage.",
+    "Video or download delivery: 48 TB/month at $0.045/GB -> about $2,160/month, with peak weeks often driving the real budget risk.",
+    "Campaign or launch burst: model the baseline month and a separate peak month so the first-week spike does not hide inside one average.",
   ]}
   includes={[
-    "Bandwidth-only CDN cost estimate from GB/month and $/GB pricing.",
-    "Use for planning and comparing pricing tiers/regions.",
-    "Baseline vs peak comparison for traffic spikes.",
+    "CDN-specific bandwidth scenarios for video, image-heavy storefront, software downloads, and launch traffic.",
+    "Baseline vs peak month comparison for delivered edge GB.",
+    "Decision-support output for dominant bandwidth risk and next optimization step.",
   ]}
   excludes={[
-    "CDN request fees (use CDN Request Cost Calculator).",
-    "Origin egress and cache fill traffic (model separately if applicable).",
+    "Request-fee pricing (use the CDN request calculator when requests are material).",
+    "Origin cache-fill pricing (use origin egress tools separately if the origin is billed).",
   ]}
   how={[
-    "Monthly cost = CDN egress GB x price per GB.",
-    "Enter your provider's effective bandwidth $/GB (consider region/tier).",
-    "If pricing is tiered, use a blended $/GB (or run multiple scenarios).",
-    "Model a peak month if launches or incidents spike traffic.",
-    "This calculator is bandwidth-only; add request fees and origin egress separately if you pay them."
+    "Bandwidth cost = delivered edge GB/month x effective $/GB.",
+    "Use the blended rate that matches your regional traffic mix and plan tier.",
+    "Keep peak delivery windows separate because launch weeks and media events can compress a month of traffic into days.",
+    "Treat this as an edge-delivery model, not a generic transfer estimate.",
   ]}
   faqs={[
     {
-      q: "Is CDN bandwidth the same as origin egress?",
-      a: "Not necessarily. CDN providers bill bandwidth at the edge; origin egress may be separate if the CDN pulls from your origin."
+      q: "Use this calculator first when?",
+      a: "Use it first when you already know edge delivery is the dominant line item and want a fast baseline-vs-peak bandwidth model before deeper CDN bill analysis.",
     },
     {
-      q: "What about request charges?",
-      a: "Many CDNs charge per request (e.g., per 10k). This calculator is bandwidth-only."
+      q: "What traffic fits this page best?",
+      a: "Video or media delivery, image-heavy storefront traffic, software downloads, and campaign or launch bursts where delivered GB is the primary cost surface.",
     },
     {
-      q: "How do I estimate GB per month?",
-      a: "Use traffic analytics (bytes transferred) if you have it. If you only have throughput, use the Units Converter to convert Mbps to GB/month."
+      q: "Does cache hit rate matter here?",
+      a: "It matters for origin leakage, but this page keeps the edge-delivery bill separate so you do not blur viewer bandwidth and origin fill costs.",
     },
     {
-      q: "Does cache hit rate change bandwidth billed by the CDN?",
-      a: "The CDN edge bandwidth to end users is still billed as bandwidth. Cache hit rate mainly changes your origin egress and origin request volume."
+      q: "What should I validate before trusting the number?",
+      a: "Match delivered edge GB and the effective $/GB to billing or CDN analytics, then check peak windows separately from the ordinary month.",
     },
-    {
-      q: "Should I include cache fill / prefetch traffic?",
-      a: "If your CDN pulls large objects from origin, you may pay origin egress for cache fill. Model that separately with the Data Egress calculator."
-    },
-    {
-      q: "What about free bandwidth tiers?",
-      a: "If your plan includes free allowances, subtract them from GB/month before applying $/GB, or use an effective blended rate."
-    }
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-04-19"
   related={[
-    { href: "/guides/cdn-costs", label: "Guide: CDN cost breakdown" },
-    { href: "/guides/cdn-cost-per-gigabyte", label: "Guide: CDN cost per GB" },
-    { href: "/guides/estimate-cdn-bandwidth-gb-per-month", label: "Guide: Estimate GB/month" },
-    { href: "/guides/cloudfront-vs-cloudflare-cdn-cost", label: "CloudFront vs Cloudflare cost" },
-    { href: "/calculators/cdn-request-cost-calculator", label: "CDN request cost" },
-    { href: "/calculators/cdn-origin-egress-calculator", label: "CDN origin egress" },
-    { href: "/calculators/data-egress-cost-calculator", label: "Origin egress cost" },
-    { href: "/calculators/unit-converter", label: "Units converter" },
+    { href: "/calculators/cdn-cost-calculator", label: "Full CDN cost planner" },
+    { href: "/guides/cdn-costs", label: "Guide: CDN cost diagnosis" },
+    { href: "/calculators/cdn-request-cost-calculator", label: "Request fee calculator" },
+    { href: "/calculators/cdn-origin-egress-calculator", label: "Origin leakage calculator" },
+    { href: "/guides/estimate-cdn-bandwidth-gb-per-month", label: "Guide: estimate edge GB" },
+    { href: "/guides/origin-egress-vs-cdn-bandwidth", label: "Origin vs edge bandwidth" },
   ]}
 >
   <div class="prose">
-    <h2 style="margin-top:0">When bandwidth dominates (and how to avoid under-budgeting)</h2>
-    <ul class="muted" style="margin:10px 0 0; padding-left:18px">
-      <li>Large objects (images/video) and global audiences push bandwidth up fast.</li>
-      <li>Compression and image optimization can change GB/month materially.</li>
-      <li>Peak events can add a "second month" of bandwidth in a few days.</li>
+    <h2 style="margin-top:0">Use this calculator first when...</h2>
+    <ul>
+      <li>You are planning <strong>video</strong>, <strong>media</strong>, or <strong>download</strong> delivery where delivered edge GB is the main bill driver.</li>
+      <li>You run an <strong>image-heavy storefront</strong> and want to see how asset weight and campaign traffic affect edge cost first.</li>
+      <li>You need a separate <strong>launch</strong> or <strong>campaign</strong> peak month instead of one blended average.</li>
+    </ul>
+    <p class="muted" style="margin-top:8px">
+      This page is for <strong>edge delivery</strong> planning. It keeps delivered viewer traffic, request pricing,
+      and origin leakage in separate lanes so your bandwidth model stays clean.
+    </p>
+  </div>
+
+  <CdnBandwidthCostCalculatorComponent client:load />
+
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Which CDN bandwidth scenario looks most like your month?</h2>
+    <ul>
+      <li><strong>Video library / streaming delivery</strong>: large delivered GB, stable requests, and heavy regional mix sensitivity.</li>
+      <li><strong>Image-heavy storefront</strong>: merchandising, asset weight, and campaign bursts move the edge bill.</li>
+      <li><strong>Software downloads</strong>: release windows can create a second month of edge delivery in days.</li>
+      <li><strong>Launch or campaign burst</strong>: peak-week delivery often matters more than the calm-week average.</li>
     </ul>
   </div>
 
-  <DataEgressCostCalculator
-    transferLabel="CDN bandwidth (GB / month)"
-    priceLabel="CDN price ($ / GB)"
-    defaultGbPerMonth={4000}
-    defaultPricePerGbUsd={0.06}
-  client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Estimate GB/month from Mbps (quick conversion)</h2>
-    <p class="muted" style="margin-top:8px">
-      If you start from average throughput, convert Mbps to GB/month first, then paste the result into the calculator.
-      Use <a href="/calculators/unit-converter/">Units Converter</a> for a precise conversion and to avoid GB vs GiB mixups.
-    </p>
-    <p class="muted" style="margin-top:8px">
-      If you have a traffic curve (p50/p95), run two scenarios and save them so you can compare a typical month vs a peak month.
-    </p>
-    <p class="muted" style="margin-top:8px">
-      Tip: use the "Save scenario" button in the calculator to keep a baseline and a peak link you can revisit.
-    </p>
+    <h2 style="margin-top:0">What this estimate still misses</h2>
+    <ul>
+      <li><strong>Request fees</strong>: if requests are a material line item, pair this with the request calculator.</li>
+      <li><strong>Origin leakage</strong>: cache fill, revalidation, or low hit rate belong in the origin side model.</li>
+      <li><strong>Adjacent charges</strong>: WAF, logs, image optimization, and edge functions still sit outside this bandwidth-only estimate.</li>
+    </ul>
   </div>
+
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">CDN bandwidth cost is an edge-delivery volume problem, not a generic transfer estimate</h2>
-    <p class="muted" style="margin-top:8px">
-      This page should stay focused on what the CDN serves to end users at the edge. The biggest mistakes happen when
-      teams mix this with origin backhaul, internal transfers, or request-heavy effects that belong on other pages.
-    </p>
+    <h2 style="margin-top:0">Why bandwidth pages go wrong</h2>
     <ul>
-      <li><strong>Delivered GB</strong>: the direct edge output to viewers, not the cache-fill path back to origin.</li>
-      <li><strong>Rate mix</strong>: the effective $/GB changes with region, traffic tiers, and commercial plan terms.</li>
-      <li><strong>Traffic shape</strong>: object size, video share, and compression settings move this bill more than request tuning.</li>
+      <li>Teams copy a headline $/GB instead of the effective blended rate that matches the real regional mix.</li>
+      <li>Peak-week delivery is hidden inside a monthly average even though the launch window drives procurement anxiety.</li>
+      <li>Viewer-facing edge traffic is mixed with origin-side refill traffic, which makes the bandwidth page feel fuzzy and low-trust.</li>
     </ul>
+  </div>
 
-    <h2>Where CDN bandwidth estimates usually drift</h2>
-    <ul>
-      <li>Average throughput is converted once, but launch days or media events compress a large share of the month into a short window.</li>
-      <li>Traffic mix shifts toward larger assets, poorer compression, or more international delivery after the estimate was made.</li>
-      <li>Origin traffic is accidentally blended in, making the CDN bill look larger or smaller than it really is.</li>
-      <li>One global effective rate is used even though top geographies have meaningfully different economics.</li>
-    </ul>
-
-    <h2>What to review before trusting the bandwidth baseline</h2>
-    <ul>
-      <li>Separate edge delivery from origin egress and cache-fill traffic before choosing the price assumption.</li>
-      <li>Check object-size trends and compression wins because they matter more than small request optimizations here.</li>
-      <li>Model a peak event month explicitly if launches, streaming, or large downloads are part of the business.</li>
-      <li>Use a rate that matches the actual region mix rather than one marketing headline number.</li>
-    </ul>
-
-    <h2>Baseline vs media-heavy bandwidth scenarios</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>GB/month</th>
-          <th>Rate</th>
-          <th>Drivers</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Baseline</td>
-          <td>Expected</td>
-          <td>Blended</td>
-          <td>Normal traffic</td>
-        </tr>
-        <tr>
-          <td>Peak</td>
-          <td>High</td>
-          <td>Same</td>
-          <td>Launch/event</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>How to review the first real CDN bandwidth month</h2>
-    <ul>
-      <li>Check whether the miss came from delivered GB growth, regional mix, or accidental origin leakage before changing every assumption.</li>
-      <li>Review peak windows separately because that is where hidden bandwidth multipliers usually show up first.</li>
-    </ul>
-
-    <h2>Next steps</h2>
-    <div class="btn-row" style="margin-top:0">
-      <a class="btn" href="/guides/">Guides</a>
-      <a class="btn" href="/calculators/">All calculators</a>
-      <a class="btn" href="/guides/cdn-costs/">Guide: CDN cost breakdown</a>
-      <a class="btn" href="/guides/estimate-cdn-bandwidth-gb-per-month/">Guide: Estimate GB/month</a>
-      <a class="btn" href="/guides/cloudfront-vs-cloudflare-cdn-cost/">CloudFront vs Cloudflare cost</a>
-      <a class="btn" href="/calculators/cdn-request-cost-calculator/">CDN request cost</a>
-      <a class="btn" href="/calculators/cdn-origin-egress-calculator/">CDN origin egress</a>
+  <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Next step after edge-delivery math</h2>
+    <div class="grid">
+      <a class="card2 tool col-6" href="/calculators/cdn-request-cost-calculator/">
+        <div class="tool-title">Request fees are moving the bill</div>
+        <div class="tool-desc">Go here when small objects, bots, or cache-key sprawl make request pricing material.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cdn-origin-egress-calculator/">
+        <div class="tool-title">Origin leakage is the next question</div>
+        <div class="tool-desc">Go here when cache misses, refill traffic, or revalidation still leave the origin paying real money.</div>
+      </a>
+      <a class="card2 tool col-6" href="/calculators/cdn-cost-calculator/">
+        <div class="tool-title">Need the full CDN planner</div>
+        <div class="tool-desc">Use the main planner when bandwidth, request fees, and origin egress all need to stay visible together.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/cdn-costs/">
+        <div class="tool-title">Need diagnosis before more math</div>
+        <div class="tool-desc">Use the guide when you still need to decide which CDN line item moved first.</div>
+      </a>
     </div>
   </div>
 </CalculatorLayout>

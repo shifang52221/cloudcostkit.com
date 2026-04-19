@@ -1596,8 +1596,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CDN Cost Guide: Pricing, Calculator Inputs, and Provider Comparison",
-    "description": "Understand CDN cost fast with practical formulas for pricing, calculator inputs, provider comparison, bandwidth, requests, and origin egress.",
+    "title": "CDN Cost Guide: Diagnose the Bill, Choose the Right Calculator, and Validate the Model",
+    "description": "Use this CDN guide to diagnose which CDN line item moved first, route to the right calculator, and keep bandwidth, request fees, and origin egress as separate cost surfaces.",
     "canonicalPath": "/guides/cdn-costs",
     "category": "CDN",
     "slug": "cdn-costs",
@@ -2194,12 +2194,13 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Request-based pricing explained: how to estimate requests and avoid surprises",
-    "description": "A practical framework for request-based cloud pricing: convert RPS to monthly requests, model retries and fan-out, and avoid unit mistakes (per 10k vs per 1M).",
+    "title": "Request Pricing Hub: calculators, guides, and next steps",
+    "description": "A lightweight hub for request pricing: choose the right guide or calculator for request math, retries, payload transfer, and adjacent cost checks.",
     "canonicalPath": "/guides/requests-costs",
     "category": "Requests",
     "slug": "requests-costs",
     "topics": [
+      "egress",
       "requests"
     ]
   },
