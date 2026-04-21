@@ -226,7 +226,29 @@ const description =
   <section class="card section prose" style="margin-top:18px">
     <h2 style="margin-top:0">Related guides</h2>
     <p class="muted" style="margin:0">
-      For step-by-step estimation guidance and pitfalls, browse <a href="/guides/aws/">AWS cost guides</a>.
+      Use an indexed guide path when you need the reasoning behind the estimate, not just another calculator input form.
     </p>
+    <div class="grid" style="margin-top:12px">
+      <a class="card2 tool col-6" href="/guides/aws-network-costs/">
+        <div class="tool-title">AWS network costs guide</div>
+        <div class="tool-desc">Separate internet egress, cross-AZ, cross-region, NAT, and endpoint boundaries before pricing traffic.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/compute-costs/">
+        <div class="tool-title">Compute costs guide</div>
+        <div class="tool-desc">Check runtime choice, idle capacity, and surrounding line items before trusting EC2, ECS, EKS, Lambda, or Fargate totals.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/storage-costs/">
+        <div class="tool-title">Storage costs guide</div>
+        <div class="tool-desc">Review growth, retention, snapshots, replication, and request amplification when data services dominate.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/observability-costs/">
+        <div class="tool-title">Observability costs guide</div>
+        <div class="tool-desc">Untangle logs, metrics, alarms, and scan volume before deciding whether the estimate or the telemetry policy is wrong.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/request-based-pricing/">
+        <div class="tool-title">Request-based pricing guide</div>
+        <div class="tool-desc">Use this when retries, polling, fan-out, or per-request billing units are the part most likely to distort the model.</div>
+      </a>
+    </div>
   </section>
 </BaseLayout>
