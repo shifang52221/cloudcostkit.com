@@ -8,7 +8,7 @@ import { withTrailingSlash } from "../../lib/url";
 
 const title = `Azure cost guides | ${SITE.name}`;
 const description =
-  "Azure cost guide hub for routing into the right provider-specific estimate: networking, observability, storage, runtime, and premium SKU boundaries.";
+  "Azure cost guide hub for routing into the right provider-specific estimate across networking, observability, storage, runtime, and premium SKU boundaries before you commit to a deeper service workflow.";
 const slots = SITE.adsenseSlots;
 
 type GuideGroup = {
@@ -140,6 +140,28 @@ const azureGuideGroups: GuideGroup[] = [
           </div>
         </div>
       ))}
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Fast-moving Azure pricing pages</h2>
+    <p class="muted" style="margin:0">
+      These Azure service guides are already proving they can attract search demand, so they should stay visible here
+      as direct next steps instead of relying only on category lists.
+    </p>
+    <div class="grid" style="margin-top:14px">
+      <a class="card2 tool col-6" href="/guides/azure-container-registry-pricing/">
+        <div class="tool-title">Azure Container Registry pricing</div>
+        <div class="tool-desc">Estimate storage, pull behavior, and geo-replication before registry throughput spikes.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-load-balancer-pricing/">
+        <div class="tool-title">Azure Load Balancer pricing</div>
+        <div class="tool-desc">Keep L4 hours, traffic processed, and billed egress separate before comparing architectures.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/azure-event-hubs-pricing/">
+        <div class="tool-title">Azure Event Hubs pricing</div>
+        <div class="tool-desc">Model throughput, retention, replay exposure, and downstream pipeline multipliers together.</div>
+      </a>
     </div>
   </section>
 

@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS CloudWatch Metrics Pricing & Cost Guide";
 const description =
-  "CloudWatch metrics cost model: custom metrics, API requests, dashboards, and retention.";
+  "Model AWS CloudWatch metrics cost from custom metrics, API requests, dashboards, and retention, with guidance on bill boundaries, cardinality growth, and adjacent alarm spend.";
 ---
 <GuideLayout
   title={title}
@@ -119,6 +119,18 @@ const description =
     <li>Confirm which charges are CloudWatch-native and which begin once alarms or external tools consume the metrics.</li>
     <li>Validate dashboard, request, and alarm ownership before comparing teams or environments.</li>
     <li>Keep growth windows separate from normal budgeting assumptions.</li>
+  </ul>
+
+  <h2>Related operational guides</h2>
+  <ul>
+    <li>
+      <a href="/guides/aws-cloudtrail-pricing/">AWS CloudTrail pricing</a>: useful when metrics, dashboards, and audit
+      pipelines are being reviewed as one observability spend cluster.
+    </li>
+    <li>
+      <a href="/guides/aws-route-53-pricing/">AWS Route 53 pricing</a>: useful when DNS health checks, failover
+      posture, and CloudWatch-backed monitoring need to be budgeted together.
+    </li>
   </ul>
 
   <h2>Sources</h2>

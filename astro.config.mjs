@@ -11,6 +11,7 @@ const sitemapExcludedPaths = new Set([
   "/cookie-notice/",
   "/guides/gcp/",
   "/guides/azure/",
+  "/guides/aws/",
   "/guides/requests-costs/",
   "/guides/kubernetes-cost-calculator/",
   "/guides/backups-and-snapshots-costs/",

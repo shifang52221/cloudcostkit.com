@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling";
 const description =
-  "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks. Includes baseline and peak DNS modeling steps.";
+  "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks, with baseline and peak DNS modeling steps for retry storms, failovers, and health-check sprawl.";
 ---
 <GuideLayout
   title={title}
@@ -171,6 +171,18 @@ const description =
     <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly</a>
     <a class="btn" href="/guides/cloud-cost-estimation-checklist/">Cost checklist</a>
   </div>
+
+  <h2>Related operational guides</h2>
+  <ul>
+    <li>
+      <a href="/guides/aws-cloudtrail-pricing/">AWS CloudTrail pricing</a>: useful when incident investigation or
+      governance work is changing both audit volume and DNS behavior.
+    </li>
+    <li>
+      <a href="/guides/aws-cloudwatch-metrics-pricing/">AWS CloudWatch metrics pricing</a>: useful when Route 53 health
+      checks, alarms, or dashboard polling are part of the same reliability review.
+    </li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>

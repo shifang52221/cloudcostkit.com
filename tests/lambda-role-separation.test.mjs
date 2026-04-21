@@ -15,7 +15,7 @@ const optimizationPage = normalize(
 test("pricing page is framed as the Lambda bill-boundary page", () => {
   assert.match(
     pricingPage,
-    /Use this page when you need to decide what belongs inside the Lambda bill before you debate cold starts, retries, or runtime tuning/i,
+    /This is the AWS Lambda bill-boundary page\. Use it when you need to decide what belongs inside the Lambda bill before you debate cold starts, retries, or runtime tuning/i,
   );
   assert.match(
     pricingPage,

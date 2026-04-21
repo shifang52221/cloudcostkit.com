@@ -18,17 +18,17 @@ const messagingGuide = normalize(
 );
 
 test("compute guide owns the runtime budgeting role", () => {
-  assert.match(computeGuide, /This is the runtime budgeting parent page/i);
+  assert.match(computeGuide, /This is the compute runtime budgeting parent page/i);
   assert.match(computeGuide, /start here before choosing deeper compute paths/i);
 });
 
 test("storage guide owns the capacity and lifecycle budgeting role", () => {
-  assert.match(storageGuide, /This is the capacity and lifecycle budgeting parent page/i);
-  assert.match(storageGuide, /copies, retrieval, and lifecycle transitions/i);
+  assert.match(storageGuide, /This is the storage system budgeting parent page/i);
+  assert.match(storageGuide, /capacity, copies, retrieval, and lifecycle transitions/i);
 });
 
 test("database guide owns the stateful service budgeting role", () => {
-  assert.match(databaseGuide, /This is the stateful service budgeting parent page/i);
+  assert.match(databaseGuide, /This is the database system budgeting parent page/i);
   assert.match(databaseGuide, /not just a lighter storage page/i);
 });
 

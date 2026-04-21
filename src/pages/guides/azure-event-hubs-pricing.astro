@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Azure Event Hubs Pricing Guide: Throughput, Retention, Replay, and Egress";
 const description =
-  "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress with a practical planning checklist.";
+  "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress, with a practical checklist for validating burst traffic and downstream replay risk.";
 
 const faqs = [
   {
@@ -155,6 +155,18 @@ const faqs = [
     <a href="/guides/log-costs/">log cost guidance</a> so replay-driven downstream spend is not treated as an unrelated
     problem.
   </p>
+
+  <h2>Related Azure service guides</h2>
+  <ul>
+    <li>
+      <a href="/guides/azure-container-registry-pricing/">Azure Container Registry pricing</a>: useful when platform
+      teams are budgeting the artifact and deployment side of the same application stack.
+    </li>
+    <li>
+      <a href="/guides/azure-load-balancer-pricing/">Azure Load Balancer pricing</a>: useful when public traffic,
+      retries, or egress behavior need to be reviewed beside stream volume and replay patterns.
+    </li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>

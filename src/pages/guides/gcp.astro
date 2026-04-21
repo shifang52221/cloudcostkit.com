@@ -8,7 +8,7 @@ import { withTrailingSlash } from "../../lib/url";
 
 const title = `GCP cost guides | ${SITE.name}`;
 const description =
-  "GCP cost guide hub for routing into the right provider-specific estimate: transfer boundaries, serverless paths, observability growth, and storage or data platform drivers.";
+  "GCP cost guide hub for routing into the right provider-specific estimate across transfer boundaries, serverless paths, observability growth, and storage or data platform drivers before you open a deeper guide.";
 const slots = SITE.adsenseSlots;
 
 type GuideGroup = {
@@ -140,6 +140,28 @@ const gcpGuideGroups: GuideGroup[] = [
           </div>
         </div>
       ))}
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Fast-moving GCP pricing pages</h2>
+    <p class="muted" style="margin:0">
+      These service pages already map well to active search demand, so they should stay explicit in the provider hub
+      instead of hiding only inside the broader runtime and storage groups.
+    </p>
+    <div class="grid" style="margin-top:14px">
+      <a class="card2 tool col-6" href="/guides/gcp-cloud-run-pricing/">
+        <div class="tool-title">GCP Cloud Run pricing</div>
+        <div class="tool-desc">Start here when requests, CPU, memory, egress, and logs all need to stay in one workload model.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/gcp-cloud-sql-pricing/">
+        <div class="tool-title">GCP Cloud SQL pricing</div>
+        <div class="tool-desc">Useful for instance-hours, storage, backups, and network-sensitive database budgeting.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/gcp-cloud-storage-pricing/">
+        <div class="tool-title">GCP Cloud Storage pricing</div>
+        <div class="tool-desc">Useful when storage class, request mix, retrieval, and egress need to stay visible together.</div>
+      </a>
     </div>
   </section>
 

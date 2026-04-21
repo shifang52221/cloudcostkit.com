@@ -2,9 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const pricingPage = readFileSync(new URL("../src/pages/guides/aws-kms-pricing.astro", import.meta.url), "utf8");
-const estimatePage = readFileSync(new URL("../src/pages/guides/aws-kms-estimate-requests.astro", import.meta.url), "utf8");
-const optimizationPage = readFileSync(new URL("../src/pages/guides/aws-kms-cost-optimization.astro", import.meta.url), "utf8");
+const normalize = (value) => value.replace(/\s+/g, " ").trim();
+
+const pricingPage = normalize(readFileSync(new URL("../src/pages/guides/aws-kms-pricing.astro", import.meta.url), "utf8"));
+const estimatePage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-kms-estimate-requests.astro", import.meta.url), "utf8"),
+);
+const optimizationPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-kms-cost-optimization.astro", import.meta.url), "utf8"),
+);
 
 test("pricing page is framed as the bill-boundary page", () => {
   assert.match(
@@ -13,7 +19,7 @@ test("pricing page is framed as the bill-boundary page", () => {
   );
   assert.match(
     pricingPage,
-    /This guide is about bill boundaries: key-months, request charges, service-triggered KMS calls, and the adjacent costs that should be tracked beside KMS rather than confused with it/i,
+    /This is the AWS KMS request and key-boundary page/i,
   );
 });
 

@@ -31,7 +31,7 @@ test("kubernetes cost calculator page is framed as the supporting checklist page
 test("beyond-nodes page is framed as the non-node completeness checklist page", () => {
   assert.match(
     beyondNodesPage,
-    /This page is the non-node completeness checklist page for Kubernetes: node count should already be credible, and the goal here is to catch the control plane, storage, load balancer, observability, and transfer lines that a node-only model misses/i,
+    /This is the Kubernetes non-node completeness checklist page\. Node count should already be credible, and the goal here is to catch the control plane, storage, load balancer, observability, and transfer lines that a node-only model misses/i,
   );
   assert.match(
     beyondNodesPage,
@@ -42,7 +42,7 @@ test("beyond-nodes page is framed as the non-node completeness checklist page", 
 test("requests-limits page is framed as the sizing workflow page", () => {
   assert.match(
     sizingWorkflowPage,
-    /This page is the Kubernetes sizing workflow page, not the concept-only requests-vs-limits explainer: the job is to move from requests to allocatable capacity, headroom, and a defendable node count in sequence/i,
+    /This is the Kubernetes node-sizing workflow page\. Its job is to move from requests to allocatable capacity, headroom, and a defendable node count in sequence/i,
   );
   assert.match(
     sizingWorkflowPage,

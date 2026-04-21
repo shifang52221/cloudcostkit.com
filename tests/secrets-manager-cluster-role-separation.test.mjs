@@ -2,9 +2,17 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const pricingPage = readFileSync(new URL("../src/pages/guides/aws-secrets-manager-pricing.astro", import.meta.url), "utf8");
-const estimatePage = readFileSync(new URL("../src/pages/guides/aws-secrets-manager-estimate-api-calls.astro", import.meta.url), "utf8");
-const optimizationPage = readFileSync(new URL("../src/pages/guides/aws-secrets-manager-cost-optimization.astro", import.meta.url), "utf8");
+const normalize = (value) => value.replace(/\s+/g, " ").trim();
+
+const pricingPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-secrets-manager-pricing.astro", import.meta.url), "utf8"),
+);
+const estimatePage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-secrets-manager-estimate-api-calls.astro", import.meta.url), "utf8"),
+);
+const optimizationPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-secrets-manager-cost-optimization.astro", import.meta.url), "utf8"),
+);
 
 test("pricing page is framed as the Secrets Manager bill-boundary page", () => {
   assert.match(

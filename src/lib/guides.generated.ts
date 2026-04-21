@@ -46,13 +46,15 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "API Gateway pricing: what to model (requests + transfer)",
-    "description": "A practical API Gateway pricing checklist: request charges, data transfer, and the add-ons that can show up on the bill.",
+    "description": "Model AWS API Gateway pricing across request charges, data transfer, logs, and adjacent add-ons, with a clearer checklist for what belongs in the API bill versus downstream systems.",
     "canonicalPath": "/guides/aws-api-gateway-pricing",
     "category": "AWS",
     "slug": "aws-api-gateway-pricing",
     "topics": [
       "egress",
-      "requests"
+      "logging",
+      "requests",
+      "storage"
     ]
   },
   {
@@ -99,7 +101,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS CloudTrail Pricing & Cost Guide",
-    "description": "CloudTrail cost model for management vs data events, Lake vs S3 logs, and pricing drivers with estimation steps.",
+    "description": "Model AWS CloudTrail cost across management vs data events, Lake vs S3 delivery paths, and downstream logging boundaries, with estimation steps for selector scope and audit growth.",
     "canonicalPath": "/guides/aws-cloudtrail-pricing",
     "category": "AWS",
     "slug": "aws-cloudtrail-pricing",
@@ -110,7 +112,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS CloudWatch Metrics Pricing & Cost Guide",
-    "description": "CloudWatch metrics cost model: custom metrics, API requests, dashboards, and retention.",
+    "description": "Model AWS CloudWatch metrics cost from custom metrics, API requests, dashboards, and retention, with guidance on bill boundaries, cardinality growth, and adjacent alarm spend.",
     "canonicalPath": "/guides/aws-cloudwatch-metrics-pricing",
     "category": "AWS",
     "slug": "aws-cloudwatch-metrics-pricing",
@@ -149,7 +151,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS ECS Pricing & Cost Guide (EC2 vs Fargate drivers)",
-    "description": "ECS cost model for compute, storage, and networking. Compare EC2 vs Fargate and identify real cost drivers.",
+    "description": "Model AWS ECS cost across compute, storage, networking, and adjacent runtime choices, with clearer guidance on how EC2 versus Fargate changes the real bill drivers.",
     "canonicalPath": "/guides/aws-ecs-pricing",
     "category": "AWS",
     "slug": "aws-ecs-pricing",
@@ -245,7 +247,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling",
-    "description": "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks. Includes baseline and peak DNS modeling steps.",
+    "description": "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks, with baseline and peak DNS modeling steps for retry storms, failovers, and health-check sprawl.",
     "canonicalPath": "/guides/aws-route-53-pricing",
     "category": "AWS",
     "slug": "aws-route-53-pricing",
@@ -575,7 +577,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "ECS EC2 vs Fargate Cost Comparison",
-    "description": "Compare ECS on EC2 vs Fargate using compute, storage, and networking drivers. When each model is cheaper.",
+    "description": "Compare ECS on EC2 versus Fargate using compute, storage, networking, and utilization drivers, with clearer guidance on when steady workloads beat spiky or operationally simpler ones.",
     "canonicalPath": "/guides/aws-ecs-ec2-vs-fargate-cost",
     "category": "AWS",
     "slug": "aws-ecs-ec2-vs-fargate-cost",
@@ -668,7 +670,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate CloudTrail Events per Month (cost planning)",
-    "description": "Methods to estimate CloudTrail event volume: Lake queries, S3 logs, and workload-driven approximations.",
+    "description": "Estimate AWS CloudTrail events per month using Lake queries, S3 log counts, and workload-driven approximations, with a clearer path to separate management, data, and busy-week volume.",
     "canonicalPath": "/guides/aws-cloudtrail-estimate-events",
     "category": "AWS",
     "slug": "aws-cloudtrail-estimate-events",
@@ -1150,7 +1152,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 Glacier Pricing & Cost Guide (storage, retrieval, Deep Archive)",
-    "description": "Practical S3 Glacier cost model: storage GB-month, retrieval volume and requests, and minimum duration fees.",
+    "description": "Practical S3 Glacier cost model covering storage GB-month, retrieval volume and requests, transition exposure, and minimum-duration fees, with clearer workflow boundaries for archive planning.",
     "canonicalPath": "/guides/aws-s3-glacier-pricing",
     "category": "AWS",
     "slug": "aws-s3-glacier-pricing",
@@ -1388,7 +1390,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Blob Storage pricing: a practical cost model",
-    "description": "Model Blob Storage cost without copying price tables: GB-month, operations, redundancy/replication, retrieval, and egress.",
+    "description": "Model Azure Blob Storage cost without copying price tables by separating GB-month, operations, redundancy, retrieval, and egress, with clearer guidance for replication-heavy and access-heavy workloads.",
     "canonicalPath": "/guides/azure-blob-storage-pricing",
     "category": "Azure",
     "slug": "azure-blob-storage-pricing",
@@ -1444,7 +1446,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Event Hubs Pricing Guide: Throughput, Retention, Replay, and Egress",
-    "description": "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress with a practical planning checklist.",
+    "description": "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress, with a practical checklist for validating burst traffic and downstream replay risk.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
@@ -1647,7 +1649,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate CDN Bandwidth (GB per month) from traffic",
-    "description": "Convert Mbps or RPS traffic into monthly CDN GB for cost models. Includes formulas, examples, and pitfalls.",
+    "description": "Convert Mbps or RPS traffic into monthly CDN bandwidth in GB, with formulas, examples, and pitfalls that help separate average delivery from peak-heavy edge traffic.",
     "canonicalPath": "/guides/estimate-cdn-bandwidth-gb-per-month",
     "category": "CDN",
     "slug": "estimate-cdn-bandwidth-gb-per-month",
@@ -1808,7 +1810,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "GCP Cloud Run Pricing Guide: Cost Calculator Inputs for Requests, CPU, and Egress",
-    "description": "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs. Includes practical calculator inputs and validation steps.",
+    "description": "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs, with practical calculator inputs and validation steps for retries, peak traffic, and noisy endpoints.",
     "canonicalPath": "/guides/gcp-cloud-run-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-run-pricing",
@@ -1821,12 +1823,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "GCP Cloud Storage Pricing & Cost Guide",
-    "description": "Understand Cloud Storage cost drivers: storage class, operations, retrieval, and egress with estimation steps.",
+    "description": "Understand GCP Cloud Storage cost drivers across storage class, operations, retrieval, replication, and egress, with estimation steps for request-heavy and archive-heavy workloads.",
     "canonicalPath": "/guides/gcp-cloud-storage-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-storage-pricing",
     "topics": [
       "egress",
+      "requests",
       "storage"
     ]
   },
@@ -2267,7 +2270,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Storage Costs Explained (GB-month, requests, retrieval)",
-    "description": "A practical storage cost model: GB-month, requests, retrieval, and transfer. Includes estimation checklist.",
+    "description": "Build a practical storage cost model across GB-month, requests, retrieval, replication, and transfer, with a parent-guide view that helps map the whole storage budget before narrower pages.",
     "canonicalPath": "/guides/storage-costs",
     "category": "Storage",
     "slug": "storage-costs",

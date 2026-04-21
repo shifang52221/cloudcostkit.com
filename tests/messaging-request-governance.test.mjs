@@ -19,16 +19,16 @@ test("messaging guide owns the event and delivery budgeting parent role", () => 
 });
 
 test("request-based pricing guide owns the generic request-math role", () => {
-  assert.match(requestGuide, /This is the generic request-math and billing-unit guide/i);
+  assert.match(requestGuide, /This is the billing page for request fees/i);
   assert.match(
     requestGuide,
-    /go back to the messaging parent page if the broader event and delivery budget is still unclear/i,
+    /go back to .*messaging costs.* before continuing with request math/i,
   );
 });
 
 test("requests-costs guide owns the lightweight routing hub role", () => {
-  assert.match(requestHub, /This is the lightweight request routing hub/i);
-  assert.match(requestHub, /Start with/i);
+  assert.match(requestHub, /This is the request boundary page/i);
+  assert.match(requestHub, /Choose your next step/i);
   assert.match(requestHub, /request-based-pricing/i);
   assert.match(requestHub, /full workflow/i);
 });

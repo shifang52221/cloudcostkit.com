@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS CloudTrail Pricing & Cost Guide";
 const description =
-  "CloudTrail cost model for management vs data events, Lake vs S3 logs, and pricing drivers with estimation steps.";
+  "Model AWS CloudTrail cost across management vs data events, Lake vs S3 delivery paths, and downstream logging boundaries, with estimation steps for selector scope and audit growth.";
 ---
 <GuideLayout
   title={title}
@@ -128,6 +128,18 @@ const description =
     <li>Reconcile your event assumptions against a measured monthly event model rather than a rough guess.</li>
     <li>Validate retention and query assumptions as downstream logging decisions, not hidden CloudTrail pricing inputs.</li>
     <li>Keep incident windows and automation spikes separate from normal budget assumptions.</li>
+  </ul>
+
+  <h2>Related operational guides</h2>
+  <ul>
+    <li>
+      <a href="/guides/aws-cloudwatch-metrics-pricing/">AWS CloudWatch metrics pricing</a>: useful when CloudTrail
+      alerts, dashboards, and CloudWatch-native monitoring belong in the same observability budget review.
+    </li>
+    <li>
+      <a href="/guides/aws-route-53-pricing/">AWS Route 53 pricing</a>: useful when incident traffic, DNS failover, or
+      routing changes are part of the same operational cost story.
+    </li>
   </ul>
 
   <h2>Sources</h2>

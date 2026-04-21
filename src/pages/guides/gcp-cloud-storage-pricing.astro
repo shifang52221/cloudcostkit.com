@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "GCP Cloud Storage Pricing & Cost Guide";
 const description =
-  "Understand Cloud Storage cost drivers: storage class, operations, retrieval, and egress with estimation steps.";
+  "Understand GCP Cloud Storage cost drivers across storage class, operations, retrieval, replication, and egress, with estimation steps for request-heavy and archive-heavy workloads.";
 
 const faqs = [
   {
@@ -154,6 +154,18 @@ const faqs = [
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Egress</a>
     <a class="btn" href="/guides/network-transfer-costs/">Network transfer costs</a>
   </div>
+
+  <h2>Related GCP service guides</h2>
+  <ul>
+    <li>
+      <a href="/guides/gcp-cloud-run-pricing/">GCP Cloud Run pricing</a>: useful when object delivery, response bytes,
+      or serverless asset handling belong in the same workload review.
+    </li>
+    <li>
+      <a href="/guides/gcp-cloud-sql-pricing/">GCP Cloud SQL pricing</a>: useful when export, backup, or application
+      data flows move storage and database spend together.
+    </li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>

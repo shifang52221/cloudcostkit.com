@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "GCP Cloud Run Pricing Guide: Cost Calculator Inputs for Requests, CPU, and Egress";
 const description =
-  "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs. Includes practical calculator inputs and validation steps.";
+  "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs, with practical calculator inputs and validation steps for retries, peak traffic, and noisy endpoints.";
 
 const faqs = [
   {
@@ -186,6 +186,18 @@ const faqs = [
     with the <a href="/guides/cloud-cost-estimation-checklist/">cloud cost estimation checklist</a> so your estimate is
     tied to measurable inputs and a validation step.
   </p>
+
+  <h2>Related GCP service guides</h2>
+  <ul>
+    <li>
+      <a href="/guides/gcp-cloud-sql-pricing/">GCP Cloud SQL pricing</a>: useful when Cloud Run traffic, connection
+      patterns, or background jobs move database capacity and backup costs at the same time.
+    </li>
+    <li>
+      <a href="/guides/gcp-cloud-storage-pricing/">GCP Cloud Storage pricing</a>: useful when response transfer,
+      stored assets, or archive flows shape the broader service bill.
+    </li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>

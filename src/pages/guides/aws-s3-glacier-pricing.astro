@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 Glacier Pricing & Cost Guide (storage, retrieval, Deep Archive)";
 const description =
-  "Practical S3 Glacier cost model: storage GB-month, retrieval volume and requests, and minimum duration fees.";
+  "Practical S3 Glacier cost model covering storage GB-month, retrieval volume and requests, transition exposure, and minimum-duration fees, with clearer workflow boundaries for archive planning.";
 ---
 <GuideLayout
   title={title}
@@ -92,6 +92,22 @@ const description =
     <a class="btn" href="/calculators/aws-s3-glacier-cost-calculator/">Archive cost</a>
     <a class="btn" href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate retrieval</a>
   </div>
+
+  <h2>Related Glacier workflow pages</h2>
+  <ul>
+    <li>
+      <a href="/guides/aws-s3-glacier-estimate-retrieval/">Estimate Glacier retrieval</a>: use this when you still need
+      defendable restore GB, request counts, and peak retrieval windows.
+    </li>
+    <li>
+      <a href="/guides/aws-s3-glacier-retrieval-pricing/">Glacier retrieval pricing</a>: use this when retrieval fees
+      are the main cost question rather than total archive ownership.
+    </li>
+    <li>
+      <a href="/guides/s3-to-glacier-transfer-cost/">S3 to Glacier transfer cost</a>: use this when lifecycle
+      transitions and archive movement are shaping the bill before restore even begins.
+    </li>
+  </ul>
 
   <h2>Validation checklist</h2>
   <ul>

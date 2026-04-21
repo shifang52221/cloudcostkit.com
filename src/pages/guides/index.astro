@@ -7,7 +7,7 @@ import { withTrailingSlash } from "../../lib/url";
 
 const title = `Guides | ${SITE.name}`;
 const description =
-  "Practical guides for estimating cloud spend: egress, logs, storage, networking, CDN, and Kubernetes capacity.";
+  "Practical cloud cost guides for AWS, Azure, and GCP covering egress, logs, storage, networking, CDN, Kubernetes, and managed-service pricing with estimation workflows and validation checklists.";
 const slots = SITE.adsenseSlots;
 
 const grouped = GUIDES.reduce<Record<string, typeof GUIDES>>((acc, g) => {
@@ -24,7 +24,7 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
       <a class="btn btn-primary" href="/guides/gcp-cloud-run-pricing/">Cloud Run pricing</a>
       <a class="btn" href="/guides/azure-container-registry-pricing/">ACR pricing</a>
       <a class="btn" href="/guides/azure-event-hubs-pricing/">Event Hubs pricing</a>
-      <a class="btn" href="/guides/cdn-costs/">CDN cost guide</a>
+      <a class="btn" href="/guides/azure-load-balancer-pricing/">Azure Load Balancer pricing</a>
     </div>
   </section>
 
@@ -43,9 +43,35 @@ const categories = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)
         <div class="tool-title">Azure Event Hubs pricing</div>
         <div class="tool-desc">Useful for bytes, retention, replays, and consumer-side multiplier thinking.</div>
       </a>
-      <a class="card2 tool col-6" href="/guides/egress-costs/">
-        <div class="tool-title">Egress costs</div>
-        <div class="tool-desc">Useful when transfer charges are showing up but the boundary is still unclear.</div>
+      <a class="card2 tool col-6" href="/guides/azure-load-balancer-pricing/">
+        <div class="tool-title">Azure Load Balancer pricing</div>
+        <div class="tool-desc">Useful when hours, processed traffic, and internet-facing transfer need to stay separate.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="card section prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Fast-moving service pages</h2>
+    <p class="muted" style="margin:10px 0 0">
+      These service-specific pages are already showing strong search traction, so they deserve direct guide-hub
+      placement instead of being left inside broad category browsing.
+    </p>
+    <div class="grid" style="margin-top:10px">
+      <a class="card2 tool col-6" href="/guides/aws-cloudtrail-pricing/">
+        <div class="tool-title">AWS CloudTrail pricing</div>
+        <div class="tool-desc">Model management vs data events, then separate downstream storage and scan costs.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-cloudwatch-metrics-pricing/">
+        <div class="tool-title">AWS CloudWatch metrics pricing</div>
+        <div class="tool-desc">Useful when custom metric cardinality, API polling, and dashboard cost all need to stay visible.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-route-53-pricing/">
+        <div class="tool-title">AWS Route 53 pricing</div>
+        <div class="tool-desc">Strong fit for DNS query, hosted zone, and health-check budgeting questions.</div>
+      </a>
+      <a class="card2 tool col-6" href="/guides/aws-s3-glacier-pricing/">
+        <div class="tool-title">AWS S3 Glacier pricing</div>
+        <div class="tool-desc">Useful for archive storage, retrieval, request, and minimum-duration tradeoff planning.</div>
       </a>
     </div>
   </section>

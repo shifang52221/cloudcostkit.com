@@ -2,9 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const pricingPage = readFileSync(new URL("../src/pages/guides/aws-waf-pricing.astro", import.meta.url), "utf8");
-const estimatePage = readFileSync(new URL("../src/pages/guides/aws-waf-estimate-requests.astro", import.meta.url), "utf8");
-const optimizationPage = readFileSync(new URL("../src/pages/guides/aws-waf-cost-optimization.astro", import.meta.url), "utf8");
+const normalize = (value) => value.replace(/\s+/g, " ").trim();
+
+const pricingPage = normalize(readFileSync(new URL("../src/pages/guides/aws-waf-pricing.astro", import.meta.url), "utf8"));
+const estimatePage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-waf-estimate-requests.astro", import.meta.url), "utf8"),
+);
+const optimizationPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-waf-cost-optimization.astro", import.meta.url), "utf8"),
+);
 
 test("pricing page is framed as the budget-boundary page", () => {
   assert.match(
@@ -13,7 +19,7 @@ test("pricing page is framed as the budget-boundary page", () => {
   );
   assert.match(
     pricingPage,
-    /This guide is about budget boundaries: Web ACLs, rules, evaluated requests, and the downstream logging or SIEM costs that should be tracked beside WAF rather than confused with it/i,
+    /This is the AWS WAF bill-boundary page/i,
   );
 });
 

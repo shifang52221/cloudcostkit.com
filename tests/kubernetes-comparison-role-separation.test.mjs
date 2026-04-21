@@ -15,7 +15,7 @@ const crossCloudComparisonPage = normalize(
 test("kubernetes costs page is framed as the navigation hub", () => {
   assert.match(
     hubPage,
-    /This page is the Kubernetes cost navigation hub, not the provider-specific pricing page or the platform-comparison page: the job is to route you from generic cluster budgeting to the right next guide before you overfit one estimate/i,
+    /This is the Kubernetes system budgeting parent page inside the broader compute hierarchy\. Use it before you optimize node count, non-node completeness, or platform comparisons in isolation/i,
   );
   assert.match(
     hubPage,

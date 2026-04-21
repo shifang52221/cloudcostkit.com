@@ -4,7 +4,7 @@ import { UnitConverterCalculator } from "../../components/calculators/UnitConver
 
 const title = "Cloud Units Converter";
 const description =
-  "Convert GB to GiB and Mbps to MB/s, plus estimate monthly transfer from throughput, utilization, hours/day, and days/month, with baseline vs peak scenarios. Educational use only.";
+  "Convert cloud billing units like GB and GiB or Mbps and MB/s, then estimate monthly transfer from throughput, utilization, and schedule assumptions without mixing decimal and binary units.";
 ---
 <CalculatorLayout
   title={title}
@@ -51,39 +51,40 @@ const description =
 >
   <UnitConverterCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">Where unit mistakes distort cloud bills</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is not just a convenience converter. It helps prevent the small unit mismatches that quietly break
+      egress, storage, and request-based models before the pricing math even starts.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>GB vs GiB</strong>: storage bills often use decimal units while system dashboards show binary units.</li>
+      <li><strong>Mbps vs MB/s</strong>: throughput charts use bits while payload and transfer planning often need bytes.</li>
+      <li><strong>Hours and utilization</strong>: monthly transfer estimates drift when teams start from peak throughput instead of sustained usage.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>How to convert throughput into monthly transfer</h2>
+    <p class="muted" style="margin-top:8px">
+      Throughput-based budgeting works only when you explicitly separate the sustained rate from the short-lived peak.
+      This page gives you a quick bridge between those two views.
+    </p>
     <ul>
-      <li>GB vs GiB differences matter for storage bills; Mbps vs MB/s matters for throughput charts.</li>
-      <li>Monthly transfer uses utilization and time windows, not peak Mbps.</li>
+      <li>Start from average throughput, not the highest spike visible in a dashboard.</li>
+      <li>Apply utilization and schedule assumptions that match the real service window.</li>
+      <li>Keep bits and bytes explicit so the conversion does not silently drift by 8x.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>When the “average Mbps” shortcut fails</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Download-heavy releases and cache misses can make the peak month look nothing like baseline.</li>
+      <li>Short business-hour workloads should not be modeled as 24x7 traffic.</li>
+      <li>Switching between GB and GiB mid-estimate makes later storage and transfer lines impossible to reconcile.</li>
     </ul>
 
-    <h2>Input checklist</h2>
+    <h2>Quick unit checklist before you trust the output</h2>
     <ul>
       <li>Confirm whether dashboards report GB or GiB before converting.</li>
       <li>Use average throughput, not peak, when estimating monthly transfer.</li>
       <li>Match hours/day to real schedules (not always 24x7).</li>
-    </ul>
-
-    
-
-    <h2>Advanced inputs to capture</h2>
-    <ul>
-      <li>Confirm billing units first (GB vs GiB) before converting.</li>
-      <li>Use average throughput and utilization, not peak.</li>
-      <li>Match hours per day and days per month to real schedules.</li>
       <li>Keep bits vs bytes explicit when converting Mbps to MB/s.</li>
     </ul>
 
@@ -112,12 +113,6 @@ const description =
         </tr>
       </tbody>
     </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

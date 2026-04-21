@@ -4,7 +4,7 @@ import { ReservedBreakEvenCalculator } from "../../components/calculators/Reserv
 
 const title = "Reserved vs On-demand Break-even Calculator";
 const description =
-  "Estimate the break-even usage where a committed rate beats on-demand, given hourly pricing and upfront costs using hours/day and days/month, with baseline vs peak scenarios. Educational use only.";
+  "Estimate when a committed compute rate beats on-demand pricing by comparing hourly savings, upfront cost, and expected usage patterns across baseline and higher-utilization scenarios.";
 ---
 <CalculatorLayout
   title={title}
@@ -51,26 +51,60 @@ const description =
 >
   <ReservedBreakEvenCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to get your inputs</h2>
+    <h2 style="margin-top:0">What a break-even calculator can and cannot tell you</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is useful when you already have candidate on-demand and committed rates and want to know how much usage
+      it takes for the commitment to win. It does not decide whether the commitment is strategically wise on its own.
+    </p>
     <ul>
-      <li><strong>Inputs</strong>: use billing exports, metrics, or logs to get real counts/GB where possible.</li>
-      <li><strong>Units</strong>: convert throughput (Mbps) or rates (RPS) into monthly units when needed.</li>
-      <li><strong>Scenarios</strong>: build a baseline and a high-usage scenario to avoid under-budgeting.</li>
+      <li><strong>Good fit</strong>: comparing two pricing shapes for the same workload and utilization pattern.</li>
+      <li><strong>Bad fit</strong>: deciding term length, discount-rate assumptions, or flexibility tradeoffs without a broader ROI model.</li>
+      <li><strong>Most useful output</strong>: how sensitive payback is when usage drops below the expected baseline.</li>
     </ul>
 
-    <h2>Result interpretation</h2>
+    <h2>Inputs that change the payback story fastest</h2>
     <ul>
-      <li>Break-even depends on utilization; lower utilization pushes payback out.</li>
-      <li>If break-even is longer than your expected lifetime, keep on-demand.</li>
+      <li><strong>Hourly spread</strong>: small rate gaps make upfront cost harder to recover.</li>
+      <li><strong>Real billable hours</strong>: overestimating uptime is the fastest way to fake an attractive payback.</li>
+      <li><strong>Workload lifetime</strong>: break-even after the project ends is not a real savings story.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2>When commitments look cheaper on paper but lose in practice</h2>
     <ul>
-      <li>Using a single average and ignoring peak/incident scenarios.</li>
-      <li>Double-counting or missing adjacent line items (transfer, logs, retries).</li>
+      <li>Using 24x7 hours for a workload that only runs part of the day.</li>
+      <li>Ignoring the cost of being locked into capacity you may not keep using.</li>
+      <li>Comparing different workload shapes instead of the same underlying demand profile.</li>
     </ul>
 
-    <h2>Scenario planning</h2>
+    <h2>A quick sensitivity table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Input</th>
+          <th>If it rises</th>
+          <th>Why it matters</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hours per day</td>
+          <td>Payback gets faster</td>
+          <td>More runtime means more hourly savings to recover upfront cost</td>
+        </tr>
+        <tr>
+          <td>Upfront payment</td>
+          <td>Payback gets slower</td>
+          <td>You need more saved hours before the commitment wins</td>
+        </tr>
+        <tr>
+          <td>Hourly rate gap</td>
+          <td>Payback gets faster</td>
+          <td>A wider spread makes each billable hour more valuable</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Scenario planning with actual hours</h2>
     <table>
       <thead>
         <tr>
@@ -95,12 +129,6 @@ const description =
         </tr>
       </tbody>
     </table>
-
-    <h2>Validate after changes</h2>
-    <ul>
-      <li>Compare your estimate to the first real bill and adjust assumptions.</li>
-      <li>Track the primary driver metric (requests/GB/count) over time.</li>
-    </ul>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

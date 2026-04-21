@@ -4,7 +4,7 @@ import { AwsWafRequestEstimator as AwsWafRequestEstimatorComponent } from "../..
 
 const title = "WAF Request Volume Estimator (Baseline + Attack)";
 const description =
-  "Estimate WAF evaluated request volume from baseline RPS, attack spikes, and monthly duration so you can budget request-based charges. Educational use only.";
+  "Estimate WAF evaluated request volume from normal traffic, blocked traffic, and attack windows so the security-month baseline is not distorted by calm-day averages.";
 ---
 <CalculatorLayout
   title={title}
