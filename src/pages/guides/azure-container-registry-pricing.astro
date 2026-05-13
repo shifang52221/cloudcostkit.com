@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Container Registry Pricing Guide: ACR Cost by Tier and Usage";
+const title = "Azure Container Registry Pricing: Understand storage, image pulls, geo-replication, and tier tradeoffs";
 const description =
-  "Model Azure Container Registry cost from storage, pull volume, and egress. Compare Basic, Standard, and Premium with practical calculator-ready inputs.";
+  "Understand Azure Container Registry pricing through stored layers, pull churn during deploys, geo-replication, transfer paths, and the real Standard-versus-Premium tradeoffs you can validate before budgeting.";
 
 const faqs = [
   {
@@ -37,11 +37,15 @@ const faqs = [
 >
   <p>
     If you are evaluating Azure Container Registry for real production usage, the cleanest starting point is not the
-    tier table by itself. It is the workload around the registry. ACR cost is usually shaped by four things that belong
-    in the same estimate: stored image data, pull behavior, billed transfer paths, and the operational reasons a team
-    moves from Basic to Standard or Premium. Most cost surprises do not come from the list price of the tier. They come
-    from retention drift, pull storms during CI or node churn, and cross-region patterns that were never modeled as
-    billable transfer.
+    tier table by itself. The real budgeting decision is usually whether your registry problem is storage growth, pull
+    pressure, or cross-region delivery. ACR cost is usually shaped by four things that belong in the same estimate:
+    stored image data, pull behavior, billed transfer paths, and the operational reasons a team moves from Basic to
+    Standard or Premium. Most cost surprises do not come from the list price of the tier. They come from retention
+    drift, pull storms during CI or node churn, and cross-region patterns that were never modeled as billable transfer.
+  </p>
+  <p>
+    Use this page when you need to show whether ACR spend is really coming from stored layers, pull churn during
+    deploys, cross-region delivery, or the capability jump from Standard to Premium.
   </p>
 
   <h2>What the ACR tier changes, and what it does not</h2>

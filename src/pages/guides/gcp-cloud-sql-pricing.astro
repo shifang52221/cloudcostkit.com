@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Cloud SQL pricing: instance-hours, storage, backups, and network (practical estimate)";
 const description =
-  "A driver-based Cloud SQL estimate: instance-hours (HA + replicas), storage GB-month, backups/retention, and data transfer. Includes a worked template, common pitfalls, and validation steps for peak sizing and growth.";
+  "A driver-based Cloud SQL estimate that separates provisioned capacity, storage and backup growth, and network-sensitive access patterns, with validation steps for HA sizing and transfer risk.";
 
 const faqs = [
   {
@@ -26,8 +26,11 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-sql-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p>
-    Cloud SQL cost is easiest to estimate when you treat it as "capacity + data": instance-hours for compute, GB-month for
-    storage and backups, and a separate transfer line item when clients are cross-region or external.
+    Cloud SQL cost is easiest to estimate when you treat it as "capacity + data", but the first budgeting decision is
+    whether Cloud SQL spend is mainly a provisioned-capacity problem, a storage-and-backup growth problem, or a
+    network-bound access pattern. Once that split is clear, the estimate becomes much more reliable: instance-hours for
+    compute, GB-month for storage and backups, and a separate transfer line item when clients are cross-region or
+    external.
   </p>
 
   <h2>0) What to measure (inputs you can actually validate)</h2>

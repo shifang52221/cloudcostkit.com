@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling";
 const description =
-  "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks, with baseline and peak DNS modeling steps for retry storms, failovers, and health-check sprawl.";
+  "Estimate AWS Route 53 cost by separating query-led spend, hosted-zone baseline, and health-check sprawl, with baseline and peak DNS modeling for failovers and retry storms.";
 ---
 <GuideLayout
   title={title}
@@ -30,7 +30,7 @@ const description =
   ]}
 >
   <p>
-    Use this page when you need to decide what belongs inside the Route 53 bill before you debate TTL tuning or query reduction.
+    Use this page when you need to decide what belongs inside the Route 53 bill before you debate TTL tuning or query reduction. The first budgeting decision is whether Route 53 spend is mainly query-led, zone-led, or health-check-led.
   </p>
   <p class="muted">
     This guide is about bill boundaries: hosted zones, DNS queries, health checks, and the adjacent resolver, CDN, and incident-side costs that should be tracked beside Route 53 rather than blended into it.

@@ -27,6 +27,9 @@ const description =
   <p>
     If you are still deciding which line items belong inside the CloudWatch metrics bill, go back to the pricing guide first.
   </p>
+  <p class="muted">
+    Before you trust the active-series model, show which namespaces are truly custom, which dimensions only restate infrastructure identity, and which exporter or dashboard habits would make the same metric family appear larger than the billable CloudWatch series count.
+  </p>
 
   <h2>Evidence pack before you estimate anything</h2>
   <ul>
@@ -133,6 +136,9 @@ const description =
     <li>Confirm you don't have duplicated exporters emitting equivalent series.</li>
     <li>Once deployed, compare estimate vs measured active series from a real week.</li>
   </ul>
+  <p class="muted">
+    You are ready to hand this estimate to pricing or optimization only when another reviewer can see the baseline series, the main cardinality multiplier, and the small set of dimensions most likely to change next month if the system grows.
+  </p>
 
   <h2>Sources</h2>
   <ul>

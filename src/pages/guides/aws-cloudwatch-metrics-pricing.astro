@@ -27,6 +27,9 @@ const description =
   <p class="muted">
     This guide is about bill boundaries: custom metrics, high-resolution metrics, metrics API requests, dashboards, and the adjacent alarm and external observability costs that should be tracked beside the metrics bill rather than blended into it.
   </p>
+  <p class="muted">
+    If two teams publish similar dashboards but only one team owns the custom metrics explosion, this page should help you keep the CloudWatch-native bill attached to the publisher instead of hiding it inside a shared observability bucket.
+  </p>
 
   <h2>Inside the metrics bill vs beside the metrics bill</h2>
   <ul>
@@ -120,6 +123,9 @@ const description =
     <li>Validate dashboard, request, and alarm ownership before comparing teams or environments.</li>
     <li>Keep growth windows separate from normal budgeting assumptions.</li>
   </ul>
+  <p class="muted">
+    Before you compare environments or teams, verify which request volume is truly CloudWatch-native, which refresh behavior comes from dashboards, and which access pattern starts only after another observability tool begins polling the same metrics.
+  </p>
 
   <h2>Related operational guides</h2>
   <ul>

@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Origin egress vs CDN bandwidth: what's the difference?";
 const description =
-  "CDN bills often have two related but different bandwidth concepts: origin egress (from your origin) and CDN bandwidth (to end users). Learn how to model both without double-counting.";
+  "Separate CDN edge delivery from origin cache-fill traffic so you can see whether the delivery bill really belongs on the CDN, the origin, or both without double-counting.";
 const faqs = [
   {
     q: "Can origin egress be higher than CDN bandwidth?",
@@ -27,9 +27,11 @@ const faqs = [
     explain why CDN bandwidth and origin egress are related but different cost surfaces.
   </p>
   <p>
-    If you are building a <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a> model, the easiest mistake
-    is mixing up two similar-sounding line items: <strong>origin egress</strong> and <strong>CDN bandwidth</strong>.
-    They are related, but they are not the same thing.
+    If you are building a <a href="/calculators/cdn-cost-calculator/">CDN cost calculator</a> model, the first
+    budgeting decision is whether the delivery bill mostly belongs on the CDN edge or on the origin because cache-fill
+    traffic is still too heavy. The easiest mistake is mixing up two similar-sounding line items:
+    <strong>origin egress</strong> and <strong>CDN bandwidth</strong>. They are related, but they are not the same
+    thing.
   </p>
   <p class="muted">
     If you need the full CDN delivery model after this distinction is clear, go back to the CDN pricing guide; if you

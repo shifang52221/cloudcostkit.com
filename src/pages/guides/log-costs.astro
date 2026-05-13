@@ -5,7 +5,7 @@ import { withTrailingSlash } from "../../lib/url";
 
 const title = "Log costs explained: ingestion, retention, scan, and incident spikes";
 const description =
-  "Estimate log costs from ingestion volume, retention, and query or scan fees, with practical guidance for noisy sources, retention tiers, and incident-time query spikes.";
+  "Estimate log costs by separating ingestion volume, retention exposure, and incident-time query behavior, with practical guidance for noisy sources and repeated wide-window scans.";
 const faqs = [
   {
     q: "What are the main drivers of log cost?",
@@ -37,6 +37,11 @@ const loggingGuides = GUIDES.filter((g) => (g.topics || []).includes("logging") 
     Most log platforms charge for <strong>ingestion</strong> (GB ingested), <strong>retention</strong> (stored GB-month),
     and sometimes <strong>scan/search</strong> (GB scanned by queries). If your bill surprised you, it's usually because
     volume, retention, or query behavior drifted upward. This is the log ingestion, retention, and scan economics page.
+  </p>
+
+  <p>
+    The first budgeting decision is whether the log bill is mainly an ingestion problem, a retention problem, or an
+    incident-time search problem. Once that split is clear, the right lever usually becomes obvious much faster.
   </p>
 
   <p class="muted">

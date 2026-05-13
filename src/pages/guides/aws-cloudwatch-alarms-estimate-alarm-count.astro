@@ -27,6 +27,9 @@ const description =
   <p>
     If you are still deciding which line items belong inside the CloudWatch alarms bill, go back to the pricing guide first.
   </p>
+  <p class="muted">
+    Before you trust the alarm-month estimate, show which alarms come from intentional coverage, which arrive automatically from template expansion, and which only exist because ephemeral environments inherit the full production alarm pack.
+  </p>
 
   <h2>Evidence pack before you estimate anything</h2>
   <ul>
@@ -144,6 +147,9 @@ const description =
     <li>Pro-rate ephemeral environments by days active per month.</li>
     <li>Identify scaling multipliers (fleet size, tenants, regions) and model baseline versus busy-month scenarios.</li>
   </ul>
+  <p class="muted">
+    This inventory model is ready to hand off only when another reviewer can identify the baseline alarm set, the main growth multiplier, and the specific environments or rollout habits that would change the next month's alarm count without changing alert quality.
+  </p>
 
   <h2>Sources</h2>
   <ul>

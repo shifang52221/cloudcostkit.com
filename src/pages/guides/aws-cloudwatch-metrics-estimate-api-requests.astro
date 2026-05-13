@@ -78,6 +78,11 @@ const description =
     During incidents, engineers open multiple dashboards and run many ad-hoc investigations. For planning, include a
     “busy day” factor (for example, 5–10× normal dashboard views).
   </p>
+  <p class="muted">
+    Before you trust the request model, show which calls come from human dashboard sessions, which come from always-on
+    wallboards or NOC displays, and which only appear because external tooling polls CloudWatch on its own refresh loop
+    instead of reusing cached results.
+  </p>
 
   <h2>Worked example (order-of-magnitude)</h2>
   <ul>
@@ -106,6 +111,10 @@ const description =
   </div>
 
   <h2>Validation checklist</h2>
+  <p class="muted">
+    This estimate is ready to hand off only when another reviewer can identify the steady polling baseline, the main
+    incident multiplier, and the small set of callers most likely to change next month's API request volume.
+  </p>
   <ul>
     <li>Measure a real week of metrics API request counts and compare to the model.</li>
     <li>Identify “always-on” polling (wallboards and NOC screens) and quantify their refresh intervals.</li>

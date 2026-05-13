@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 Glacier Pricing & Cost Guide (storage, retrieval, Deep Archive)";
 const description =
-  "Practical S3 Glacier cost model covering storage GB-month, retrieval volume and requests, transition exposure, and minimum-duration fees, with clearer workflow boundaries for archive planning.";
+  "Practical S3 Glacier cost model that separates quiet archive storage, retrieval volume, and small-object request exposure, with workflow boundaries for archive planning and restore-heavy months.";
 ---
 <GuideLayout
   title={title}
@@ -31,6 +31,9 @@ const description =
 >
   <p>
     Use this page when you need to decide what belongs inside the archive bill before you debate restore batching, object repackaging, or tier changes.
+  </p>
+  <p>
+    The first budgeting decision is whether the archive bill is mainly a quiet-storage problem, a retrieval-volume problem, or a small-object request problem.
   </p>
   <p class="muted">
     This guide is about bill boundaries: stored GB-month, retrieval GB, retrieval requests, transition exposure, minimum-duration exposure, and the adjacent compute, analysis-copy, or workflow costs that should be tracked beside the archive bill rather than blended into it.

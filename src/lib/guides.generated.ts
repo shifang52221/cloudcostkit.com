@@ -87,14 +87,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Aurora Serverless v2 pricing: how to estimate ACUs and avoid surprise bills",
-    "description": "A practical way to estimate Aurora Serverless v2 costs: ACU-hours, storage GB-month, backups/retention, and how to model peaks so your estimate survives real traffic.",
+    "description": "A practical way to estimate Aurora Serverless v2 costs by separating minimum-capacity baseline exposure from repeated peak windows, then layering in storage and backup retention.",
     "canonicalPath": "/guides/aws-aurora-serverless-v2-pricing",
     "category": "AWS",
     "slug": "aws-aurora-serverless-v2-pricing",
     "topics": [
       "backup",
       "database",
-      "kubernetes",
       "serverless",
       "storage"
     ]
@@ -247,7 +246,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling",
-    "description": "Estimate AWS Route 53 cost from hosted zones, DNS query volume, and health checks, with baseline and peak DNS modeling steps for retry storms, failovers, and health-check sprawl.",
+    "description": "Estimate AWS Route 53 cost by separating query-led spend, hosted-zone baseline, and health-check sprawl, with baseline and peak DNS modeling for failovers and retry storms.",
     "canonicalPath": "/guides/aws-route-53-pricing",
     "category": "AWS",
     "slug": "aws-route-53-pricing",
@@ -324,7 +323,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "CloudFront invalidation pricing: when it matters and how to estimate",
-    "description": "A practical guide to CloudFront invalidation costs: what to count, why broad invalidations reduce cache hit rate, and safer cache-busting patterns that avoid repeated invalidations.",
+    "description": "A practical guide to CloudFront invalidation cost that separates direct invalidation charges from the larger hit-rate and origin side effects caused by broad purge behavior.",
     "canonicalPath": "/guides/aws-cloudfront-invalidation-pricing",
     "category": "AWS",
     "slug": "aws-cloudfront-invalidation-pricing",
@@ -1152,7 +1151,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 Glacier Pricing & Cost Guide (storage, retrieval, Deep Archive)",
-    "description": "Practical S3 Glacier cost model covering storage GB-month, retrieval volume and requests, transition exposure, and minimum-duration fees, with clearer workflow boundaries for archive planning.",
+    "description": "Practical S3 Glacier cost model that separates quiet archive storage, retrieval volume, and small-object request exposure, with workflow boundaries for archive planning and restore-heavy months.",
     "canonicalPath": "/guides/aws-s3-glacier-pricing",
     "category": "AWS",
     "slug": "aws-s3-glacier-pricing",
@@ -1412,8 +1411,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Container Registry Pricing Guide: ACR Cost by Tier and Usage",
-    "description": "Model Azure Container Registry cost from storage, pull volume, and egress. Compare Basic, Standard, and Premium with practical calculator-ready inputs.",
+    "title": "Azure Container Registry Pricing: Understand storage, image pulls, geo-replication, and tier tradeoffs",
+    "description": "Understand Azure Container Registry pricing through stored layers, pull churn during deploys, geo-replication, transfer paths, and the real Standard-versus-Premium tradeoffs you can validate before budgeting.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
     "slug": "azure-container-registry-pricing",
@@ -1445,14 +1444,13 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Event Hubs Pricing Guide: Throughput, Retention, Replay, and Egress",
-    "description": "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress, with a practical checklist for validating burst traffic and downstream replay risk.",
+    "title": "Azure Event Hubs Pricing: Model ingress, retention, replay, and burst-throughput cost",
+    "description": "Model Azure Event Hubs pricing around ingress bytes, retained history, consumer rereads, burst-throughput windows, and downstream replay exposure so the stream budget survives calm days and incident periods.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
     "topics": [
       "backup",
-      "egress",
       "messaging"
     ]
   },
@@ -1660,7 +1658,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Origin egress vs CDN bandwidth: what's the difference?",
-    "description": "CDN bills often have two related but different bandwidth concepts: origin egress (from your origin) and CDN bandwidth (to end users). Learn how to model both without double-counting.",
+    "description": "Separate CDN edge delivery from origin cache-fill traffic so you can see whether the delivery bill really belongs on the CDN, the origin, or both without double-counting.",
     "canonicalPath": "/guides/origin-egress-vs-cdn-bandwidth",
     "category": "CDN",
     "slug": "origin-egress-vs-cdn-bandwidth",
@@ -1717,7 +1715,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Cloud CDN pricing (GCP): bandwidth, requests, and origin egress (cache fill)",
-    "description": "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate by path, heavy-tail endpoints, and purge/deploy events that reduce hit rate.",
+    "description": "A practical Cloud CDN cost model that separates edge bandwidth, request shape, and origin cache-fill pressure, with validation steps for hit rate by path and purge-driven miss spikes.",
     "canonicalPath": "/guides/gcp-cloud-cdn-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-cdn-pricing",
@@ -1741,14 +1739,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Cloud Logging pricing (GCP): ingestion, retention, and query scans",
-    "description": "A practical model for Cloud Logging costs: GB ingested, retention storage (GB-month), and query/scan behavior. Includes a fast method to estimate GB/day from events/sec × bytes/event and a checklist to find dominant sources.",
+    "description": "A practical Cloud Logging cost model that separates noisy ingestion, retention exposure, and repeated scan behavior, with a fast way to estimate GB/day and validate dominant log sources.",
     "canonicalPath": "/guides/gcp-cloud-logging-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-logging-pricing",
     "topics": [
       "backup",
-      "logging",
-      "storage"
+      "logging"
     ]
   },
   {
@@ -1784,7 +1781,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Cloud SQL pricing: instance-hours, storage, backups, and network (practical estimate)",
-    "description": "A driver-based Cloud SQL estimate: instance-hours (HA + replicas), storage GB-month, backups/retention, and data transfer. Includes a worked template, common pitfalls, and validation steps for peak sizing and growth.",
+    "description": "A driver-based Cloud SQL estimate that separates provisioned capacity, storage and backup growth, and network-sensitive access patterns, with validation steps for HA sizing and transfer risk.",
     "canonicalPath": "/guides/gcp-cloud-sql-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-sql-pricing",
@@ -1809,8 +1806,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "GCP Cloud Run Pricing Guide: Cost Calculator Inputs for Requests, CPU, and Egress",
-    "description": "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs, with practical calculator inputs and validation steps for retries, peak traffic, and noisy endpoints.",
+    "title": "GCP Cloud Run Pricing: Estimate requests, CPU-seconds, memory-seconds, concurrency, and egress",
+    "description": "Estimate Cloud Run pricing from requests, CPU-seconds, memory-seconds, concurrency behavior, egress, and logs so you can explain whether spend is coming from scale, slow handlers, retries, or large responses.",
     "canonicalPath": "/guides/gcp-cloud-run-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-run-pricing",
@@ -2153,7 +2150,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Log costs explained: ingestion, retention, scan, and incident spikes",
-    "description": "Estimate log costs from ingestion volume, retention, and query or scan fees, with practical guidance for noisy sources, retention tiers, and incident-time query spikes.",
+    "description": "Estimate log costs by separating ingestion volume, retention exposure, and incident-time query behavior, with practical guidance for noisy sources and repeated wide-window scans.",
     "canonicalPath": "/guides/log-costs",
     "category": "Logging",
     "slug": "log-costs",

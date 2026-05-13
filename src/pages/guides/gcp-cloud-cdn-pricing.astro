@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Cloud CDN pricing (GCP): bandwidth, requests, and origin egress (cache fill)";
 const description =
-  "A practical Cloud CDN cost model: edge bandwidth, request volume, and origin egress (cache fill). Includes validation steps for hit rate by path, heavy-tail endpoints, and purge/deploy events that reduce hit rate.";
+  "A practical Cloud CDN cost model that separates edge bandwidth, request shape, and origin cache-fill pressure, with validation steps for hit rate by path and purge-driven miss spikes.";
 
 const faqs = [
   {
@@ -32,9 +32,10 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    Cloud CDN pricing becomes predictable when you break it into three drivers: <strong>edge bandwidth</strong>,{" "}
-    <strong>edge requests</strong>, and <strong>origin egress (cache fill)</strong>. Most surprise bills are caused by cache
-    misses and cold-cache events, not by steady-state hits.
+    Cloud CDN pricing becomes predictable when you break it into three drivers, but the real budgeting decision is
+    whether Cloud CDN cost is mainly an edge bandwidth problem, a request-shape problem, or a cache-fill problem
+    caused by weak hit rate. Most surprise bills are caused by cache misses and cold-cache events, not by steady-state
+    hits.
   </p>
 
   <h2>0) Define the boundary (edge vs origin)</h2>

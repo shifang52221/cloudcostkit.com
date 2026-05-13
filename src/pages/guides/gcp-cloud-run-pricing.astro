@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "GCP Cloud Run Pricing Guide: Cost Calculator Inputs for Requests, CPU, and Egress";
+const title = "GCP Cloud Run Pricing: Estimate requests, CPU-seconds, memory-seconds, concurrency, and egress";
 const description =
-  "Estimate Cloud Run cost using requests, duration, concurrency, transfer, and logs, with practical calculator inputs and validation steps for retries, peak traffic, and noisy endpoints.";
+  "Estimate Cloud Run pricing from requests, CPU-seconds, memory-seconds, concurrency behavior, egress, and logs so you can explain whether spend is coming from scale, slow handlers, retries, or large responses.";
 
 const faqs = [
   {
@@ -38,6 +38,14 @@ const faqs = [
   <p>
     This is the Cloud Run service behavior and pricing decision page. Use it when you are budgeting Cloud Run from the
     way the service behaves in production: request volume, execution time, concurrency, outbound transfer, and logging.
+  </p>
+  <p>
+    Use this page when you need to decide whether Cloud Run cost is mainly being driven by request scale, slow
+    execution, large responses, or logging overhead.
+  </p>
+  <p>
+    Use this page when you need to decide whether Cloud Run spend is mostly request scale, slow handlers,
+    low-concurrency compute time, large responses, or logging that rises with every retry and timeout.
   </p>
   <p class="muted">
     Go back to the serverless parent guide if the broader architecture model is still unclear and you still need to map

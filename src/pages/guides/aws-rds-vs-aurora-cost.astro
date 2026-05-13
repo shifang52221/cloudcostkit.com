@@ -136,6 +136,10 @@ const faqs = [
     <li>Validate backup storage and growth assumptions from billing/telemetry on the current system.</li>
     <li>Document what changes your answer (I/O-heavy workload, retention policy, peak scaling) for future reviews.</li>
   </ul>
+  <p class="muted">
+    Use this comparison only after the workload is normalized, then re-check compute shape, storage growth, retention,
+    and peak behavior before you call RDS or Aurora the cheaper engine.
+  </p>
 
   <h2>Next steps</h2>
   <div class="btn-row">

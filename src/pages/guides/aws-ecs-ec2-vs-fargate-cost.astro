@@ -118,6 +118,10 @@ const description =
     <li>Measure log ingestion GB/day and retention; validate query scan behavior during incidents.</li>
     <li>Measure NAT processed GB and egress GB for the traffic path your service actually uses.</li>
   </ul>
+  <p class="muted">
+    Use this comparison to test utilization and operating-model fit first, then validate load balancers, logs, NAT,
+    and storage separately before you declare EC2 or Fargate the cheaper platform.
+  </p>
 
   <h2>Sources</h2>
   <ul>

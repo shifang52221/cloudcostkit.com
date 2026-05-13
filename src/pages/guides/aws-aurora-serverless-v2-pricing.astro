@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Aurora Serverless v2 pricing: how to estimate ACUs and avoid surprise bills";
 const description =
-  "A practical way to estimate Aurora Serverless v2 costs: ACU-hours, storage GB-month, backups/retention, and how to model peaks so your estimate survives real traffic.";
+  "A practical way to estimate Aurora Serverless v2 costs by separating minimum-capacity baseline exposure from repeated peak windows, then layering in storage and backup retention.";
 const faqs = [
   {
     q: "What is the #1 mistake in Serverless v2 estimates?",
@@ -35,9 +35,10 @@ const faqs = [
     Aurora bill anatomy page if the broader Aurora bill structure is still unclear.
   </p>
   <p>
-    Aurora Serverless v2 is priced primarily by <strong>ACU-hours</strong>, so you should estimate it like a time-series
-    bill: a baseline most hours, plus peaks that happen during batch jobs, traffic spikes, or incidents. If you budget
-    from a single average ACU, you usually under-estimate.
+    Aurora Serverless v2 is priced primarily by <strong>ACU-hours</strong>, and the first budgeting decision is whether
+    Aurora Serverless v2 spend is mostly a minimum-capacity baseline problem or a repeated peak-window problem. You
+    should estimate it like a time-series bill: a baseline most hours, plus peaks that happen during batch jobs,
+    traffic spikes, or incidents. If you budget from a single average ACU, you usually under-estimate.
   </p>
 
   <h2>Step 1: pick baseline and peak scenarios (don’t start with one number)</h2>

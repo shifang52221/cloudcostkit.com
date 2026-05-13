@@ -70,6 +70,9 @@ const description =
     <a class="btn" href="/calculators/cloudwatch-logs-insights-cost-calculator/">Logs Insights cost calculator</a>
     <a class="btn" href="/calculators/log-search-scan-cost-calculator/">Generic scan cost</a>
   </div>
+  <p class="muted">
+    A defendable estimate should separate routine dashboard refresh scans, normal engineer investigation scans, and incident-driven wide-window searches before you multiply anything into a monthly total.
+  </p>
 
   <h2>Worked example (planning)</h2>
   <ul>
@@ -114,6 +117,9 @@ const description =
   </ul>
   <p class="muted">
     Once the scanned-GB model is believable, move to the optimization guide and change one scan driver at a time.
+  </p>
+  <p class="muted">
+    Hand this model to pricing or optimization only after someone else can trace which default time windows, refresh loops, and log-group scope decisions create the recurring scanned-GB baseline versus the temporary incident spike.
   </p>
 
   <h2>Sources</h2>

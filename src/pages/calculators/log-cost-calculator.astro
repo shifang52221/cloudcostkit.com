@@ -6,13 +6,13 @@ import { LogSearchScanCostCalculator } from "../../components/calculators/LogSea
 
 const title = "Log Cost Calculator (Ingestion, Retention, and Scan Pricing)";
 const description =
-  "Estimate log pricing from ingestion GB/day, retention GB-month, and scan volume. Compare baseline and incident months in one calculator.";
+  "Estimate log pricing by separating ingestion, retention, and scan-driven behavior, so you can see whether the logging bill is really a volume problem, a retention problem, or an incident-query problem.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/log-cost-calculator"
-  intro="Log platforms usually charge for (1) ingestion, (2) retention storage (GB-month), and sometimes (3) scan/search. This log cost calculator groups those line items so you can estimate a realistic monthly total and compare baseline vs peak months."
+  intro="Log platforms usually charge for (1) ingestion, (2) retention storage (GB-month), and sometimes (3) scan/search. The first modeling decision is whether the logging bill is mainly ingestion, retention, or search-driven. This log cost calculator groups those line items so you can estimate a realistic monthly total and compare baseline vs peak months."
   examples={[
     "Estimate ingestion from GB/day, then add retention storage from retention days; optionally add scan charges if you run frequent queries.",
     "Retention increases costs linearly with days; scan costs increase with query volume and GB scanned.",

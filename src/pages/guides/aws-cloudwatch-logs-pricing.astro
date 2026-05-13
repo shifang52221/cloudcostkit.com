@@ -26,6 +26,11 @@ const description =
     <strong>queries</strong>. Many teams budget only ingestion and forget that retention policies and query scans can be
     meaningful at scale.
   </p>
+  <p class="muted">
+    A defensible review starts by proving whether the increase came from more bytes written, more days retained, or
+    more data scanned, because teams often blame CloudWatch Logs as one bucket when ingestion, retention, and query
+    behavior moved for different reasons.
+  </p>
 
   <h2>Logs pricing inputs</h2>
   <ul>
@@ -121,6 +126,11 @@ const description =
   </ul>
 
   <h2>Validation checklist</h2>
+  <p class="muted">
+    You are ready to take this model into budgeting or optimization only when another reviewer can trace the ingestion
+    baseline, the retention policy that turns it into stored GB-month, and the recurring query patterns that create
+    steady scan cost outside incident spikes.
+  </p>
   <ul>
     <li>Measure ingestion GB/day for at least 7 days (weekday/weekend patterns).</li>
     <li>Confirm retention policies per log group and lifecycle policies for exported copies.</li>

@@ -33,6 +33,11 @@ const description =
     retention, export, and wider observability costs that should be tracked beside Logs Insights rather than blended into
     it.
   </p>
+  <p class="muted">
+    The practical review question is simple: are you looking at a true Logs Insights scan bill, or are ingestion,
+    retention, export, and SIEM follow-on costs being lumped into the same conversation because they all came from the
+    same log groups?
+  </p>
   <ul>
     <li><strong>Inside the bill</strong>: scan charges driven by query scope, time range, and query frequency.</li>
     <li><strong>Beside the bill</strong>: log ingestion, storage, exports, and downstream analytics platforms.</li>
@@ -128,6 +133,10 @@ const description =
     <li>Validate dashboard time ranges and refresh intervals.</li>
     <li>Validate which log groups are included in the most common queries.</li>
   </ul>
+  <p class="muted">
+    Before you compare months, reconcile which scanned GB came from recurring dashboards, which came from routine
+    engineer queries, and which only appeared because incidents widened the time range or log-group scope.
+  </p>
 
   <h2>Sources</h2>
   <ul>

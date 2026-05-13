@@ -4,13 +4,13 @@ import { ObjectStorageCostCalculator as ObjectStorageCostCalculatorComponent } f
 
 const title = "Object Storage Cost Calculator (GB-month + requests)";
 const description =
-  "Estimate object storage cost from average GB-month, GET and PUT activity, and your own provider rates, with enough detail to separate quiet archives from request-heavy buckets.";
+  "Estimate object storage cost by separating stored-capacity exposure from request-shape pressure, so you can tell whether the bucket is really a GB-month problem, a request problem, or both.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/object-storage-cost-calculator"
-  intro="Object storage costs usually come from stored data and request volume. Use this calculator to estimate the blended monthly cost and compare baseline vs peak traffic."
+  intro="Object storage costs usually come from stored data and request volume. The first modeling decision is whether this bucket is mainly a stored-capacity problem or a request-shape problem. Use this calculator to estimate the blended monthly cost and compare baseline vs peak traffic."
   examples={[
     "5,000 GB stored, plus 5M GET and 500k PUT requests at your request pricing -> estimate monthly cost.",
     "20 TB stored with low request volume -> storage dominates; requests are usually a rounding error.",

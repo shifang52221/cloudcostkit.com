@@ -242,6 +242,10 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>If usage types do not map cleanly to your rows, pause and re-classify the billed path before pricing.</li>
     <li>If units are mixed across telemetry and billing, reconcile GB vs GiB before finalizing the estimate.</li>
   </ul>
+  <p class="muted">
+    Treat this guide as a transfer-path diagnosis workflow: confirm the billed boundary, usage type, and unit
+    assumptions before you accept any single AWS egress rate as the answer.
+  </p>
 
   <h2>Guide vs calculator: keep the workflow clean</h2>
   <ul>

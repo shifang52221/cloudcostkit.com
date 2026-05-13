@@ -37,6 +37,9 @@ export const SITE = {
     "",
   ),
   locale: "en-US",
+  publisherType: "Organization",
+  contactLabel: "Editorial and corrections contact",
+  sameAs: [] as string[],
   adsenseClient, // e.g. "ca-pub-1234567890123456"
   ga4MeasurementId: (import.meta.env.PUBLIC_GA4_MEASUREMENT_ID || "").trim(), // e.g. "G-XXXXXXXXXX"
   ads: {

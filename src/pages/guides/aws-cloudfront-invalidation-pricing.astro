@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "CloudFront invalidation pricing: when it matters and how to estimate";
 const description =
-  "A practical guide to CloudFront invalidation costs: what to count, why broad invalidations reduce cache hit rate, and safer cache-busting patterns that avoid repeated invalidations.";
+  "A practical guide to CloudFront invalidation cost that separates direct invalidation charges from the larger hit-rate and origin side effects caused by broad purge behavior.";
 ---
 <GuideLayout
   title={title}
@@ -26,7 +26,8 @@ const description =
   ]}
 >
   <p>
-    Invalidations are part of operating a CDN, but their cost impact is often <strong>indirect</strong>: aggressive
+    Invalidations are part of operating a CDN, but the real budgeting decision is whether invalidation is becoming a
+    direct line-item problem or an indirect origin-and-hit-rate problem caused by broad purge behavior. Aggressive
     invalidation lowers cache hit rate and pushes more traffic to the origin (origin requests + origin egress).
   </p>
 

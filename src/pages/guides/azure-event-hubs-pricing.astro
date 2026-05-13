@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Event Hubs Pricing Guide: Throughput, Retention, Replay, and Egress";
+const title = "Azure Event Hubs Pricing: Model ingress, retention, replay, and burst-throughput cost";
 const description =
-  "Estimate Azure Event Hubs cost from throughput, ingress volume, retention, replay multipliers, and egress, with a practical checklist for validating burst traffic and downstream replay risk.";
+  "Model Azure Event Hubs pricing around ingress bytes, retained history, consumer rereads, burst-throughput windows, and downstream replay exposure so the stream budget survives calm days and incident periods.";
 
 const faqs = [
   {
@@ -37,9 +37,15 @@ const faqs = [
 >
   <p>
     If you are trying to estimate Azure Event Hubs cost from events per second alone, the model will usually be too
-    light. Event Hubs behaves more like a stream system than a simple request meter. A reliable estimate starts with
-    bytes, retention, and how often consumers reread data. That is why the same stream can look inexpensive in a calm
-    week and surprisingly expensive during a backfill, an incident, or a replay-heavy analytics cycle.
+    light. The budgeting decision is not just how much data enters Event Hubs, but how retention and rereads change
+    the total stream cost shape. Event Hubs behaves more like a stream system than a simple request meter. A reliable
+    estimate starts with bytes, retention, and how often consumers reread data. That is why the same stream can look
+    inexpensive in a calm week and surprisingly expensive during a backfill, an incident, or a replay-heavy analytics
+    cycle.
+  </p>
+  <p>
+    Use this page when you need to explain whether the bill shape comes from bytes entering the stream, retained
+    history, consumer rereads, or burst windows that make a calm-day average unusable.
   </p>
 
   <h2>What usually drives Event Hubs cost in production</h2>

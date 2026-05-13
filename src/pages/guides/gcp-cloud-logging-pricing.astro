@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Cloud Logging pricing (GCP): ingestion, retention, and query scans";
 const description =
-  "A practical model for Cloud Logging costs: GB ingested, retention storage (GB-month), and query/scan behavior. Includes a fast method to estimate GB/day from events/sec × bytes/event and a checklist to find dominant sources.";
+  "A practical Cloud Logging cost model that separates noisy ingestion, retention exposure, and repeated scan behavior, with a fast way to estimate GB/day and validate dominant log sources.";
 
 const faqs = [
   {
@@ -32,8 +32,10 @@ const faqs = [
   faqs={faqs}
 >
   <p>
-    Logging costs are predictable when you treat logs like data: bytes in, bytes stored, bytes scanned. The biggest wins come
-    from controlling ingestion volume and retention, and from preventing dashboards from scanning wide windows repeatedly.
+    Logging costs are predictable when you treat logs like data, but the first budgeting decision is whether Cloud
+    Logging cost is mainly being created by noisy ingestion, long retention, or repeated wide-window scans. The biggest
+    wins come from controlling ingestion volume and retention, and from preventing dashboards from scanning wide windows
+    repeatedly.
   </p>
 
   <h2>0) Inventory sources (do not blend)</h2>

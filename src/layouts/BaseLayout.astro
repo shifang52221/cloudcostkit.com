@@ -23,10 +23,21 @@ const robotsValue = robots ?? "index,follow,max-snippet:-1,max-image-preview:lar
 
 const organizationSchema = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": SITE.publisherType,
   name: SITE.name,
   url: SITE.url,
   logo: new URL("/logo.svg", siteUrl).toString(),
+  sameAs: SITE.sameAs,
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      contactType: SITE.contactLabel,
+      email: SITE.email,
+      url: new URL("/contact/", siteUrl).toString(),
+      availableLanguage: ["en"],
+    },
+  ],
+  publishingPrinciples: new URL("/editorial-policy/", siteUrl).toString(),
 };
 
 const websiteSchema = {
@@ -34,6 +45,11 @@ const websiteSchema = {
   "@type": "WebSite",
   name: SITE.name,
   url: SITE.url,
+  publisher: {
+    "@type": SITE.publisherType,
+    name: SITE.name,
+    url: SITE.url,
+  },
 };
 ---
 <!doctype html>
@@ -94,6 +110,9 @@ const websiteSchema = {
         <div class="footer-inner">
           <div class="footer-meta">
             CloudCostKit is an independent cloud cost planning resource built for estimation, validation, and review workflows. Not a substitute for provider billing exports, contract pricing, sales quotes, or formal financial advice.
+          </div>
+          <div class="footer-meta">
+            Maintained by the CloudCostKit Editorial Team with visible methodology, correction intake, and page-level review expectations.
           </div>
           <nav class="footer-links" aria-label="Footer">
             <a href="/about/">About</a>

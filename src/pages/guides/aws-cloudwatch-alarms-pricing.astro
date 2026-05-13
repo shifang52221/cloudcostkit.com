@@ -27,6 +27,9 @@ const description =
   <p class="muted">
     This guide is about bill boundaries: standard alarms, high-resolution alarms, composite alarms, and the adjacent notification, metrics, and dashboard costs that should be tracked beside the alarm bill rather than blended into it.
   </p>
+  <p class="muted">
+    In practice, this page is most useful when a team needs to prove whether the bill is being driven by real alarm inventory growth or by adjacent delivery paths and observability extras that were incorrectly blamed on alarms.
+  </p>
 
   <h2>Inside the alarms bill vs beside the alarms bill</h2>
   <ul>
@@ -130,6 +133,9 @@ const description =
     <li>Confirm which costs are CloudWatch-native and which begin once alerts flow into SNS, dashboards, or extra metrics.</li>
     <li>Validate type usage and environment ownership before you compare months or teams.</li>
   </ul>
+  <p class="muted">
+    Before you compare months or ownership across teams, verify which alarm-month growth came from deliberate coverage decisions, which came from template sprawl or ephemeral environments, and which charges only begin after alerts flow into SNS, dashboards, or extra metrics.
+  </p>
 
   <h2>Sources</h2>
   <ul>
