@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "S3 Glacier Pricing & Cost Guide (storage, retrieval, Deep Archive)";
+const title = "S3 Glacier Pricing: Instant Retrieval, Flexible Retrieval, Deep Archive, and Restore Cost";
 const description =
-  "Practical S3 Glacier cost model that separates quiet archive storage, retrieval volume, and small-object request exposure, with workflow boundaries for archive planning and restore-heavy months.";
+  "Understand S3 Glacier pricing through Instant Retrieval, Flexible Retrieval, and Deep Archive storage classes, minimum storage duration, retrieval charges, metadata overhead, and restore workflow cost boundaries.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-s3-glacier-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-06-18"
   faqs={[
     {
       q: "What are the main cost components for archival storage?",
@@ -39,6 +39,24 @@ const description =
     This guide is about bill boundaries: stored GB-month, retrieval GB, retrieval requests, transition exposure, minimum-duration exposure, and the adjacent compute, analysis-copy, or workflow costs that should be tracked beside the archive bill rather than blended into it.
   </p>
 
+  <h2>Quick pricing read</h2>
+  <p>
+    Glacier pricing is no longer one generic cold-storage line. The practical choices are S3 Glacier Instant
+    Retrieval, S3 Glacier Flexible Retrieval, and S3 Glacier Deep Archive. Each class changes the storage-versus-retrieval
+    tradeoff, the minimum storage duration, and the risk that small objects or short-lived archive churn erase your
+    expected savings.
+  </p>
+  <ul>
+    <li><strong>S3 Glacier Instant Retrieval</strong>: archive-style storage with fast access, but it has a 128 KB minimum billable object size and a 90-day minimum storage duration.</li>
+    <li><strong>S3 Glacier Flexible Retrieval</strong>: the classic Glacier retrieval path with restore tiers, 90-day minimum storage duration, and free bulk retrievals.</li>
+    <li><strong>S3 Glacier Deep Archive</strong>: the lowest-cost deep archive path, but it carries a 180-day minimum storage duration and the heaviest retrieval friction.</li>
+    <li><strong>Metadata overhead matters</strong>: Flexible Retrieval and Deep Archive add 40 KB of metadata overhead per archived object, which can make small-object estates look much more expensive than raw GB suggests.</li>
+    <li><strong>Retrieval is not only a GB question</strong>: request counts, restore tier choice, and rehydration workflow can matter as much as restored volume.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current AWS S3 pricing page and S3 storage class documentation.
+  </p>
+
   <h2>Inside the archive bill vs beside the archive bill</h2>
   <ul>
     <li>
@@ -55,20 +73,32 @@ const description =
   <h2>What to model on the archive bill itself</h2>
   <ul>
     <li>
-      <strong>Stored GB-month</strong>: average archived data held over the billing window.
+      <strong>Stored GB-month</strong>: average archived data held over the billing window, adjusted for the actual storage class you are using.
     </li>
     <li>
-      <strong>Retrieval GB</strong>: restored data volume that actually re-enters the workflow.
+      <strong>Retrieval GB</strong>: restored data volume that actually re-enters the workflow, keeping restore class and urgency visible.
     </li>
     <li>
-      <strong>Retrieval requests</strong>: object-count-driven request exposure that can grow faster than restored GB.
+      <strong>Retrieval requests</strong>: object-count-driven request exposure that can grow faster than restored GB, especially with many small objects.
     </li>
     <li>
       <strong>Transition exposure</strong>: movement into archive when lifecycle rules or churn create extra archive-side activity.
     </li>
     <li>
-      <strong>Minimum-duration exposure</strong>: early deletion or overwrite patterns that erase cold-storage savings.
+      <strong>Minimum-duration exposure</strong>: early deletion or overwrite patterns that erase cold-storage savings across 90-day or 180-day rules.
     </li>
+  </ul>
+
+  <h2>Storage class choice changes the whole cost shape</h2>
+  <p>
+    Treat storage class selection as the first pricing decision, not the last. Instant Retrieval is not just "Glacier
+    but faster." Flexible Retrieval is not just "cheaper storage." Deep Archive is not just "the cheapest per GB."
+    Each class changes what the archive is optimized for and what kind of restore behavior becomes expensive.
+  </p>
+  <ul>
+    <li><strong>Choose Instant Retrieval</strong> when fast restore behavior matters enough to justify the higher storage posture and minimum billable object size.</li>
+    <li><strong>Choose Flexible Retrieval</strong> when restore SLAs can tolerate tiered retrieval and bulk restore behavior is part of the archive plan.</li>
+    <li><strong>Choose Deep Archive</strong> when retention is genuinely long-lived and restore friction is acceptable.</li>
   </ul>
 
   <h2>Boundary choices that change ownership</h2>

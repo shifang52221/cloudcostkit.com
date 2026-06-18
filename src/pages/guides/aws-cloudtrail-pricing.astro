@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS CloudTrail Pricing & Cost Guide";
+const title = "AWS CloudTrail Pricing: Free Management Copy, Data Events, Insights, and Lake";
 const description =
-  "Model AWS CloudTrail cost across management vs data events, Lake vs S3 delivery paths, and downstream logging boundaries, with estimation steps for selector scope and audit growth.";
+  "Understand AWS CloudTrail pricing through the free first copy of management events, data events, CloudTrail Insights, Trails vs CloudTrail Lake, and the downstream storage and scan costs that belong beside CloudTrail.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudtrail-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-06-18"
   faqs={[
     {
       q: "What usually drives CloudTrail spend?",
@@ -26,10 +26,33 @@ const description =
   ]}
 >
   <p>
+    If you searched for AWS CloudTrail pricing, the fastest first answer is this: the first copy of management events
+    is free, but data events, CloudTrail Insights, additional copies, and CloudTrail Lake can change the bill quickly.
+    That is why a useful pricing review starts by separating free baseline audit coverage from the paid event classes
+    and log-analysis paths around it.
+  </p>
+  <p>
     Use this page when you need to decide what belongs inside the CloudTrail bill before you debate selector tuning, retention changes, or downstream log reduction.
   </p>
   <p class="muted">
     This guide is about bill boundaries: management events, data events, CloudTrail Insights, and the adjacent storage, scan, and SIEM costs that should be tracked beside CloudTrail rather than blended into it.
+  </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    CloudTrail pricing has two main surfaces that teams often blend together by mistake. <strong>Trails</strong> are
+    where management events, data events, network activity events, and Insights enter the pricing discussion.
+    <strong>CloudTrail Lake</strong> is a different model built around ingestion, retention, and query-style analysis
+    economics. If you mix those together too early, the estimate becomes noisy and hard to defend.
+  </p>
+  <ul>
+    <li><strong>Free baseline</strong>: the first copy of management events is free.</li>
+    <li><strong>Paid CloudTrail-native drivers</strong>: additional copies, data events, network activity events, and CloudTrail Insights can move the bill sharply.</li>
+    <li><strong>Separate pricing surface</strong>: Trails vs CloudTrail Lake should be modeled as different cost shapes, not as one blended CloudTrail number.</li>
+    <li><strong>Still separate from CloudTrail itself</strong>: S3 retention, Athena scans, and SIEM ingestion remain downstream costs beside the CloudTrail bill.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current AWS CloudTrail pricing page and AWS CloudTrail user guide.
   </p>
 
   <h2>Inside the CloudTrail bill vs beside the CloudTrail bill</h2>
@@ -39,16 +62,31 @@ const description =
     <li><strong>Why this distinction matters</strong>: teams often blame CloudTrail for downstream storage or analysis spend that should be tracked as a separate logging decision.</li>
   </ul>
 
+  <h2>Trails vs CloudTrail Lake</h2>
+  <p>
+    The main pricing mistake on CloudTrail pages is treating Trails and CloudTrail Lake as if they were one service
+    line. They are related, but they support different budgeting questions. Trails are about event delivery and event
+    classes. CloudTrail Lake is about retained audit data that you ingest, store, and analyze inside Lake.
+  </p>
+  <ul>
+    <li><strong>Use Trails thinking</strong> when the bill question is about management events, data events, network activity, Insights, and copies.</li>
+    <li><strong>Use Lake thinking</strong> when the bill question is about ingesting audit data into CloudTrail Lake, retaining it there, and querying it as an analysis surface.</li>
+    <li><strong>Do not hide Lake economics</strong> inside generic "CloudTrail storage" language if Lake is actually the paid analysis path.</li>
+  </ul>
+
   <h2>What to model on the bill itself</h2>
   <ul>
     <li>
-      <strong>Management events</strong>: control-plane actions and baseline audit volume.
+      <strong>Management events</strong>: control-plane actions and baseline audit volume, remembering that the first copy of management events is free.
     </li>
     <li>
       <strong>Data events</strong>: high-volume data-plane operations that usually become the dominant CloudTrail-native charge when enabled too broadly.
     </li>
     <li>
       <strong>Insights events</strong>: anomaly-detection style add-ons that should stay separate from raw event counting assumptions.
+    </li>
+    <li>
+      <strong>Trails vs Lake ownership</strong>: keep standard trail event billing separate from CloudTrail Lake ingestion, retention, and analysis assumptions.
     </li>
     <li>
       <strong>Bill ownership</strong>: whether the real spend belongs to CloudTrail-native events or to the delivery, retention, and analysis path around them.
@@ -90,6 +128,7 @@ const description =
   </p>
   <ul>
     <li>CloudTrail-native: management events, data events, and Insights by your effective regional pricing.</li>
+    <li>CloudTrail Lake: ingestion, retention posture, and Lake-side query/analysis assumptions if Lake is part of the design.</li>
     <li>Downstream: S3 retention, Athena scans, SIEM ingestion, and any duplicated delivery path.</li>
     <li>Scenario split: keep baseline months separate from incident or automation-heavy months.</li>
   </ul>
@@ -118,6 +157,7 @@ const description =
   <ul>
     <li>Using the pricing page to do the full event-counting workflow instead of separating scope from measurement.</li>
     <li>Blending S3 retention, Athena scans, and SIEM ingestion into the core CloudTrail line item.</li>
+    <li>Blending Trails pricing with CloudTrail Lake pricing before deciding which audit path is actually in use.</li>
     <li>Ignoring how selector scope changes the CloudTrail-native bill before optimization decisions begin.</li>
     <li>Comparing narrow CloudTrail pricing to broad downstream log-platform spend as if they were one service.</li>
   </ul>

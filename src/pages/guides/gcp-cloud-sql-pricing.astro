@@ -1,30 +1,30 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud SQL pricing: instance-hours, storage, backups, and network (practical estimate)";
+const title = "GCP Cloud SQL Pricing: Instance Hours, HA, Storage, Backups, and Network";
 const description =
-  "A driver-based Cloud SQL estimate that separates provisioned capacity, storage and backup growth, and network-sensitive access patterns, with validation steps for HA sizing and transfer risk.";
+  "Understand GCP Cloud SQL pricing through edition choice, instance hours, HA and replicas, storage, backups, and network-sensitive access patterns, with adjacent application and analytics costs kept separate.";
 
 const faqs = [
   {
     q: "What usually drives managed database cost?",
-    a: "Provisioned compute capacity and primary storage are the primary drivers. Backups/retention and network transfer become meaningful for long retention or cross-region access patterns.",
+    a: "Provisioned compute capacity is usually the first driver, especially once edition choice, HA, and replicas are visible. Storage, backups, and network transfer then become the next cost surfaces that move a real Cloud SQL bill.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate instance-hours (including HA/replicas), average storage GB-month, and backup retention. Add a separate line item for outbound transfer if clients are outside the region.",
+    a: "Start with edition, instance hours, HA, replicas, average storage, backup retention, and outbound transfer. Keep BigQuery analytics, exports, and application retries beside the Cloud SQL bill instead of blending them into one database number.",
   },
   {
     q: "What is the most common mistake?",
-    a: "Sizing from average utilization and forgetting HA/replicas and retention. The bill follows provisioned capacity, not average CPU.",
+    a: "The most common mistake is treating Cloud SQL like average CPU billing instead of provisioned capacity billing. A close second is forgetting that HA, replicas, backups, and cross-region access all keep charging even when workload intensity looks calm.",
   },
   {
     q: "How do I validate?",
-    a: "Validate peak CPU/memory/IO, validate storage growth rate, validate backup/PITR retention, and validate network paths (private vs public/cross-region).",
+    a: "Validate peak CPU, memory, and I/O; confirm edition and HA posture; validate storage growth and backup retention; and trace network paths and result-export flows that may create billable transfer.",
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-sql-pricing" lastUpdated="2026-01-27" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/gcp-cloud-sql-pricing" lastUpdated="2026-06-18" faqs={faqs}>
   <p>
     Cloud SQL cost is easiest to estimate when you treat it as "capacity + data", but the first budgeting decision is
     whether Cloud SQL spend is mainly a provisioned-capacity problem, a storage-and-backup growth problem, or a
@@ -33,10 +33,39 @@ const faqs = [
     external.
   </p>
 
+  <h2>Quick pricing read</h2>
+  <p>
+    Cloud SQL pricing is not only a database size question. The bill starts with edition and instance shape, then grows
+    with HA posture, replicas, storage, backups, and network-sensitive access. The key boundary is that Cloud SQL-native
+    charges belong on this page, while exports, BigQuery analysis, application retries, and wider system behavior should
+    stay beside the Cloud SQL bill unless you are intentionally modeling the whole application estate.
+  </p>
+  <ul>
+    <li><strong>Instance hours are the first cost surface</strong>: Cloud SQL follows provisioned compute capacity, not average CPU, so primary instances, HA, and replicas must stay visible from the first estimate.</li>
+    <li><strong>Editions change the baseline posture</strong>: Enterprise and Enterprise Plus do not only change performance features; they change the pricing envelope you are choosing for the database.</li>
+    <li><strong>HA and replicas are real bill multipliers</strong>: failover posture and read scaling are not abstract architecture decisions. They create additional instance-hour exposure that should be modeled explicitly.</li>
+    <li><strong>Storage and backups form the data side of the bill</strong>: primary data, indexes, and retained backups usually become the next durable cost layer after provisioned compute.</li>
+    <li><strong>Network still matters</strong>: cross-region clients, result exports, and public or external access paths can create a separate transfer line even when the database itself is right-sized.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current Cloud SQL pricing page, Cloud SQL editions documentation,
+    replica guidance, and Cloud SQL backup documentation.
+  </p>
+
+  <h2>Inside the Cloud SQL bill vs beside the Cloud SQL bill</h2>
+  <ul>
+    <li><strong>Inside the Cloud SQL bill</strong>: edition choice, primary instance hours, HA posture, replicas, storage, backups, and Cloud SQL-adjacent network transfer tied directly to database access.</li>
+    <li><strong>Beside the Cloud SQL bill</strong>: BigQuery analysis, application retry storms, export pipelines, object-storage archives, and any non-database service layers that consume Cloud SQL output after the database has already done its work.</li>
+    <li><strong>Why this matters</strong>: BigQuery jobs, application retries, and adjacent services belong beside the Cloud SQL bill because they can make a database estate look expensive even when the database sizing itself is reasonable.</li>
+  </ul>
+
   <h2>0) What to measure (inputs you can actually validate)</h2>
   <ul>
     <li>
       <strong>Instance-hours</strong>: primary + HA + replicas (baseline and peak months).
+    </li>
+    <li>
+      <strong>Edition and shape</strong>: Enterprise vs Enterprise Plus, dedicated-core posture, and the machine shape you are actually paying for.
     </li>
     <li>
       <strong>Storage GB-month</strong>: average data + index size across the month.
@@ -52,7 +81,8 @@ const faqs = [
   <h2>1) Compute: instance-hours (primary, HA, replicas)</h2>
   <p>
     Model each instance separately and keep baseline vs peak months distinct. If you run HA or read replicas, count them
-    explicitly because they are provisioned capacity.
+    explicitly because they are provisioned capacity. For Cloud SQL, the bill follows the shape you provision, not the
+    average utilization you wish the instance had.
   </p>
   <p class="muted">
     Tool: <a href="/calculators/compute-instance-cost-calculator/">Compute instance cost</a>.
@@ -61,6 +91,7 @@ const faqs = [
     <li>Baseline: steady traffic, normal query mix.</li>
     <li>Peak: batch jobs, migrations, index builds, incident retries.</li>
     <li>Headroom: avoid resizing churn by budgeting realistic peak capacity.</li>
+    <li>Edition choice: Enterprise Plus may change the right budget posture even before you adjust workload assumptions.</li>
   </ul>
 
   <h2>2) Storage: average GB-month (data + indexes)</h2>
@@ -74,6 +105,7 @@ const faqs = [
   <ul>
     <li>Track index overhead separately if possible; it is rarely zero.</li>
     <li>Include staging/non-prod copies if they persist long-term.</li>
+    <li>Keep export copies or analytics copies beside the Cloud SQL bill instead of hiding them inside database storage.</li>
   </ul>
 
   <h2>3) Backups and retention (quiet multiplier)</h2>
@@ -84,12 +116,15 @@ const faqs = [
   <ul>
     <li>Write down retention windows (days/months) and any compliance requirements.</li>
     <li>Plan restore validation: a real drill often reveals that "restore" is not just a button.</li>
+    <li>Validate whether the selected backup option or retention posture belongs to normal production policy or to a special compliance case.</li>
   </ul>
 
   <h2>4) Network transfer (cross-region and external clients)</h2>
   <p>
     Network cost shows up when clients are outside the region or when analytics jobs pull large result sets. Split transfer
-    by destination and validate whether traffic is private or public.
+    by destination and validate whether traffic is private or public. If a BigQuery job, export workflow, or application
+    retry pattern is what really creates the data movement, keep that spend beside the Cloud SQL bill instead of
+    pretending the database alone caused it.
   </p>
   <p class="muted">
     Tool: <a href="/calculators/data-egress-cost-calculator/">Egress cost</a>.
@@ -114,6 +149,7 @@ const faqs = [
   <h2>Common pitfalls</h2>
   <ul>
     <li>Forgetting HA/replicas (capacity doubles before any traffic increase).</li>
+    <li>Comparing editions loosely and missing that edition choice changes the baseline pricing posture.</li>
     <li>Using end-of-month storage size instead of average GB-month (misstates cost for growing datasets).</li>
     <li>Long backup retention and PITR storage growing silently.</li>
     <li>Cross-region clients or large query exports creating surprise egress.</li>
@@ -122,6 +158,7 @@ const faqs = [
   <h2>How to validate</h2>
   <ul>
     <li>Validate peak CPU/memory/IO and the heaviest query patterns.</li>
+    <li>Validate edition, HA posture, and replica count against what is actually deployed.</li>
     <li>Validate storage growth rate and index overhead.</li>
     <li>Validate backup retention and any PITR settings.</li>
     <li>Validate network paths (private vs public/cross-region) and billable transfer boundaries.</li>
@@ -155,8 +192,18 @@ const faqs = [
       </a>
     </li>
     <li>
-      <a href="https://cloud.google.com/sql/docs" target="_blank" rel="nofollow noopener">
-        Cloud SQL documentation
+      <a href="https://docs.cloud.google.com/sql/docs/mysql/editions-intro" target="_blank" rel="nofollow noopener">
+        Cloud SQL editions overview
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.cloud.google.com/sql/docs/mysql/replication" target="_blank" rel="nofollow noopener">
+        Cloud SQL replication and replicas
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.cloud.google.com/sql/docs/mysql/backup-recovery/backups" target="_blank" rel="nofollow noopener">
+        Cloud SQL backups overview
       </a>
     </li>
   </ul>

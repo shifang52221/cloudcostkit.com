@@ -21,6 +21,14 @@ test("pricing page is framed as the metrics bill-boundary page", () => {
     pricingPage,
     /This guide is about bill boundaries: custom metrics, high-resolution metrics, metrics API requests, dashboards, and the adjacent alarm and external observability costs that should be tracked beside the metrics bill rather than blended into it/i,
   );
+  assert.match(
+    pricingPage,
+    /custom metrics/i,
+  );
+  assert.match(
+    pricingPage,
+    /metrics API requests/i,
+  );
 });
 
 test("estimate page is framed as the time-series measurement workflow page", () => {

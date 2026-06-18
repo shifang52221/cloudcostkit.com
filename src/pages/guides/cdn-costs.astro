@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "CDN Cost Guide: Diagnose the Bill, Choose the Right Calculator, and Validate the Model";
+const title = "CDN Pricing Guide: Diagnose Bandwidth, Request Fees, Origin Egress, and Provider Trade-Offs";
 const description =
-  "Use this CDN guide to diagnose which CDN line item moved first, route to the right calculator, and keep bandwidth, request fees, and origin egress as separate cost surfaces.";
+  "Use this CDN pricing guide to diagnose which CDN line item moved first, route to the right calculator, compare the right cost surface, and keep bandwidth, request fees, and origin egress separate.";
 const faqs = [
   {
     q: "What are the main line items on a CDN bill?",
@@ -34,7 +34,7 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   title={title}
   description={description}
   canonicalPath="/guides/cdn-costs"
-  lastUpdated="2026-04-19"
+  lastUpdated="2026-06-19"
   faqs={faqs}
 >
   <p class="muted">
@@ -44,6 +44,11 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
   <p class="muted">
     Use this page when you need to decide what belongs inside the full CDN delivery bill before you compare providers,
     simplify to per-GB math, price requests, estimate traffic volume, or untangle origin egress.
+  </p>
+  <p>
+    If you searched for CDN cost, CDN pricing, or CDN cost comparison, the first question is which CDN line item moved
+    first and whether the problem is bandwidth, request fees, origin leakage, or provider choice. Start by naming the
+    moved surface before you trust any blended CDN total.
   </p>
 
   <h2>First-screen triage: which CDN line item moved first?</h2>
@@ -74,6 +79,11 @@ const cdnGuides = GUIDES.filter((g) => (g.topics || []).includes("cdn") && g.can
     <li><strong>Use the full CDN planner</strong> when bandwidth, request, and origin surfaces all need to stay visible in one model.</li>
     <li><strong>Use the narrow calculators</strong> when one line item is already clearly isolated and you need deeper math on that slice.</li>
   </ul>
+  <p class="muted">
+    Keep the layers separate on purpose: use this page for bill diagnosis, use the provider comparison page when the
+    real decision is vendor choice, use the per-GB page when bandwidth-rate math is your first filter, and use the
+    request or origin pages when one narrower surface clearly owns the question.
+  </p>
 
   <h2>Keep the CDN guide cluster separated on purpose</h2>
   <p class="muted">

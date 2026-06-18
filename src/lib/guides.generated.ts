@@ -86,37 +86,37 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Aurora Serverless v2 pricing: how to estimate ACUs and avoid surprise bills",
-    "description": "A practical way to estimate Aurora Serverless v2 costs by separating minimum-capacity baseline exposure from repeated peak windows, then layering in storage and backup retention.",
+    "title": "Aurora Serverless v2 Pricing: ACU-Hours, Minimum Capacity, Peaks, and Storage",
+    "description": "Understand Aurora Serverless v2 pricing through ACU-hours, minimum-capacity baseline exposure, repeated peak windows, storage, backups, and the surrounding database or application costs that belong beside the Serverless v2 bill.",
     "canonicalPath": "/guides/aws-aurora-serverless-v2-pricing",
     "category": "AWS",
     "slug": "aws-aurora-serverless-v2-pricing",
     "topics": [
       "backup",
       "database",
+      "kubernetes",
       "serverless",
       "storage"
     ]
   },
   {
-    "title": "AWS CloudTrail Pricing & Cost Guide",
-    "description": "Model AWS CloudTrail cost across management vs data events, Lake vs S3 delivery paths, and downstream logging boundaries, with estimation steps for selector scope and audit growth.",
+    "title": "AWS CloudTrail Pricing: Free Management Copy, Data Events, Insights, and Lake",
+    "description": "Understand AWS CloudTrail pricing through the free first copy of management events, data events, CloudTrail Insights, Trails vs CloudTrail Lake, and the downstream storage and scan costs that belong beside CloudTrail.",
     "canonicalPath": "/guides/aws-cloudtrail-pricing",
     "category": "AWS",
     "slug": "aws-cloudtrail-pricing",
     "topics": [
-      "logging",
+      "metrics",
       "storage"
     ]
   },
   {
-    "title": "AWS CloudWatch Metrics Pricing & Cost Guide",
-    "description": "Model AWS CloudWatch metrics cost from custom metrics, API requests, dashboards, and retention, with guidance on bill boundaries, cardinality growth, and adjacent alarm spend.",
+    "title": "AWS CloudWatch Metrics Pricing: Custom Metrics, API Requests, Dashboards, and Resolution",
+    "description": "Understand AWS CloudWatch metrics pricing through custom metrics, metrics API requests, dashboards, high-resolution usage, and the alarm or external observability costs that belong beside the metrics bill.",
     "canonicalPath": "/guides/aws-cloudwatch-metrics-pricing",
     "category": "AWS",
     "slug": "aws-cloudwatch-metrics-pricing",
     "topics": [
-      "backup",
       "database",
       "logging",
       "metrics",
@@ -245,8 +245,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling",
-    "description": "Estimate AWS Route 53 cost by separating query-led spend, hosted-zone baseline, and health-check sprawl, with baseline and peak DNS modeling for failovers and retry storms.",
+    "title": "AWS Route 53 Pricing: Hosted Zones, Queries, Health Checks, and Traffic Flow",
+    "description": "Understand AWS Route 53 pricing through public and private hosted zones, query charges, free alias queries to AWS resources, health checks, and Traffic Flow or advanced routing cost boundaries.",
     "canonicalPath": "/guides/aws-route-53-pricing",
     "category": "AWS",
     "slug": "aws-route-53-pricing",
@@ -286,12 +286,13 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS WAF pricing: what to model (ACLs, rules, requests)",
-    "description": "A practical AWS WAF pricing checklist: Web ACL fees, rule fees, request charges, and the downstream costs security teams forget.",
+    "title": "AWS WAF Pricing: Web ACLs, Request Charges, Bot Control, and Logging Boundaries",
+    "description": "Understand AWS WAF pricing through Web ACL baselines, rule and request charges, blocked-traffic evaluation, Bot Control, CAPTCHA or Challenge actions, and the logging or SIEM costs that belong beside WAF.",
     "canonicalPath": "/guides/aws-waf-pricing",
     "category": "AWS",
     "slug": "aws-waf-pricing",
     "topics": [
+      "logging",
       "requests",
       "security"
     ]
@@ -1150,13 +1151,12 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "S3 Glacier Pricing & Cost Guide (storage, retrieval, Deep Archive)",
-    "description": "Practical S3 Glacier cost model that separates quiet archive storage, retrieval volume, and small-object request exposure, with workflow boundaries for archive planning and restore-heavy months.",
+    "title": "S3 Glacier Pricing: Instant Retrieval, Flexible Retrieval, Deep Archive, and Restore Cost",
+    "description": "Understand S3 Glacier pricing through Instant Retrieval, Flexible Retrieval, and Deep Archive storage classes, minimum storage duration, retrieval charges, metadata overhead, and restore workflow cost boundaries.",
     "canonicalPath": "/guides/aws-s3-glacier-pricing",
     "category": "AWS",
     "slug": "aws-s3-glacier-pricing",
     "topics": [
-      "requests",
       "storage"
     ]
   },
@@ -1411,14 +1411,13 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Container Registry Pricing: Understand storage, image pulls, geo-replication, and tier tradeoffs",
-    "description": "Understand Azure Container Registry pricing through stored layers, pull churn during deploys, geo-replication, transfer paths, and the real Standard-versus-Premium tradeoffs you can validate before budgeting.",
+    "title": "Azure Container Registry Pricing: Basic vs Standard vs Premium Cost Drivers",
+    "description": "Understand Azure Container Registry pricing through Basic, Standard, and Premium tradeoffs, included storage, geo-replication, extra storage, network charges, and the operating signals that change a monthly estimate.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
     "slug": "azure-container-registry-pricing",
     "topics": [
       "compute",
-      "egress",
       "storage"
     ]
   },
@@ -1444,8 +1443,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Event Hubs Pricing: Model ingress, retention, replay, and burst-throughput cost",
-    "description": "Model Azure Event Hubs pricing around ingress bytes, retained history, consumer rereads, burst-throughput windows, and downstream replay exposure so the stream budget survives calm days and incident periods.",
+    "title": "Azure Event Hubs Pricing: TUs, PUs, Capture, Retention, and Replay Cost",
+    "description": "Understand Azure Event Hubs pricing through Basic, Standard, Premium, and Dedicated tiers, Throughput Units, Processing Units, Capture, retention limits, replay patterns, and downstream stream costs.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",
@@ -1504,15 +1503,15 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Load Balancer pricing: L4 traffic and data processing model",
-    "description": "A practical cost model for Azure Load Balancer: hours, data processed, and egress boundaries. Includes a workflow to estimate GB processed from RPS and payload size, plus a validation checklist for peaks and retries.",
+    "title": "Azure Load Balancer Pricing: Rules, Data Processed, and Bandwidth Boundaries",
+    "description": "Understand Azure Load Balancer pricing through rules, data processed, and bandwidth boundaries. Learn when outbound rules, NAT Gateway, Application Gateway, and internet egress belong beside the load balancer line instead of inside it.",
     "canonicalPath": "/guides/azure-load-balancer-pricing",
     "category": "Azure",
     "slug": "azure-load-balancer-pricing",
     "topics": [
       "egress",
-      "kubernetes",
-      "load-balancing"
+      "load-balancing",
+      "requests"
     ]
   },
   {
@@ -1596,18 +1595,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "CDN Cost Guide: Diagnose the Bill, Choose the Right Calculator, and Validate the Model",
-    "description": "Use this CDN guide to diagnose which CDN line item moved first, route to the right calculator, and keep bandwidth, request fees, and origin egress as separate cost surfaces.",
-    "canonicalPath": "/guides/cdn-costs",
-    "category": "CDN",
-    "slug": "cdn-costs",
-    "topics": [
-      "cdn",
-      "egress",
-      "requests"
-    ]
-  },
-  {
     "title": "CDN Cost Per GB and Per Gigabyte Guide",
     "description": "Estimate CDN cost per GB with a realistic bandwidth model for region mix, tiering, free allowances, and cache fill. Built for CDN costs per GB and CDN cost per gigabyte queries.",
     "canonicalPath": "/guides/cdn-cost-per-gigabyte",
@@ -1616,6 +1603,18 @@ export const GUIDES: GuideLink[] = [
     "topics": [
       "cdn",
       "egress"
+    ]
+  },
+  {
+    "title": "CDN Pricing Guide: Diagnose Bandwidth, Request Fees, Origin Egress, and Provider Trade-Offs",
+    "description": "Use this CDN pricing guide to diagnose which CDN line item moved first, route to the right calculator, compare the right cost surface, and keep bandwidth, request fees, and origin egress separate.",
+    "canonicalPath": "/guides/cdn-costs",
+    "category": "CDN",
+    "slug": "cdn-costs",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
     ]
   },
   {
@@ -1714,18 +1713,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud CDN pricing (GCP): bandwidth, requests, and origin egress (cache fill)",
-    "description": "A practical Cloud CDN cost model that separates edge bandwidth, request shape, and origin cache-fill pressure, with validation steps for hit rate by path and purge-driven miss spikes.",
-    "canonicalPath": "/guides/gcp-cloud-cdn-pricing",
-    "category": "GCP",
-    "slug": "gcp-cloud-cdn-pricing",
-    "topics": [
-      "cdn",
-      "egress",
-      "requests"
-    ]
-  },
-  {
     "title": "Cloud Functions pricing (GCP): invocations, duration, egress, and log volume",
     "description": "A practical Cloud Functions cost model: invocations, execution time, outbound transfer, and logs. Includes a workflow to estimate baseline + peak and validate retries, cold starts, and log bytes per invocation.",
     "canonicalPath": "/guides/gcp-cloud-functions-pricing",
@@ -1735,17 +1722,6 @@ export const GUIDES: GuideLink[] = [
       "egress",
       "logging",
       "serverless"
-    ]
-  },
-  {
-    "title": "Cloud Logging pricing (GCP): ingestion, retention, and query scans",
-    "description": "A practical Cloud Logging cost model that separates noisy ingestion, retention exposure, and repeated scan behavior, with a fast way to estimate GB/day and validate dominant log sources.",
-    "canonicalPath": "/guides/gcp-cloud-logging-pricing",
-    "category": "GCP",
-    "slug": "gcp-cloud-logging-pricing",
-    "topics": [
-      "backup",
-      "logging"
     ]
   },
   {
@@ -1780,20 +1756,6 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Cloud SQL pricing: instance-hours, storage, backups, and network (practical estimate)",
-    "description": "A driver-based Cloud SQL estimate that separates provisioned capacity, storage and backup growth, and network-sensitive access patterns, with validation steps for HA sizing and transfer risk.",
-    "canonicalPath": "/guides/gcp-cloud-sql-pricing",
-    "category": "GCP",
-    "slug": "gcp-cloud-sql-pricing",
-    "topics": [
-      "backup",
-      "compute",
-      "database",
-      "egress",
-      "storage"
-    ]
-  },
-  {
     "title": "Dataflow pricing: worker hours, backlog catch-up, and observability (practical model)",
     "description": "Estimate Dataflow cost using measurable drivers: worker compute-hours, backlog catch-up scenarios (replays/backfills), data processed, and logs/metrics. Includes a worked template, pitfalls, and validation steps for autoscaling and replay patterns.",
     "canonicalPath": "/guides/gcp-dataflow-pricing",
@@ -1806,16 +1768,55 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "GCP Cloud Run Pricing: Estimate requests, CPU-seconds, memory-seconds, concurrency, and egress",
-    "description": "Estimate Cloud Run pricing from requests, CPU-seconds, memory-seconds, concurrency behavior, egress, and logs so you can explain whether spend is coming from scale, slow handlers, retries, or large responses.",
+    "title": "GCP Cloud CDN Pricing: Cache Egress, Requests, Cache Fill, and Origin Boundaries",
+    "description": "Understand GCP Cloud CDN pricing through cache egress bandwidth, cache lookup requests, cache fill, hit-rate pressure, and the origin or transfer costs that belong beside the Cloud CDN bill.",
+    "canonicalPath": "/guides/gcp-cloud-cdn-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-cdn-pricing",
+    "topics": [
+      "cdn",
+      "egress",
+      "requests"
+    ]
+  },
+  {
+    "title": "GCP Cloud Logging Pricing: Ingestion, Retention, Query Costs, and Log Buckets",
+    "description": "Understand GCP Cloud Logging pricing through ingestion charges, retention beyond 30 days, query and analysis behavior, log buckets, routed logs, and adjacent BigQuery, Pub/Sub, or SIEM costs.",
+    "canonicalPath": "/guides/gcp-cloud-logging-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-logging-pricing",
+    "topics": [
+      "backup",
+      "logging",
+      "messaging"
+    ]
+  },
+  {
+    "title": "GCP Cloud Run Pricing: Request-Based vs Instance-Based Billing, vCPU, Memory, and Egress",
+    "description": "Understand Cloud Run pricing through request-based billing, instance-based billing, vCPU-seconds, memory GiB-seconds, request charges, jobs, egress, logs, and adjacent build or image storage costs.",
     "canonicalPath": "/guides/gcp-cloud-run-pricing",
     "category": "GCP",
     "slug": "gcp-cloud-run-pricing",
     "topics": [
+      "compute",
       "egress",
       "logging",
       "requests",
-      "serverless"
+      "serverless",
+      "storage"
+    ]
+  },
+  {
+    "title": "GCP Cloud SQL Pricing: Instance Hours, HA, Storage, Backups, and Network",
+    "description": "Understand GCP Cloud SQL pricing through edition choice, instance hours, HA and replicas, storage, backups, and network-sensitive access patterns, with adjacent application and analytics costs kept separate.",
+    "canonicalPath": "/guides/gcp-cloud-sql-pricing",
+    "category": "GCP",
+    "slug": "gcp-cloud-sql-pricing",
+    "topics": [
+      "backup",
+      "compute",
+      "database",
+      "storage"
     ]
   },
   {

@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS CloudWatch Metrics Pricing & Cost Guide";
+const title = "AWS CloudWatch Metrics Pricing: Custom Metrics, API Requests, Dashboards, and Resolution";
 const description =
-  "Model AWS CloudWatch metrics cost from custom metrics, API requests, dashboards, and retention, with guidance on bill boundaries, cardinality growth, and adjacent alarm spend.";
+  "Understand AWS CloudWatch metrics pricing through custom metrics, metrics API requests, dashboards, high-resolution usage, and the alarm or external observability costs that belong beside the metrics bill.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cloudwatch-metrics-pricing"
-  lastUpdated="2026-02-23"
+  lastUpdated="2026-06-18"
   faqs={[
     {
       q: "What is the biggest driver for many CloudWatch metrics bills?",
@@ -22,6 +22,12 @@ const description =
   ]}
 >
   <p>
+    If you searched for AWS CloudWatch metrics pricing, the first thing to separate is what actually starts the bill.
+    For most teams, the main paid surface is <strong>custom metrics</strong>, not the standard AWS service metrics they
+    view every day. After that, metrics API requests, dashboard refresh behavior, and high-resolution usage decide
+    whether the bill stays small or grows with observability sprawl.
+  </p>
+  <p>
     Use this page when you need to decide what belongs inside the CloudWatch metrics bill before you debate cardinality cleanup, polling reduction, or dashboard pruning.
   </p>
   <p class="muted">
@@ -29,6 +35,23 @@ const description =
   </p>
   <p class="muted">
     If two teams publish similar dashboards but only one team owns the custom metrics explosion, this page should help you keep the CloudWatch-native bill attached to the publisher instead of hiding it inside a shared observability bucket.
+  </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    CloudWatch metrics pricing is not one generic "observability" number. The bill usually starts when you publish
+    custom metrics, then expands through metrics API requests and dashboard usage. High-resolution metrics can change
+    the unit economics again. Alarms and external tooling are related, but they are still separate cost surfaces.
+  </p>
+  <ul>
+    <li><strong>Custom metrics are the main paid surface</strong>: standard AWS service metrics are not the same thing as custom-metric inventory.</li>
+    <li><strong>Metrics API requests matter</strong>: dashboard refreshes, GetMetricData, and polling tools can create a meaningful request line item.</li>
+    <li><strong>Dashboards are not free decoration</strong>: dashboard-month charges and refresh patterns belong inside the CloudWatch-native bill.</li>
+    <li><strong>High-resolution usage is separate</strong>: high-resolution metrics and any high-resolution monitoring pattern should not be buried inside standard metric assumptions.</li>
+    <li><strong>Alarms still sit beside the metrics bill</strong>: even when metrics trigger them, alarm charges should remain a separate budget line.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current AWS CloudWatch pricing page and CloudWatch documentation.
   </p>
 
   <h2>Inside the metrics bill vs beside the metrics bill</h2>
@@ -41,13 +64,13 @@ const description =
   <h2>What to model on the bill itself</h2>
   <ul>
     <li>
-      <strong>Custom metrics time series</strong>: the active-series inventory created by names, dimensions, and environments.
+      <strong>Custom metrics time series</strong>: the active-series inventory created by names, dimensions, and environments. This is usually where the native bill really starts.
     </li>
     <li>
-      <strong>Resolution</strong>: standard vs high-resolution metrics where applicable.
+      <strong>Resolution</strong>: standard vs high-resolution metrics where applicable. Do not price them as one blended bucket if resolution choices differ by team.
     </li>
     <li>
-      <strong>Metrics API requests</strong>: dashboard refresh plus CloudWatch-native request usage.
+      <strong>Metrics API requests</strong>: dashboard refresh plus CloudWatch-native request usage such as GetMetricData and publisher-side write patterns.
     </li>
     <li>
       <strong>Dashboards</strong>: dashboard-month charges and their CloudWatch-native polling footprint.

@@ -17,6 +17,14 @@ test("pricing page is framed as the archive bill-boundary page", () => {
     content,
     /This guide is about bill boundaries: stored GB-month, retrieval GB, retrieval requests, transition exposure, minimum-duration exposure, and the adjacent compute, analysis-copy, or workflow costs that should be tracked beside the archive bill rather than blended into it\./,
   );
+  assert.match(
+    content,
+    /minimum storage duration|minimum-duration/i,
+  );
+  assert.match(
+    content,
+    /Deep Archive|Flexible Retrieval|Instant Retrieval/i,
+  );
 });
 
 test("estimate page is framed as the retrieval-measurement workflow page", () => {

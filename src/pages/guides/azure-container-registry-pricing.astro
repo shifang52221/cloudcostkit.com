@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Container Registry Pricing: Understand storage, image pulls, geo-replication, and tier tradeoffs";
+const title = "Azure Container Registry Pricing: Basic vs Standard vs Premium Cost Drivers";
 const description =
-  "Understand Azure Container Registry pricing through stored layers, pull churn during deploys, geo-replication, transfer paths, and the real Standard-versus-Premium tradeoffs you can validate before budgeting.";
+  "Understand Azure Container Registry pricing through Basic, Standard, and Premium tradeoffs, included storage, geo-replication, extra storage, network charges, and the operating signals that change a monthly estimate.";
 
 const faqs = [
   {
@@ -32,7 +32,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-container-registry-pricing"
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-06-18"
   faqs={faqs}
 >
   <p>
@@ -46,6 +46,25 @@ const faqs = [
   <p>
     Use this page when you need to show whether ACR spend is really coming from stored layers, pull churn during
     deploys, cross-region delivery, or the capability jump from Standard to Premium.
+  </p>
+
+  <h2>Quick pricing read: what most teams need first</h2>
+  <p>
+    If you searched for ACR pricing because you need a quick budget answer, start here. Azure positions Basic,
+    Standard, and Premium as service tiers with different included storage, throughput headroom, and feature scope.
+    The official pricing page gives the current regional rate card, but the budget decision still depends on included
+    storage, geo-replication, extra storage, and network charges.
+  </p>
+  <ul>
+    <li><strong>Basic</strong>: includes 10 GiB of storage and usually fits low-volume, single-region registries.</li>
+    <li><strong>Standard</strong>: includes 100 GiB of storage and is often the practical production starting point.</li>
+    <li><strong>Premium</strong>: includes 500 GiB of storage, adds geo-replication, and carries the highest throughput ceilings.</li>
+    <li><strong>Beyond the included storage</strong>: additional retained storage can continue to grow the bill separately from the tier fee.</li>
+    <li><strong>Outside the registry fee</strong>: cross-region pulls and internet delivery should still be checked as network charges.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current Azure pricing page and the latest Microsoft Learn ACR SKU
+    limits guidance.
   </p>
 
   <h2>What the ACR tier changes, and what it does not</h2>
@@ -64,6 +83,20 @@ const faqs = [
     Tier selection affects features and throughput ceilings, but monthly spend still tracks stored GB-month, pull
     behavior, and billed transfer paths.
   </p>
+
+  <h2>How to think about the ACR Basic monthly price</h2>
+  <p>
+    Many pricing searches are really asking a narrower question: what does ACR Basic cost per month? The safest answer
+    is not a single hard-coded dollar amount, because Azure pricing varies by region, currency, and agreement. The
+    reliable budgeting pattern is to treat Basic as the daily SKU charge converted into a monthly estimate, then add
+    any storage above the included allowance and any separate networking charges that your topology creates.
+  </p>
+  <ul>
+    <li><strong>Use Basic</strong> when registry traffic is modest and you do not need Premium-only features such as geo-replication.</li>
+    <li><strong>Watch extra storage</strong> when retained layers, hotfix tags, and multi-architecture images outgrow the included 10 GiB.</li>
+    <li><strong>Watch networking</strong> when AKS, build agents, or downstream consumers pull across regions or over internet paths.</li>
+    <li><strong>Watch reliability</strong> when CI retries and node churn start turning a cheap SKU into an operational bottleneck.</li>
+  </ul>
 
   <h2>Build the first estimate from registry behavior</h2>
   <p>
@@ -104,6 +137,56 @@ const faqs = [
     <li><strong>Cross-region clusters</strong>: treat them as transfer decisions, not as invisible internal traffic.</li>
     <li><strong>Geo-replication</strong>: model replication as its own operational and transfer decision instead of assuming Premium is just a bigger version of Standard.</li>
   </ul>
+
+  <h2>Read the official pricing table without underestimating the bill</h2>
+  <p>
+    The official Azure pricing table is the right source for current regional pricing, but it does not answer the
+    budgeting question by itself. It tells you what the registry SKU and storage bands cost. It does not tell you
+    whether your real bill shape is being driven by retention drift, pull concurrency, extra replicas, or transfer
+    paths outside the registry fee.
+  </p>
+  <ul>
+    <li><strong>Included storage is not your final storage cost</strong>: the tier allowance is only the starting buffer for retained layers.</li>
+    <li><strong>Premium is not just a bigger Standard</strong>: geo-replication changes the geographic shape of the estimate, not only the feature list.</li>
+    <li><strong>Throughput limits still matter</strong>: API and pull pressure can become reliability constraints before they look like storage problems.</li>
+    <li><strong>Transfer remains a separate review</strong>: a cheap registry tier does not erase cross-region or internet distribution cost.</li>
+  </ul>
+
+  <h2>Tier snapshot for budgeting decisions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Included storage</th>
+        <th>Best fit</th>
+        <th>Watch-outs</th>
+        <th>Upgrade trigger</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Basic</td>
+        <td>10 GiB</td>
+        <td>Small teams, low pull pressure, single-region usage</td>
+        <td>Can outgrow storage and throughput headroom quickly</td>
+        <td>CI churn, scale-outs, or repeated pull bottlenecks</td>
+      </tr>
+      <tr>
+        <td>Standard</td>
+        <td>100 GiB</td>
+        <td>Many production registries without Premium-only features</td>
+        <td>Still does not solve multi-region design by itself</td>
+        <td>Need for geo-replication, private endpoints, or higher concurrency</td>
+      </tr>
+      <tr>
+        <td>Premium</td>
+        <td>500 GiB</td>
+        <td>High-scale or multi-region registries with enterprise controls</td>
+        <td>Higher tier fee can hide topology inefficiency if you model it lazily</td>
+        <td>Stay only if the feature set and reliability boundary are genuinely needed</td>
+      </tr>
+    </tbody>
+  </table>
 
   <h2>When a tier upgrade is justified, and when it is hiding another problem</h2>
   <p>
@@ -164,6 +247,7 @@ const faqs = [
     <li>Validate image size using compressed pull size where possible.</li>
     <li>Validate which transfer paths are actually billed: same-region, cross-region, internet, and replication.</li>
     <li>Validate whether the upgrade trigger is reliability, feature need, or a hidden architecture issue.</li>
+    <li>Validate whether your current usage really requires Premium-only features or only cleaner topology and retention discipline.</li>
   </ul>
   <p>
     A good sign-off rule is simple: every major number in the estimate should map back to registry stats, workload

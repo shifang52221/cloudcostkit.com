@@ -1,26 +1,26 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Cloud Logging pricing (GCP): ingestion, retention, and query scans";
+const title = "GCP Cloud Logging Pricing: Ingestion, Retention, Query Costs, and Log Buckets";
 const description =
-  "A practical Cloud Logging cost model that separates noisy ingestion, retention exposure, and repeated scan behavior, with a fast way to estimate GB/day and validate dominant log sources.";
+  "Understand GCP Cloud Logging pricing through ingestion charges, retention beyond 30 days, query and analysis behavior, log buckets, routed logs, and adjacent BigQuery, Pub/Sub, or SIEM costs.";
 
 const faqs = [
   {
     q: "What usually drives logging cost?",
-    a: "Ingestion volume (GB) is usually the primary driver. Retention becomes material when you keep logs for months, and query scans matter for dashboard-heavy analytics.",
+    a: "Cloud Logging cost is usually led by ingestion volume first. Retention becomes material after 30 days, and the surrounding analysis path matters when logs are routed into BigQuery, Pub/Sub, SIEM tools, or broader observability workflows.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate GB/day (from provider usage or from events/sec × bytes/event), then model retention days. Add scan/search if you run frequent queries or dashboards.",
+    a: "Estimate monthly ingestion first, then split what stays in log buckets, what is retained beyond 30 days, and what is routed to other destinations. Keep Cloud Logging-native charges separate from downstream analytics or archive costs.",
   },
   {
     q: "What is the most common mistake?",
-    a: "Using one blended event size and ignoring a single dominant source (ingress/firewall/audit). Another common miss is dashboard refresh frequency: repeated scans can add up quickly.",
+    a: "The most common mistake is mixing Cloud Logging storage charges with downstream BigQuery, Pub/Sub, SIEM, or archive costs, then treating all of it as one logging number. Another common miss is ignoring one dominant log source such as load balancer, firewall, or audit logs.",
   },
   {
     q: "How do I validate?",
-    a: "Sample real payload sizes for top sources, validate retention per source, and audit dashboards/alerts for wide windows and frequent refresh.",
+    a: "Validate top sources by volume, confirm which buckets actually store the logs, check retention by bucket, and verify whether queries happen inside Cloud Logging or in routed analytics systems such as BigQuery.",
   },
 ];
 ---
@@ -28,15 +28,42 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-logging-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-06-18"
   faqs={faqs}
 >
   <p>
     Logging costs are predictable when you treat logs like data, but the first budgeting decision is whether Cloud
-    Logging cost is mainly being created by noisy ingestion, long retention, or repeated wide-window scans. The biggest
-    wins come from controlling ingestion volume and retention, and from preventing dashboards from scanning wide windows
-    repeatedly.
+    Logging cost is mainly being created by ingestion volume, retention policy, or repeated query and scan behavior. The
+    page gets much easier to trust once you separate the Cloud Logging bill itself from the systems that analyze or
+    archive logs after routing.
   </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    Cloud Logging pricing is not one generic "search your logs" fee. The first bill boundary is whether the log entry
+    is stored in a Cloud Logging bucket at all. After that, the main Cloud Logging-native charges are ingestion into log
+    bucket storage, retention beyond the included period, and any bucket-level storage pattern created by routing the
+    same log into multiple destinations. Querying in Logs Explorer does not behave the same way as routed analysis in
+    BigQuery or downstream SIEM tools, so those paths should not be blended into one line item.
+  </p>
+  <ul>
+    <li><strong>Ingestion is usually the main paid surface</strong>: Cloud Logging charges for logs streamed into log bucket storage for indexing, querying, and analysis, with the first 50 GiB per project per month free for standard logging storage.</li>
+    <li><strong>Retention becomes a second charge only after the included period</strong>: default bucket retention does not create the same long-tail storage bill as extending retention beyond 30 days.</li>
+    <li><strong>Log buckets change ownership</strong>: if logs are routed into multiple buckets, the project that stores those buckets carries the storage charge for each stored copy.</li>
+    <li><strong>Query and analysis paths must stay separated</strong>: Logs Explorer usage is not the same budget line as routed analysis in BigQuery, Pub/Sub pipelines, or external SIEM tooling.</li>
+    <li><strong>Vended network logs and routed analytics can change the shape</strong>: network telemetry, bucket choices, and routed destinations can make a logging estate look more expensive or cheaper than one blended average suggests.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current Google Cloud Observability pricing page, Cloud Logging
+    bucket documentation, and Cloud Logging analytics guidance.
+  </p>
+
+  <h2>Inside the Cloud Logging bill vs beside the Cloud Logging bill</h2>
+  <ul>
+    <li><strong>Inside the Cloud Logging bill</strong>: ingestion into Cloud Logging bucket storage, retained data beyond the included period, bucket-level storage ownership, and any separate storage behavior created by routing logs into multiple buckets.</li>
+    <li><strong>Beside the Cloud Logging bill</strong>: BigQuery analysis, Pub/Sub fan-out, SIEM ingestion, Cloud Storage archive copies, and broader observability tooling that consumes logs after they leave the bucket path.</li>
+    <li><strong>Why this matters</strong>: BigQuery, Pub/Sub, and SIEM pipelines belong beside the Cloud Logging bill, because a team can have a modest Cloud Logging bill and still create a large downstream logging estate elsewhere.</li>
+  </ul>
 
   <h2>0) Inventory sources (do not blend)</h2>
   <p>List the sources that can dominate volume and model them separately.</p>
@@ -57,7 +84,8 @@ const faqs = [
 
   <h2>1) Ingestion (GB)</h2>
   <p>
-    Ingestion is the core driver. If you have usage exports, use them. If not, estimate from event rate and payload size.
+    Ingestion is the core driver. If you have usage exports, use them. If not, estimate from event rate and payload
+    size. For most teams, this is the first place to look before debating retention or analytics tooling.
   </p>
   <p class="muted">
     Tools: <a href="/calculators/log-ingestion-cost-calculator/">Log ingestion</a>,{" "}
@@ -70,12 +98,18 @@ const faqs = [
     <li>
       Sample bytes/event for the top sources instead of using one blended average.
     </li>
+    <li>
+      Keep ordinary application logs, load balancer logs, audit logs, and firewall or network logs separated because
+      they rarely share the same size or retention profile.
+    </li>
   </ul>
 
   <h2>2) Retention (GB-month)</h2>
   <p>
-    Retention is a storage multiplier. In steady state, stored volume is roughly the last N days of logs, so retained GB is
-    approximately <strong>GB/day × retention days</strong>.
+    Retention is a storage multiplier. In steady state, stored volume is roughly the last N days of logs, so retained
+    GB is approximately <strong>GB/day × retention days</strong>. For Cloud Logging specifically, you should separate
+    the included retention window from extended retention, because the economics change once you deliberately keep logs
+    longer than the default bucket behavior.
   </p>
   <p class="muted">
     Tools: <a href="/calculators/log-retention-storage-cost-calculator/">Retention storage</a>,{" "}
@@ -88,12 +122,17 @@ const faqs = [
     <li>
       Split retention by log class (access vs audit vs app logs) instead of one global retention setting.
     </li>
+    <li>
+      Validate which logs remain in Cloud Logging buckets versus which are exported elsewhere, because the exported copy
+      creates a different storage bill.
+    </li>
   </ul>
 
   <h2>3) Query and scan (dashboards + alerts)</h2>
   <p>
-    Query costs depend on how much data you scan and how often. Dashboards and alert rules can scan far more data than you
-    expect, especially with broad time windows and frequent refresh.
+    Query and analysis behavior can still matter, but keep the budget boundary clean. Logs Explorer behavior inside Cloud
+    Logging is not the same as routed queries in BigQuery or downstream SIEM tools. Dashboards and alert rules can scan
+    far more data than you expect once logs leave the basic bucket workflow and enter heavier analytics paths.
   </p>
   <p class="muted">
     Tool: <a href="/calculators/log-search-scan-cost-calculator/">Log scan/search</a>.
@@ -104,6 +143,10 @@ const faqs = [
     </li>
     <li>
       Prefer queries that filter early and use narrower time windows.
+    </li>
+    <li>
+      If a team is really paying for routed analytics rather than Cloud Logging-native usage, move that spend beside the
+      Cloud Logging bill instead of hiding it here.
     </li>
   </ul>
 
@@ -127,6 +170,7 @@ const faqs = [
   <ul>
     <li>Turning on high-volume sources without measuring their payload sizes.</li>
     <li>Using one blended event size that hides a dominant source (ingress/firewall).</li>
+    <li>Blending Cloud Logging storage with BigQuery, Pub/Sub, SIEM, or object-storage archive costs.</li>
     <li>Keeping long retention everywhere by default.</li>
     <li>Dashboards/alerts scanning wide windows repeatedly (query cost explosion).</li>
     <li>Verbose logging during incidents (peak ingestion dominates the month).</li>
@@ -136,7 +180,9 @@ const faqs = [
   <ul>
     <li>Sample payload sizes for top sources and compute bytes/event.</li>
     <li>Validate which sources are enabled and disable/suppress the noisiest first.</li>
+    <li>Validate which log buckets actually store the data and which projects own those buckets.</li>
     <li>Validate retention per log class and apply tiered storage if needed.</li>
+    <li>Audit whether analysis happens in Logs Explorer, BigQuery, or external SIEM tooling before assigning query costs.</li>
     <li>Audit dashboard refresh intervals and alert windows (reduce repeated wide scans).</li>
   </ul>
 
@@ -152,13 +198,18 @@ const faqs = [
   <h2>Sources</h2>
   <ul>
     <li>
-      <a href="https://cloud.google.com/logging/pricing" target="_blank" rel="nofollow noopener">
-        Cloud Logging pricing
+      <a href="https://cloud.google.com/products/observability/pricing" target="_blank" rel="nofollow noopener">
+        Google Cloud Observability pricing
       </a>
     </li>
     <li>
-      <a href="https://cloud.google.com/logging/docs" target="_blank" rel="nofollow noopener">
-        Cloud Logging documentation
+      <a href="https://docs.cloud.google.com/logging/docs/buckets" target="_blank" rel="nofollow noopener">
+        Configure Cloud Logging buckets
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.cloud.google.com/logging/docs/log-analytics" target="_blank" rel="nofollow noopener">
+        Logs Explorer and Log Analytics guidance
       </a>
     </li>
   </ul>

@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Event Hubs Pricing: Model ingress, retention, replay, and burst-throughput cost";
+const title = "Azure Event Hubs Pricing: TUs, PUs, Capture, Retention, and Replay Cost";
 const description =
-  "Model Azure Event Hubs pricing around ingress bytes, retained history, consumer rereads, burst-throughput windows, and downstream replay exposure so the stream budget survives calm days and incident periods.";
+  "Understand Azure Event Hubs pricing through Basic, Standard, Premium, and Dedicated tiers, Throughput Units, Processing Units, Capture, retention limits, replay patterns, and downstream stream costs.";
 
 const faqs = [
   {
@@ -32,14 +32,19 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-event-hubs-pricing"
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-06-18"
   faqs={faqs}
 >
   <p>
     If you are trying to estimate Azure Event Hubs cost from events per second alone, the model will usually be too
-    light. The budgeting decision is not just how much data enters Event Hubs, but how retention and rereads change
-    the total stream cost shape. Event Hubs behaves more like a stream system than a simple request meter. A reliable
-    estimate starts with bytes, retention, and how often consumers reread data. That is why the same stream can look
+    light. The first pricing decision is to choose the right pricing tier before you model event volume: Basic,
+    Standard, Premium, and Dedicated expose different capacity units, feature boundaries, and retention options. The
+    budgeting decision is not just how much data enters Event Hubs, but how retention and rereads change the total
+    stream cost shape.
+  </p>
+  <p>
+    Event Hubs behaves more like a stream system than a simple request meter. A reliable estimate starts with tier
+    choice, capacity unit, bytes, retention, and how often consumers reread data. That is why the same stream can look
     inexpensive in a calm week and surprisingly expensive during a backfill, an incident, or a replay-heavy analytics
     cycle.
   </p>
@@ -47,6 +52,80 @@ const faqs = [
     Use this page when you need to explain whether the bill shape comes from bytes entering the stream, retained
     history, consumer rereads, or burst windows that make a calm-day average unusable.
   </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    Event Hubs pricing starts with the tier and capacity model, then gets shaped by ingestion, retention, Capture, and
+    replay behavior. Basic and Standard are usually planned around <strong>Throughput Units</strong>. Premium is planned
+    around <strong>Processing Units</strong>. Dedicated is planned around <strong>Capacity Units</strong>. Those units
+    are not interchangeable labels; they represent different isolation, scale, and feature assumptions.
+  </p>
+  <ul>
+    <li><strong>Basic</strong>: lowest-friction entry tier, but it lacks several features that commonly matter in production pricing reviews.</li>
+    <li><strong>Standard</strong>: common general-purpose tier; model Throughput Units, ingress volume, Capture if used, and retention needs.</li>
+    <li><strong>Premium</strong>: uses Processing Units for isolated capacity and supports longer-retention and enterprise stream scenarios.</li>
+    <li><strong>Dedicated</strong>: uses Capacity Units for large dedicated deployments where isolation and scale dominate the pricing decision.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against Azure Event Hubs pricing and Microsoft Learn guidance for quotas,
+    scalability, and tier limits.
+  </p>
+
+  <h2>Choose the right pricing tier before modeling event volume</h2>
+  <p>
+    A pricing estimate that starts with events per second can still be wrong if the tier is wrong. Capture, Kafka
+    support, Schema Registry, and retention limits can decide the tier before the first byte is modeled. Treat the tier
+    choice as a capability and isolation decision first, then use the stream model to size the bill.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Capacity model</th>
+        <th>Best fit</th>
+        <th>Pricing watch-out</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Basic</td>
+        <td>Throughput Units</td>
+        <td>Simple ingestion where advanced stream features are not required</td>
+        <td>Can be the wrong tier if Capture, Kafka, Schema Registry, or longer retention is needed</td>
+      </tr>
+      <tr>
+        <td>Standard</td>
+        <td>Throughput Units</td>
+        <td>Most general-purpose event streams with shared capacity economics</td>
+        <td>Capture and retention choices can change the bill shape beyond raw ingress</td>
+      </tr>
+      <tr>
+        <td>Premium</td>
+        <td>Processing Units</td>
+        <td>Isolated capacity, higher-scale production workloads, and longer retention needs</td>
+        <td>A Processing Unit is not just a more expensive Throughput Unit; size it around isolation and sustained load</td>
+      </tr>
+      <tr>
+        <td>Dedicated</td>
+        <td>Capacity Units</td>
+        <td>Large dedicated deployments where committed capacity and isolation matter most</td>
+        <td>Capacity commitment can dominate smaller streams even when the per-stream model looks efficient</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Do not mix up TUs, PUs, and CUs</h2>
+  <p>
+    Throughput Units, Processing Units, and Capacity Units are the first boundary to get right. TUs are the shared
+    throughput planning unit for Basic and Standard. PUs are the Premium capacity unit for isolated workloads. CUs are
+    the Dedicated capacity unit for committed, large-scale Event Hubs deployments. Moving up the stack changes the
+    operating model, not only the price label.
+  </p>
+  <ul>
+    <li><strong>Use TUs</strong> when the question is shared throughput and general-purpose ingress capacity.</li>
+    <li><strong>Use PUs</strong> when isolation, sustained throughput, or longer retention makes Premium the right class.</li>
+    <li><strong>Use CUs</strong> when the estate is large enough that a dedicated capacity model is the real buying decision.</li>
+  </ul>
 
   <h2>What usually drives Event Hubs cost in production</h2>
   <p>

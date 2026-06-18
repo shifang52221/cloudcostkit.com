@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Load Balancer pricing: L4 traffic and data processing model";
+const title = "Azure Load Balancer Pricing: Rules, Data Processed, and Bandwidth Boundaries";
 const description =
-  "A practical cost model for Azure Load Balancer: hours, data processed, and egress boundaries. Includes a workflow to estimate GB processed from RPS and payload size, plus a validation checklist for peaks and retries.";
+  "Understand Azure Load Balancer pricing through rules, data processed, and bandwidth boundaries. Learn when outbound rules, NAT Gateway, Application Gateway, and internet egress belong beside the load balancer line instead of inside it.";
 
 const faqs = [
   {
@@ -28,33 +28,81 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-load-balancer-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-06-18"
   faqs={faqs}
 >
   <p>
-    L4 load balancer estimates are easiest when you treat them like a network device: it runs for a number of hours and it
-    processes a volume of traffic. The two keys are: (1) split <strong>internal</strong> vs <strong>internet-facing</strong>,
-    and (2) model <strong>baseline + peak</strong>.
+    If you searched for Azure Load Balancer pricing, the first thing to confirm is what Azure actually bills on the
+    load balancer line versus what still lands on bandwidth or adjacent network services. This page is the pricing and
+    bill-boundary guide for Azure Load Balancer: use it to separate rules, data processed, and separate bandwidth
+    charges before you blend in outbound internet access, NAT, or L7 gateway assumptions.
+  </p>
+  <p>
+    L4 load balancer estimates are easiest when you treat them like a network device with explicit billing boundaries.
+    The two keys are: (1) split <strong>internal</strong> vs <strong>internet-facing</strong>, and (2) model
+    <strong>baseline + peak</strong> without assuming that every transferred byte belongs inside the load balancer bill.
+  </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    Azure Load Balancer pricing is not just a generic traffic number. The official pricing surface is built around
+    rules, data processed, and separate bandwidth charges. That is why a clean estimate has to distinguish what is
+    billed on the load balancer line from what belongs on outbound internet, cross-region transfer, or adjacent
+    services.
+  </p>
+  <ul>
+    <li><strong>Rules</strong>: configuration count matters because rules are part of the priced surface.</li>
+    <li><strong>Data processed</strong>: processed bytes belong on the load balancer estimate, but they are not a shortcut for all egress cost.</li>
+    <li><strong>Separate bandwidth charges</strong>: Azure still applies bandwidth pricing where the traffic path qualifies for it.</li>
+    <li><strong>Outbound design</strong>: if the real question is outbound internet access or SNAT behavior, validate whether you are pricing Azure Load Balancer outbound rules or a NAT Gateway design.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current Azure pricing page and Microsoft Learn guidance for Azure
+    Load Balancer outbound behavior.
   </p>
 
   <h2>0) Confirm you are modeling the right product</h2>
+  <p>
+    Azure Load Balancer is the right page only when the bill question is still about an L4 balancer. If the bill is
+    really driven by application-layer routing, WAF, or outbound internet architecture, you need to separate that
+    before you trust the estimate.
+  </p>
   <ul>
     <li>
       <strong>Azure Load Balancer</strong> is L4 (TCP/UDP). It does not do HTTP routing like an L7 gateway.
     </li>
     <li>
-      If you do HTTP routing, TLS termination, WAF, or path-based rules, you may be using a different L7 product; model that
-      separately.
+      If you do HTTP routing, TLS termination, WAF, or path-based rules, you may be using <strong>Application Gateway</strong> instead; model that separately.
+    </li>
+    <li>
+      If your real question is outbound internet access or SNAT design, validate whether you are really modeling Azure
+      Load Balancer outbound rules or whether <strong>NAT Gateway</strong> is the more accurate pricing surface.
+    </li>
+    <li>
+      Basic Load Balancer has already been retired, so production budgeting should be framed around the current Azure
+      Load Balancer pricing model rather than legacy Basic-versus-Standard choices.
     </li>
   </ul>
 
-  <h2>1) Hours (count your load balancers)</h2>
+  <h2>1) Know what belongs inside the Azure Load Balancer bill</h2>
+  <p>
+    The cleanest budgeting move is to decide which line items belong inside the load balancer bill before you estimate
+    traffic. Azure Load Balancer pricing is about the balancer surface itself. Adjacent costs still matter, but they
+    should be tracked beside the balancer instead of being blended into a single vague "network" number.
+  </p>
+  <ul>
+    <li><strong>Inside the balancer bill</strong>: rules, data processed, and load balancer runtime assumptions.</li>
+    <li><strong>Beside the balancer bill</strong>: bandwidth charges, NAT Gateway charges, Application Gateway charges, and downstream service transfer.</li>
+    <li><strong>Needs explicit validation</strong>: outbound SNAT path, cross-region paths, and whether internet responses are billed on a separate bandwidth line.</li>
+  </ul>
+
+  <h2>2) Hours (count your load balancers)</h2>
   <p>
     Count load balancers per environment (prod/stage/dev) and multiply by hours per month. If you have multiple front doors
     (regions, active-active), include them explicitly.
   </p>
 
-  <h2>2) Traffic processed (GB)</h2>
+  <h2>3) Traffic processed (GB)</h2>
   <p>
     Estimate monthly GB processed by converting request volume and average payload sizes into transfer. If you have multiple
     endpoints, model the highest-volume ones separately so heavy-tail endpoints do not disappear into a blended average.
@@ -73,7 +121,31 @@ const faqs = [
     </li>
   </ul>
 
-  <h2>3) Egress (the boundary that matters)</h2>
+  <h2>4) Data processed is not the same thing as bandwidth charges</h2>
+  <p>
+    This is the mistake that makes Azure Load Balancer pricing pages feel misleading. Data processed is part of the load
+    balancer estimate. Bandwidth charges are a separate billing boundary for qualifying traffic paths. If you collapse
+    those into one line, you can understate or double-count the network bill.
+  </p>
+  <ul>
+    <li><strong>Do not assume</strong> that every processed GB is the same thing as billed internet egress.</li>
+    <li><strong>Do not assume</strong> that internal traffic is priced the same way as internet-facing delivery.</li>
+    <li><strong>Do separate</strong> the load balancer processed-bytes model from your bandwidth validation workflow.</li>
+  </ul>
+
+  <h2>5) Outbound rules, SNAT, and NAT Gateway boundaries</h2>
+  <p>
+    Standard Azure Load Balancer outbound behavior deserves its own review because it can shift where teams expect the
+    bill to land. If your architecture depends on outbound rules or SNAT through the balancer, keep that design
+    decision explicit instead of assuming outbound internet pricing is automatically "part of the load balancer."
+  </p>
+  <ul>
+    <li><strong>Use outbound rules review</strong> when VM or cluster egress depends on the load balancer path.</li>
+    <li><strong>Use NAT Gateway review</strong> when your real decision is dedicated outbound internet architecture rather than balancing inbound traffic.</li>
+    <li><strong>Separate Application Gateway</strong> when the workload needs L7 routing, TLS termination, or WAF instead of a pure L4 balancer.</li>
+  </ul>
+
+  <h2>6) Egress (the boundary that matters)</h2>
   <p>
     If traffic exits to the internet, egress is often the material line item. Treat egress as independent from "GB processed"
     and validate what is billed (internal traffic may be priced differently than internet-facing traffic).
@@ -88,7 +160,7 @@ const faqs = [
     </li>
   </ul>
 
-  <h2>4) Hidden multipliers to check</h2>
+  <h2>7) Hidden multipliers to check</h2>
   <ul>
     <li>
       <strong>Retries/timeouts</strong>: multiply requests and bytes (and downstream dependencies).
@@ -121,6 +193,7 @@ const faqs = [
     <li>Modeling only average traffic and ignoring peak periods that drive capacity and cost.</li>
     <li>Ignoring retries/timeouts that multiply request volume and transfer.</li>
     <li>Assuming all traffic is "internal" without validating egress boundaries.</li>
+    <li>Modeling outbound internet design on the load balancer page when NAT Gateway is the real pricing surface.</li>
   </ul>
 
   <h2>How to validate</h2>
@@ -129,6 +202,7 @@ const faqs = [
     <li>Validate retries/timeouts in client and server logs.</li>
     <li>Validate response sizes for top endpoints (bytes, not just request counts).</li>
     <li>Validate which traffic is billed as egress (internet/cross-region vs internal).</li>
+    <li>Validate whether outbound rules or NAT Gateway define the real internet path for the workload.</li>
   </ul>
 
   <h2>Related tools</h2>

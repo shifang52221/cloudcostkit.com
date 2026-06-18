@@ -1,21 +1,21 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Aurora Serverless v2 pricing: how to estimate ACUs and avoid surprise bills";
+const title = "Aurora Serverless v2 Pricing: ACU-Hours, Minimum Capacity, Peaks, and Storage";
 const description =
-  "A practical way to estimate Aurora Serverless v2 costs by separating minimum-capacity baseline exposure from repeated peak windows, then layering in storage and backup retention.";
+  "Understand Aurora Serverless v2 pricing through ACU-hours, minimum-capacity baseline exposure, repeated peak windows, storage, backups, and the surrounding database or application costs that belong beside the Serverless v2 bill.";
 const faqs = [
   {
     q: "What is the #1 mistake in Serverless v2 estimates?",
-    a: "Using a single average ACU and ignoring peak periods. Costs track ACU-hours over time, so frequent short peaks can add up.",
+    a: "Using a single average ACU and ignoring peak periods. Aurora Serverless v2 charges follow ACU-hours over time, so a small baseline plus repeated short peaks can still create a meaningful monthly bill.",
   },
   {
     q: "Should I model min and max capacity?",
-    a: "Yes. Min capacity acts like a baseline you pay most of the time. Max capacity helps you bound the peak scenario and understand worst-case spend.",
+    a: "Yes. Minimum capacity acts like a baseline you carry much of the time, while maximum capacity defines the upper boundary of peak exposure. Together they shape the compute side of the bill much more accurately than one blended average.",
   },
   {
     q: "What else do I need besides ACUs?",
-    a: "Storage GB-month and backup GB-month (retention + churn). These can become long-term baselines even when compute is right-sized.",
+    a: "Storage GB-month and backup GB-month still matter, and so do adjacent logs, metrics, and application-side retries or transfer paths. These can become long-term baselines even when compute is right-sized.",
   },
 ];
 ---
@@ -23,7 +23,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/aws-aurora-serverless-v2-pricing"
-  lastUpdated="2026-01-27"
+  lastUpdated="2026-06-18"
   faqs={faqs}
 >
   <p class="muted">
@@ -40,6 +40,33 @@ const faqs = [
     should estimate it like a time-series bill: a baseline most hours, plus peaks that happen during batch jobs,
     traffic spikes, or incidents. If you budget from a single average ACU, you usually under-estimate.
   </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    Aurora Serverless v2 pricing is not just "serverless database, pay when busy." The compute bill is built from
+    ACU-hours over time, and the real shape depends on minimum-capacity baseline exposure versus repeated peak-window
+    expansion. Each ACU represents roughly 2 GiB of memory with associated CPU and networking, so the minimum and
+    maximum range you configure changes both your performance posture and your billing posture. Storage and backups stay
+    as neighboring cost surfaces even when compute is elastic.
+  </p>
+  <ul>
+    <li><strong>ACU-hours are the core compute surface</strong>: Serverless v2 charges follow actual ACU capacity over time rather than a fixed instance-hour model.</li>
+    <li><strong>Minimum-capacity baseline matters</strong>: the minimum ACU setting often behaves like a quiet monthly floor, and newer engine versions can allow 0 ACUs with automatic pause while many environments still effectively budget around 0.5 ACUs or higher.</li>
+    <li><strong>Peak windows create the second bill shape</strong>: backfills, deploy storms, analytics bursts, and incident retries can add repeated ACU-hour spikes even when the baseline looks calm.</li>
+    <li><strong>Storage and backups are still separate surfaces</strong>: Aurora Serverless v2 does not make storage or backup retention disappear just because compute scales elastically.</li>
+    <li><strong>Keep neighboring costs beside the Serverless v2 bill</strong>: broader Aurora bill anatomy, database parent budgeting, and application costs such as retry storms or external transfer should stay beside this page unless they are directly shaping ACU-hours.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current Aurora pricing page, Aurora Serverless v2 capacity-range
+    documentation, and Aurora scaling guidance.
+  </p>
+
+  <h2>Inside the Serverless v2 bill vs beside the Serverless v2 bill</h2>
+  <ul>
+    <li><strong>Inside the Serverless v2 bill</strong>: ACU-hours, minimum-capacity baseline exposure, peak-window compute expansion, storage, and backup retention tied directly to the Aurora cluster.</li>
+    <li><strong>Beside the Serverless v2 bill</strong>: broader Aurora bill-structure questions, database parent budgeting decisions, logs, metrics, application costs, and transfer paths that are not directly part of ACU-hour compute shape.</li>
+    <li><strong>Why this matters</strong>: a team can tune ACU ranges correctly and still create a large adjacent bill through application retries, logging, or database-adjacent workflows that do not belong inside the Serverless v2 compute model.</li>
+  </ul>
 
   <h2>Step 1: pick baseline and peak scenarios (don’t start with one number)</h2>
   <p>
@@ -137,8 +164,13 @@ const faqs = [
       </a>
     </li>
     <li>
-      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html" target="_blank" rel="nofollow noopener">
-        Aurora Serverless v2 documentation
+      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.requirements.html" target="_blank" rel="nofollow noopener">
+        Aurora Serverless v2 capacity range requirements
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html" target="_blank" rel="nofollow noopener">
+        Aurora Serverless v2 scaling and capacity guidance
       </a>
     </li>
   </ul>

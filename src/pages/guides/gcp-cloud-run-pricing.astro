@@ -1,30 +1,30 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "GCP Cloud Run Pricing: Estimate requests, CPU-seconds, memory-seconds, concurrency, and egress";
+const title = "GCP Cloud Run Pricing: Request-Based vs Instance-Based Billing, vCPU, Memory, and Egress";
 const description =
-  "Estimate Cloud Run pricing from requests, CPU-seconds, memory-seconds, concurrency behavior, egress, and logs so you can explain whether spend is coming from scale, slow handlers, retries, or large responses.";
+  "Understand Cloud Run pricing through request-based billing, instance-based billing, vCPU-seconds, memory GiB-seconds, request charges, jobs, egress, logs, and adjacent build or image storage costs.";
 
 const faqs = [
   {
     q: "What usually drives Cloud Run cost?",
-    a: "CPU/memory time is the core driver, but request volume, egress, and log ingestion can dominate for high-traffic or large-response services.",
+    a: "For services, the main Cloud Run-native drivers are billing setting, vCPU time, memory time, request charges when request-based billing is used, and the amount of billable instance time created by latency, concurrency, startup, and shutdown behavior.",
   },
   {
-    q: "Is Cloud Run priced per request or by CPU and memory?",
-    a: "Treat request volume as the entry point, but cost is usually shaped by CPU time, memory time, request duration, and egress. There is not one single blended 'price per request' that stays accurate across workloads.",
+    q: "Is Cloud Run request-based or instance-based?",
+    a: "Cloud Run services can use request-based billing or instance-based billing. Request-based billing adds request charges and bills CPU and memory around request processing. Instance-based billing bills the full instance lifecycle and removes the per-request fee.",
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate monthly requests, request duration (p50/p95), and response size. Add separate line items for outbound transfer and logs/retention.",
+    a: "Start with the billing setting, monthly requests, p50/p95 duration, vCPU, memory, concurrency, min instances, response transfer, and log volume. Keep Artifact Registry, Cloud Build, and downstream services beside the Cloud Run line.",
   },
   {
     q: "What is the most common mistake?",
-    a: "Sizing from one average duration and ignoring retries and the slow path. Incidents often increase both request volume and duration at the same time.",
+    a: "The most common mistake is blending services, jobs, images, build minutes, network transfer, and logs into one Cloud Run number. That hides whether the service itself is expensive or the surrounding workflow is expensive.",
   },
   {
     q: "How do I validate?",
-    a: "Validate p50/p95 latency, concurrency behavior, retries/timeouts, top endpoints by bytes, and log bytes per request.",
+    a: "Validate the billing setting, billed instance time, p50/p95 latency, concurrency behavior, min-instance idle time, retries/timeouts, top endpoints by bytes, and log bytes per request.",
   },
 ];
 ---
@@ -32,7 +32,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-run-pricing"
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-06-18"
   faqs={faqs}
 >
   <p>
@@ -52,21 +52,51 @@ const faqs = [
     retries, downstream amplification, and observability before narrowing the estimate to Cloud Run.
   </p>
 
+  <h2>Quick pricing read</h2>
+  <p>
+    Cloud Run pricing starts with the billing setting, not with a single "price per request." For services, the first
+    fork is request-based billing versus instance-based billing. After that, the bill is shaped by vCPU, memory, request
+    charges, region, billed instance time, concurrency, and whether the workload is an HTTP service, a job, or a
+    specialized GPU-style deployment.
+  </p>
+  <ul>
+    <li><strong>Request-based billing</strong>: the default service model. You pay for request charges plus vCPU and memory during billable request processing, startup, and shutdown windows.</li>
+    <li><strong>Instance-based billing</strong>: you pay for the full lifecycle of a running instance, with no separate per-request fee. It can fit steadier services, background work, or cases where always-allocated CPU is intentional.</li>
+    <li><strong>vCPU, memory, and request charges</strong>: these are the core Cloud Run-native service surfaces to model before you add network, logs, or downstream dependencies.</li>
+    <li><strong>Cloud Run jobs</strong>: jobs are billed around CPU, memory, active runtime, region, and any parallel execution shape rather than HTTP request volume.</li>
+    <li><strong>Adjacent costs</strong>: Artifact Registry, Cloud Build, outbound data transfer, Cloud Logging, Cloud Monitoring, and downstream databases should sit beside the Cloud Run bill unless you are explicitly building a full application budget.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current Google Cloud Run pricing page, Cloud Run billing settings
+    documentation, and Cloud Run cost-optimization guidance.
+  </p>
+
   <h2>What Cloud Run teams usually pay for in the real world</h2>
   <p>
     Most teams start with request count because it is easy to understand, but request count alone is not the bill.
-    Cloud Run cost is usually shaped by a stack of related drivers that need to be read together.
+    Cloud Run cost is usually shaped by a stack of related drivers that need to be read together. The important move is
+    to separate Cloud Run-native charges from the surrounding delivery workflow.
   </p>
   <ul>
+    <li><strong>Billing setting</strong> decides whether the service is modeled as request-based billing or instance-based billing before any traffic math begins.</li>
     <li><strong>Requests</strong> tell you how often the service executes, but they only become meaningful after you split baseline traffic from peak and retry traffic.</li>
-    <li><strong>CPU and memory time</strong> decide how expensive each request becomes, which is why a slow path or poor concurrency setting can change the monthly total quickly.</li>
+    <li><strong>vCPU and memory time</strong> decide how expensive each request or running instance becomes, which is why a slow path or poor concurrency setting can change the monthly total quickly.</li>
+    <li><strong>Minimum instances</strong> can create idle billable time that looks small per minute but becomes a real baseline if it is enabled across many services or regions.</li>
     <li><strong>Egress</strong> matters when responses are large, clients are global, or the service is exporting files rather than returning small JSON payloads.</li>
-    <li><strong>Logs</strong> matter because request-by-request observability scales linearly with traffic and can become a second bill long before the application feels large.</li>
+    <li><strong>Logs and metrics</strong> matter because request-by-request observability scales linearly with traffic and can become a second bill long before the application feels large.</li>
   </ul>
   <p>
     The practical takeaway is simple: if you only model requests, you will usually undercount the expensive month. If
-    you model requests, execution time, transfer, and logs together, Cloud Run becomes much easier to budget.
+    you model billing setting, requests, billed instance time, transfer, and logs together, Cloud Run becomes much
+    easier to budget.
   </p>
+
+  <h2>Inside the Cloud Run bill vs beside the Cloud Run bill</h2>
+  <ul>
+    <li><strong>Inside the Cloud Run bill</strong>: request charges when applicable, vCPU-seconds, memory GiB-seconds, GPU seconds when used, jobs runtime, worker-pool runtime, minimum-instance exposure, and region-specific pricing.</li>
+    <li><strong>Beside the Cloud Run bill</strong>: Artifact Registry image storage, Cloud Build build minutes, Cloud Logging ingestion and retention, Cloud Monitoring, outbound data transfer, load balancing, Cloud SQL, storage, Pub/Sub, and any downstream API charges.</li>
+    <li><strong>Why this matters</strong>: Artifact Registry and Cloud Build belong beside the Cloud Run bill, not hidden inside it, because image storage or build activity can grow even when the Cloud Run service itself is efficient.</li>
+  </ul>
 
   <h2>Build the first estimate from service behavior, not from one average</h2>
   <p>
@@ -75,10 +105,12 @@ const faqs = [
     drivers that explain why this service is cheap in one month and surprisingly expensive in another.
   </p>
   <ul>
+    <li><strong>Billing mode</strong>: decide whether the service is using request-based billing or instance-based billing, and keep that assumption visible in the estimate.</li>
     <li><strong>Requests per month</strong>: convert traffic into a monthly number, but keep baseline and peak separated instead of blending them.</li>
     <li><strong>Duration by percentile</strong>: use p50 and p95 so you can see what normal execution looks like and what the slow path costs.</li>
     <li><strong>CPU and memory shape</strong>: capture what each request actually consumes while it is running, especially for handlers that are not purely I/O-bound.</li>
     <li><strong>Concurrency behavior</strong>: note whether higher concurrency improves efficiency or causes latency and contention that erase the savings.</li>
+    <li><strong>Minimum instances</strong>: model warm capacity separately from live request processing so idle exposure is not mistaken for traffic-driven spend.</li>
     <li><strong>Response size and egress</strong>: isolate heavy endpoints, downloads, exports, or media responses so they do not disappear inside one blended average.</li>
     <li><strong>Log bytes per request</strong>: estimate logging separately from application payload size because verbose logs often scale differently from response bodies.</li>
   </ul>
@@ -94,12 +126,14 @@ const faqs = [
     volume together.
   </p>
 
-  <h2>How compute, concurrency, transfer, and logs interact</h2>
+  <h2>How billing mode, concurrency, transfer, and logs interact</h2>
   <p>
     This is the part many quick guides skip. Cloud Run does not become expensive because one input goes up in
     isolation. It gets expensive when several cost drivers reinforce each other.
   </p>
   <ul>
+    <li><strong>Request-based billing with bursty traffic</strong> can be efficient when scale-to-zero and short request windows dominate the pattern.</li>
+    <li><strong>Instance-based billing with steady traffic</strong> can be more predictable when instances stay useful between requests and no per-request fee is valuable.</li>
     <li><strong>High latency with low effective concurrency</strong> means compute time dominates faster because every request holds resources longer.</li>
     <li><strong>Large responses</strong> can push network transfer ahead of compute, especially for export, download, or media endpoints.</li>
     <li><strong>Retry storms and timeouts</strong> multiply requests, compute time, downstream calls, and log volume together.</li>
@@ -115,6 +149,18 @@ const faqs = [
     <li><strong>CPU-bound handlers</strong>: lower concurrency is often safer because it protects p95 latency and keeps contention visible.</li>
     <li><strong>I/O-bound handlers</strong>: higher concurrency can improve cost efficiency, but only if latency stays controlled under load.</li>
     <li><strong>Mixed workloads</strong>: split batch-like or heavy endpoints into separate services so one concurrency decision does not distort the entire estimate.</li>
+  </ul>
+
+  <h2>Services, jobs, and GPU workloads should not share one shortcut</h2>
+  <p>
+    A service that responds to HTTP requests, a job that runs to completion, and a GPU-backed service can all be Cloud
+    Run workloads, but they do not deserve the same budget shortcut. Keeping them separate makes the estimate easier to
+    explain and makes the page more useful for real architecture reviews.
+  </p>
+  <ul>
+    <li><strong>Services</strong>: model billing mode, requests, duration, vCPU, memory, concurrency, min instances, transfer, and logs.</li>
+    <li><strong>Jobs</strong>: model task count, parallelism, retry behavior, active runtime, vCPU, memory, region, and whether failed attempts create repeated runtime.</li>
+    <li><strong>GPU workloads</strong>: model them as instance-based commitments with GPU seconds and idle exposure visible, not as ordinary request-priced services.</li>
   </ul>
 
   <h2>Scenario planning: the fastest way to avoid a weak budget</h2>
@@ -134,17 +180,17 @@ const faqs = [
     <tbody>
       <tr>
         <td>Baseline month</td>
-        <td>Expected traffic, normal latency, standard log volume</td>
+        <td>Expected traffic, chosen billing mode, normal latency, standard log volume</td>
         <td>Gives you the operating floor for a stable period</td>
       </tr>
       <tr>
         <td>Peak month</td>
-        <td>Higher request volume, larger response mix, busier endpoints</td>
+        <td>Higher request volume, larger response mix, busier endpoints, more billed instance time</td>
         <td>Shows whether network and logs scale faster than compute</td>
       </tr>
       <tr>
         <td>Failure month</td>
-        <td>Retries, timeouts, slow upstreams, noisy logging</td>
+        <td>Retries, timeouts, slow upstreams, cold starts, noisy logging, failed job reruns</td>
         <td>Reveals how incidents turn one service into several simultaneous cost spikes</td>
       </tr>
     </tbody>
@@ -160,7 +206,9 @@ const faqs = [
     have the right variables but the wrong shape of data behind them.
   </p>
   <ul>
+    <li>The billing mode is not recorded, so request-based and instance-based assumptions get mixed in one spreadsheet.</li>
     <li>One average duration is used for every endpoint, which hides the slow path that drives cost and tail latency.</li>
+    <li>Minimum instances are treated as a reliability setting but never modeled as idle billable time.</li>
     <li>Retry traffic appears in dashboards but never makes it into the budget model.</li>
     <li>Large-response endpoints are blended into a harmless-looking average response size.</li>
     <li>Logging assumptions stay frozen even after traffic growth or more verbose instrumentation.</li>
@@ -170,8 +218,10 @@ const faqs = [
     Before you sign off on the estimate, validate the service against real operating signals rather than intuition.
   </p>
   <ul>
+    <li>Check whether the service uses request-based billing or instance-based billing before comparing months.</li>
     <li>Check p50 and p95 latency for the endpoints that dominate traffic or spend.</li>
     <li>Check concurrency behavior under load so you know whether your efficiency assumptions survive real traffic.</li>
+    <li>Check minimum instances and idle exposure separately from active request processing.</li>
     <li>Check the top endpoints by response bytes, not just by request count.</li>
     <li>Check retries, timeout windows, and incident periods separately from normal traffic.</li>
     <li>Check log bytes per request and retention settings so observability is not treated as a rounding error.</li>
@@ -215,8 +265,13 @@ const faqs = [
       </a>
     </li>
     <li>
-      <a href="https://cloud.google.com/run/docs" target="_blank" rel="nofollow noopener">
-        Cloud Run documentation
+      <a href="https://docs.cloud.google.com/run/docs/configuring/billing-settings" target="_blank" rel="nofollow noopener">
+        Cloud Run billing settings for services
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.cloud.google.com/run/docs/tips/services-cost-optimization" target="_blank" rel="nofollow noopener">
+        Cost-optimized Cloud Run services
       </a>
     </li>
   </ul>

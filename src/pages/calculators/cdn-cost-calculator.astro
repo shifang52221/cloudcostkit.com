@@ -49,7 +49,7 @@ const description =
       a: "Confirm edge GB, request units, cache hit rate, and origin pricing against billing, analytics, or a written traffic assumption set. Then compare baseline and peak separately.",
     },
   ]}
-  lastUpdated="2026-04-19"
+  lastUpdated="2026-06-19"
   related={[
     { href: "/guides/cdn-costs", label: "Guide: CDN cost diagnosis" },
     { href: "/calculators/cdn-bandwidth-cost-calculator", label: "Edge bandwidth calculator" },
@@ -59,6 +59,13 @@ const description =
     { href: "/guides/cdn-cost-comparison", label: "Provider comparison guide" },
   ]}
 >
+  <div class="prose">
+    <p class="muted" style="margin-top:0">
+      Start here when the real question is not "what is the CDN rate?" but "which cost surface dominates this month
+      once bandwidth, request fees, and origin exposure all stay visible together?"
+    </p>
+  </div>
+
   <div class="prose">
     <h2 style="margin-top:0">Which number moved first?</h2>
     <ul>
@@ -77,6 +84,11 @@ const description =
       <li><strong>Dynamic API at the edge</strong>: request share and origin leakage can outrank bandwidth.</li>
       <li><strong>Launch month with lower cache hit rate</strong>: all three cost surfaces can move together.</li>
     </ul>
+    <p class="muted" style="margin-top:8px">
+      The planner is strongest when you still need to compare <strong>bandwidth share</strong>, <strong>request
+      share</strong>, and <strong>origin egress share</strong> before deciding whether the next move is optimization,
+      provider comparison, or deeper single-surface math.
+    </p>
   </div>
 
   <CdnCostPlanner client:load />
@@ -101,6 +113,10 @@ const description =
 
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Next step by intent</h2>
+    <p class="muted" style="margin-top:8px">
+      Use the cards below to leave this page on purpose. If one surface clearly dominates, move to the narrower math.
+      If the total still feels fuzzy, go back to diagnosis rather than forcing a blended answer.
+    </p>
     <div class="grid">
       <a class="card2 tool col-6" href="/calculators/cdn-bandwidth-cost-calculator/">
         <div class="tool-title">Bandwidth is clearly dominant</div>

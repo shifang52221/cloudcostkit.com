@@ -1,19 +1,19 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS WAF pricing: what to model (ACLs, rules, requests)";
+const title = "AWS WAF Pricing: Web ACLs, Request Charges, Bot Control, and Logging Boundaries";
 const description =
-  "A practical AWS WAF pricing checklist: Web ACL fees, rule fees, request charges, and the downstream costs security teams forget.";
+  "Understand AWS WAF pricing through Web ACL baselines, rule and request charges, blocked-traffic evaluation, Bot Control, CAPTCHA or Challenge actions, and the logging or SIEM costs that belong beside WAF.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-waf-pricing"
-  lastUpdated="2026-04-04"
+  lastUpdated="2026-06-18"
   faqs={[
     {
       q: "What typically drives WAF cost?",
-      a: "Request volume plus the baseline of Web ACLs and rules you configure. During traffic spikes, request charges can dominate.",
+      a: "The core WAF bill is shaped by Web ACL count, rules or rule groups, evaluated requests, and any paid managed protections such as Bot Control or Fraud Control. During attacks, evaluated requests can dominate quickly.",
     },
     {
       q: "What costs sit downstream of WAF?",
@@ -26,9 +26,28 @@ const description =
     This is the AWS WAF bill-boundary page.
   </p>
   <p class="muted">
-    Stay here when the open question is Web ACLs, rules, evaluated requests, and the downstream logging or SIEM costs
-    that should be tracked beside WAF rather than confused with it. Go back to the security parent page if the broader
-    security spike question is still unclear.
+    Stay here when the open question is Web ACLs, rules, evaluated requests, optional managed protections, and the
+    downstream logging or SIEM costs that should be tracked beside WAF rather than confused with it. Go back to the
+    security parent page if the broader security spike question is still unclear.
+  </p>
+
+  <h2>Quick pricing read</h2>
+  <p>
+    AWS WAF pricing is not only a request counter. The bill starts with the Web ACL baseline, then adds rules or rule
+    groups, evaluated requests, and any optional intelligent protections such as Bot Control, Fraud Control, or
+    CAPTCHA and Challenge actions. The important boundary is that blocked traffic still counts as evaluated traffic, but
+    logging, storage, SIEM analysis, and investigation workflows still belong beside the WAF bill rather than inside it.
+  </p>
+  <ul>
+    <li><strong>Web ACLs are the first baseline</strong>: each Web ACL creates a baseline charge, so environment sprawl and duplicated protection surfaces increase cost before traffic is even discussed.</li>
+    <li><strong>Rules and rule groups add structural cost</strong>: custom rules, managed rule groups, and other rule-group choices change the baseline posture of the bill.</li>
+    <li><strong>Evaluated requests are the main variable surface</strong>: allowed and blocked traffic both count, which is why attack windows can raise spend even when the origin is protected successfully.</li>
+    <li><strong>Managed protections can change the bill shape</strong>: Bot Control, Fraud Control, and CAPTCHA or Challenge usage are not the same as a simple Web ACL plus request model.</li>
+    <li><strong>Logging boundaries still matter</strong>: CloudWatch, S3, Firehose, and SIEM pipelines belong beside WAF because teams often create a second security-observability bill after WAF has already done its work.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current AWS WAF pricing page, AWS WAF logging documentation, and
+    AWS-managed intelligent threat documentation.
   </p>
 
   <h2>What to model (baseline + variable)</h2>
@@ -40,7 +59,10 @@ const description =
       <strong>Rule count</strong>: custom rules + managed rule groups you enable (based on your pricing model)
     </li>
     <li>
-      <strong>Requests/month</strong>: total evaluated requests (watch out for attack traffic)
+      <strong>Requests/month</strong>: total evaluated requests, including blocked traffic and attack-driven spikes
+    </li>
+    <li>
+      <strong>Managed protections</strong>: Bot Control, Fraud Control, CAPTCHA, or Challenge actions when your protection model uses them
     </li>
     <li>
       <strong>Downstream</strong>: log delivery, storage, search/analytics, and SIEM ingestion
@@ -52,7 +74,7 @@ const description =
 
   <h2>Inside the WAF bill vs outside the WAF bill</h2>
   <ul>
-    <li><strong>Inside the WAF bill</strong>: Web ACL baselines, rule or managed-rule coverage, and evaluated requests including blocked traffic during attack windows.</li>
+    <li><strong>Inside the WAF bill</strong>: Web ACL baselines, rule or managed-rule coverage, evaluated requests including blocked traffic during attack windows, and any WAF-native intelligent protection add-ons that are enabled on the Web ACL.</li>
     <li><strong>Usually outside the WAF bill</strong>: log delivery, retention, query scans, SIEM ingestion, and analyst workflows triggered by WAF events.</li>
     <li><strong>Why that boundary matters</strong>: teams often blame WAF for total security-observability spend when the real multiplier sits in downstream logging and investigation.</li>
   </ul>
@@ -67,7 +89,7 @@ const description =
       Baseline scenario: typical month requests and current ACL/rule inventory.
     </li>
     <li>
-      Spike scenario: attack/bot window where evaluated requests are much higher.
+      Spike scenario: attack or bot window where evaluated requests are much higher and optional protections may activate more often.
     </li>
   </ul>
 
@@ -78,6 +100,9 @@ const description =
     </li>
     <li>
       <strong>Requests/month</strong> = evaluated requests (allowed + blocked), baseline + spike
+    </li>
+    <li>
+      <strong>Managed protections</strong> = Bot Control / Fraud Control / CAPTCHA or Challenge assumptions that are actually enabled
     </li>
     <li>
       <strong>Logs</strong> = (bytes per request) * requests/month + retention + query scans
@@ -93,6 +118,9 @@ const description =
       <strong>ACL and rule inventory</strong>: list ACLs by environment and identify duplicated policies (sprawl is common).
     </li>
     <li>
+      <strong>Managed protections</strong>: confirm whether Bot Control, Fraud Control, CAPTCHA, or Challenge are enabled on the same ACL instead of assuming a plain request-only model.
+    </li>
+    <li>
       <strong>Log volume</strong>: measure bytes per event and multiply by events/day; do not assume "logs are small".
     </li>
   </ul>
@@ -101,8 +129,9 @@ const description =
   <ul>
     <li>Underestimating request volume during incidents (bot traffic, attacks).</li>
     <li>Keeping many almost-identical ACLs and rules across environments.</li>
+    <li>Forgetting that blocked traffic still counts in evaluated request volume.</li>
+    <li>Ignoring paid managed protections and then comparing the bill to a plain ACL-plus-requests estimate.</li>
     <li>Streaming full logs everywhere without volume controls.</li>
-    <li>Measuring allowed requests only and forgetting blocked traffic in evaluated volume.</li>
     <li>Using one average and missing peak hours (spikes drive the bill).</li>
   </ul>
 
@@ -110,6 +139,7 @@ const description =
   <ul>
     <li>Reconcile evaluated requests against the bill for the same window (baseline week + spike window).</li>
     <li>Confirm rule/ACL inventory matches what is deployed (copy/paste ACL sprawl is common).</li>
+    <li>Confirm whether Bot Control, Fraud Control, CAPTCHA, or Challenge are part of the deployed policy set.</li>
     <li>Verify logging controls: sampling, retention, and dashboard query windows.</li>
   </ul>
 
@@ -147,6 +177,16 @@ const description =
     <li>
       <a href="https://aws.amazon.com/waf/pricing/" target="_blank" rel="nofollow noopener">
         AWS WAF pricing
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-bot.html" target="_blank" rel="nofollow noopener">
+        AWS WAF Bot Control managed rule group
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.aws.amazon.com/waf/latest/developerguide/waf-captcha-and-challenge.html" target="_blank" rel="nofollow noopener">
+        AWS WAF CAPTCHA and Challenge
       </a>
     </li>
     <li>

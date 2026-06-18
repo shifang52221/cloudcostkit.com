@@ -1,15 +1,15 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "AWS Route 53 Pricing Guide: Route 53 Cost Calculator Inputs and DNS Query Modeling";
+const title = "AWS Route 53 Pricing: Hosted Zones, Queries, Health Checks, and Traffic Flow";
 const description =
-  "Estimate AWS Route 53 cost by separating query-led spend, hosted-zone baseline, and health-check sprawl, with baseline and peak DNS modeling for failovers and retry storms.";
+  "Understand AWS Route 53 pricing through public and private hosted zones, query charges, free alias queries to AWS resources, health checks, and Traffic Flow or advanced routing cost boundaries.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-route-53-pricing"
-  lastUpdated="2026-03-11"
+  lastUpdated="2026-06-18"
   faqs={[
     {
       q: "What usually drives Route 53 cost?",
@@ -36,6 +36,23 @@ const description =
     This guide is about bill boundaries: hosted zones, DNS queries, health checks, and the adjacent resolver, CDN, and incident-side costs that should be tracked beside Route 53 rather than blended into it.
   </p>
 
+  <h2>Quick pricing read</h2>
+  <p>
+    Route 53 pricing looks simple at first, but the bill shape changes as soon as you separate public hosted zones,
+    private hosted zones, DNS query classes, health checks, and Traffic Flow. The best first move is to decide which
+    of those is actually in play before you assume every DNS question is just "queries times a single rate."
+  </p>
+  <ul>
+    <li><strong>Hosted zones</strong>: public hosted zones and private hosted zones are both billable zone surfaces, but they do not behave the same way in the query model.</li>
+    <li><strong>Private hosted zone queries</strong>: private hosted zone queries do not add Route 53 query charges the way public authoritative queries do.</li>
+    <li><strong>Free alias behavior</strong>: alias queries to AWS resources are free, so not every answered DNS request belongs in the paid query line.</li>
+    <li><strong>Health checks</strong>: health checks are their own steady cost surface and should not be hidden inside generic query assumptions.</li>
+    <li><strong>Traffic Flow and advanced routing</strong>: routing policy choices can change the effective pricing model, so keep Traffic Flow and advanced routing logic separate from basic DNS query counting.</li>
+  </ul>
+  <p class="muted">
+    This page was updated on 2026-06-18 against the current AWS Route 53 pricing page and Route 53 developer guide.
+  </p>
+
   <h2>Inside the Route 53 bill vs beside the Route 53 bill</h2>
   <ul>
     <li>
@@ -53,16 +70,19 @@ const description =
     </li>
   </ul>
 
-  <h2>What to model (the 3 core line items)</h2>
+  <h2>What to model (the pricing surfaces that actually matter)</h2>
   <ul>
     <li>
-      <strong>Hosted zones</strong>: how many zones you maintain across environments/accounts
+      <strong>Hosted zones</strong>: how many public and private zones you maintain across environments/accounts
     </li>
     <li>
-      <strong>Standard queries/month</strong>: your actual DNS query volume
+      <strong>Public DNS queries/month</strong>: your paid authoritative public query volume after you separate free alias behavior where relevant
     </li>
     <li>
       <strong>Health checks</strong>: if you use DNS-level health checks or endpoint monitoring
+    </li>
+    <li>
+      <strong>Traffic Flow / advanced routing</strong>: if traffic policies or advanced routing classes are part of the design, treat them as explicit pricing lines instead of burying them inside generic query math
     </li>
   </ul>
 
@@ -77,8 +97,14 @@ const description =
       to monthly.
     </li>
     <li>
+      <strong>Alias behavior</strong>: separate alias queries to AWS resources before you multiply every public query by a paid rate.
+    </li>
+    <li>
       <strong>Health checks</strong>: count them, and confirm whether you have per-endpoint checks, multi-region checks, or checks per
       record.
+    </li>
+    <li>
+      <strong>Routing policy</strong>: identify whether geolocation, latency, IP-based routing, or Traffic Flow policies are part of the design because they can change the effective billing surface.
     </li>
   </ul>
 
@@ -112,7 +138,7 @@ const description =
   <h2>Fast DNS cost formula</h2>
   <ul>
     <li><strong>Total monthly Route 53 cost</strong> = hosted zone fees + DNS query charges + health checks.</li>
-    <li><strong>DNS query charges</strong> = queries/month x effective query unit rate.</li>
+    <li><strong>DNS query charges</strong> = paid public queries/month x effective query unit rate after excluding free alias behavior where applicable.</li>
     <li><strong>Peak protection</strong>: budget with both baseline and incident retry scenarios.</li>
   </ul>
 
@@ -125,6 +151,9 @@ const description =
     <li>
       <strong>Authoritative query growth</strong>: traffic growth, low TTL posture, or resolver churn can lift the paid
       query line item.
+    </li>
+    <li>
+      <strong>Routing-policy blind spots</strong>: Traffic Flow or advanced routing may raise the unit economics even when raw query volume looks stable.
     </li>
     <li>
       <strong>Health check sprawl</strong>: checks per endpoint and per environment add steady monthly cost and are easy
@@ -152,6 +181,7 @@ const description =
   <h2>How to validate the estimate</h2>
   <ul>
     <li>In Cost Explorer / CUR, confirm you see distinct line items for hosted zones, queries, and health checks.</li>
+    <li>Validate whether the measured query set includes free alias queries to AWS resources before you apply a paid public-query rate everywhere.</li>
     <li>Compare baseline vs peak: if peak is not materially higher, the estimate workflow may still be missing incident behavior.</li>
     <li>Check whether the bill is query-led, zone-led, or health-check-led before choosing an optimization plan.</li>
   </ul>
@@ -159,6 +189,7 @@ const description =
   <h2>Failure patterns</h2>
   <ul>
     <li>Using this pricing page as the only source of truth for query measurement.</li>
+    <li>Charging private hosted zone queries or free alias queries as if they were standard public authoritative query lines.</li>
     <li>Folding resolver-side or CDN-side behavior directly into the Route 53 bill without separating ownership.</li>
     <li>Ignoring health-check sprawl across environments.</li>
     <li>Estimating only baseline and skipping peak bill scenarios.</li>

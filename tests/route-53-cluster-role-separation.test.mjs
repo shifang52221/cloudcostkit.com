@@ -15,6 +15,14 @@ test("pricing page is framed as the Route 53 bill-boundary page", () => {
     pricingPage,
     /This guide is about bill boundaries: hosted zones, DNS queries, health checks, and the adjacent resolver, CDN, and incident-side costs that should be tracked beside Route 53 rather than blended into it/i,
   );
+  assert.match(
+    pricingPage,
+    /private hosted zone queries/i,
+  );
+  assert.match(
+    pricingPage,
+    /alias queries.*AWS resources.*free/i,
+  );
 });
 
 test("estimate page is framed as the DNS measurement workflow page", () => {

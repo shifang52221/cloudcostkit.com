@@ -18,6 +18,14 @@ test("pricing page is framed as the CloudTrail bill-boundary page", () => {
     pricingPage,
     /This guide is about bill boundaries: management events, data events, CloudTrail Insights, and the adjacent storage, scan, and SIEM costs that should be tracked beside CloudTrail rather than blended into it/i,
   );
+  assert.match(
+    pricingPage,
+    /first copy of management events/i,
+  );
+  assert.match(
+    pricingPage,
+    /CloudTrail Lake/i,
+  );
 });
 
 test("estimate page is framed as the event-measurement workflow page", () => {
