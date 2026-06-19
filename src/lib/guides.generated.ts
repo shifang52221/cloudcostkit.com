@@ -391,7 +391,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "CloudWatch dashboards pricing: what to include (dashboard-month + API)",
-    "description": "A practical guide to CloudWatch dashboard costs: dashboard-month charges plus the hidden drivers (metrics API requests, alarms, and high-cardinality metrics).",
+    "description": "Estimate CloudWatch dashboard pricing by separating dashboard-month charges from metrics API requests, alarms, and high-cardinality metric volume so dashboard sprawl is not mistaken for one simple fixed fee.",
     "canonicalPath": "/guides/aws-cloudwatch-dashboards-pricing",
     "category": "AWS",
     "slug": "aws-cloudwatch-dashboards-pricing",
@@ -613,7 +613,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "EKS control plane cost: how to model it and when it matters",
-    "description": "A practical guide to modeling EKS control plane costs: fixed hourly fees, multi-cluster strategy, and how to keep dev/test clusters from inflating spend.",
+    "description": "Model EKS control plane cost with fixed per-cluster hourly fees, multi-cluster strategy, and dev or test sprawl so platform overhead is measured before node spend hides the real cluster-count problem.",
     "canonicalPath": "/guides/aws-eks-control-plane-cost",
     "category": "AWS",
     "slug": "aws-eks-control-plane-cost",
@@ -634,7 +634,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "EKS pricing: what to include in a realistic cost estimate",
-    "description": "A practical EKS pricing checklist: nodes, control plane, load balancers, storage, logs/metrics, and data transfer — with calculators to estimate each part.",
+    "description": "Estimate EKS pricing by separating nodes, control plane, load balancers, storage, logs and metrics, and data transfer so the Kubernetes bill is broken into real cost surfaces before optimization starts.",
     "canonicalPath": "/guides/aws-eks-pricing",
     "category": "AWS",
     "slug": "aws-eks-pricing",
@@ -877,12 +877,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Fargate cost optimization (high-leverage fixes)",
-    "description": "A practical Fargate cost optimization checklist: rightsize tasks, scale on real signals, reduce idle capacity, and avoid hidden networking and logging costs.",
+    "description": "Reduce Fargate cost by rightsizing tasks, scaling on real signals, cutting idle capacity, and exposing hidden networking and logging lines before small CPU tweaks distract from larger savings.",
     "canonicalPath": "/guides/aws-fargate-cost-optimization",
     "category": "AWS",
     "slug": "aws-fargate-cost-optimization",
     "topics": [
       "compute",
+      "kubernetes",
       "logging",
       "serverless"
     ]
@@ -1165,7 +1166,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 Glacier retrieval pricing per GB and per request",
-    "description": "A practical breakdown of Glacier retrieval pricing: cost per GB retrieved plus request fees, with guidance for small-object amplification and tier selection.",
+    "description": "Estimate Glacier retrieval pricing by separating GB restored, request fees, small-object amplification, and retrieval tier choice so archive restores are modeled with both latency and cost in view.",
     "canonicalPath": "/guides/aws-s3-glacier-retrieval-pricing",
     "category": "AWS",
     "slug": "aws-s3-glacier-retrieval-pricing",
@@ -1186,7 +1187,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 pricing: a practical model for storage, requests, egress, and replication",
-    "description": "A practical S3 pricing guide: what to include (GB-month, requests, egress, replication) and how to estimate the key inputs without copying price tables.",
+    "description": "Estimate S3 pricing by separating GB-month storage, requests, egress, replication, and delivery boundaries so the main object-storage bill is modeled from real usage drivers instead of copied price tables.",
     "canonicalPath": "/guides/aws-s3-pricing",
     "category": "AWS",
     "slug": "aws-s3-pricing",
@@ -1220,7 +1221,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 storage classes: how they change cost (and when archive fees matter)",
-    "description": "A practical guide to S3-like storage classes: why cheaper storage can come with retrieval/transition tradeoffs, and how to model cost with simple assumptions.",
+    "description": "Compare S3 storage classes by modeling retrieval, transition, lifecycle churn, and minimum-duration tradeoffs so cheaper per-GB tiers are judged against the real access pattern.",
     "canonicalPath": "/guides/aws-s3-storage-classes",
     "category": "AWS",
     "slug": "aws-s3-storage-classes",
@@ -1983,7 +1984,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Messaging costs explained: requests, deliveries, retries, and payload size",
-    "description": "A practical framework to estimate queue and pub/sub bills: request-based pricing, deliveries/retries, fan-out, and payload transfer (the hidden multiplier).",
+    "description": "Estimate messaging costs by mapping publishes into deliveries, retries, fan-out, payload transfer, and request-based pricing so queue and pub/sub bills reflect the real message-expansion pattern.",
     "canonicalPath": "/guides/messaging-costs",
     "category": "General",
     "slug": "messaging-costs",
@@ -2007,7 +2008,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Networking costs explained: egress, transfer boundaries, NAT, and private connectivity",
-    "description": "A practical networking cost model: internet egress, cross-zone/region transfer, NAT/private endpoints, and how to validate boundaries to avoid double counting.",
+    "description": "Estimate networking costs by separating internet egress, cross-zone and cross-region transfer, NAT, and private connectivity so each boundary is priced correctly and double counting is easier to catch.",
     "canonicalPath": "/guides/networking-costs",
     "category": "General",
     "slug": "networking-costs",
@@ -2165,7 +2166,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Log retention storage cost: steady-state GB-month explained",
-    "description": "How log retention turns GB/day into stored GB-month cost. Learn the steady-state model, retention tiers, and the fastest levers to reduce long-term log spend.",
+    "description": "Estimate log retention storage cost by converting GB per day into steady-state GB-month, retention tiers, and long-term storage exposure so log spend is reduced with policy changes instead of guesswork.",
     "canonicalPath": "/guides/log-retention-storage-cost",
     "category": "Logging",
     "slug": "log-retention-storage-cost",
