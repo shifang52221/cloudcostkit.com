@@ -6,7 +6,7 @@ import AdSlot from "../../components/AdSlot.astro";
 
 const title = "Cloud Cost Calculators: Find the Right CDN, Egress, EC2, and Storage Estimator";
 const description =
-  "Find the right cloud cost calculator fast for CDN, egress, EC2, logs, storage, and Kubernetes planning. Clear assumptions, fast estimates, no signup.";
+  "Find the right cloud cost calculator for CDN, egress, EC2, logs, storage, and Kubernetes planning so each estimate starts with the correct driver, assumptions, and next validation step.";
 
 const grouped = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
   (acc[t.category] ||= []).push(t);

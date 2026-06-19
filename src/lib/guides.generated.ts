@@ -717,7 +717,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate DNS queries per month (Route 53 query volume)",
-    "description": "How to estimate DNS query volume for Route 53 cost models: from metrics and logs, and what drives query spikes (TTL, retries, resolver behavior).",
+    "description": "Estimate Route 53 DNS query volume from authoritative metrics, resolver logs, TTL posture, and retry-driven spikes so monthly query models reflect noisy services and incident-heavy behavior.",
     "canonicalPath": "/guides/aws-route-53-estimate-dns-queries",
     "category": "AWS",
     "slug": "aws-route-53-estimate-dns-queries",
@@ -928,7 +928,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "gp2 vs gp3 cost: how to choose (EBS)",
-    "description": "A practical comparison of EBS gp2 vs gp3: how pricing and performance knobs differ, when gp3 is cheaper, and what to validate before switching.",
+    "description": "Compare EBS gp2 vs gp3 cost by separating GB-month, IOPS, throughput, and performance-driven oversizing so you can see when gp3 is cheaper and what to validate before switching.",
     "canonicalPath": "/guides/aws-ebs-gp2-vs-gp3-cost",
     "category": "AWS",
     "slug": "aws-ebs-gp2-vs-gp3-cost",
@@ -1126,7 +1126,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Reserved vs on-demand: how to choose commitments using break-even analysis",
-    "description": "A practical guide to choosing commitments: use break-even utilization and sensitivity analysis to decide when reserved pricing beats on-demand.",
+    "description": "Choose reserved vs on-demand pricing by modeling break-even utilization, downside scenarios, and workload stability so commitment savings are judged against real usage risk rather than list-price discounts.",
     "canonicalPath": "/guides/aws-reserved-vs-on-demand",
     "category": "AWS",
     "slug": "aws-reserved-vs-on-demand",
@@ -1289,7 +1289,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "SQS vs SNS cost: how to compare messaging unit economics",
-    "description": "Compare SQS vs SNS cost with a practical checklist: request types, retries, fan-out, payload transfer, and the usage patterns that decide the bill.",
+    "description": "Compare SQS vs SNS cost by normalizing request types, retries, fan-out, payload transfer, and downstream behavior so messaging unit economics are judged on the same workload shape.",
     "canonicalPath": "/guides/aws-sqs-vs-sns-cost",
     "category": "AWS",
     "slug": "aws-sqs-vs-sns-cost",
@@ -1368,7 +1368,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Azure Application Gateway pricing: how to model L7 load balancer costs",
-    "description": "Model Application Gateway costs using measurable drivers: hours, request volume, traffic processed, WAF, and logs - plus a validation checklist.",
+    "description": "Model Azure Application Gateway pricing with gateway hours, request volume, traffic processed, WAF exposure, and log volume so peak traffic and the second bill do not disappear from the estimate.",
     "canonicalPath": "/guides/azure-application-gateway-pricing",
     "category": "Azure",
     "slug": "azure-application-gateway-pricing",
@@ -2199,13 +2199,14 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Request Pricing Hub: calculators, guides, and next steps",
-    "description": "A lightweight hub for request pricing: choose the right guide or calculator for request math, retries, payload transfer, and adjacent cost checks.",
+    "description": "Use this request pricing hub to route into request math, retries, payload transfer, and adjacent cost checks when you need the right guide or calculator without mixing request scope across services.",
     "canonicalPath": "/guides/requests-costs",
     "category": "Requests",
     "slug": "requests-costs",
     "topics": [
       "egress",
-      "requests"
+      "requests",
+      "storage"
     ]
   },
   {
