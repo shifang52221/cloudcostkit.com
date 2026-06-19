@@ -12,7 +12,7 @@ export type GuideLink = {
 export const GUIDES: GuideLink[] = [
   {
     "title": "ALB vs NLB cost: how to choose and estimate (LCU vs NLCU)",
-    "description": "Compare ALB vs NLB cost with a practical checklist: fixed hourly fees, LCU vs NLCU drivers, traffic patterns, and when each tends to win.",
+    "description": "Compare ALB vs NLB cost by breaking the bill into LB-hours, ALB LCU drivers, NLB connection and byte drivers, and the traffic shape that decides which load balancer is actually cheaper.",
     "canonicalPath": "/guides/aws-alb-vs-nlb-cost",
     "category": "AWS",
     "slug": "aws-alb-vs-nlb-cost",
@@ -220,7 +220,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS RDS cost optimization (high-leverage fixes)",
-    "description": "A short playbook to reduce RDS cost: right-size instances, control storage growth, tune backups, and avoid expensive I/O patterns.",
+    "description": "Reduce AWS RDS cost by isolating compute headroom, storage growth, backup retention, and I/O-heavy query patterns before changing instance size, retention policy, or architecture.",
     "canonicalPath": "/guides/aws-rds-cost-optimization",
     "category": "AWS",
     "slug": "aws-rds-cost-optimization",
@@ -233,7 +233,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS RDS pricing (what to include)",
-    "description": "A practical checklist for estimating AWS RDS costs: instances, storage, backups, I/O, and the line items that commonly surprise budgets.",
+    "description": "Estimate AWS RDS pricing by separating instance-hours, allocated storage, backup storage, Multi-AZ or replica capacity, and any I/O-pricing exposure so the database bill is not blended with adjacent workflow costs.",
     "canonicalPath": "/guides/aws-rds-pricing",
     "category": "AWS",
     "slug": "aws-rds-pricing",
@@ -266,11 +266,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS SQS pricing (what to include)",
-    "description": "A practical checklist for estimating SQS costs: requests, retries, Receive/Delete patterns, and the common pitfalls that inflate spend.",
+    "description": "Estimate AWS SQS pricing by separating request-driven queue charges, retries, Receive/Delete and polling behavior, and the downstream compute or logging costs that belong beside the queue bill.",
     "canonicalPath": "/guides/aws-sqs-pricing",
     "category": "AWS",
     "slug": "aws-sqs-pricing",
     "topics": [
+      "compute",
+      "logging",
       "messaging",
       "requests"
     ]
@@ -860,12 +862,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Estimate WAF request volume (CDN/LB to monthly requests)",
-    "description": "How to estimate WAF request volume for cost models: from CDN/LB metrics, from logs, and what to do about bot spikes.",
+    "description": "Estimate AWS WAF evaluated requests from CDN or load balancer metrics, log samples, attack windows, and bot spikes so monthly request models reflect baseline traffic and incident-heavy months.",
     "canonicalPath": "/guides/aws-waf-estimate-requests",
     "category": "AWS",
     "slug": "aws-waf-estimate-requests",
     "topics": [
       "cdn",
+      "load-balancing",
       "logging",
       "metrics",
       "requests",
@@ -964,7 +967,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "KMS pricing: what to model (keys + requests)",
-    "description": "A practical AWS KMS pricing checklist: key-months, request volume, and the services and patterns that generate surprise KMS request bills.",
+    "description": "Estimate AWS KMS pricing by separating key-month charges from request volume, caller behavior, caching gaps, and retry-heavy workflows so crypto calls do not get mistaken for the whole security bill.",
     "canonicalPath": "/guides/aws-kms-pricing",
     "category": "AWS",
     "slug": "aws-kms-pricing",
@@ -1087,7 +1090,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "RDS backups and snapshots (how to estimate cost)",
-    "description": "A practical approach to estimating RDS backup and snapshot storage: retention, growth, and the biggest planning mistakes.",
+    "description": "Estimate AWS RDS backup and snapshot cost by separating retention, daily churn, manual snapshot sprawl, and copied backup storage so backup growth does not disappear inside the main database bill.",
     "canonicalPath": "/guides/aws-rds-backups-and-snapshots",
     "category": "AWS",
     "slug": "aws-rds-backups-and-snapshots",
@@ -1329,7 +1332,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "WAF cost optimization (reduce requests + rule sprawl)",
-    "description": "A practical playbook to reduce WAF spend: cut evaluated requests, keep rule count tight, and avoid downstream logging waste.",
+    "description": "Reduce AWS WAF cost by cutting evaluated requests, tightening rule sprawl, and controlling downstream logging volume so attack-month savings do not come at the expense of real security coverage.",
     "canonicalPath": "/guides/aws-waf-cost-optimization",
     "category": "AWS",
     "slug": "aws-waf-cost-optimization",
@@ -2220,7 +2223,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 CRR vs SRR Cost Comparison: Transfer, Storage, and Request Fees",
-    "description": "Practical S3 CRR vs SRR cost comparison with transfer fees, replica storage, and request costs. Includes calculator-ready inputs.",
+    "description": "Compare S3 CRR vs SRR cost by separating cross-region transfer exposure, same-region replication, replica storage, request fees, and changed-data volume instead of relying on total bucket size.",
     "canonicalPath": "/guides/s3-crr-vs-srr-cost",
     "category": "Storage",
     "slug": "s3-crr-vs-srr-cost",
@@ -2256,7 +2259,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 to Glacier transfer cost: what to include in the move",
-    "description": "A practical checklist for S3 to Glacier transfer cost: transition requests, minimum storage duration, and any transfer or rewrite overhead.",
+    "description": "Estimate S3 to Glacier transfer cost by separating lifecycle transition requests, minimum storage duration penalties, restore behavior, and any cross-region or rewrite overhead created during the move.",
     "canonicalPath": "/guides/s3-to-glacier-transfer-cost",
     "category": "Storage",
     "slug": "s3-to-glacier-transfer-cost",
