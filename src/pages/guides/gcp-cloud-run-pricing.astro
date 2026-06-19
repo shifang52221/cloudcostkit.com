@@ -32,16 +32,12 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/gcp-cloud-run-pricing"
-  lastUpdated="2026-06-18"
+  lastUpdated="2026-06-19"
   faqs={faqs}
 >
   <p>
     This is the Cloud Run service behavior and pricing decision page. Use it when you are budgeting Cloud Run from the
     way the service behaves in production: request volume, execution time, concurrency, outbound transfer, and logging.
-  </p>
-  <p>
-    Use this page when you need to decide whether Cloud Run cost is mainly being driven by request scale, slow
-    execution, large responses, or logging overhead.
   </p>
   <p>
     Use this page when you need to decide whether Cloud Run spend is mostly request scale, slow handlers,
@@ -52,7 +48,7 @@ const faqs = [
     retries, downstream amplification, and observability before narrowing the estimate to Cloud Run.
   </p>
 
-  <h2>Quick pricing read</h2>
+  <h2>Quick pricing read: what most teams need first</h2>
   <p>
     Cloud Run pricing starts with the billing setting, not with a single "price per request." For services, the first
     fork is request-based billing versus instance-based billing. After that, the bill is shaped by vCPU, memory, request
@@ -67,7 +63,7 @@ const faqs = [
     <li><strong>Adjacent costs</strong>: Artifact Registry, Cloud Build, outbound data transfer, Cloud Logging, Cloud Monitoring, and downstream databases should sit beside the Cloud Run bill unless you are explicitly building a full application budget.</li>
   </ul>
   <p class="muted">
-    This page was updated on 2026-06-18 against the current Google Cloud Run pricing page, Cloud Run billing settings
+    This page was updated on 2026-06-19 against the current Google Cloud Run pricing page, Cloud Run billing settings
     documentation, and Cloud Run cost-optimization guidance.
   </p>
 

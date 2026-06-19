@@ -92,11 +92,11 @@ test("Event Hubs guide opens with replay-aware budgeting framing", () => {
 test("Cloud Run guide opens with clearer service-shape budgeting framing", () => {
   assert.match(
     cloudRunGuide,
-    /Use this page when you need to decide whether Cloud Run cost is mainly being driven by request scale, slow execution, large responses, or logging overhead/i,
+    /Use this page when you need to decide whether Cloud Run spend is mostly request scale, slow handlers, low-concurrency compute time, large responses, or logging that rises with every retry and timeout/i,
   );
   assert.match(
     cloudRunGuide,
-    /Quick pricing read/i,
+    /Quick pricing read: what most teams need first/i,
   );
   assert.match(
     cloudRunGuide,
@@ -109,6 +109,10 @@ test("Cloud Run guide opens with clearer service-shape budgeting framing", () =>
   assert.match(
     cloudRunGuide,
     /Cloud Run jobs|jobs are billed/i,
+  );
+  assert.match(
+    cloudRunGuide,
+    /updated on 2026-06-19/i,
   );
 });
 

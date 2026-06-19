@@ -76,6 +76,10 @@ test("Cloud Run pricing page uses sharper SERP wording and first-screen promise"
   );
   assert.match(
     gcpCloudRunPricingPage,
+    /Quick pricing read: what most teams need first/i,
+  );
+  assert.match(
+    gcpCloudRunPricingPage,
     /Use this page when you need to decide whether Cloud Run spend is mostly request scale, slow handlers, low-concurrency compute time, large responses, or logging that rises with every retry and timeout\./i,
   );
   assert.match(
@@ -92,7 +96,7 @@ test("Cloud Run pricing page uses sharper SERP wording and first-screen promise"
   );
   assert.match(
     gcpCloudRunPricingPage,
-    /updated on 2026-06-18/i,
+    /updated on 2026-06-19/i,
   );
 });
 
