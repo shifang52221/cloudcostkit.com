@@ -1443,8 +1443,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Event Hubs Pricing: TUs, PUs, Capture, Retention, and Replay Cost",
-    "description": "Understand Azure Event Hubs pricing through Basic, Standard, Premium, and Dedicated tiers, Throughput Units, Processing Units, Capture, retention limits, replay patterns, and downstream stream costs.",
+    "title": "Azure Event Hubs Pricing: Tier Limits, TUs, PUs, CUs, Capture, and Replay Cost",
+    "description": "Understand Azure Event Hubs pricing through Basic, Standard, Premium, and Dedicated tiers, Throughput Units, Processing Units, Capacity Units, Capture, retention ceilings, replay patterns, and downstream stream costs.",
     "canonicalPath": "/guides/azure-event-hubs-pricing",
     "category": "Azure",
     "slug": "azure-event-hubs-pricing",

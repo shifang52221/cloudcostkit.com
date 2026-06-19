@@ -77,7 +77,7 @@ test("Event Hubs guide opens with replay-aware budgeting framing", () => {
   );
   assert.match(
     eventHubsGuide,
-    /Quick pricing read/i,
+    /Quick pricing read: what most teams need first/i,
   );
   assert.match(
     eventHubsGuide,
@@ -86,6 +86,18 @@ test("Event Hubs guide opens with replay-aware budgeting framing", () => {
   assert.match(
     eventHubsGuide,
     /Basic.*Standard.*Premium.*Dedicated/i,
+  );
+  assert.match(
+    eventHubsGuide,
+    /Throughput Units.*Processing Units.*Capacity Units/i,
+  );
+  assert.match(
+    eventHubsGuide,
+    /Capture.*retention.*replay/i,
+  );
+  assert.match(
+    eventHubsGuide,
+    /updated on 2026-06-19/i,
   );
 });
 

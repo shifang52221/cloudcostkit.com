@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Event Hubs Pricing: TUs, PUs, Capture, Retention, and Replay Cost";
+const title = "Azure Event Hubs Pricing: Tier Limits, TUs, PUs, CUs, Capture, and Replay Cost";
 const description =
-  "Understand Azure Event Hubs pricing through Basic, Standard, Premium, and Dedicated tiers, Throughput Units, Processing Units, Capture, retention limits, replay patterns, and downstream stream costs.";
+  "Understand Azure Event Hubs pricing through Basic, Standard, Premium, and Dedicated tiers, Throughput Units, Processing Units, Capacity Units, Capture, retention ceilings, replay patterns, and downstream stream costs.";
 
 const faqs = [
   {
@@ -32,7 +32,7 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-event-hubs-pricing"
-  lastUpdated="2026-06-18"
+  lastUpdated="2026-06-19"
   faqs={faqs}
 >
   <p>
@@ -53,21 +53,53 @@ const faqs = [
     history, consumer rereads, or burst windows that make a calm-day average unusable.
   </p>
 
-  <h2>Quick pricing read</h2>
+  <h2>Quick pricing read: what most teams need first</h2>
   <p>
     Event Hubs pricing starts with the tier and capacity model, then gets shaped by ingestion, retention, Capture, and
-    replay behavior. Basic and Standard are usually planned around <strong>Throughput Units</strong>. Premium is planned
-    around <strong>Processing Units</strong>. Dedicated is planned around <strong>Capacity Units</strong>. Those units
-    are not interchangeable labels; they represent different isolation, scale, and feature assumptions.
+    replay behavior. Basic and Standard are usually planned around <strong>Throughput Units</strong>. Premium is
+    planned around <strong>Processing Units</strong>. Dedicated is planned around <strong>Capacity Units</strong>.
+    Those units are not interchangeable labels; they represent different isolation, scale, and feature assumptions.
   </p>
-  <ul>
-    <li><strong>Basic</strong>: lowest-friction entry tier, but it lacks several features that commonly matter in production pricing reviews.</li>
-    <li><strong>Standard</strong>: common general-purpose tier; model Throughput Units, ingress volume, Capture if used, and retention needs.</li>
-    <li><strong>Premium</strong>: uses Processing Units for isolated capacity and supports longer-retention and enterprise stream scenarios.</li>
-    <li><strong>Dedicated</strong>: uses Capacity Units for large dedicated deployments where isolation and scale dominate the pricing decision.</li>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Capacity model</th>
+        <th>Retention ceiling</th>
+        <th>Capture boundary</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Basic</td>
+        <td>Throughput Units</td>
+        <td>1 day</td>
+        <td>No Capture</td>
+      </tr>
+      <tr>
+        <td>Standard</td>
+        <td>Throughput Units</td>
+        <td>7 days</td>
+        <td>Capture is billed separately</td>
+      </tr>
+      <tr>
+        <td>Premium</td>
+        <td>Processing Units</td>
+        <td>90 days</td>
+        <td>Capture is included</td>
+      </tr>
+      <tr>
+        <td>Dedicated</td>
+        <td>Capacity Units</td>
+        <td>90 days</td>
+        <td>Capture is included</td>
+      </tr>
+    </tbody>
+  </table>
   <p class="muted">
-    This page was updated on 2026-06-18 against Azure Event Hubs pricing and Microsoft Learn guidance for quotas,
+    Capture, retention, and replay are the first three questions to settle. Standard retention tops out at 7 days,
+    Premium and Dedicated can retain up to 90 days, and any retention above the included storage quota can add
+    overage. This page was updated on 2026-06-19 against Azure Event Hubs pricing and Microsoft Learn guidance for quotas,
     scalability, and tier limits.
   </p>
 

@@ -53,7 +53,11 @@ test("ACR pricing page uses sharper SERP wording and first-screen promise", () =
 test("Event Hubs pricing page uses sharper SERP wording and first-screen promise", () => {
   assert.match(
     azureEventHubsPricingPage,
-    /Azure Event Hubs Pricing: TUs, PUs, Capture, Retention, and Replay Cost/i,
+    /Azure Event Hubs Pricing: Tier Limits, TUs, PUs, CUs, Capture, and Replay Cost/i,
+  );
+  assert.match(
+    azureEventHubsPricingPage,
+    /Quick pricing read: what most teams need first/i,
   );
   assert.match(
     azureEventHubsPricingPage,
@@ -66,6 +70,14 @@ test("Event Hubs pricing page uses sharper SERP wording and first-screen promise
   assert.match(
     azureEventHubsPricingPage,
     /Throughput Units.*Processing Units.*Capacity Units/i,
+  );
+  assert.match(
+    azureEventHubsPricingPage,
+    /Capture.*retention.*replay/i,
+  );
+  assert.match(
+    azureEventHubsPricingPage,
+    /updated on 2026-06-19/i,
   );
 });
 
