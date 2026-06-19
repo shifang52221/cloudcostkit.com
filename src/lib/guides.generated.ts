@@ -1411,8 +1411,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "Azure Container Registry Pricing: Basic vs Standard vs Premium Cost Drivers",
-    "description": "Understand Azure Container Registry pricing through Basic, Standard, and Premium tradeoffs, included storage, geo-replication, extra storage, network charges, and the operating signals that change a monthly estimate.",
+    "title": "Azure Container Registry Pricing: Tier Limits, Storage, and Geo-Replication",
+    "description": "Understand Azure Container Registry pricing through Basic, Standard, and Premium tier limits, included storage, geo-replication, throughput, and the operating signals that change a monthly estimate.",
     "canonicalPath": "/guides/azure-container-registry-pricing",
     "category": "Azure",
     "slug": "azure-container-registry-pricing",

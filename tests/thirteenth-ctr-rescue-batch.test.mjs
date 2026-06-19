@@ -26,7 +26,7 @@ const cloudTrailPricingPage = normalize(
 test("ACR pricing page uses sharper SERP wording and first-screen promise", () => {
   assert.match(
     azureContainerRegistryPricingPage,
-    /Azure Container Registry Pricing: Basic vs Standard vs Premium Cost Drivers/i,
+    /Azure Container Registry Pricing: Tier Limits, Storage, and Geo-Replication/i,
   );
   assert.match(
     azureContainerRegistryPricingPage,
@@ -34,11 +34,11 @@ test("ACR pricing page uses sharper SERP wording and first-screen promise", () =
   );
   assert.match(
     azureContainerRegistryPricingPage,
-    /Quick pricing read: what most teams need first/i,
+    /Quick tier snapshot: what most teams need first/i,
   );
   assert.match(
     azureContainerRegistryPricingPage,
-    /Basic.*10 GiB.*Standard.*100 GiB.*Premium.*500 GiB/i,
+    /Price per day.*Basic.*10 GiB.*Standard.*100 GiB.*Premium.*500 GiB.*Geo-replication.*Throughput/i,
   );
   assert.match(
     azureContainerRegistryPricingPage,
@@ -46,7 +46,7 @@ test("ACR pricing page uses sharper SERP wording and first-screen promise", () =
   );
   assert.match(
     azureContainerRegistryPricingPage,
-    /updated on 2026-06-18/i,
+    /updated on 2026-06-19/i,
   );
 });
 

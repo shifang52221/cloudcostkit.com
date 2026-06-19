@@ -1,9 +1,9 @@
 ---
 import GuideLayout from "../../layouts/GuideLayout.astro";
 
-const title = "Azure Container Registry Pricing: Basic vs Standard vs Premium Cost Drivers";
+const title = "Azure Container Registry Pricing: Tier Limits, Storage, and Geo-Replication";
 const description =
-  "Understand Azure Container Registry pricing through Basic, Standard, and Premium tradeoffs, included storage, geo-replication, extra storage, network charges, and the operating signals that change a monthly estimate.";
+  "Understand Azure Container Registry pricing through Basic, Standard, and Premium tier limits, included storage, geo-replication, throughput, and the operating signals that change a monthly estimate.";
 
 const faqs = [
   {
@@ -32,28 +32,25 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/azure-container-registry-pricing"
-  lastUpdated="2026-06-18"
+  lastUpdated="2026-06-19"
   faqs={faqs}
 >
   <p>
     If you are evaluating Azure Container Registry for real production usage, the cleanest starting point is not the
     tier table by itself. The real budgeting decision is usually whether your registry problem is storage growth, pull
-    pressure, or cross-region delivery. ACR cost is usually shaped by four things that belong in the same estimate:
-    stored image data, pull behavior, billed transfer paths, and the operational reasons a team moves from Basic to
-    Standard or Premium. Most cost surprises do not come from the list price of the tier. They come from retention
-    drift, pull storms during CI or node churn, and cross-region patterns that were never modeled as billable transfer.
+    pressure, or cross-region delivery.
   </p>
   <p>
     Use this page when you need to show whether ACR spend is really coming from stored layers, pull churn during
     deploys, cross-region delivery, or the capability jump from Standard to Premium.
   </p>
 
-  <h2>Quick pricing read: what most teams need first</h2>
+  <h2>Quick tier snapshot: what most teams need first</h2>
   <p>
-    If you searched for ACR pricing because you need a quick budget answer, start here. Azure positions Basic,
-    Standard, and Premium as service tiers with different included storage, throughput headroom, and feature scope.
-    The official pricing page gives the current regional rate card, but the budget decision still depends on included
-    storage, geo-replication, extra storage, and network charges.
+    If you searched for ACR pricing because you need a quick budget answer, start here. Price per day is the daily SKU
+    charge, but the budget decision still depends on included storage, geo-replication, and throughput. Basic includes
+    10 GiB, Standard includes 100 GiB, and Premium includes 500 GiB. Geo-replication is only supported in Premium,
+    and Premium offers the highest throughput headroom for concurrent pull bursts.
   </p>
   <ul>
     <li><strong>Basic</strong>: includes 10 GiB of storage and usually fits low-volume, single-region registries.</li>
@@ -63,7 +60,7 @@ const faqs = [
     <li><strong>Outside the registry fee</strong>: cross-region pulls and internet delivery should still be checked as network charges.</li>
   </ul>
   <p class="muted">
-    This page was updated on 2026-06-18 against the current Azure pricing page and the latest Microsoft Learn ACR SKU
+    This page was updated on 2026-06-19 against the current Azure pricing page and the latest Microsoft Learn ACR SKU
     limits guidance.
   </p>
 
