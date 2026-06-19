@@ -2,15 +2,15 @@
 import CalculatorLayout from "../../layouts/CalculatorLayout.astro";
 import { ComputeInstanceCostCalculator } from "../../components/calculators/ComputeInstanceCost";
 
-const title = "EC2 Cost Calculator: Estimate Monthly AWS EC2 Pricing Fast";
+const title = "EC2 Cost Calculator: Estimate Monthly EC2 Pricing Fast";
 const description =
-  "Estimate monthly AWS EC2 cost fast from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 calculator, EC2 cost estimator, and EC2 pricing workflow searches.";
+  "Estimate monthly EC2 cost from instance count, blended hourly price, uptime, and peak scenarios. Built for EC2 calculator, EC2 cost estimator, and EC2 pricing workflow searches.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/ec2-cost-calculator"
-  intro="Use this EC2 cost calculator when you need a quick monthly AWS EC2 estimate from instance count, uptime, and a blended $/hour. It is built for fast planning, baseline vs peak comparisons, and finance-ready compute checks before you add EBS, transfer, or load balancers."
+  intro="Use this EC2 cost calculator when you need a quick monthly estimate from instance count, uptime, and a blended $/hour. It is built for fast planning, baseline vs peak comparisons, and finance-ready compute checks before you add EBS, transfer, or load balancers."
   examples={[
     "10 instances at your blended $/hour with 100% uptime -> estimate monthly compute cost.",
     "Reduce hours/day for dev/test to avoid over-budgeting always-on assumptions.",
@@ -54,7 +54,7 @@ const description =
       a: "This page is a fast EC2 estimator for planning and scenario analysis. For final procurement-level budgets, confirm assumptions in AWS Pricing Calculator and compare against CUR usage history.",
     },
   ]}
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-06-19"
   related={[
     { href: "/calculators/compute-instance-cost-calculator", label: "Compute instance cost (generic)" },
     { href: "/calculators/reserved-vs-on-demand-break-even-calculator", label: "Reserved vs on-demand break-even" },
@@ -66,9 +66,9 @@ const description =
   <div class="prose">
     <h2 style="margin-top:0">When to use this EC2 pricing calculator</h2>
     <p class="muted" style="margin-top:8px">
-      This page is most useful when you need a compute-only EC2 estimate that can survive a finance or architecture
-      review. It is designed for baseline vs peak planning, purchase-mix discussions, and fast reconciliation against
-      instance-hours before storage, transfer, and load balancers are layered in.
+      Use this page when the runtime is already EC2 and you need a finance-safe monthly estimate. It is strongest when
+      you want to compare baseline and peak months, test a purchase mix, and keep EBS, transfer, and load balancers
+      outside the compute line until the EC2 number is stable.
     </p>
     <ul style="margin:10px 0 0; padding-left:18px">
       <li>Compare current blended hourly cost with a target purchase mix.</li>
@@ -85,51 +85,24 @@ const description =
   <div class="prose">
     <h2 style="margin-top:0">What matters most in an EC2 estimate</h2>
     <ul style="margin:10px 0 0; padding-left:18px">
-      <li><strong>Average instance-hours</strong>, not just provisioned instance count.</li>
-      <li><strong>Effective blended $/hour</strong>, not list price if finance tracks commitments.</li>
+      <li><strong>Average instance-hours</strong>, not just provisioned count.</li>
+      <li><strong>Effective blended $/hour</strong>, not list price when finance tracks commitments.</li>
       <li><strong>Peak vs baseline</strong>, so autoscaling and on-demand spillover stay visible.</li>
       <li><strong>Separate non-compute lines</strong> like EBS, transfer, and load balancers.</li>
     </ul>
     <p class="muted" style="margin-top:10px">
-      Most EC2 budgeting mistakes happen when teams mix those drivers into one rough average. This page keeps the
-      estimate useful by isolating compute first, then making you add non-compute lines explicitly instead of hiding
-      them inside a single "EC2 total" assumption.
+      The common failure is averaging all of those drivers into one rough number. Keep average instance-hours,
+      effective blended $/hour, baseline vs peak, and separate non-compute lines visible as separate decisions and the
+      estimate stays explainable.
     </p>
   </div>
   <ComputeInstanceCostCalculator client:load />
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">How to choose better inputs and a better blended rate</h2>
-    <ul>
-      <li><strong>Instances</strong>: use average running instances from billing (instance-hours / monthly hours).</li>
-      <li><strong>Hourly rate</strong>: use a blended $/hour if you mix on-demand, Savings Plans, or RIs.</li>
-      <li><strong>Schedule</strong>: hours/day and days/month should reflect real uptime windows.</li>
-      <li><strong>Sources</strong>: Cost and Usage Report, instance-hours metrics, or inventory snapshots.</li>
-    </ul>
-    <ul>
-      <li><strong>Steady baseline</strong>: use the effective rate after Savings Plans or Reserved coverage.</li>
-      <li><strong>Burst capacity</strong>: keep on-demand or spot assumptions visible instead of averaging them away.</li>
-      <li><strong>Mixed fleets</strong>: compute a weighted average by family, schedule, and purchase model.</li>
-      <li><strong>Environment split</strong>: separate prod, staging, and dev/test if uptime windows differ.</li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      If your estimate is far from the bill, check instance-hours and blended $/hour before you change anything else.
-      Those two fields explain most EC2 estimate failures. Also keep EBS, transfer, and load balancer costs out of this
-      compute model until the EC2 line is stable on its own.
-    </p>
-    <ul>
-      <li>Model instance count by family and uptime schedule.</li>
-      <li>Use a blended $/hour if you mix purchase options.</li>
-      <li>Add EBS volumes and snapshots as separate line items.</li>
-      <li>Include network transfer out or cross-AZ traffic separately.</li>
-    </ul>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Scenario planning and finance reconciliation</h2>
+    <h2 style="margin-top:0">How to choose inputs and reconcile the number</h2>
     <p class="muted" style="margin-top:8px">
       A reliable EC2 estimate should survive two tests: it should explain baseline vs peak compute behavior, and it
       should reconcile cleanly with how finance sees effective cost. That means you do not stop at one average monthly
-      number. You carry a small set of scenarios and then line them up against instance-hours and effective rate data.
+      number. You carry a small set of scenarios and line them up against instance-hours and effective rate data.
     </p>
     <table>
       <thead>
@@ -162,12 +135,9 @@ const description =
       </tbody>
     </table>
     <ul>
-      <li>Compare instance-hours and effective $/hour to billing line items.</li>
-      <li>Check average instance count in metrics or inventory data.</li>
-      <li>Review baseline vs peak deltas so autoscaling risk is visible in budget reviews.</li>
-      <li>Use measured instance-hours, not provisioned capacity.</li>
-      <li>Use blended $/hour that matches your purchase mix in billing.</li>
-      <li>Keep compute, EBS, transfer, and load balancer as separate line items.</li>
+      <li>Use average running instances from billing, not provisioned count.</li>
+      <li>Use a blended $/hour if you mix on-demand, Savings Plans, or RIs.</li>
+      <li>Keep EBS, transfer, and load balancer costs outside the compute line until the EC2 number is stable.</li>
       <li>Recheck assumptions after instance family or commitment changes.</li>
     </ul>
     <p class="muted" style="margin-top:10px">
@@ -178,28 +148,11 @@ const description =
   </div>
 
   <div class="prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Purchase-mix choices and failure patterns</h2>
-    <ul>
-      <li><strong>Baseline steady capacity</strong>: map to RI or Savings Plans candidates.</li>
-      <li><strong>Burst capacity</strong>: keep as on-demand unless burst is predictable.</li>
-      <li><strong>Interruptible workloads</strong>: model spot separately with interruption risk.</li>
-      <li>Recalculate blended $/hour whenever commitment coverage changes.</li>
-    </ul>
-    <ul>
-      <li>Using list prices while finance tracks effective blended cost.</li>
-      <li>Applying the same uptime schedule to prod and dev/test environments.</li>
-      <li>Hiding autoscaling peaks inside monthly averages.</li>
-      <li>Treating compute estimate as total stack cost without EBS or transfer.</li>
-    </ul>
-    <p class="muted" style="margin-top:10px">
-      The most common failure pattern is not "wrong EC2 math." It is mixing steady committed capacity, burst
-      on-demand usage, and non-compute charges into one oversimplified total. Keep those drivers visible and the page
-      stays useful.
-    </p>
-  </div>
-
-  <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Next actions after the first estimate</h2>
+    <p class="muted" style="margin-top:8px">
+      Use the next links by intent: clarify inputs, compare runtime choice, or move directly into the adjacent
+      non-compute line that most likely changes the final budget.
+    </p>
     <div class="btn-row" style="margin-top:10px">
       <a class="btn" href="/guides/aws-ec2-cost-estimation/">Guide: EC2 cost estimation</a>
       <a class="btn" href="/calculators/compute-instance-cost-calculator/">Compute instance cost (generic)</a>
