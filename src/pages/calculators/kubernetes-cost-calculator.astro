@@ -5,7 +5,7 @@ import { KubernetesRequestsLimitsCalculator } from "../../components/calculators
 
 const title = "Kubernetes Cost Calculator (node sizing from requests)";
 const description =
-  "Estimate Kubernetes cluster cost by sizing nodes from pod requests and applying per-node pricing. Baseline vs peak scenarios.";
+  "Estimate Kubernetes cluster cost from pod requests, node count, and per-node pricing, then keep control plane, storage, egress, and observability as separate line items beside the node baseline.";
 ---
 <CalculatorLayout
   title={title}
