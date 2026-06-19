@@ -4,13 +4,13 @@ import { DataEgressCostCalculator as DataEgressCostCalculatorComponent } from ".
 
 const title = "AWS Egress Cost Calculator: Model Baseline vs Peak Transfer Spend";
 const description =
-  "Model monthly egress spend from GB, effective $/GB, and baseline-vs-peak scenarios. Built for practical planning before architecture, CDN, and transfer-boundary decisions.";
+  "Model monthly egress spend from GB, effective $/GB, and baseline-vs-peak scenarios when the transfer boundary is already known. Built for practical planning before billing, architecture, and CDN decisions.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/data-egress-cost-calculator"
-  intro="Use this calculator to price one transfer boundary at a time, compare baseline and peak months, and decide what to optimize next. It is designed for estimation and action planning, not just formula output."
+  intro="Use this calculator when the transfer boundary is already known and you need a baseline-vs-peak planning number before a billing or architecture decision. Price one boundary at a time, compare baseline and peak months, and decide what to optimize next."
   examples={[
     "Public API outbound transfer: 3,200 GB/month at $0.085/GB gives a baseline estimate near $272/month.",
     "CDN origin fill traffic: tiered pricing with cache-miss spikes can double monthly transfer spend during launch windows.",
@@ -52,7 +52,7 @@ const description =
       a: "Use the egress guide for boundary validation, then map AWS network charges and refine adjacent calculators like CDN origin and cross-region transfer."
     }
   ]}
-  lastUpdated="2026-04-19"
+  lastUpdated="2026-06-19"
   related={[
     { href: "/guides/egress-costs", label: "Validate boundary assumptions (guide)" },
     { href: "/guides/aws-network-costs", label: "Map AWS network line items (guide)" },
@@ -66,8 +66,9 @@ const description =
   <div class="prose" style="margin-top:16px">
     <h2 style="margin:0 0 10px">When to use this calculator first</h2>
     <p class="muted" style="margin:0 0 10px">
-      Start here when your team needs a planning number now and already knows the transfer boundary being modeled.
-      This page helps you turn traffic assumptions into a budget range quickly, then decide the highest-value follow-up.
+      Start here when your team needs a planning number now and the boundary is already known. This page helps you
+      turn traffic assumptions into a budget range quickly, keep one boundary per run, and then decide the
+      highest-value follow-up.
     </p>
     <ul class="muted" style="margin:0 0 14px; padding-left:18px">
       <li>You can name the boundary clearly (public internet, CDN origin fill, cross-region replication, or DR sync).</li>
@@ -114,8 +115,8 @@ const description =
       </a>
     </div>
     <p class="muted" style="margin-top:12px">
-      Use one boundary per scenario, then confirm path ownership, effective $/GB, and peak-window behavior against
-      billing exports before you sign off on the estimate.
+      Use one boundary at a time, then confirm path ownership, effective $/GB, and peak-window behavior against AWS
+      network bill lines before you sign off on the estimate.
     </p>
   </div>
 </CalculatorLayout>

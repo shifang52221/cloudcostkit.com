@@ -2173,8 +2173,8 @@ export const GUIDES: GuideLink[] = [
     ]
   },
   {
-    "title": "AWS Egress Cost Guide: Internet, Cross-Region, Cross-AZ, and CDN-Origin Charges",
-    "description": "Estimate AWS egress cost fast with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical next steps for AWS egress calculator, pricing, and charge-planning workflows.",
+    "title": "AWS Egress Cost Guide: Pricing by Internet, Cross-Region, Cross-AZ, and CDN-Origin Path",
+    "description": "Break down AWS egress cost by transfer path before trusting any headline $/GB rate. Covers internet egress, cross-region, cross-AZ, CDN-origin charges, and the next validation steps for pricing review.",
     "canonicalPath": "/guides/egress-costs",
     "category": "Networking",
     "slug": "egress-costs",

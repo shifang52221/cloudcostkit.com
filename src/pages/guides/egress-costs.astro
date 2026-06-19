@@ -3,9 +3,9 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 import { GUIDES } from "../../lib/guides.generated";
 import { withTrailingSlash } from "../../lib/url";
 
-const title = "AWS Egress Cost Guide: Internet, Cross-Region, Cross-AZ, and CDN-Origin Charges";
+const title = "AWS Egress Cost Guide: Pricing by Internet, Cross-Region, Cross-AZ, and CDN-Origin Path";
 const description =
-  "Estimate AWS egress cost fast with formulas for internet, cross-region, cross-AZ, and origin-to-CDN transfer. Includes practical next steps for AWS egress calculator, pricing, and charge-planning workflows.";
+  "Break down AWS egress cost by transfer path before trusting any headline $/GB rate. Covers internet egress, cross-region, cross-AZ, CDN-origin charges, and the next validation steps for pricing review.";
 const faqs = [
   {
     q: "What counts as egress?",
@@ -38,7 +38,7 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   title={title}
   description={description}
   canonicalPath="/guides/egress-costs"
-  lastUpdated="2026-04-19"
+  lastUpdated="2026-06-19"
   faqs={faqs}
   openingAssist={{
     message:
@@ -51,13 +51,22 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     ],
   }}
 >
+  <p>
+    If you searched for AWS egress cost, AWS egress pricing, AWS egress charges, or AWS egress fees, the first job is
+    to identify which transfer path actually moved before you trust any headline $/GB rate.
+  </p>
+  <p class="muted">
+    On AWS, "egress" is usually not one bill. It is a mix of internet egress, cross-region transfer, cross-AZ traffic,
+    and CDN origin movement that must be separated before you estimate, explain a spike, or sign off on a forecast.
+  </p>
+
   <h2>First-screen triage: the bill went up, what changed first?</h2>
   <ol>
     <li><strong>What changed</strong> first: transfer volume, transfer boundary, or effective rate.</li>
     <li><strong>Which bill path moved</strong> and what AWS usage type drove the increase.</li>
     <li>
       Confirm whether the cost belongs to <strong>internet egress</strong>, <strong>cross-region</strong>,{" "}
-      <strong>cross-AZ</strong>, or <strong>CDN origin fill</strong>.
+      <strong>cross-AZ</strong>, or <strong>CDN origin</strong>.
     </li>
     <li>
       <strong>How to check first</strong>: billing usage types and service-specific transfer lines.
@@ -244,7 +253,8 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
   </ul>
   <p class="muted">
     Treat this guide as a transfer-path diagnosis workflow: confirm the billed boundary, usage type, and unit
-    assumptions before you accept any single AWS egress rate as the answer.
+    assumptions before you accept any single AWS egress rate as the answer. The final check is whether AWS billing
+    usage types, service line items, and peak-window behavior all support the same story.
   </p>
 
   <h2>Guide vs calculator: keep the workflow clean</h2>
