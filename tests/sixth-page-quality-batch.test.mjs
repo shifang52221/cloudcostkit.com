@@ -25,7 +25,7 @@ test("EC2 calculator closes with compute-line sign-off language instead of relyi
 test("Data egress calculator includes one-boundary-per-scenario sign-off guidance", () => {
   assert.match(
     egressCalculator,
-    /Use one boundary per scenario, then confirm path ownership, effective \$\/GB, and peak-window behavior against billing exports before you sign off on the estimate/i,
+    /Use one boundary at a time, then confirm path ownership, effective \$\/GB, and peak-window behavior against AWS network bill lines before you sign off on the estimate/i,
   );
 });
 

@@ -5,13 +5,13 @@ import { DataEgressCostCalculator } from "../../components/calculators/DataEgres
 
 const title = "Storage Pricing Calculator";
 const description =
-  "Estimate generic object storage pricing from stored GB, request volume, and optional egress, with scenario planning for blended-rate budgeting before you commit to provider-specific rules.";
+  "Build a provider-neutral object storage estimate from stored GB, request volume, and optional egress for cross-provider comparisons and early blended-rate budgeting before product rules are known.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/storage-pricing-calculator"
-  intro="Object storage pricing usually comes from three buckets: (1) stored GB (GB-month), (2) request fees (GET/PUT/LIST), and (3) data egress. This page helps you estimate the first two directly, plus a simple egress estimate if you want a fuller picture."
+  intro="This provider-neutral calculator gives you a first storage budget from stored GB, request volume, and optional egress. It is designed for cross-provider comparisons and early planning; move to an S3-specific or other product page when storage classes, lifecycle, retrieval, or replication rules drive the decision."
   examples={[
     "5,000 GB stored at $0.023/GB-month -> ~$115/month (storage only). Add request fees if you do millions of requests.",
     "20 TB stored with low request volume -> storage dominates; egress may dominate if you download a lot.",
@@ -68,6 +68,19 @@ const description =
     { href: "/guides/s3-crr-vs-srr-cost", label: "S3 CRR vs SRR cost" },
   ]}
 >
+  <div class="prose">
+    <h2 style="margin-top:0">Use this for provider-neutral planning</h2>
+    <p class="muted" style="margin-top:8px">
+      This page intentionally normalizes the common cost surfaces across object storage products. It is useful before
+      you know the final provider, region mix, storage-class policy, or product-specific request rules.
+    </p>
+    <ul>
+      <li><strong>Start here</strong> for an early budget range or cross-provider worksheet.</li>
+      <li><strong>Keep generic</strong>: stored GB, request volume, blended rates, and optional egress.</li>
+      <li><strong>Move to S3-specific pages</strong> when lifecycle, retrieval, storage classes, replication, or AWS request behavior matters.</li>
+    </ul>
+  </div>
+
   <div class="prose">
     <h2 style="margin-top:0">1) Storage + requests</h2>
     <p class="muted" style="margin-top:8px">
@@ -164,7 +177,7 @@ const description =
     <h2>Where generic storage pricing breaks down</h2>
     <ul>
       <li>Move to the object storage calculator when you need a cleaner view of storage plus request behavior without generic comparison language.</li>
-      <li>Move to S3, replication, or Glacier pages when provider-specific rules become material to the decision.</li>
+      <li>Move to S3, replication, or Glacier pages when provider-specific rules, lifecycle, retrieval, or archive behavior become material to the decision.</li>
       <li>Keep one-time migration or restoration events in a separate peak case so the generic monthly baseline stays honest.</li>
     </ul>
 

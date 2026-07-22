@@ -6,28 +6,29 @@ import { StorageReplicationCostCalculator } from "../../components/calculators/S
 
 const title = "S3 Cost Calculator";
 const description =
-  "Estimate S3 cost from storage GB-month, request activity, optional egress, and optional replication, with scenario planning for quiet buckets, download-heavy workloads, and copy-driven growth.";
+  "Build an S3-specific cost estimate from storage GB-month, GET/PUT/LIST requests, egress, storage classes, and replication, with baseline and peak scenarios for real bucket workloads.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/s3-cost-calculator"
-  intro="S3-like storage cost usually comes from storage (GB-month), requests, and egress. Some setups also add replication and cross-region transfer costs. This page groups common line items so you can build a realistic monthly estimate."
+  intro="This S3-specific calculator models the bill boundaries that matter for Amazon S3-style buckets: stored GB-month, request families, data egress, and replication or copy-driven growth. Use it when the bucket behavior is known; use the generic storage calculator for an early cross-provider baseline."
   examples={[
     "Start with storage + requests, then add egress if you download data, and replication if you copy across regions.",
     "Many workloads are storage-dominated until egress or replication is added.",
     "Use baseline and peak scenarios to avoid underestimating churn or download spikes.",
   ]}
   includes={[
-    "Storage + request fee estimate (GET/PUT) using your pricing assumptions.",
+    "Storage + request fee estimate using S3-style GET, PUT, and LIST assumptions.",
     "Optional egress estimate from GB/month and $/GB.",
     "Optional replication estimate from replicated GB/month and $/GB.",
+    "Storage-class and lifecycle review prompts for archive or infrequent-access scenarios.",
     "Optional storage growth and RPS estimators.",
     "Scenario-based planning (baseline vs peak) in one worksheet.",
   ]}
   excludes={[
     "Retrieval and lifecycle transition fees for archive tiers (model separately).",
-    "Provider-specific tiering and region complexity unless you use blended rates or scenarios.",
+    "Exact AWS regional pricing, discounts, and account-specific terms unless you enter them.",
     "KMS, inventory, analytics, and additional per-feature charges.",
   ]}
   how={[
@@ -65,6 +66,20 @@ const description =
     { href: "/guides/copy-storage-pricing", label: "Copy storage pricing checklist" },
   ]}
 >
+  <div class="prose">
+    <h2 style="margin-top:0">Use this for an S3-specific estimate</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is for a bucket-level S3 decision where request families, storage classes, lifecycle behavior, or
+      replication can change the answer. It keeps those S3-specific boundaries visible instead of treating every object
+      storage product as one blended rate.
+    </p>
+    <ul>
+      <li><strong>Start here</strong> when you have S3 usage or bucket behavior to model.</li>
+      <li><strong>Keep visible</strong>: GET, PUT, LIST, storage class, egress, and changed GB replicated.</li>
+      <li><strong>Move to generic storage</strong> when you only need a provider-neutral comparison or an early commercial range.</li>
+    </ul>
+  </div>
+
   <div class="prose">
     <h2 style="margin-top:0">1) Storage + requests</h2>
     <p class="muted" style="margin-top:8px">
@@ -202,7 +217,7 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/">Guides</a>
       <a class="btn" href="/calculators/">All calculators</a>
-      <a class="btn" href="/calculators/storage-pricing-calculator/">Storage pricing calculator (generic)</a>
+      <a class="btn" href="/calculators/storage-pricing-calculator/">Generic storage baseline</a>
       <a class="btn" href="/calculators/s3-request-cost-calculator/">S3 request cost calculator</a>
       <a class="btn" href="/guides/s3-pricing-explained/">Guide: S3 pricing explained</a>
       <a class="btn" href="/guides/s3-replication-cost/">Guide: S3 replication cost</a>
