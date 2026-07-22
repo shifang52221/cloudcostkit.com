@@ -18,10 +18,12 @@ const description =
   includes={[
     "Request fee estimate from requests/month and $ per 1M requests.",
     "Transfer estimate from requests/month and average response KB (then $/GB).",
-    "Request volume estimator for baseline and peak traffic.",
-    "Baseline vs peak scenario table for request spikes.",
+    "Baseline vs peak scenario table once request volume is already known.",
+    "A clean handoff for request-plus-transfer budgeting after measurement work is done.",
   ]}
   excludes={[
+    "Request discovery from RPS, logs, retries, bots, or automation.",
+    "Access-log ingestion, retention, and query pricing.",
     "Caching, WAF, custom domains, and other add-ons unless you model them separately.",
     "Upstream/downstream service costs (Lambda, databases, logs, etc).",
   ]}
@@ -59,6 +61,15 @@ const description =
 >
   <AwsApiGatewayCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This calculator is the bill-conversion page of the API Gateway cluster: use it after request volume is already
+      believable and you need to turn that traffic model into request-fee and transfer spend.
+    </p>
+    <p class="muted">
+      The built-in RPS helper is only a quick conversion convenience, not a defendable request-discovery workflow; use
+      the dedicated request estimator when RPS, retries, bots, logs, or peak windows still need evidence.
+    </p>
+
     <h2 style="margin-top:0">Start by separating API type and traffic path</h2>
     <p>
       The quickest way to break an API Gateway estimate is to treat all traffic as one blended stream. Before trusting
@@ -101,6 +112,13 @@ const description =
       size, compress aggressively, or hand off large responses to a CDN workflow. If both move together, this page is a
       planning checkpoint and the next review should include logs, WAF, and backend dependencies.
     </p>
+
+    <h2>When to hand off to a neighboring page</h2>
+    <ul>
+      <li>If the request count is still fuzzy, hand off to <a href="/calculators/aws-api-gateway-request-estimator/">API Gateway request estimator</a> before trusting any dollar figure here.</li>
+      <li>If access logs look like the side bill that keeps surprising reviews, hand off to <a href="/calculators/aws-api-gateway-access-log-cost-calculator/">API Gateway access log cost calculator</a> instead of blending them into this total.</li>
+      <li>If the bill boundary itself is still disputed, go back to <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a> before debating optimization.</li>
+    </ul>
 
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">

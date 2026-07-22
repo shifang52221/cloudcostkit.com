@@ -17,13 +17,14 @@ const description =
   ]}
   includes={[
     "Estimated ingestion volume (GB/day) from request volume and average log bytes.",
-    "Optional RPS-based request estimator.",
+    "Traffic-to-log-volume sizing only as an input to logging cost.",
     "Ingestion and retention storage cost estimate from your pricing inputs.",
-    "Baseline vs peak scenario table for request spikes.",
+    "Baseline vs peak scenario table for logging-side volume changes.",
   ]}
   excludes={[
     "API Gateway request pricing and response transfer pricing.",
     "Logs Insights query scan/search costs (model separately if needed).",
+    "Request-volume discovery for the core API bill.",
   ]}
   how={[
     "GB/day ~ (requests/month / 30.4) x bytes/log / 1e9.",
@@ -55,6 +56,15 @@ const description =
   <AwsApiGatewayAccessLogCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This calculator is the logging-side page of the API Gateway cluster: use it only after you know access logs are
+      the side bill that needs its own ingestion and retention model, with query and scan behavior reviewed separately.
+    </p>
+    <p class="muted">
+      Its local RPS helper is only for traffic-to-log-volume sizing; go back to the main API Gateway cost calculator or
+      the request estimator for core API request billing and defendable request-volume discovery.
+    </p>
+
     <h2 style="margin-top:0">How to estimate bytes per log line (quick, reliable)</h2>
     <ol class="muted" style="margin:10px 0 0; padding-left:18px">
       <li>Export 100-1,000 log lines from a representative day.</li>
@@ -133,6 +143,13 @@ const description =
     <ul>
       <li>Check whether the miss came from request volume, bytes per line, or retention policy before changing the whole estimate.</li>
       <li>Review ingestion GB/day, retained GB-month, and query scan behavior together because all three can move at once.</li>
+    </ul>
+
+    <h2>When to hand off to the neighboring calculators</h2>
+    <ul>
+      <li>If the missing input is still billable requests, use <a href="/calculators/aws-api-gateway-request-estimator/">API Gateway request estimator</a> to stabilize the traffic baseline first.</li>
+      <li>If the logging question is solved and you now need the core API bill, switch to <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway cost calculator</a>.</li>
+      <li>If the real debate is whether logging belongs inside or beside the API Gateway bill, go back to <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a> before mixing models.</li>
     </ul>
 
     <h2>Next steps</h2>

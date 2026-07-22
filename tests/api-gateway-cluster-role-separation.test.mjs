@@ -2,10 +2,35 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const pricingPage = readFileSync(new URL("../src/pages/guides/aws-api-gateway-pricing.astro", import.meta.url), "utf8");
-const estimatePage = readFileSync(new URL("../src/pages/guides/aws-api-gateway-estimate-requests.astro", import.meta.url), "utf8");
-const optimizationPage = readFileSync(new URL("../src/pages/guides/aws-api-gateway-cost-optimization.astro", import.meta.url), "utf8");
-const accessLogsPage = readFileSync(new URL("../src/pages/guides/aws-api-gateway-access-logs-cost.astro", import.meta.url), "utf8");
+const normalize = (value) => value.replace(/\s+/g, " ").trim();
+
+const pricingPage = normalize(readFileSync(new URL("../src/pages/guides/aws-api-gateway-pricing.astro", import.meta.url), "utf8"));
+const estimatePage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-api-gateway-estimate-requests.astro", import.meta.url), "utf8"),
+);
+const optimizationPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-api-gateway-cost-optimization.astro", import.meta.url), "utf8"),
+);
+const accessLogsPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-api-gateway-access-logs-cost.astro", import.meta.url), "utf8"),
+);
+const costCalculatorPage = readFileSync(
+  new URL("../src/pages/calculators/aws-api-gateway-cost-calculator.astro", import.meta.url),
+  "utf8",
+);
+const costCalculatorComponent = normalize(
+  readFileSync(new URL("../src/components/calculators/AwsApiGatewayCost.tsx", import.meta.url), "utf8"),
+);
+const requestEstimatorPage = normalize(
+  readFileSync(new URL("../src/pages/calculators/aws-api-gateway-request-estimator.astro", import.meta.url), "utf8"),
+);
+const accessLogCalculatorPage = normalize(
+  readFileSync(new URL("../src/pages/calculators/aws-api-gateway-access-log-cost-calculator.astro", import.meta.url), "utf8"),
+);
+const accessLogCalculatorComponent = normalize(
+  readFileSync(new URL("../src/components/calculators/AwsApiGatewayAccessLogCost.tsx", import.meta.url), "utf8"),
+);
+const costCalculatorNormalized = normalize(costCalculatorPage);
 
 test("pricing page is framed as the bill-boundary page", () => {
   assert.match(
@@ -49,4 +74,41 @@ test("access logs page is framed as the support logging-cost page", () => {
     accessLogsPage,
     /If you are still deciding what belongs inside the API Gateway bill overall, go back to the pricing guide first/i,
   );
+});
+
+test("cost calculator is framed as the bill-conversion calculator", () => {
+  assert.match(
+    costCalculatorNormalized,
+    /This calculator is the bill-conversion page of the API Gateway cluster: use it after request volume is already believable and you need to turn that traffic model into request-fee and transfer spend/i,
+  );
+  assert.match(
+    costCalculatorNormalized,
+    /The built-in RPS helper is only a quick conversion convenience, not a defendable request-discovery workflow; use the dedicated request estimator when RPS, retries, bots, logs, or peak windows still need evidence/i,
+  );
+  assert.match(costCalculatorComponent, /Avg RPS/i);
+  assert.match(costCalculatorComponent, /Use estimate/i);
+});
+
+test("request estimator is framed as the request-volume workflow calculator", () => {
+  assert.match(
+    requestEstimatorPage,
+    /This calculator is the request-volume workflow of the API Gateway cluster: it exists to turn RPS, peak windows, retries, bots, and automation into defendable billable requests before pricing starts/i,
+  );
+  assert.match(
+    requestEstimatorPage,
+    /It does not price transfer, request fees, or access-log storage; once the request model is stable, hand the result to the main API Gateway cost calculator or the pricing guide/i,
+  );
+});
+
+test("access log calculator is framed as the logging-side calculator", () => {
+  assert.match(
+    accessLogCalculatorPage,
+    /This calculator is the logging-side page of the API Gateway cluster: use it only after you know access logs are the side bill that needs its own ingestion and retention model, with query and scan behavior reviewed separately/i,
+  );
+  assert.match(
+    accessLogCalculatorPage,
+    /Its local RPS helper is only for traffic-to-log-volume sizing; go back to the main API Gateway cost calculator or the request estimator for core API request billing and defendable request-volume discovery/i,
+  );
+  assert.match(accessLogCalculatorComponent, /Avg RPS/i);
+  assert.match(accessLogCalculatorComponent, /Use estimate/i);
 });

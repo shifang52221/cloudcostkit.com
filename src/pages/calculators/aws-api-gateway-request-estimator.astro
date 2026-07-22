@@ -22,8 +22,8 @@ const description =
     "Retry multiplier to account for timeouts and bot traffic.",
   ]}
   excludes={[
-    "Per-request pricing (use the API Gateway cost calculator).",
-    "Transfer, caching, and downstream service costs.",
+    "Per-request pricing, transfer pricing, and access-log storage pricing.",
+    "Caching, downstream service costs, and other non-request line items.",
   ]}
   how={[
     "Baseline requests = baseline RPS x baseline hours x 3600.",
@@ -54,6 +54,15 @@ const description =
   <AwsApiGatewayRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This calculator is the request-volume workflow of the API Gateway cluster: it exists to turn RPS, peak windows,
+      retries, bots, and automation into defendable billable requests before pricing starts.
+    </p>
+    <p class="muted">
+      It does not price transfer, request fees, or access-log storage; once the request model is stable, hand the
+      result to the main API Gateway cost calculator or the pricing guide.
+    </p>
+
     <h2 style="margin-top:0">API Gateway request volume is mostly a traffic-shape and retry-amplification problem</h2>
     <p class="muted" style="margin-top:8px">
       This estimator is for translating API traffic behavior into billable gateway requests. The biggest misses usually
@@ -80,6 +89,13 @@ const description =
       <li>Model peak windows explicitly instead of hiding them in one monthly average.</li>
       <li>Keep retries and bot traffic visible so the estimate can be defended in review.</li>
       <li>Treat this page as a request-volume estimator only, not as a full API cost model.</li>
+    </ul>
+
+    <h2>What this calculator should hand off next</h2>
+    <ul>
+      <li>Hand off to <a href="/calculators/aws-api-gateway-cost-calculator/">AWS API Gateway cost calculator</a> when request volume is stable enough to convert into request-fee and transfer spend.</li>
+      <li>Hand off to <a href="/guides/aws-api-gateway-pricing/">API Gateway pricing</a> if request measurement changes what belongs inside the API Gateway bill versus adjacent transfer or logging cost.</li>
+      <li>Do not use this page as a shortcut for logging-side cost work; <a href="/calculators/aws-api-gateway-access-log-cost-calculator/">API Gateway access log cost calculator</a> is the page for ingestion and retention modeling.</li>
     </ul>
 
     <h2>Next steps</h2>
