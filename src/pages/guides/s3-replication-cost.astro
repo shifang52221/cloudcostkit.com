@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 replication cost: how to estimate cross-region replication";
 const description =
-  "A practical guide to estimating S3 replication cost: what data volume to count, which fees to expect, and how to model replica storage, requests, and transfer. Includes a fast checklist.";
+  "Estimate S3 replication cost as a workflow: measure changed GB, apply rule coverage, separate destination storage, requests, transfer direction, and backfill events.";
 const faqs = [
   {
     q: "What volume should I use for replication cost?",
@@ -23,13 +23,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-replication-cost"
-  lastUpdated="2026-04-04"
+  lastUpdated="2026-07-22"
   faqs={faqs}
 >
   <p class="muted">
     Replication is rarely "free". Even when the feature itself is simple, the bill usually combines a few different
     charges: data copied, extra replica storage, and sometimes request fees and transfer. This is the storage copy-path
     economics page.
+  </p>
+  <p class="muted">
+    This is the S3 replication workflow page: use it to turn a replication requirement into a sequence of changed-GB
+    measurement, rule coverage, destination storage, request overhead, and transfer-direction checks. Use AWS S3
+    replication pricing when the open question is the AWS-specific bill boundary rather than the estimation workflow.
   </p>
   <p class="muted">
     Stay here when the main question is how changed data becomes copy-path cost. Go back to the storage parent page if
@@ -115,6 +120,7 @@ const faqs = [
     <a class="btn" href="/calculators/storage-replication-cost-calculator/">Storage replication cost</a>
     <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
+    <a class="btn" href="/guides/aws-s3-replication-pricing/">AWS S3 replication pricing</a>
   </div>
   <p class="muted" style="margin-top:14px">
     If the main issue is still the wider storage budget model rather than the copy path itself, go back to{" "}

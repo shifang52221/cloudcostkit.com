@@ -41,8 +41,8 @@ test("aws-s3-request-costs owns the request-cost boundary role", () => {
   );
 });
 
-test("aws-s3-replication-pricing owns the storage copy-path economics role", () => {
-  assert.match(replicationGuide, /This is the storage copy-path economics page/i);
+test("aws-s3-replication-pricing owns the AWS S3 replication bill-boundary role", () => {
+  assert.match(replicationGuide, /This is the AWS S3 replication bill-boundary page/i);
   assert.match(
     replicationGuide,
     /go back to the storage parent page if the broader storage budget shape is still unclear/i,

@@ -4,13 +4,13 @@ import { StorageReplicationCostCalculator } from "../../components/calculators/S
 
 const title = "S3 Replication Cost Calculator";
 const description =
-  "Estimate S3 replication cost from changed data volume and per-GB pricing, with a clearer way to model steady write churn, cross-region copies, and replication-heavy recovery workflows.";
+  "Convert credible S3 replicated GB/month into a movement-fee estimate after changed data, rule coverage, and per-GB replication assumptions are known.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/s3-replication-cost-calculator"
-  intro="S3 replication and cross-region copies are driven by changed data volume. Use this S3 replication cost calculator to estimate monthly replication fees from replicated GB/month and your per-GB assumption."
+  intro="This calculator is the S3 replication bill-conversion page: use it after replicated GB/month, replication coverage, and the S3-specific per-GB assumption are believable enough to translate into a movement-fee estimate."
   examples={[
     "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at your $/GB -> estimate replication fee.",
     "Replication volume is often far smaller than total stored GB because it's driven by writes and churn.",
@@ -18,10 +18,12 @@ const description =
   includes={[
     "Replication fee estimate from replicated GB/month and $/GB pricing assumptions.",
     "Useful for cross-region replication, backup copy traffic, and sync workloads.",
+    "Quick changed-data helpers for turning rough write volume into a calculator input.",
   ]}
   excludes={[
     "Replica storage costs (model separately).",
     "Provider-specific billing rules and request pricing unless you add them separately.",
+    "Defendable write-volume measurement, rule inventory, and AWS S3 bill-boundary analysis.",
   ]}
   how={[
     "Monthly replication fee = replicated GB/month x $/GB.",
@@ -38,7 +40,7 @@ const description =
       a: "No. Replication usually means storing data twice. Add destination storage as a separate line item.",
     },
   ]}
-  lastUpdated="2026-01-29"
+  lastUpdated="2026-07-22"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -54,6 +56,10 @@ const description =
       This page matters when teams confuse the size of the bucket with the size of the replication bill. Replication
       charges usually follow writes, updates, and backfills. The dominant question is how much data changes and needs to
       move, not how much data already exists quietly at rest.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      Use the helper inputs only as quick conversions. If write GB, churn, replication coverage, or backfill volume
+      still needs evidence, use the replication-volume measurement guide before trusting this calculator output.
     </p>
     <ul>
       <li><strong>Changed data</strong>: the write or update path that actually generates replication traffic.</li>

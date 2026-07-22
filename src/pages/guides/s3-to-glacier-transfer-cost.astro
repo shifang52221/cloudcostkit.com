@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 to Glacier transfer cost: what to include in the move";
 const description =
-  "Estimate S3 to Glacier transfer cost by separating lifecycle transition requests, minimum storage duration penalties, restore behavior, and any cross-region or rewrite overhead created during the move.";
+  "Model S3 to Glacier archive-transition cost by separating lifecycle requests, minimum-duration exposure, restore readiness, and rewrite churn from replication and cross-region copy.";
 const faqs = [
   {
     q: "Do I pay data transfer to move objects into Glacier?",
@@ -23,13 +23,19 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/s3-to-glacier-transfer-cost"
-  lastUpdated="2026-04-04"
+  lastUpdated="2026-07-22"
   faqs={faqs}
 >
   <p class="muted">
     Moving data from S3 to Glacier is usually cheap, but the workflow can create extra costs. Use this checklist to
     model transition requests, minimum duration rules, and any transfer overhead. This is the archive-transition
     boundary page.
+  </p>
+  <p class="muted">
+    This is the archive-transition workflow page, not a replication or cross-region copy pricing page: use it when
+    lifecycle movement into Glacier creates transition requests, minimum-duration exposure, restore-readiness risk, or
+    rewrite churn. Use replication pages only when the same object remains active in another bucket or region as a copy
+    path.
   </p>
   <p class="muted">
     Stay here when the main question is archive migration and restore readiness. Go back to the storage parent page if

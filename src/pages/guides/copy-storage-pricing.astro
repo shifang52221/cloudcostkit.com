@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Copy storage pricing: what you pay for when data moves";
 const description =
-  "A practical guide to pricing storage copy operations (cross-region copy, replication, backups) across S3-like object storage: transfer, requests, and extra storage.";
+  "Route storage copy, backup, migration, replication, request overhead, cross-region transfer, and archive-transition cost questions before choosing a calculator or guide.";
 const faqs = [
   {
     q: "What is the biggest cost driver when copying data?",
@@ -23,13 +23,19 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/copy-storage-pricing"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-07-22"
   faqs={faqs}
 >
   <p>
     "Copying data" in cloud storage can mean many things: an intra-region copy, cross-region replication, backup copy
     traffic, or syncing objects between buckets. The costs usually fall into a few predictable buckets. This guide gives
     you a checklist so you don't miss a line item.
+  </p>
+  <p class="muted">
+    This is the storage copy and backup routing page: use it before calculators when you still need to decide whether
+    the copy is replication, backup copy, migration backfill, cross-region transfer, or archive transition. Do not use
+    this page as the final S3 replication pricing page once the provider, rule type, changed GB, and destination
+    storage are already known.
   </p>
 
   <h2>1) Transfer / data movement</h2>
@@ -50,6 +56,14 @@ const faqs = [
     If you're specifically pricing S3 replication, start with <a href="/guides/s3-replication-cost/">S3 replication cost</a>
     and treat replicated GB/month as the key input.
   </p>
+
+  <h2>Choose the narrower page once the copy type is clear</h2>
+  <ul>
+    <li><strong>S3 replication pricing</strong>: use when AWS S3 replication charges and CRR/SRR boundaries are the issue.</li>
+    <li><strong>Replication GB measurement</strong>: use when writes, churn, coverage, or backfill volume still need evidence.</li>
+    <li><strong>Cross-region transfer</strong>: use when the region pair and traffic direction are known and you only need the transfer line.</li>
+    <li><strong>Archive transition</strong>: use when lifecycle movement into Glacier is the real workflow risk.</li>
+  </ul>
 
   <h2>2) Extra storage at the destination</h2>
   <p>

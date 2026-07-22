@@ -1199,12 +1199,13 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 replication pricing: estimate replicated GB/month and total impact",
-    "description": "A practical guide to S3 replication pricing: replication volume (changed data), extra destination storage, transfer-like charges, and when CRR vs SRR changes the bill.",
+    "description": "AWS S3 replication pricing by bill boundary: replicated GB, destination storage, requests, CRR versus SRR, backfill exposure, and transfer-like effects.",
     "canonicalPath": "/guides/aws-s3-replication-pricing",
     "category": "AWS",
     "slug": "aws-s3-replication-pricing",
     "topics": [
       "egress",
+      "requests",
       "storage"
     ]
   },
@@ -1962,7 +1963,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "How to estimate replication GB/month from write volume",
-    "description": "Replication cost is driven by changed data, not total stored GB. Learn how to estimate replicated GB/month from write throughput and change rates for S3-like storage.",
+    "description": "Measure storage replication GB/month from write GB, object size, churn, rule coverage, retries, and backfill volume before using replication pricing calculators.",
     "canonicalPath": "/guides/estimate-replication-gb-per-month-from-writes",
     "category": "General",
     "slug": "estimate-replication-gb-per-month-from-writes",
@@ -2212,7 +2213,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Copy storage pricing: what you pay for when data moves",
-    "description": "A practical guide to pricing storage copy operations (cross-region copy, replication, backups) across S3-like object storage: transfer, requests, and extra storage.",
+    "description": "Route storage copy, backup, migration, replication, request overhead, cross-region transfer, and archive-transition cost questions before choosing a calculator or guide.",
     "canonicalPath": "/guides/copy-storage-pricing",
     "category": "Storage",
     "slug": "copy-storage-pricing",
@@ -2249,7 +2250,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 replication cost: how to estimate cross-region replication",
-    "description": "A practical guide to estimating S3 replication cost: what data volume to count, which fees to expect, and how to model replica storage, requests, and transfer. Includes a fast checklist.",
+    "description": "Estimate S3 replication cost as a workflow: measure changed GB, apply rule coverage, separate destination storage, requests, transfer direction, and backfill events.",
     "canonicalPath": "/guides/s3-replication-cost",
     "category": "Storage",
     "slug": "s3-replication-cost",
@@ -2261,7 +2262,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 to Glacier transfer cost: what to include in the move",
-    "description": "Estimate S3 to Glacier transfer cost by separating lifecycle transition requests, minimum storage duration penalties, restore behavior, and any cross-region or rewrite overhead created during the move.",
+    "description": "Model S3 to Glacier archive-transition cost by separating lifecycle requests, minimum-duration exposure, restore readiness, and rewrite churn from replication and cross-region copy.",
     "canonicalPath": "/guides/s3-to-glacier-transfer-cost",
     "category": "Storage",
     "slug": "s3-to-glacier-transfer-cost",

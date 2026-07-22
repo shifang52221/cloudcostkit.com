@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "How to estimate replication GB/month from write volume";
 const description =
-  "Replication cost is driven by changed data, not total stored GB. Learn how to estimate replicated GB/month from write throughput and change rates for S3-like storage.";
+  "Measure storage replication GB/month from write GB, object size, churn, rule coverage, retries, and backfill volume before using replication pricing calculators.";
 const faqs = [
   {
     q: "Should I use total bucket size to estimate replication?",
@@ -23,13 +23,18 @@ const faqs = [
   title={title}
   description={description}
   canonicalPath="/guides/estimate-replication-gb-per-month-from-writes"
-  lastUpdated="2026-01-21"
+  lastUpdated="2026-07-22"
   faqs={faqs}
 >
   <p>
     When people search for <a href="/guides/s3-replication-cost/">S3 replication cost</a>, the hardest input is usually not
     the price. It's the volume: <strong>how many GB per month actually replicate?</strong> The key idea is simple:
     replication is driven by <strong>writes and changes</strong>, not by your total stored dataset size.
+  </p>
+  <p class="muted">
+    This is the replication-volume measurement page, not the replication pricing page: stay here while write GB, churn,
+    object size, replication coverage, retries, or one-time backfill volume still need evidence. Move to calculators
+    only after replicated GB/month is credible enough to price.
   </p>
 
   <h2>Start with the right question</h2>

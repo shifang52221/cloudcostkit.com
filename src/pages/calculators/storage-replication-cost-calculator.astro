@@ -4,13 +4,13 @@ import { StorageReplicationCostCalculator as StorageReplicationCostCalculatorCom
 
 const title = "Storage Replication Cost Calculator (S3 CRR/SRR and Cross-Region Copy)";
 const description =
-  "Estimate storage replication cost by separating steady changed-data copy from backfill and migration bursts, with clearer support for CRR, SRR, cross-region, and DR planning.";
+  "Convert provider-neutral changed-data replication volume into spend, separating steady copy, backfill peaks, replica storage, and adjacent request costs.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/storage-replication-cost-calculator"
-  intro="Replication and multi-region storage can add meaningful transfer or feature charges. The first modeling decision is whether the replication bill is being created by steady changed data or by one-time backfill and migration traffic. Estimate monthly replication cost from changed GB, then compare baseline vs peak replication volume for S3 CRR, SRR, cross-region copy, and DR planning."
+  intro="This calculator is the provider-neutral replication bill-conversion page: use it after changed GB, copy mode, and effective per-GB replication or transfer rate are credible enough to translate into spend. The first modeling decision is whether the replication bill is being created by steady changed data or by one-time backfill and migration traffic. It compares steady copy with backfill and DR peaks without replacing provider-specific pricing analysis."
   examples={[
     "2,500 GB/month replicated at $0.02/GB -> $50/month (transfer/feature fee estimate).",
     "50 GB/day of changed data replicated cross-region (~1,520 GB/month) at $0.01/GB -> about $15/month (replication fee only).",
@@ -21,10 +21,12 @@ const description =
     "Works for cross-region replication, backup copy traffic, or sync workloads.",
     "Optional daily change and event estimators.",
     "Baseline vs peak scenario table for replication spikes.",
+    "Provider-neutral inputs for comparing copy-path scenarios before provider-specific sign-off.",
   ]}
   excludes={[
     "Replica storage costs (model separately).",
     "Provider-specific billing rules for replication direction, request pricing, and minimum charges.",
+    "Defendable measurement of writes, churn, rule coverage, or provider billing boundaries.",
   ]}
   how={[
     "Monthly cost = replicated GB per month x price per GB.",
@@ -54,7 +56,7 @@ const description =
       a: "Start from write volume (GB/day) or batch sizes, then multiply by days in the month. For event-driven workloads, use logs/metrics to estimate average write throughput.",
     },
   ]}
-  lastUpdated="2026-03-12"
+  lastUpdated="2026-07-22"
   related={[
     { href: "/guides/s3-replication-cost", label: "Guide: S3 replication cost" },
     { href: "/guides/estimate-replication-gb-per-month-from-writes", label: "Estimate replication GB/month" },
@@ -70,6 +72,11 @@ const description =
       This page is most useful when you need to separate steady changed-data replication from one-time copy bursts. It
       is built for teams planning S3 CRR, SRR, cross-region copy, or DR replication and trying to avoid the classic
       mistake of modeling the whole dataset instead of the data that actually moves each month.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      The built-in changed-data and event helpers are only quick conversion conveniences, not defendable
+      replication-measurement workflows. Use the write-volume guide when the input still needs evidence, and use an
+      AWS-specific pricing guide when the provider bill boundary is still unclear.
     </p>
     <ul>
       <li><strong>Ongoing replication</strong>: changed GB per month in normal operation.</li>
