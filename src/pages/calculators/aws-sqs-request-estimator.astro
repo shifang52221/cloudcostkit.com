@@ -11,18 +11,19 @@ const description =
   description={description}
   canonicalPath="/calculators/aws-sqs-request-estimator"
   robots="noindex,follow"
-  intro="Estimate monthly SQS request volume by modeling messages per month, requests per message, retry multipliers, and peak volume."
+  intro="This calculator is the SQS request-volume workflow page: use it to translate message lifecycle amplification into monthly billable requests before pricing starts. It does not own queue pricing, storage, downstream compute, or full SQS bill conversion."
   examples={[
     "200M messages/month with 3 requests/message and a 120% retry multiplier.",
     "Use a peak scenario for incident or batch spikes.",
   ]}
   includes={[
     "Estimated requests per message from base + retries + extra APIs.",
+    "Message lifecycle amplification from retries, visibility changes, and polling behavior.",
     "Total requests per month from message volume.",
     "Optional peak scenario on message volume.",
   ]}
   excludes={[
-    "Per-request pricing (use the SQS cost calculator).",
+    "Queue pricing and full SQS bill conversion.",
     "Downstream compute or storage costs.",
   ]}
   how={[
@@ -53,6 +54,12 @@ const description =
   <AwsSqsRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      Treat this as the measurement step of the SQS workflow. Once message lifecycle amplification is credible enough,
+      move to <a href="/calculators/aws-sqs-cost-calculator/">AWS SQS cost calculator</a> or the queue-request guide for
+      the pricing side.
+    </p>
+
     <h2 style="margin-top:0">SQS request volume is a message-lifecycle multiplier, not just a message count</h2>
     <p class="muted" style="margin-top:8px">
       The important idea on this page is that one message often becomes multiple billable requests. Send, receive,

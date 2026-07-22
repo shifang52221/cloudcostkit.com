@@ -11,18 +11,19 @@ const description =
   description={description}
   canonicalPath="/calculators/aws-kms-request-estimator"
   robots="noindex,follow"
-  intro="Estimate monthly KMS requests by translating workload units (requests, objects, secret reads) into KMS calls per unit, then applying a retry/burst multiplier."
+  intro="This calculator is the KMS request-volume workflow page: use it to turn workload units and crypto-call density into monthly KMS requests before pricing starts. It does not own key-month pricing, full KMS bill conversion, or downstream service costs."
   examples={[
     "500M app requests/month with 0.08 KMS calls per request and a 115% retry multiplier.",
     "Model a peak month separately to capture incident or batch-job spikes.",
   ]}
   includes={[
     "Baseline KMS requests from units x calls per unit.",
+    "Crypto-call density review for cached and uncached request paths.",
     "Optional retry/burst multiplier for realistic totals.",
     "Optional peak scenario for unit spikes.",
   ]}
   excludes={[
-    "Key-month charges (use the KMS cost calculator).",
+    "Key-month pricing and full KMS bill conversion.",
     "Downstream service costs that are not KMS charges.",
   ]}
   how={[
@@ -54,6 +55,12 @@ const description =
   <AwsKmsRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This estimator exists for one job: request-volume measurement. Once the workload path and crypto-call density are
+      credible enough, hand the result to <a href="/calculators/aws-kms-cost-calculator/">AWS KMS cost calculator</a> or
+      the request-estimation guide for the rest of the billing workflow.
+    </p>
+
     <h2 style="margin-top:0">KMS request volume is a crypto-call-density problem inside a workload path</h2>
     <p class="muted" style="margin-top:8px">
       The job of this page is to estimate how many KMS calls are hidden inside a unit of work. What matters most is not

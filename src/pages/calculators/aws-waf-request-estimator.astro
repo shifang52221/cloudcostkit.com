@@ -11,7 +11,7 @@ const description =
   description={description}
   canonicalPath="/calculators/aws-waf-request-estimator"
   robots="noindex,follow"
-  intro="Estimate monthly evaluated requests for WAF pricing by combining baseline RPS and attack spikes. Use the output in the AWS WAF cost calculator."
+  intro="This calculator is the WAF evaluated-request workflow page: use it to translate baseline traffic, blocked traffic, and attack windows into monthly evaluated requests before pricing starts. It does not own Web ACL pricing, rule pricing, security logging, or full WAF bill conversion."
   examples={[
     "Baseline 1,200 RPS for 24h/day with 20 attack hours at 12,000 RPS.",
     "Add a 10-25% multiplier for retries, bots, and blocked traffic.",
@@ -20,9 +20,10 @@ const description =
     "Baseline requests from RPS x hours/day x days/month.",
     "Attack spike requests from RPS x attack hours/month.",
     "Optional multiplier to cover retries and blocked traffic.",
+    "A support handoff for the main WAF calculator once evaluated traffic is credible.",
   ]}
   excludes={[
-    "Web ACL and rule pricing (use the WAF cost calculator).",
+    "Web ACL pricing, rule pricing, and full WAF bill conversion.",
     "Downstream logging and analytics costs.",
   ]}
   how={[
@@ -55,6 +56,11 @@ const description =
   <AwsWafRequestEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      The measurement problem on this page is narrow but important: baseline traffic, blocked traffic, and attack
+      windows often move faster than the calm-month averages teams first put into the WAF budget.
+    </p>
+
     <h2 style="margin-top:0">WAF evaluated requests are normal traffic plus attack windows, not just average RPS</h2>
     <p class="muted" style="margin-top:8px">
       This estimator exists to model the traffic that security teams actually pay to evaluate. That means baseline

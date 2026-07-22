@@ -11,7 +11,7 @@ const description =
   description={description}
   canonicalPath="/calculators/aws-sns-delivery-estimator"
   robots="noindex,follow"
-  intro="Estimate monthly SNS deliveries by modeling publishes, matched fan-out (after filter policies), and retry multipliers for failure scenarios."
+  intro="This calculator is the SNS delivery-volume workflow page: use it to translate publish count, matched fan-out, and retry behavior into monthly delivery attempts before pricing starts. It does not own SNS pricing, downstream SQS, Lambda, or email cost, or full messaging architecture decisions."
   examples={[
     "120M publishes/month, 25 subscriptions, 40% match rate, 110% retry buffer.",
     "Peak scenario for incident-driven delivery spikes.",
@@ -20,10 +20,12 @@ const description =
     "Matched fan-out from subscriptions per topic and match rate.",
     "Baseline deliveries from publishes and fan-out.",
     "Retry multiplier to account for failed deliveries.",
+    "A delivery-volume handoff for the main SNS calculator or pricing guide.",
   ]}
   excludes={[
-    "Per-request pricing (use the SNS cost calculator).",
+    "SNS pricing and full bill conversion.",
     "Downstream service costs (SQS, Lambda, email).",
+    "Full messaging architecture decisions across topics and subscribers.",
   ]}
   how={[
     "Matched fan-out = subscriptions x match rate.",
@@ -54,6 +56,11 @@ const description =
   <AwsSnsDeliveryEstimatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      Keep this page narrow. The question here is only whether publish count, matched fan-out, and retry behavior are
+      measured well enough to produce a defendable delivery baseline before the main SNS cost model takes over.
+    </p>
+
     <h2 style="margin-top:0">SNS delivery volume is a publish-to-fan-out multiplier problem</h2>
     <p class="muted" style="margin-top:8px">
       This page exists to translate publish activity into actual delivery attempts. The key levers are not only how
