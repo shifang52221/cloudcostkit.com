@@ -4,13 +4,13 @@ import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent
 
 const title = "Fargate vs EC2 Pricing Calculator and Cost Comparison";
 const description =
-  "Compare Fargate vs EC2 pricing with consistent assumptions and baseline vs peak scenarios. Estimate Fargate vCPU-hours plus GB-hours versus EC2 instance-hours using your pricing inputs, hours/day, and days/month.";
+  "Compare generic Fargate vs EC2 runtime economics with consistent workload assumptions, baseline and peak scenarios, and separate vCPU-hours, memory GB-hours, and EC2 instance-hours before an ECS-specific decision.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-fargate-vs-ec2-cost-calculator"
-  intro="If you are comparing Fargate vs EC2 pricing, this calculator keeps the workload shape consistent on both sides. Model Fargate as vCPU-hours plus memory GB-hours, model EC2 as instance-hours at your blended $/hour, then compare baseline vs peak without hiding idle-capacity risk. This is compute-only."
+  intro="This generic Fargate versus EC2 calculator keeps the same workload shape on both sides and compares compute economics before platform-specific details. Model Fargate as vCPU-hours plus memory GB-hours, model EC2 as instance-hours at your blended $/hour, then compare baseline vs peak. Use the ECS-specific calculator when host packing, daemon tasks, or cluster overhead are part of the decision."
   examples={[
     "6 tasks at 0.5 vCPU and 1 GB running 24 hours/day for 30 days vs 3 instances at $0.18/hr.",
     "If EC2 is underutilized, Fargate can be cheaper; if EC2 is packed efficiently with commitments, EC2 often wins.",
@@ -64,6 +64,17 @@ const description =
 >
   <AwsFargateVsEc2CostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Use this for generic runtime economics</h2>
+    <p class="muted" style="margin-top:8px">
+      This page is the generic Fargate versus EC2 runtime comparison. It is useful when the workload shape is known but
+      the orchestration platform is not the main question yet. It is not an ECS-specific cluster model.
+    </p>
+    <ul>
+      <li><strong>Compare here</strong>: running task capacity, EC2 utilization, commitments, and burst headroom.</li>
+      <li><strong>Keep separate</strong>: storage, networking, logging, and other non-compute lines.</li>
+      <li><strong>Move to the ECS page</strong> when task placement, daemon workloads, host density, or cluster overhead changes the result.</li>
+    </ul>
+
     <h2 style="margin-top:0">Use this when your search is really "EC2 vs Fargate pricing"</h2>
     <ul>
       <li><strong>Use this calculator</strong> when you want the same workload shape on Fargate and EC2.</li>

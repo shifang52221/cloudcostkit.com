@@ -4,13 +4,13 @@ import { AwsFargateVsEc2CostCalculator as AwsFargateVsEc2CostCalculatorComponent
 
 const title = "ECS on EC2 vs ECS on Fargate Cost Calculator";
 const description =
-  "Compare ECS on EC2 versus ECS on Fargate with consistent workload assumptions, so you can see how task shape, runtime hours, and peak usage change the cheaper option.";
+  "Compare ECS on EC2 versus ECS on Fargate with an ECS-specific host-density model, including task shape, runtime hours, cluster overhead, and peak usage before you choose the cheaper platform.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/aws-ecs-ec2-vs-fargate-cost-calculator"
-  intro="Compare ECS on EC2 (instances x $/hour) vs ECS on Fargate (vCPU-hours + GB-hours) using average running capacity and hours/day x days/month. This is compute-only; add load balancers, logs, and data transfer for a full ECS model."
+  intro="This ECS-specific calculator compares ECS on EC2 (instances x $/hour) with ECS on Fargate (vCPU-hours + GB-hours) while keeping host density, daemon tasks, spare headroom, and cluster overhead visible. Use the generic Fargate versus EC2 calculator when the ECS placement model is not the decision."
   examples={[
     "ECS service: average 6 tasks at 0.5 vCPU and 1 GB running 24 hours/day for 30 days vs 3 EC2 instances at $0.18/hr.",
     "ECS on EC2 often wins when instances are packed and covered by commitments; Fargate can win when idle capacity dominates.",
@@ -57,6 +57,18 @@ const description =
 >
   <AwsFargateVsEc2CostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <h2 style="margin-top:0">Use this for an ECS-specific platform decision</h2>
+    <p class="muted" style="margin-top:8px">
+      This is not a generic Fargate versus EC2 calculator. It is for ECS teams deciding whether host packing and
+      cluster operations justify ECS on EC2, or whether task-level billing and simpler capacity ownership make ECS on
+      Fargate the better fit.
+    </p>
+    <ul>
+      <li><strong>Model here</strong>: daemon tasks, host density, spare capacity, deployment overlap, and ECS overhead.</li>
+      <li><strong>Keep compute-only</strong>: add ALB, NAT, EBS, logs, metrics, and transfer after the platform baseline is clear.</li>
+      <li><strong>Move to generic Fargate</strong> when the question is only runtime economics across the same workload shape.</li>
+    </ul>
+
     <h2 style="margin-top:0">ECS on EC2 vs ECS on Fargate is not the same as generic EC2 vs Fargate</h2>
     <p class="muted" style="margin-top:8px">
       This page is narrower than a generic runtime comparison because ECS changes the tradeoff. On EC2, you are not
