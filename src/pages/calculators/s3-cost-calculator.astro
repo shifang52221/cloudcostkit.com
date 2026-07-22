@@ -6,13 +6,13 @@ import { StorageReplicationCostCalculator } from "../../components/calculators/S
 
 const title = "S3 Cost Calculator";
 const description =
-  "Build an S3-specific cost estimate from storage GB-month, GET/PUT/LIST requests, egress, storage classes, and replication, with baseline and peak scenarios for real bucket workloads.";
+  "Convert known AWS S3 workload inputs into separate monthly bill-conversion lines for storage GB-month, GET/PUT/LIST requests, egress, storage classes, and replication.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/s3-cost-calculator"
-  intro="This S3-specific calculator models the bill boundaries that matter for Amazon S3-style buckets: stored GB-month, request families, data egress, and replication or copy-driven growth. Use it when the bucket behavior is known; use the generic storage calculator for an early cross-provider baseline."
+  intro="This calculator is the AWS S3 multi-line bill-conversion page: use it after stored GB-month, request families, egress GB, and any replicated GB are credible enough to convert into monthly lines. Move back to guides when the unresolved issue is boundary diagnosis rather than arithmetic."
   examples={[
     "Start with storage + requests, then add egress if you download data, and replication if you copy across regions.",
     "Many workloads are storage-dominated until egress or replication is added.",
@@ -69,9 +69,9 @@ const description =
   <div class="prose">
     <h2 style="margin-top:0">Use this for an S3-specific estimate</h2>
     <p class="muted" style="margin-top:8px">
-      This page is for a bucket-level S3 decision where request families, storage classes, lifecycle behavior, or
-      replication can change the answer. It keeps those S3-specific boundaries visible instead of treating every object
-      storage product as one blended rate.
+      This page converts a bucket-level AWS S3 decision where request families, storage classes, lifecycle behavior,
+      egress, or replication can change the answer. It keeps those S3-specific boundaries visible instead of treating
+      every object storage product as one blended rate.
     </p>
     <ul>
       <li><strong>Start here</strong> when you have S3 usage or bucket behavior to model.</li>

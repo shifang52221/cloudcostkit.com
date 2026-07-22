@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 pricing: a practical model for storage, requests, egress, and replication";
 const description =
-  "Estimate S3 pricing by separating GB-month storage, requests, egress, replication, and delivery boundaries so the main object-storage bill is modeled from real usage drivers instead of copied price tables.";
+  "Map the AWS S3 bill boundary across GB-month storage, request classes, egress, replication, and archive-adjacent lines so each S3 cost surface is routed to the right deeper workflow.";
 
 const faqs = [
   {
@@ -27,8 +27,14 @@ const faqs = [
 ---
 <GuideLayout title={title} description={description} canonicalPath="/guides/aws-s3-pricing" lastUpdated="2026-01-27" faqs={faqs}>
   <p class="muted">
-    This is the S3 pricing anatomy page. Use it when the main job is to separate storage, requests, transfer, and
-    replication inside one S3 bill before you optimize one narrower driver in isolation.
+    This is the AWS S3 bill-boundary page. Use it when the main job is to separate storage, requests, transfer,
+    replication, and archive-adjacent effects inside one AWS S3 bill before you optimize one narrower driver in
+    isolation.
+  </p>
+  <p class="muted">
+    This is the S3 pricing anatomy page for AWS-specific cost surfaces. Use request, transfer, replication, and archive
+    pages when one of those narrower drivers is the unresolved decision. Do not use this page as the S3-like concept
+    explainer or as the provider-neutral storage baseline.
   </p>
   <p class="muted">
     Go back to the storage parent page if the broader storage budget shape is still unclear.

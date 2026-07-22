@@ -1145,11 +1145,12 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 data transfer costs: egress, cross-region access, and common surprises",
-    "description": "A practical guide to S3 data transfer costs: what counts as egress, how cross-region access shows up on bills, and how to estimate GB/month from your traffic patterns.",
+    "description": "Diagnose AWS S3 data transfer by path: internet egress, CDN origin fill, cross-region reads, replication traffic, and private network boundaries, with evidence steps for monthly GB.",
     "canonicalPath": "/guides/aws-s3-data-transfer",
     "category": "AWS",
     "slug": "aws-s3-data-transfer",
     "topics": [
+      "cdn",
       "egress",
       "storage"
     ]
@@ -1187,7 +1188,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 pricing: a practical model for storage, requests, egress, and replication",
-    "description": "Estimate S3 pricing by separating GB-month storage, requests, egress, replication, and delivery boundaries so the main object-storage bill is modeled from real usage drivers instead of copied price tables.",
+    "description": "Map the AWS S3 bill boundary across GB-month storage, request classes, egress, replication, and archive-adjacent lines so each S3 cost surface is routed to the right deeper workflow.",
     "canonicalPath": "/guides/aws-s3-pricing",
     "category": "AWS",
     "slug": "aws-s3-pricing",
@@ -1222,7 +1223,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 storage classes: how they change cost (and when archive fees matter)",
-    "description": "Compare S3 storage classes by modeling retrieval, transition, lifecycle churn, and minimum-duration tradeoffs so cheaper per-GB tiers are judged against the real access pattern.",
+    "description": "Choose AWS S3 storage classes from access frequency, retrieval latency, transition churn, and minimum-duration exposure instead of judging tiers by the lowest GB-month rate alone.",
     "canonicalPath": "/guides/aws-s3-storage-classes",
     "category": "AWS",
     "slug": "aws-s3-storage-classes",
@@ -2238,7 +2239,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 pricing explained: storage vs requests vs egress",
-    "description": "A practical breakdown of S3-like object storage pricing: GB-month storage, request fees, and data egress - plus how to estimate each without missing hidden line items.",
+    "description": "Explain S3-like object-storage cost anatomy across GB-month storage, request fees, and egress without pretending a generic model is an AWS regional pricing reference.",
     "canonicalPath": "/guides/s3-pricing-explained",
     "category": "Storage",
     "slug": "s3-pricing-explained",

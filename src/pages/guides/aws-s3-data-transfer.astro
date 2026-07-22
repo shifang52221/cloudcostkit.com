@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 data transfer costs: egress, cross-region access, and common surprises";
 const description =
-  "A practical guide to S3 data transfer costs: what counts as egress, how cross-region access shows up on bills, and how to estimate GB/month from your traffic patterns.";
+  "Diagnose AWS S3 data transfer by path: internet egress, CDN origin fill, cross-region reads, replication traffic, and private network boundaries, with evidence steps for monthly GB.";
 const faqs = [
   {
     q: "Is S3 transfer usually more expensive than storage?",
@@ -30,6 +30,15 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p class="muted">
+    This is the S3 transfer-path diagnosis page. Stay here while the unresolved question is which path moved bytes and
+    which evidence proves monthly GB. It does not own replication volume, storage-class economics, or the full S3 bill
+    model.
+  </p>
+  <p class="muted">
+    Go back to the storage parent page if the broader storage budget shape is still unclear. Move to the S3 pricing
+    guide after the path is known and the remaining question is how the AWS bill boundary is assembled.
+  </p>
   <p>
     For many storage-heavy systems, S3 data transfer (egress) becomes the largest line item long before storage does.
     This guide helps you model transfer in a way that avoids double-counting and missed costs.

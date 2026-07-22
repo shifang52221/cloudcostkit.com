@@ -5,13 +5,13 @@ import { DataEgressCostCalculator } from "../../components/calculators/DataEgres
 
 const title = "Storage Pricing Calculator";
 const description =
-  "Build a provider-neutral object storage estimate from stored GB, request volume, and optional egress for cross-provider comparisons and early blended-rate budgeting before product rules are known.";
+  "Build a provider-neutral storage baseline from stored GB, request volume, and optional egress for cross-provider comparisons before product-specific rules are known.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/storage-pricing-calculator"
-  intro="This provider-neutral calculator gives you a first storage budget from stored GB, request volume, and optional egress. It is designed for cross-provider comparisons and early planning; move to an S3-specific or other product page when storage classes, lifecycle, retrieval, or replication rules drive the decision."
+  intro="This calculator is the provider-neutral storage baseline page: use it before the final provider, region mix, storage class policy, or product-specific request rules are known. Move to S3 or product-specific pages when those assumptions become material."
   examples={[
     "5,000 GB stored at $0.023/GB-month -> ~$115/month (storage only). Add request fees if you do millions of requests.",
     "20 TB stored with low request volume -> storage dominates; egress may dominate if you download a lot.",

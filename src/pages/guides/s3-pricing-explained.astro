@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 pricing explained: storage vs requests vs egress";
 const description =
-  "A practical breakdown of S3-like object storage pricing: GB-month storage, request fees, and data egress - plus how to estimate each without missing hidden line items.";
+  "Explain S3-like object-storage cost anatomy across GB-month storage, request fees, and egress without pretending a generic model is an AWS regional pricing reference.";
 const faqs = [
   {
     q: "What are the main drivers of S3 cost?",
@@ -27,14 +27,14 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    If you are searching for a <a href="/calculators/storage-pricing-calculator/">storage pricing calculator</a>, you are
-    usually trying to estimate S3-like object storage cost. The good news: most object storage bills can be explained by
-    three buckets: <strong>storage</strong>, <strong>requests</strong>, and <strong>egress</strong>. This is the S3
-    pricing anatomy page.
+    This is the S3-like object-storage concept clarifier. It explains the common anatomy of storage, requests, and
+    egress before you commit to AWS-specific usage types, regions, storage classes, or feature rules.
   </p>
   <p class="muted">
-    Stay here when the main question is how one S3-style bill breaks apart. Go back to the storage parent page if the
-    broader storage budget shape is still unclear.
+    This is the S3 pricing anatomy page for a provider-agnostic mental model. It explains storage, request, and egress
+    anatomy without pretending to be the AWS regional pricing reference. Move to AWS S3 pricing when the question is
+    AWS-specific bill boundaries, and go back to the storage parent page if the broader storage budget shape is still
+    unclear.
   </p>
 
   <h2>Use this page when the bill structure matters more than the workflow</h2>
