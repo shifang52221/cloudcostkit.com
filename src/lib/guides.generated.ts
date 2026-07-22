@@ -137,7 +137,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS cross-AZ data transfer cost: causes and estimate steps",
-    "description": "A practical guide to AWS cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.",
+    "description": "Diagnose AWS cross-AZ data transfer by AZ locality: load balancers, databases, Kubernetes, NAT paths, GB crossing zones, and safe reduction checks.",
     "canonicalPath": "/guides/aws-cross-az-data-transfer-cost",
     "category": "AWS",
     "slug": "aws-cross-az-data-transfer-cost",
@@ -279,7 +279,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "AWS VPC data transfer cost: estimate cross-AZ, cross-region, and egress",
-    "description": "A practical guide to AWS VPC data transfer costs: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.",
+    "description": "Classify AWS VPC data transfer paths before pricing: cross-AZ, cross-region, NAT, endpoint, and internet boundaries, with practical GB validation steps.",
     "canonicalPath": "/guides/aws-vpc-data-transfer",
     "category": "AWS",
     "slug": "aws-vpc-data-transfer",

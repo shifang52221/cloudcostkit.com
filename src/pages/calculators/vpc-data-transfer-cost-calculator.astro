@@ -4,34 +4,36 @@ import { DataEgressCostCalculator } from "../../components/calculators/DataEgres
 
 const title = "AWS VPC Data Transfer Cost Calculator";
 const description =
-  "Estimate AWS VPC data transfer cost from monthly GB and boundary-specific pricing, whether you are modeling cross-AZ chatter, cross-region movement, or internet-facing paths.";
+  "Convert known AWS VPC transfer GB into spend after the path and effective rate are identified. Best for cross-AZ, cross-region, and VPC-boundary scenarios.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/vpc-data-transfer-cost-calculator"
-  intro="Data transfer is often the hardest cloud line item to predict. This AWS VPC data transfer cost calculator helps you estimate monthly spend from GB/month and your $/GB assumptions. Use it for cross-zone, cross-region, and internet egress style modeling."
+  intro="This calculator is the bill-conversion page of the VPC transfer cluster: use it after the transfer boundary, monthly GB, and effective path-specific rate are believable enough to translate into spend. It is intentionally a calculator, not a traffic-forensics workflow."
   examples={[
-    "If you move 2,000 GB/month across boundaries at your $/GB -> estimate monthly transfer spend.",
-    "Transfer costs can exceed compute for chatty microservices or data-heavy pipelines.",
+    "If you validated 2,000 GB/month of cross-AZ service traffic and have the effective $/GB for that path, convert it into monthly transfer spend.",
+    "If a topology change moved traffic across a region or AZ boundary, model the recurring baseline separately from the migration or failover peak.",
   ]}
   includes={[
-    "Transfer cost estimate from GB/month and $/GB pricing assumptions.",
-    "Useful for internet egress, cross-boundary transfers, and general transfer modeling.",
+    "Bill conversion from monthly GB and a path-specific $/GB assumption.",
+    "One VPC transfer boundary per run: cross-AZ, cross-region, or another already-classified VPC path.",
+    "Mbps-to-GB helper for quick throughput conversion when monitoring gives only average bandwidth.",
   ]}
   excludes={[
     "Per-hour gateway fees (e.g., NAT gateway hourly) and per-connection pricing.",
     "Provider-specific exceptions and free allowances unless you model them separately.",
+    "Defendable path measurement, flow-log attribution, or boundary classification.",
   ]}
   how={[
     "Monthly transfer cost = GB/month x $/GB.",
-    "If you have multiple transfer types (internet egress, cross-region, cross-zone), model each separately and sum.",
+    "Model one known VPC transfer boundary at a time, then sum rows outside the calculator.",
     "If you have free allowances, subtract them before applying rates.",
   ]}
   faqs={[
     {
       q: "What should I use for GB/month?",
-      a: "Start from monitoring/flow logs/billing exports. If you only have average throughput, convert Mbps to GB/month with the Units Converter.",
+      a: "Start from monitoring, flow logs, or billing exports. The built-in Mbps helper is only a quick throughput-to-GB convenience, not a defendable path-measurement workflow.",
     },
     {
       q: "Why are transfer bills surprising?",
@@ -42,9 +44,9 @@ const description =
       a: "Segment by architecture: load balancer paths, service-to-service calls, and replication. Validate AZ locality (client and backend in the same AZ) and model a peak scenario.",
     },
   ]}
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-07-22"
   related={[
-    { href: "/calculators/data-egress-cost-calculator", label: "Data egress cost (generic)" },
+    { href: "/calculators/data-egress-cost-calculator", label: "Boundary-known egress estimate" },
     { href: "/calculators/aws-nat-gateway-cost-calculator", label: "NAT gateway cost" },
     { href: "/calculators/aws-load-balancer-cost-calculator", label: "Load balancer cost" },
     { href: "/calculators/cross-region-transfer-cost-calculator", label: "Cross-region transfer cost" },
@@ -64,9 +66,14 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">Model VPC transfer by boundary, not by one blended rate</h2>
     <p class="muted" style="margin-top:8px">
-      This calculator becomes useful only when you identify the actual boundary you are paying for. Cross-AZ,
-      cross-region, and internet paths may all move the same bytes, but they are not the same commercial event. The
-      biggest mistake is collapsing them into one average number too early.
+      This calculator becomes useful only after you identify the actual boundary you are paying for. Cross-AZ,
+      cross-region, and internet-facing paths may all move bytes from the same application, but they are not the same
+      billing event. The biggest mistake is collapsing them into one average number too early.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      The built-in Mbps helper is only a quick throughput-to-GB convenience, not a defendable path-measurement workflow.
+      Use the VPC transfer guide or cross-AZ diagnosis guide when the path, AZ locality, or billing usage type still
+      needs evidence.
     </p>
     <ul>
       <li><strong>Cross-AZ</strong>: east-west traffic created by placement or load-balancing choices.</li>
@@ -93,6 +100,14 @@ const description =
       <li>Keep CDN origin traffic, replication, and service-to-service traffic as separate lines even if they share similar units.</li>
       <li>Use measured monthly GB where possible, and convert throughput carefully only when metrics are all you have.</li>
       <li>Do not treat a blended rate as final unless you know the boundary mix is stable.</li>
+    </ul>
+
+    <h2>Calculator role in this cluster</h2>
+    <ul>
+      <li><strong>This page owns</strong>: known-boundary GB x effective rate bill conversion.</li>
+      <li><strong>The VPC transfer guide owns</strong>: classifying whether the bytes crossed AZ, region, NAT, endpoint, or internet boundaries.</li>
+      <li><strong>The cross-AZ guide owns</strong>: AZ-locality diagnosis before you decide the cross-AZ share.</li>
+      <li><strong>The egress calculator owns</strong>: baseline-vs-peak planning for outbound or external transfer once that boundary is known.</li>
     </ul>
 
     <h2>Baseline vs topology-shift transfer scenarios</h2>

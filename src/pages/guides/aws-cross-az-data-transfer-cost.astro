@@ -3,13 +3,13 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS cross-AZ data transfer cost: causes and estimate steps";
 const description =
-  "A practical guide to AWS cross-AZ data transfer costs: common causes (load balancers, databases, Kubernetes), how to estimate GB crossing zones, and how to reduce it safely.";
+  "Diagnose AWS cross-AZ data transfer by AZ locality: load balancers, databases, Kubernetes, NAT paths, GB crossing zones, and safe reduction checks.";
 ---
 <GuideLayout
   title={title}
   description={description}
   canonicalPath="/guides/aws-cross-az-data-transfer-cost"
-  lastUpdated="2026-02-07"
+  lastUpdated="2026-07-22"
   faqs={[
     {
       q: "Why do teams get surprised by cross-AZ charges?",
@@ -26,12 +26,24 @@ const description =
     model once you know <strong>GB/month crossing zones</strong>, but the hard part is identifying what causes the cross-AZ
     traffic in your architecture.
   </p>
+  <p class="muted">
+    This is the AZ-locality diagnosis page in the VPC transfer cluster: use it when the suspected cost driver is traffic
+    between Availability Zones. If you still need to separate internet egress, cross-region, NAT, endpoint, and cross-AZ
+    paths, start with the VPC transfer guide first.
+  </p>
 
   <h2>Quick cross-AZ estimate</h2>
   <ul>
     <li><strong>Total GB/month</strong>: service traffic at the boundary.</li>
     <li><strong>Cross-AZ share</strong>: percent of traffic crossing zones.</li>
     <li><strong>Cost</strong>: GB/month x cross-AZ rate.</li>
+  </ul>
+
+  <h2>Use this page for locality, not broad transfer routing</h2>
+  <ul>
+    <li><strong>Stay here</strong> when the question is which clients, targets, pods, databases, or NAT paths are crossing AZs.</li>
+    <li><strong>Leave this page</strong> when the traffic might be internet egress, cross-region replication, or endpoint/NAT processed GB instead.</li>
+    <li><strong>Use the calculator after diagnosis</strong> when cross-AZ GB and the effective path rate are credible enough to convert into spend.</li>
   </ul>
 
 
@@ -68,6 +80,7 @@ const description =
   </ol>
   <div class="btn-row">
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost calculator</a>
+    <a class="btn" href="/guides/aws-vpc-data-transfer/">VPC transfer path classification</a>
     <a class="btn" href="/calculators/unit-converter/">Unit converter</a>
   </div>
 

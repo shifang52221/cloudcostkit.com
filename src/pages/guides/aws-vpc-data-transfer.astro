@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "AWS VPC data transfer cost: estimate cross-AZ, cross-region, and egress";
 const description =
-  "A practical guide to AWS VPC data transfer costs: where transfer happens in real architectures, how to estimate GB/month, and how to avoid surprises.";
+  "Classify AWS VPC data transfer paths before pricing: cross-AZ, cross-region, NAT, endpoint, and internet boundaries, with practical GB validation steps.";
 const faqs = [
   {
     q: "What creates VPC data transfer costs?",
@@ -23,16 +23,22 @@ const faqs = [
   },
 ];
 ---
-<GuideLayout title={title} description={description} canonicalPath="/guides/aws-vpc-data-transfer" lastUpdated="2026-04-04" faqs={faqs}>
+<GuideLayout title={title} description={description} canonicalPath="/guides/aws-vpc-data-transfer" lastUpdated="2026-07-22" faqs={faqs}>
   <p class="muted">
     VPC data transfer costs often show up as "small" per-GB rates that become large at scale. The hard part is not the
-    math - it is identifying how much traffic crosses pricing boundaries (AZ, region, and internet). This is the AWS
-    transfer-path boundary page.
+    math - it is identifying how much traffic crosses pricing boundaries (AZ, region, NAT, endpoints, and internet).
+    This is the AWS transfer-path boundary page. This is the AWS VPC transfer-path classification page.
   </p>
   <p class="muted">
-    Stay here when the main question is which AWS path crosses AZ, region, internet, or NAT boundaries and how much GB
-    belongs on each one. Go back to the AWS networking parent page if the broader AWS networking budget map is still
-    unclear.
+    Use it before calculators when the open question is whether traffic crossed an AZ, region, NAT path, endpoint path,
+    or public-internet boundary. Do not use this page as the final pricing page once the boundary and GB are already
+    credible; move to the path-specific calculator or narrower guide instead.
+  </p>
+  <p class="muted">
+    Stay here when the main question is which AWS path owns the bytes and how much GB belongs on each line. Go back to
+    the AWS networking parent page if NAT, endpoint-hours, load balancers, and transfer boundaries still need to be
+    budgeted as one AWS networking system. Go back to the AWS networking parent page if the broader AWS networking
+    budget map is still unclear.
   </p>
 
   <h2>Step 1: Map the traffic boundary (draw the path)</h2>
@@ -82,6 +88,7 @@ const faqs = [
     <a class="btn" href="/calculators/vpc-data-transfer-cost-calculator/">VPC transfer cost</a>
     <a class="btn" href="/calculators/cross-region-transfer-cost-calculator/">Cross-region transfer</a>
     <a class="btn" href="/calculators/data-egress-cost-calculator/">Internet egress</a>
+    <a class="btn" href="/guides/aws-cross-az-data-transfer-cost/">Cross-AZ locality diagnosis</a>
   </div>
 
   <h2>Worked estimate template (copy/paste)</h2>
@@ -114,6 +121,13 @@ const faqs = [
     <li>After one billing cycle, reconcile transfer usage types against your modeled GB/month boundaries.</li>
     <li>Spot-check one suspected path with flow logs to confirm the magnitude and direction.</li>
     <li>Re-run the estimate after major changes (new region, new CDN, new replication, new endpoints).</li>
+  </ul>
+
+  <h2>When to leave this page</h2>
+  <ul>
+    <li>If the suspected driver is specifically AZ-locality, move to the cross-AZ guide and inspect client-to-target placement.</li>
+    <li>If the boundary is already known and you only need spend, use the VPC transfer calculator as a bill-conversion step.</li>
+    <li>If the traffic leaves AWS to users or partners, use the egress guide or egress calculator instead of treating it as generic VPC transfer.</li>
   </ul>
 
   <h2>Related tools and guides</h2>
