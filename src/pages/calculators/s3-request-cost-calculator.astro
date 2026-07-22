@@ -4,26 +4,26 @@ import { ObjectStorageCostCalculator } from "../../components/calculators/Object
 
 const title = "S3 Request Cost Calculator";
 const description =
-  "Estimate S3-style request cost from monthly GET and PUT volume with per-1k pricing, especially for small-object workloads, metadata-heavy pipelines, and chatty storage patterns.";
+  "Convert credible S3 request-class counts into monthly request-fee lines for GET, PUT, LIST, HEAD, multipart, and metadata-heavy storage patterns without blending storage, egress, or replication.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/s3-request-cost-calculator"
-  intro="For many storage workloads, request fees are tiny. But for millions of small objects, heavy LIST/HEAD usage, or chatty pipelines, request charges can become a real line item. Use this S3 request cost calculator to estimate request fees from monthly request volume and your provider's per-1k prices."
+  intro="This calculator is the S3 request-class bill-conversion page: use it after GET, PUT, LIST, HEAD, multipart, or other request counts are credible enough to convert into monthly request-fee lines. It does not own request discovery, storage GB-month, egress, replication, or the full S3 bill model."
   examples={[
     "50M GET + 5M PUT per month at your per-1k pricing -> estimate monthly request fees.",
     "Millions of small objects with frequent metadata reads can make requests non-trivial even when storage GB is modest.",
   ]}
   includes={[
-    "Request fee estimate for S3-like GET and PUT operations using per-1k pricing.",
-    "Optional RPS-based request estimator.",
+    "Request fee estimate for S3-like GET, PUT, LIST, HEAD, multipart, and metadata-heavy operations using per-1k pricing.",
+    "Optional RPS-based request estimator when a request count is almost ready but still needs a quick conversion.",
     "Optional request mix presets.",
-    "A quick way to sanity-check whether requests are noise or meaningful for your workload.",
+    "A quick way to decide whether S3 request classes are noise or a meaningful line item inside the larger storage bill.",
   ]}
   excludes={[
-    "Storage GB-month pricing (model separately if needed).",
-    "Egress costs and replication/copy costs (model separately).",
+    "Request discovery when logs, metrics, retries, or automation traffic are still uncertain.",
+    "Storage GB-month pricing, egress, replication, and full S3 bill modeling.",
   ]}
   how={[
     "Request cost = (requests / 1,000) x price per 1,000 for each request type.",
@@ -48,6 +48,7 @@ const description =
   related={[
     { href: "/calculators/object-storage-cost-calculator", label: "Object storage cost" },
     { href: "/calculators/rps-to-monthly-requests-calculator", label: "RPS to monthly requests" },
+    { href: "/guides/aws-s3-request-costs", label: "Guide: S3 request costs" },
     { href: "/guides/s3-pricing-explained", label: "Guide: S3 pricing explained" },
     { href: "/guides/copy-storage-pricing", label: "Guide: copy storage pricing" },
     { href: "/guides/s3-crr-vs-srr-cost", label: "S3 CRR vs SRR cost" },
@@ -57,7 +58,8 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">S3 request cost is mostly an operation-mix problem, not a generic storage problem</h2>
     <p class="muted" style="margin-top:8px">
-      This page matters when object operations multiply faster than stored GB. The main question is usually not
+      Use this page only when the request count is ready enough to price. It matters when object operations multiply
+      faster than stored GB. The main question is usually not
       "how much data do we store?" but "which operations are hitting the bucket and how often?" GET, PUT, LIST, HEAD,
       multipart uploads, and retries can create a meaningful request bill even when storage itself looks modest.
     </p>
@@ -81,6 +83,13 @@ const description =
       <li>Check whether retries, pipeline loops, or metadata scans are creating extra requests.</li>
       <li>Keep request cost separate from storage and transfer so adjacent bills do not get blended together.</li>
       <li>Model bursty ingest or processing months explicitly if object activity is not steady.</li>
+    </ul>
+
+    <h2>When to hand off instead of pricing here</h2>
+    <ul>
+      <li>Use the S3 request-cost guide first when the team still needs to decide which request classes belong in the model.</li>
+      <li>Use the object storage calculator when storage GB-month is the main driver and requests are only a small side line.</li>
+      <li>Use transfer or replication tools when the bill is moving because bytes leave the bucket or objects are copied across regions.</li>
     </ul>
 
     <h2>Baseline vs metadata-heavy request scenarios</h2>
@@ -121,6 +130,7 @@ const description =
       <a class="btn" href="/calculators/">All calculators</a>
       <a class="btn" href="/calculators/object-storage-cost-calculator/">Object storage cost</a>
       <a class="btn" href="/calculators/rps-to-monthly-requests-calculator/">RPS to monthly requests</a>
+      <a class="btn" href="/guides/aws-s3-request-costs/">Guide: S3 request costs</a>
       <a class="btn" href="/guides/s3-pricing-explained/">Guide: S3 pricing explained</a>
       <a class="btn" href="/guides/copy-storage-pricing/">Guide: copy storage pricing</a>
     </div>

@@ -4,24 +4,26 @@ import { ApiResponseTransferCalculator } from "../../components/calculators/ApiR
 
 const title = "API Response Size Transfer Calculator";
 const description =
-  "Estimate monthly API response transfer from daily request volume and average payload size, with scenario planning for baseline traffic, heavier endpoints, and release-window spikes.";
+  "Translate credible API request counts and over-the-wire response sizes into monthly payload-transfer GB before egress-rate, CDN, or origin-cost pricing takes over.";
 ---
 <CalculatorLayout
   title={title}
   description={description}
   canonicalPath="/calculators/api-response-size-transfer-calculator"
-  intro="Estimate monthly response transfer from request volume and typical response size, then compare baseline vs peak traffic."
+  intro="This calculator is the payload-transfer bridge page: use it after request count and average response size are credible enough to translate into monthly transferred GB. It does not own request pricing, request discovery, CDN cache behavior, or egress-rate pricing."
   examples={[
     "2,000,000 requests/day with 15 KB average responses ~ 870 GB/month (estimate).",
     "Peak 180% scenario highlights incident-driven transfer spikes."
   ]}
   includes={[
     "Monthly transfer estimate from requests/day and average response KB.",
-    "Optional RPS-based request estimator.",
+    "Optional RPS-based request estimator when throughput is already known.",
     "Baseline vs peak scenario table for bandwidth spikes.",
-    "Useful for quick egress/CDN planning and cost comparisons.",
+    "A handoff number for egress, CDN, load balancer, or origin-cost planning.",
   ]}
   excludes={[
+    "Request-fee pricing and request discovery workflows.",
+    "CDN cache-hit modeling, origin shielding, and egress-rate pricing.",
     "Protocol overhead, retries, uploads, and request headers.",
     "Compression differences between endpoints (model with your average KB).",
   ]}
@@ -51,9 +53,9 @@ const description =
 
   <div class="prose" style="margin-top:18px">
     <p class="muted" style="margin-top:0">
-      Treat this as a support estimator inside bigger egress, API, CDN, and load-balancing workflows. It is best when you
-      already know the request pattern and need to translate payload size into transfer, not when you need a full network
-      cost model by itself.
+      Treat this as a support estimator inside bigger egress, API, CDN, and load-balancing workflows. It is best after
+      the request pattern is known and the open question is how response size turns that traffic into transferred GB,
+      not when you still need to discover billable requests or choose the final network pricing model.
     </p>
 
     <h2 style="margin-top:0">What response size should include</h2>
@@ -80,7 +82,7 @@ const description =
   <div class="prose" style="margin-top:18px">
     <h2 style="margin-top:0">This tool estimates payload transfer, not the whole network bill</h2>
     <p class="muted" style="margin-top:8px">
-      This page is a bridge tool. It translates request count and average response size into monthly transferred bytes,
+      This calculator is the payload-transfer bridge page. It translates request count and average response size into monthly transferred bytes,
       which you can then use inside egress, CDN, or origin-cost models. It should stay focused on the payload math
       instead of pretending to be a full network pricing calculator.
     </p>
@@ -141,6 +143,7 @@ const description =
     <ul>
       <li>Use the egress calculator when you need to turn transfer GB into public bandwidth cost.</li>
       <li>Use CDN calculators when cache hit ratio changes whether the origin actually pays the full transfer bill.</li>
+      <li>Use the API request calculator instead when the main question is request-fee pricing rather than payload bytes.</li>
       <li>Re-check during peak or incident windows because retries and fallback paths can invalidate a calm-month baseline.</li>
     </ul>
 
