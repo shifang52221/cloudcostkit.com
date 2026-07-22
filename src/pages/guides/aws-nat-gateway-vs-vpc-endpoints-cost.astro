@@ -26,6 +26,16 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p class="muted">
+    This page is the migration economics comparison in the NAT Gateway cluster: use it only after the NAT bill boundary
+    and processed-GB baseline are clear enough to compare the current NAT path against endpoint-hours, endpoint GB, and
+    residual traffic.
+  </p>
+  <p class="muted">
+    It is not the first page for discovering NAT processed GB and it is not the optimization playbook for rollout
+    changes; use the estimate guide or optimization guide when those jobs are still unresolved.
+  </p>
+
   <p>
     NAT Gateway is often the first surprise “networking bill” teams see. A common fix is to keep AWS-service traffic
     private with VPC endpoints (Interface endpoints / PrivateLink, or Gateway endpoints where available). This guide
@@ -45,7 +55,7 @@ const faqs = [
 
   <h2>Step 1: estimate NAT processed GB (baseline + peak)</h2>
   <p>
-    You need a rough monthly processed GB. Use metrics/flow logs when possible:
+    You need a rough monthly processed GB before the comparison is meaningful. Use metrics/flow logs when possible:
     <a href="/guides/aws-nat-gateway-estimate-gb-processed/"> estimate NAT GB processed</a>.
   </p>
   <p class="muted">
@@ -110,6 +120,13 @@ const faqs = [
     <li>Confirm endpoint-hours match the intended footprint (no unexpected AZ/sprawl).</li>
     <li>Check for shifted spend: cross-AZ transfer and internet egress.</li>
     <li>Re-check incident windows; retries can recreate NAT spikes even after endpoints.</li>
+  </ul>
+
+  <h2>When to leave this comparison page</h2>
+  <ul>
+    <li>If the NAT baseline is still guessed, return to <a href="/guides/aws-nat-gateway-estimate-gb-processed/">estimate NAT GB processed</a>.</li>
+    <li>If the endpoint choice is already made and the next question is rollout sequencing, private-path adoption, or savings validation, go to <a href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a> or <a href="/guides/aws-vpc-endpoints-cost-optimization/">VPC endpoints cost optimization</a>.</li>
+    <li>If the dispute is about what belongs in the NAT or endpoint bill, return to <a href="/guides/aws-nat-gateway-cost/">NAT Gateway costs</a> and <a href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a> first.</li>
   </ul>
 
   <h2>Related guides</h2>

@@ -18,12 +18,13 @@ const description =
   includes={[
     "Hourly component from NAT gateways x hours/day x days/month x $/hour.",
     "Traffic component from GB processed x $/GB processed.",
-    "Optional Mbps to monthly GB estimator.",
-    "Baseline vs peak scenario table for traffic spikes.",
+    "Optional Mbps-to-monthly-GB convenience conversion.",
+    "Baseline vs peak scenario table once the traffic baseline is known.",
   ]}
   excludes={[
     "Internet egress $/GB charges (model separately if applicable).",
     "Other transfer fees (cross-AZ/cross-region) depending on your architecture.",
+    "Endpoint break-even analysis and routing-change attribution.",
   ]}
   how={[
     "Hourly cost = NAT gateways x (hours/day x days/month) x $ per NAT gateway-hour.",
@@ -57,6 +58,16 @@ const description =
 >
   <AwsNatGatewayCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This calculator is the bill-conversion page of the NAT Gateway cluster: use it after gateway count, runtime, and
+      processed GB are believable enough to translate into hourly and per-GB processing charges.
+    </p>
+    <p class="muted">
+      The built-in Mbps helper is only a quick throughput-to-GB convenience, not a defendable traffic attribution
+      workflow; use the processed-GB estimate guide when metrics, flow logs, destinations, or incident windows still
+      need evidence.
+    </p>
+
     <h2 style="margin-top:0">NAT cost has a fixed floor and a traffic multiplier</h2>
     <p class="muted" style="margin-top:8px">
       NAT Gateway bills usually become confusing because two different cost shapes are mixed together: a relatively
@@ -127,7 +138,9 @@ const description =
     <h2>Next steps</h2>
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
+      <a class="btn" href="/guides/aws-nat-gateway-estimate-gb-processed/">Estimate processed GB</a>
       <a class="btn" href="/guides/aws-nat-gateway-vs-vpc-endpoints-cost/">NAT vs endpoints break-even</a>
+      <a class="btn" href="/guides/aws-nat-gateway-cost-optimization/">NAT cost optimization</a>
       <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
     </div>
   </div>
