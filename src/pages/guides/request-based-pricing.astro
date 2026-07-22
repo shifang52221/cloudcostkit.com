@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "Request-based pricing explained (APIs, CDN, and messaging)";
 const description =
-  "A practical guide to request-based pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.";
+  "A practical guide to generic request pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.";
 const faqs = [
   {
     q: "What services are usually request-priced?",
@@ -27,8 +27,12 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    This is the billing page for request fees. Convert monthly counts into per-10k or per-1M pricing without losing
+    This is the generic request pricing explainer. Convert monthly counts into per-10k or per-1M pricing without losing
     track of the billable units.
+  </p>
+  <p class="muted">
+    This is the billing page for request fees. It stays generic on purpose so API, CDN, messaging, and security
+    pricing can share the same request math without collapsing their different workflows into one page.
   </p>
   <p class="muted">
     If you still need to define what counts as a request or how many requests to model, go back to the request
@@ -86,8 +90,8 @@ const faqs = [
     </li>
   </ul>
   <p class="muted">
-    If you do not have request metrics yet, estimate from business events: signups, orders, or jobs per month multiplied
-    by requests per event.
+    This page should solve the generic math problem: what counts as a request, how units are priced, and how retries
+    and traffic shape change totals. It should not replace parent pages that explain why the workload behaves that way.
   </p>
 
   <h2>Build the estimate by traffic shape, not by one average</h2>

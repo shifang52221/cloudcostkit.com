@@ -10,7 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/api-request-cost-calculator"
-  intro="Use this page when you need generic request-based billing math before switching to a provider-specific calculator. The goal is not only to multiply requests by a price. It is to estimate billable requests, keep baseline and surge traffic separate, and validate whether retries, preflight calls, callbacks, or internal traffic are changing the true request total."
+  intro="This calculator is the generic request bill-conversion page: use it when you need generic request-based billing math before switching to a provider-specific calculator. The goal is not only to multiply requests by a price. It is to estimate billable requests, keep baseline and surge traffic separate, and validate whether retries, preflight calls, callbacks, or internal traffic are changing the true request total."
   examples={[
     "500,000,000 requests/month at $1.00 per 1M requests ~ $500/month.",
     "Peak 180% scenario turns 500M into 900M requests for budget planning.",
@@ -55,6 +55,10 @@ const description =
   <p class="muted">
     This calculator maps API call volume into billable requests. Confirm the request boundary first, then carry the
     monthly count into the request-fee pricing guide once the billable unit is clear.
+  </p>
+  <p class="muted">
+    Use this page for request conversion, not request discovery. If RPS, retries, bots, logs, or billable-request
+    boundaries are still uncertain, settle those inputs before treating the cost output as final.
   </p>
   <ApiRequestCostCalculatorComponent client:load />
   <div class="prose" style="margin-top:18px">

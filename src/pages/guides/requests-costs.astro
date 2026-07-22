@@ -5,7 +5,7 @@ import { withTrailingSlash } from "../../lib/url";
 
 const title = "Request Pricing Hub: calculators, guides, and next steps";
 const description =
-  "Use this request pricing hub to route into request math, retries, payload transfer, and adjacent cost checks when you need the right guide or calculator without mixing request scope across services.";
+  "Use this request boundary hub to route into request math, retries, payload transfer, and adjacent cost checks when you need the right guide or calculator without mixing request scope across services.";
 
 const faqs = [
   {
@@ -40,8 +40,8 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
     before you price the bill.
   </p>
   <p class="muted">
-    Use the calculators only after the boundary is defined so every estimate inherits the same definition of billable
-    requests.
+    This page should stay a lightweight navigation stop, not the full request workflow. Use the calculators only after
+    the boundary is defined so every estimate inherits the same definition of billable requests.
   </p>
 
   <div class="btn-row">
@@ -62,6 +62,7 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
   <ul>
     <li>Use this page when you already know the topic and just need the shortest path to the stronger guide or tool.</li>
     <li>Do not use this page as your main explainer if you still need unit mapping, traffic-shape modeling, or validation steps.</li>
+    <li>This page is a routing hub, not the full request workflow, and it should not replace the deeper pages below.</li>
     <li>That full job belongs to <a href="/guides/request-based-pricing/">request-based pricing explained</a>.</li>
   </ul>
 

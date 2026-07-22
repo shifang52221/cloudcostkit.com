@@ -1212,7 +1212,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "S3 request costs: when GET/PUT/LIST becomes meaningful",
-    "description": "S3 request costs are often tiny, but they can matter for workloads with many small objects or high metadata churn. Learn how to estimate request fees and when to care.",
+    "description": "Explain the S3 request-cost boundary: GET, PUT, LIST, metadata churn, request classes, unit checks, and when many small objects or scans make request fees meaningful.",
     "canonicalPath": "/guides/aws-s3-request-costs",
     "category": "AWS",
     "slug": "aws-s3-request-costs",
@@ -2032,7 +2032,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Request-based pricing explained (APIs, CDN, and messaging)",
-    "description": "A practical guide to request-based pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.",
+    "description": "A practical guide to generic request pricing: how to estimate requests/month, translate RPS to monthly volume, and avoid unit mistakes (per 10k vs per 1M). Includes validation steps.",
     "canonicalPath": "/guides/request-based-pricing",
     "category": "General",
     "slug": "request-based-pricing",
@@ -2202,7 +2202,7 @@ export const GUIDES: GuideLink[] = [
   },
   {
     "title": "Request Pricing Hub: calculators, guides, and next steps",
-    "description": "Use this request pricing hub to route into request math, retries, payload transfer, and adjacent cost checks when you need the right guide or calculator without mixing request scope across services.",
+    "description": "Use this request boundary hub to route into request math, retries, payload transfer, and adjacent cost checks when you need the right guide or calculator without mixing request scope across services.",
     "canonicalPath": "/guides/requests-costs",
     "category": "Requests",
     "slug": "requests-costs",

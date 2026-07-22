@@ -3,7 +3,7 @@ import GuideLayout from "../../layouts/GuideLayout.astro";
 
 const title = "S3 request costs: when GET/PUT/LIST becomes meaningful";
 const description =
-  "S3 request costs are often tiny, but they can matter for workloads with many small objects or high metadata churn. Learn how to estimate request fees and when to care.";
+  "Explain the S3 request-cost boundary: GET, PUT, LIST, metadata churn, request classes, unit checks, and when many small objects or scans make request fees meaningful.";
 const faqs = [
   {
     q: "When do S3 request costs matter?",
@@ -31,8 +31,12 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    This is the request-cost boundary page. Use it when GET, PUT, LIST, and metadata-heavy behavior are the real
+    This is the S3 request-cost boundary page. Use it when GET, PUT, LIST, and metadata-heavy behavior are the real
     driver, not the full storage-system budget or the whole S3 bill anatomy.
+  </p>
+  <p class="muted">
+    This is the request-cost boundary page for S3. Keep request-class math here and leave storage, replication, and
+    transfer to their own pages.
   </p>
   <p class="muted">
     Go back to the storage parent page if the broader storage budget shape is still unclear.
