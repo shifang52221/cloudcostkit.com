@@ -30,6 +30,15 @@ const faqs = [
   lastUpdated="2026-01-27"
   faqs={faqs}
 >
+  <p class="muted">
+    This page is the consumer-versus-provider bill-shape guide in the endpoint cluster: use it when the main question
+    is how interface endpoint usage differs from provider-side load balancer, service, and transfer exposure.
+  </p>
+  <p class="muted">
+    It is not the first page for endpoint bill boundaries or input measurement; use VPC endpoints pricing for line-item
+    scope and the estimate guide for endpoint-hours and GB modeling.
+  </p>
+
   <p>
     PrivateLink helps keep service traffic private. Cost modeling is straightforward if you separate three things:
     <strong> endpoint-hours</strong>, <strong>data processed</strong>, and <strong>transfer boundaries</strong> in your
@@ -145,6 +154,13 @@ const faqs = [
     <a class="btn" href="/guides/aws-privatelink-cost-optimization/">PrivateLink cost optimization</a>
     <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
   </div>
+
+  <h2>When this is not the right page</h2>
+  <ul>
+    <li>If you need to decide what belongs inside the endpoint bill before debating alternatives, go to <a href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>.</li>
+    <li>If your main problem is estimating endpoint-hours, AZ attachments, or GB processed, go to <a href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint-hours and GB</a>.</li>
+    <li>If the next question is operational cleanup, endpoint sprawl reduction, or locality fixes, go to <a href="/guides/aws-privatelink-cost-optimization/">PrivateLink cost optimization</a>.</li>
+  </ul>
 
   <h2>Sources</h2>
   <ul>

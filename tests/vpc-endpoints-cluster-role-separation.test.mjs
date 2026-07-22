@@ -2,9 +2,24 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const pricingPage = readFileSync(new URL("../src/pages/guides/aws-vpc-endpoints-pricing.astro", import.meta.url), "utf8");
-const estimatePage = readFileSync(new URL("../src/pages/guides/aws-vpc-endpoints-estimate-hours-and-gb.astro", import.meta.url), "utf8");
-const optimizationPage = readFileSync(new URL("../src/pages/guides/aws-vpc-endpoints-cost-optimization.astro", import.meta.url), "utf8");
+const normalize = (value) => value.replace(/\s+/g, " ").trim();
+
+const pricingPage = normalize(readFileSync(new URL("../src/pages/guides/aws-vpc-endpoints-pricing.astro", import.meta.url), "utf8"));
+const estimatePage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-vpc-endpoints-estimate-hours-and-gb.astro", import.meta.url), "utf8"),
+);
+const optimizationPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-vpc-endpoints-cost-optimization.astro", import.meta.url), "utf8"),
+);
+const privateLinkPricingPage = normalize(
+  readFileSync(new URL("../src/pages/guides/aws-privatelink-pricing.astro", import.meta.url), "utf8"),
+);
+const interfaceCalculatorPage = normalize(
+  readFileSync(new URL("../src/pages/calculators/aws-vpc-interface-endpoint-cost-calculator.astro", import.meta.url), "utf8"),
+);
+const interfaceCalculatorComponent = normalize(
+  readFileSync(new URL("../src/components/calculators/AwsVpcInterfaceEndpointCost.tsx", import.meta.url), "utf8"),
+);
 
 test("pricing page is framed as the bill-boundary page", () => {
   assert.match(
@@ -37,4 +52,28 @@ test("optimization page is framed as the production intervention page", () => {
     optimizationPage,
     /This page is for production intervention: endpoint consolidation, AZ right-sizing, traffic reduction, and locality fixes/i,
   );
+});
+
+test("PrivateLink pricing is framed as the consumer-versus-provider bill-shape page", () => {
+  assert.match(
+    privateLinkPricingPage,
+    /This page is the consumer-versus-provider bill-shape guide in the endpoint cluster: use it when the main question is how interface endpoint usage differs from provider-side load balancer, service, and transfer exposure/i,
+  );
+  assert.match(
+    privateLinkPricingPage,
+    /It is not the first page for endpoint bill boundaries or input measurement; use VPC endpoints pricing for line-item scope and the estimate guide for endpoint-hours and GB modeling/i,
+  );
+});
+
+test("interface endpoint calculator is framed as the bill-conversion calculator", () => {
+  assert.match(
+    interfaceCalculatorPage,
+    /This calculator is the bill-conversion page of the endpoint cluster: use it after endpoint count, AZ coverage, runtime, and processed GB are believable enough to translate into endpoint-hours and per-GB processing charges/i,
+  );
+  assert.match(
+    interfaceCalculatorPage,
+    /The built-in Mbps helper is only a quick throughput-to-GB convenience, not a defendable endpoint-traffic measurement workflow; use the estimate guide when inventory, AZ scope, NAT displacement, or GB sources still need evidence/i,
+  );
+  assert.match(interfaceCalculatorComponent, /Avg Mbps/i);
+  assert.match(interfaceCalculatorComponent, /Use estimate/i);
 });

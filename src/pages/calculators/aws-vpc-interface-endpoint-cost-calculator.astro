@@ -18,12 +18,13 @@ const description =
   includes={[
     "Endpoint-hours from endpoints x AZs x hours/day x days/month x $ per endpoint-hour.",
     "Data processing from GB/month x $ per GB processed.",
-    "Optional Mbps-based data processed estimator.",
-    "Baseline vs peak scenario table for endpoint and data spikes.",
+    "Optional Mbps-based processed-GB convenience conversion.",
+    "Baseline vs peak scenario table once the endpoint and traffic baseline is known.",
   ]}
   excludes={[
     "Other VPC data transfer line items (cross-AZ/cross-region) depending on your path.",
     "Service-specific pricing differences and tiered steps unless you reflect them in your inputs.",
+    "Provider-side load balancer and service-stack exposure.",
   ]}
   how={[
     "Endpoint-hours = endpoints x AZs per endpoint x (hours/day x days/month).",
@@ -61,6 +62,16 @@ const description =
   <AwsVpcInterfaceEndpointCostCalculatorComponent client:load />
 
   <div class="prose" style="margin-top:18px">
+    <p class="muted" style="margin-top:0">
+      This calculator is the bill-conversion page of the endpoint cluster: use it after endpoint count, AZ coverage,
+      runtime, and processed GB are believable enough to translate into endpoint-hours and per-GB processing charges.
+    </p>
+    <p class="muted">
+      The built-in Mbps helper is only a quick throughput-to-GB convenience, not a defendable endpoint-traffic
+      measurement workflow; use the estimate guide when inventory, AZ scope, NAT displacement, or GB sources still need
+      evidence.
+    </p>
+
     <h2 style="margin-top:0">PrivateLink has a fixed AZ footprint before traffic even arrives</h2>
     <p class="muted" style="margin-top:8px">
       Interface endpoints behave differently from NAT and generic transfer tools because they create a recurring
@@ -132,7 +143,9 @@ const description =
     <div class="btn-row" style="margin-top:0">
       <a class="btn" href="/guides/aws-network-costs/">AWS network cost hub</a>
       <a class="btn" href="/guides/aws-vpc-endpoints-estimate-hours-and-gb/">Estimate endpoint inputs</a>
+      <a class="btn" href="/guides/aws-vpc-endpoints-pricing/">VPC endpoints pricing</a>
       <a class="btn" href="/guides/aws-vpc-endpoints-cost-optimization/">Endpoints optimization</a>
+      <a class="btn" href="/guides/aws-privatelink-pricing/">PrivateLink pricing</a>
     </div>
   </div>
 </CalculatorLayout>
