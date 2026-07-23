@@ -28,9 +28,12 @@ const faqs = [
   openingAssist={false}
 >
   <p class="muted">
-    This is the network transfer boundary page: define the transfer path before you choose rates. Separate internet
-    egress, cross-AZ, cross-region, CDN edge delivery, and origin cache fill here first so every downstream estimate
-    inherits the right billing boundary.
+    This is the network transfer boundary page. This page is the transfer path boundary parent. Define the transfer path
+    before you choose rates. Separate internet egress, cross-AZ, cross-region, CDN edge delivery, and origin cache fill
+    here first so every downstream estimate inherits the right billing boundary.
+  </p>
+  <p class="muted">
+    It does not own AWS-specific egress billing diagnosis or final path-specific rate modeling.
   </p>
 
   <h2>Start here: classify the path before pricing</h2>
@@ -47,6 +50,10 @@ const faqs = [
     <li>If the main uncertainty is cross-region replication or failover sync, continue with <a href="/calculators/cross-region-transfer-cost-calculator/">cross-region transfer</a>.</li>
     <li>If the traffic stays inside your architecture but crosses zones, keep modeling the cross-AZ path before you trust an internet-egress rate.</li>
   </ul>
+  <p class="muted">
+    Hand off to the AWS egress guide only after the traffic looks like an outbound AWS transfer charge rather than a
+    generic path-classification problem.
+  </p>
 
   <h2>1) Split transfer into clear buckets</h2>
   <ul>

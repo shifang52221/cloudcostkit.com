@@ -47,10 +47,19 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
       "data-egress-cost-calculator",
       "cross-region-transfer-cost-calculator",
       "vpc-data-transfer-cost-calculator",
-      "api-response-size-transfer-calculator",
-    ],
+    "api-response-size-transfer-calculator",
+  ],
   }}
 >
+  <p class="muted">
+    This is the egress decision and billing page. This page is the AWS egress diagnosis and billing workflow. Use it
+    when you already believe the traffic is an outbound transfer charge and need to decide which egress bill you are
+    modeling, how to estimate GB/month, and when to go straight to pricing.
+  </p>
+  <p class="muted">
+    It does not replace the transfer path boundary parent. If the traffic path is still ambiguous, go back to the
+    network transfer boundary guide before choosing an AWS egress model.
+  </p>
   <p>
     If you searched for AWS egress cost, AWS egress pricing, AWS egress charges, or AWS egress fees, the first job is
     to identify which transfer path actually moved before you trust any headline $/GB rate.
@@ -83,11 +92,6 @@ const egressGuides = GUIDES.filter((g) => (g.topics || []).includes("egress") &&
     <li>Retry and incident traffic is excluded from peak scenarios.</li>
   </ul>
 
-  <p class="muted">
-    This is the egress decision and billing page. Use it when you already believe the traffic is an outbound transfer
-    charge and need to decide which egress bill you are modeling, how to estimate GB/month, and when to go straight to
-    pricing.
-  </p>
   <div class="btn-row" style="margin-top:12px">
     <a class="btn" href="/calculators/data-egress-cost-calculator/">AWS egress calculator</a>
     <a class="btn" href="/guides/aws-network-costs/">AWS network costs</a>

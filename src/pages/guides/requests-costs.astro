@@ -36,12 +36,13 @@ const requestGuides = GUIDES.filter((g) => (g.topics || []).includes("requests")
   robots="noindex,follow"
 >
   <p class="muted">
-    This is the request boundary page. Retries, bots, cache misses, and other traffic amplifiers belong in this model
-    before you price the bill.
+    This is the request boundary page. This page is the noindex request routing hub. Retries, bots, cache misses, and
+    other traffic amplifiers belong in this model before you price the bill.
   </p>
   <p class="muted">
-    This page should stay a lightweight navigation stop, not the full request workflow. Use the calculators only after
-    the boundary is defined so every estimate inherits the same definition of billable requests.
+    This page should stay a lightweight navigation stop, not the full request workflow. It does not own request pricing
+    math, service-specific request measurement, or calculator-ready bill conversion. Use the calculators only after the
+    boundary is defined so every estimate inherits the same definition of billable requests.
   </p>
 
   <div class="btn-row">

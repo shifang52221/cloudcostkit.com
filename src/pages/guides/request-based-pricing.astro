@@ -27,12 +27,15 @@ const faqs = [
   faqs={faqs}
 >
   <p class="muted">
-    This is the generic request pricing explainer. Convert monthly counts into per-10k or per-1M pricing without losing
-    track of the billable units.
+    This is the generic request pricing explainer. This page is the generic request billing-math explainer. Convert
+    monthly counts into per-10k or per-1M pricing without losing track of the billable units.
   </p>
   <p class="muted">
-    This is the billing page for request fees. It stays generic on purpose so API, CDN, messaging, and security
-    pricing can share the same request math without collapsing their different workflows into one page.
+    This is the billing page for request fees. It stays generic on purpose so API, CDN, messaging, and security pricing
+    can share the same request math without collapsing their different workflows into one page.
+  </p>
+  <p class="muted">
+    It does not own request discovery, service-specific request measurement, or parent workload modeling.
   </p>
   <p class="muted">
     If you still need to define what counts as a request or how many requests to model, go back to the request
@@ -89,11 +92,6 @@ const faqs = [
       <a href="/calculators/rps-to-monthly-requests-calculator/">RPS to Monthly Requests</a>.
     </li>
   </ul>
-  <p class="muted">
-    This page should solve the generic math problem: what counts as a request, how units are priced, and how retries
-    and traffic shape change totals. It should not replace parent pages that explain why the workload behaves that way.
-  </p>
-
   <h2>Build the estimate by traffic shape, not by one average</h2>
   <ul>
     <li><strong>Baseline window</strong>: normal traffic and normal retries.</li>
