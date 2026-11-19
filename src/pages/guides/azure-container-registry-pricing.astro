@@ -8,7 +8,7 @@ const description =
 const faqs = [
   {
     q: "What usually drives ACR cost?",
-    a: "Image storage (GB-month) is the baseline, but heavy CI/CD or large clusters can make pulls and data transfer meaningful.",
+    a: "Start with the registry tier's daily fee, which includes a storage allowance. Add storage above that allowance, applicable geo-replication charges, and separately billed network transfer. Pull pressure can affect the tier you need; do not assume every pull has a separate per-request fee.",
   },
   {
     q: "How should I think about ACR Basic vs Standard vs Premium?",
@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "How do I estimate quickly?",
-    a: "Estimate average image size, retention window, and pull volume. Treat cross-region pulls and internet egress separately.",
+    a: "Multiply the selected tier's daily fee by the days in your estimate, then add excess storage and applicable replication charges. Use retained layer volume rather than tag count, and check cross-region pulls and internet egress separately against official pricing.",
   },
   {
     q: "How do I validate?",

@@ -70,7 +70,7 @@ export function ComputeInstanceCostCalculator() {
             <div className="hint">~{formatCurrency2(fullTimeMonthlyCost)} per month at 24x30.4.</div>
           </div>
           <div className="field field-3">
-            <div className="label">Utilization (%)</div>
+            <div className="label">Running share of scheduled hours (%)</div>
             <input
               type="number"
               inputMode="numeric"
@@ -80,7 +80,7 @@ export function ComputeInstanceCostCalculator() {
               step={1}
               onChange={(e) => setUtilizationPct(+e.target.value)}
             />
-            <div className="hint">Use 100 if hours/day already models uptime.</div>
+            <div className="hint">Not CPU utilization. Use 100 if hours/day already represents actual running time; reducing this value applies an additional runtime reduction, not a CPU discount.</div>
           </div>
           <div className="field field-3">
             <div className="label">Hours/day</div>

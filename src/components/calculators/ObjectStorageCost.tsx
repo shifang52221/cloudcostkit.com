@@ -19,7 +19,7 @@ export function ObjectStorageCostCalculator() {
   const [avgGetRps, setAvgGetRps] = useState(2);
   const [avgPutRps, setAvgPutRps] = useState(0.2);
   const secondsPerMonth = 30.4 * 24 * 3600;
-  const averageStoredTb = averageStoredGb / 1024;
+  const averageStoredTb = clamp(averageStoredGb, 0, 1e12) / 1000;
   const getRps = getRequestsPerMonth / secondsPerMonth;
   const putRps = putRequestsPerMonth / secondsPerMonth;
   const totalRequestsPerMonth = getRequestsPerMonth + putRequestsPerMonth;
@@ -82,7 +82,7 @@ export function ObjectStorageCostCalculator() {
               min={0}
               onChange={(e) => setAverageStoredGb(+e.target.value)}
             />
-            <div className="hint">Approx {formatNumber(averageStoredTb, 2)} TB-month.</div>
+            <div className="hint">Approx {formatNumber(averageStoredTb, 2)} TB average stored (1 TB = 1,000 GB). Match the volume unit to your rate; convert GiB-based billing first.</div>
           </div>
           <div className="field field-3">
             <div className="label">Starting storage (GB)</div>
@@ -372,9 +372,10 @@ export function ObjectStorageCostCalculator() {
 
       <div className="panel">
         <h3>Results</h3>
+        <p className="muted">Storage and request fees only. Egress, retrieval, replication, and other services are not included in this subtotal.</p>
         <div className="kpis">
           <div className="kpi">
-            <div className="k">Estimated monthly total</div>
+            <div className="k">Monthly storage + requests subtotal</div>
             <div className="v">{formatCurrency2(result.totalMonthlyUsd)}</div>
           </div>
           <div className="kpi">

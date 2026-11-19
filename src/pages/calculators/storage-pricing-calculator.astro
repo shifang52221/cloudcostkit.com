@@ -94,6 +94,27 @@ const description =
   </div>
   <ObjectStorageCostCalculator client:load />
 
+  <section class="prose" aria-labelledby="storage-budget-example">
+    <h2 id="storage-budget-example">Worked budget: what changes when downloads double?</h2>
+    <p>These are illustrative USD rates, not a current provider quote. Use the same volume units as your provider's rate. This example uses decimal GB and TB (1 TB = 1,000 GB).</p>
+    <div role="region" aria-label="Worked storage budget line items" tabindex="0" style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Monthly line item</th><th>Calculation</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td>Average stored data</td><td>5,000 GB × $0.023/GB-month</td><td>$115.00</td></tr>
+        <tr><td>GET requests</td><td>5,000,000 / 1,000 × $0.0004</td><td>$2.00</td></tr>
+        <tr><td>PUT requests</td><td>500,000 / 1,000 × $0.005</td><td>$2.50</td></tr>
+        <tr><td>Storage + requests subtotal</td><td>$115.00 + $2.00 + $2.50</td><td>$119.50</td></tr>
+        <tr><td>Baseline egress</td><td>500 GB × $0.09/GB</td><td>$45.00</td></tr>
+        <tr><td>Combined baseline budget</td><td>$119.50 + $45.00</td><td>$164.50</td></tr>
+        <tr><td>Budget with double downloads</td><td>$119.50 + (1,000 GB × $0.09/GB)</td><td>$209.50</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>The increase is $45.00/month when only egress volume doubles. Storage, request counts, and the flat rate stay unchanged. Free allowances, tier changes, retrieval, replication, taxes, and discounts are excluded. If downloads also increase billable GETs, change those inputs too.</p>
+    <p>The two calculators show separate subtotals, not an automatically combined budget. Add their baseline results once; do not add a peak result to a baseline for the same line item.</p>
+  </section>
+
   <div class="prose" style="margin-top:18px">
     <h2>2) Optional: egress</h2>
     <p class="muted" style="margin-top:8px">
