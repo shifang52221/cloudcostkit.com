@@ -10,6 +10,7 @@ const description =
   title={title}
   description={description}
   canonicalPath="/calculators/log-ingestion-cost-calculator"
+  nextStepsPlacement="after-tool"
   intro="Most log platforms charge for ingestion. This calculator estimates monthly ingestion volume and cost using either measured GB/day or an event-rate model (events/s x bytes/event). Use a baseline and peak scenario to stress-test log spikes."
   examples={[
     "If you know GB/day, use it directly: monthly GB ~ GB/day x billing days.",
@@ -105,6 +106,7 @@ const description =
     </ul>
 
     <h2>Baseline vs verbose-mode ingestion scenarios</h2>
+    <div role="region" aria-label="Log ingestion scenario comparison" tabindex="0" style="overflow-x:auto">
     <table>
       <thead>
         <tr>
@@ -129,6 +131,7 @@ const description =
         </tr>
       </tbody>
     </table>
+    </div>
 
     <h2>How to review the first real ingestion bill</h2>
     <ul>

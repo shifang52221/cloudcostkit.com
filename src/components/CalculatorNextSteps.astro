@@ -1,0 +1,33 @@
+---
+import { withTrailingSlash } from "../lib/url";
+
+type Props = {
+  related?: { href: string; label: string }[];
+  guides: { canonicalPath: string; title: string; description: string }[];
+};
+const { related, guides } = Astro.props;
+---
+{(related?.length || guides.length) ? (
+  <section class="card section prose" data-calculator-next-steps>
+    <h2 style="margin-top:0">Best next steps</h2>
+    <p class="muted" style="margin:8px 0 12px">
+      Use this calculator for the first estimate, then validate the answer with the closest guide or companion tool.
+    </p>
+    {related?.length ? (
+      <div class="btn-row" style="margin-top:0">
+        {related.slice(0, 4).map((r) => (
+          <a class="btn" href={withTrailingSlash(r.href)}>{r.label}</a>
+        ))}
+      </div>
+    ) : (
+      <div class="grid" style="margin-top:10px">
+        {guides.slice(0, 2).map((g) => (
+          <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
+            <div class="tool-title">{g.title}</div>
+            <div class="tool-desc">{g.description}</div>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+) : null}

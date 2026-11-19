@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import AdSlot from "../components/AdSlot.astro";
+import CalculatorNextSteps from "../components/CalculatorNextSteps.astro";
 import { SITE } from "../config/site";
 import { withTrailingSlash } from "../lib/url";
 import { GUIDES } from "../lib/guides.generated";
@@ -22,6 +23,7 @@ type Props = {
   examples?: string[];
   related?: RelatedLink[];
   robots?: string;
+  nextStepsPlacement?: "before-tool" | "after-tool";
 };
 
 const {
@@ -37,6 +39,7 @@ const {
   examples,
   related,
   robots,
+  nextStepsPlacement = "before-tool",
 } = Astro.props;
 const slots = SITE.adsenseSlots;
 const siteUrl = Astro.site ? Astro.site.toString() : SITE.url;
@@ -219,33 +222,9 @@ const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].fil
     </div>
   </section>
 
-  {(related && related.length) || relatedGuides.length ? (
-    <section class="card section prose">
-      <h2 style="margin-top:0">Best next steps</h2>
-      <p class="muted" style="margin:8px 0 12px">
-        Use this calculator for the first estimate, then validate the answer with the closest guide or companion tool.
-      </p>
-      {related && related.length ? (
-        <div class="btn-row" style="margin-top:0">
-          {related.slice(0, 4).map((r) => (
-            <a class="btn" href={withTrailingSlash(r.href)}>
-              {r.label}
-            </a>
-          ))}
-        </div>
-      ) : null}
-      {!related?.length && relatedGuides.length ? (
-        <div class="grid" style="margin-top:10px">
-          {relatedGuides.slice(0, 2).map((g) => (
-            <a class="card2 tool col-6" href={withTrailingSlash(g.canonicalPath)}>
-              <div class="tool-title">{g.title}</div>
-              <div class="tool-desc">{g.description}</div>
-            </a>
-          ))}
-        </div>
-      ) : null}
-    </section>
-  ) : null}
+  {nextStepsPlacement === "before-tool" && (
+    <CalculatorNextSteps related={related} guides={relatedGuides} />
+  )}
 
   <script is:inline type="text/javascript">
     (function () {
@@ -436,6 +415,10 @@ const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].fil
   <section class="card section">
     <slot />
   </section>
+
+  {nextStepsPlacement === "after-tool" && (
+    <CalculatorNextSteps related={related} guides={relatedGuides} />
+  )}
 
   <section class="section">
     <AdSlot slot={slots.calculatorMid} minHeight={280} />
