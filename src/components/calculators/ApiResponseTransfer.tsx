@@ -12,7 +12,7 @@ export function ApiResponseTransferCalculator() {
   const [avgRps, setAvgRps] = useState(40);
   const estimatedRequestsPerDay = clamp(avgRps, 0, 1e9) * 24 * 3600;
   const requestsPerSecond = requestsPerDay / (24 * 3600);
-  const estimatedMonthlyGb = (requestsPerDay * 30.4 * avgResponseKb) / (1024 * 1024);
+  const estimatedMonthlyGb = estimateApiTransfer({ requestsPerDay, avgResponseKb }).totalGb;
   const avgMbps = (estimatedMonthlyGb * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
@@ -73,7 +73,7 @@ export function ApiResponseTransferCalculator() {
             <div className="hint">Est {formatNumber(estimatedRequestsPerDay, 0)} requests/day.</div>
           </div>
           <div className="field field-3">
-            <div className="label">Average response size (KB)</div>
+            <div className="label">Average response size (decimal KB)</div>
             <input
               type="number"
               inputMode="decimal"
@@ -83,6 +83,7 @@ export function ApiResponseTransferCalculator() {
               onChange={(e) => setAvgResponseKb(+e.target.value)}
             />
             <div className="hint">
+              1 KB = 1,000 bytes; 1 GB = 1,000,000 KB. Multiply KiB by 1.024 before entering it here.
               ~{formatNumber(estimatedMonthlyGb, 0)} GB/month, {formatNumber(avgMbps, 2)} Mbps average.
             </div>
           </div>

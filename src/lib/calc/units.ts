@@ -28,7 +28,7 @@ export function throughputToMonthlyTransferGb(opts: {
   const hoursPerDay = clamp(opts.hoursPerDay, 0, 24);
   const seconds = daysPerMonth * hoursPerDay * 3600;
   const mbTransferred = mbps * utilizationPct * seconds;
-  const gbTransferred = mbTransferred / 8 / 1024; // Mb -> MB -> GB (decimal-ish estimate)
+  const gbTransferred = mbTransferred / 8 / 1000; // Decimal Mbps -> MB -> GB.
   return { daysPerMonth, mbps, utilizationPct, hoursPerDay, gbTransferred };
 }
 

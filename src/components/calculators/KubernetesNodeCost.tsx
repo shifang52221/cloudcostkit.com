@@ -67,7 +67,7 @@ export function KubernetesNodeCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Utilization (%)</div>
+            <div className="label">Running share of scheduled hours (%)</div>
             <input
               type="number"
               inputMode="numeric"
@@ -77,7 +77,7 @@ export function KubernetesNodeCostCalculator() {
               step={1}
               onChange={(e) => setUtilizationPct(+e.target.value)}
             />
-            <div className="hint">Use &lt;100% if nodes aren't running 24/7.</div>
+            <div className="hint">Not CPU utilization. Use 100 when hours/day already represents actual running time; otherwise uptime would be reduced twice.</div>
           </div>
           <div className="field field-3">
             <div className="label">Hours/day</div>

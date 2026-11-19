@@ -71,11 +71,14 @@ export function KubernetesRequestsLimitsCalculator() {
   ]);
 
   const peakPods = Math.ceil(clamp(pods, 0, 1e8) * (clamp(peakPodMultiplierPct, 100, 1000) / 100));
-  const peakDeltaNodes = peakResult.nodesNeededForRequests - result.nodesNeededForRequests;
+  const peakDeltaNodes = peakResult.nodesNeededForRequests != null && result.nodesNeededForRequests != null
+    ? peakResult.nodesNeededForRequests - result.nodesNeededForRequests : null;
+  const nodeCount = (value: number | null) => value == null ? "Cannot fit" : formatNumber(value, 0);
   const cpuRequestCoresPerPod = cpuRequestMillicores / 1000;
   const memRequestGiBPerPod = memRequestMiB / 1024;
 
   const bottleneckLabel = (r: typeof result) => {
+    if (!r.isSchedulable) return "Single Pod exceeds node capacity";
     const maxNodes = r.nodesNeededForRequests;
     if (maxNodes === 0) return "None";
     if (r.nodesByPodLimit === maxNodes && r.nodesByPodLimit > 0) return "Max pods per node";
@@ -300,6 +303,12 @@ export function KubernetesRequestsLimitsCalculator() {
 
       <div className="panel">
         <h3>Results</h3>
+        <div role="status" aria-live="polite" className="muted" style={{ marginBottom: 12 }}>
+          {!result.isSchedulable
+            ? "Cannot schedule: one Pod exceeds the allocatable CPU or memory of this node size. Choose a larger node or reduce per-Pod requests; adding more nodes of the same size will not solve this."
+            : result.pods === 0 ? "No Pods requested; no workload nodes are needed."
+            : `Each node fits up to ${Number.isFinite(result.podsPerNode) ? formatNumber(result.podsPerNode, 0) : "an unbounded number of"} identical Pods under these inputs. This estimate respects whole-Pod packing; validate affinity, topology, DaemonSets and availability headroom separately.`}
+        </div>
         <div className="kpis">
           <div className="kpi">
             <div className="k">Total CPU requests</div>
@@ -311,7 +320,7 @@ export function KubernetesRequestsLimitsCalculator() {
           </div>
           <div className="kpi">
             <div className="k">Nodes needed (requests)</div>
-            <div className="v">{formatNumber(result.nodesNeededForRequests, 0)}</div>
+            <div className="v">{nodeCount(result.nodesNeededForRequests)}</div>
           </div>
           <div className="kpi">
             <div className="k">Bottleneck</div>
@@ -330,7 +339,7 @@ export function KubernetesRequestsLimitsCalculator() {
           </div>
         </div>
 
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 12, overflowX: "auto" }}>
           <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Baseline vs peak</div>
           <table className="table">
             <thead>
@@ -346,21 +355,21 @@ export function KubernetesRequestsLimitsCalculator() {
               <tr>
                 <td>Baseline</td>
                 <td className="num">{formatNumber(result.pods, 0)}</td>
-                <td className="num">{formatNumber(result.nodesNeededForRequests, 0)}</td>
+                <td className="num">{nodeCount(result.nodesNeededForRequests)}</td>
                 <td className="num">{formatNumber(result.totalCpuRequestCores, 2)}</td>
                 <td className="num">{formatNumber(result.totalMemRequestGiB, 2)}</td>
               </tr>
               <tr>
                 <td>Peak</td>
                 <td className="num">{formatNumber(peakPods, 0)}</td>
-                <td className="num">{formatNumber(peakResult.nodesNeededForRequests, 0)}</td>
+                <td className="num">{nodeCount(peakResult.nodesNeededForRequests)}</td>
                 <td className="num">{formatNumber(peakResult.totalCpuRequestCores, 2)}</td>
                 <td className="num">{formatNumber(peakResult.totalMemRequestGiB, 2)}</td>
               </tr>
               <tr>
                 <td>Delta</td>
                 <td className="num">{formatNumber(peakPods - result.pods, 0)}</td>
-                <td className="num">{formatNumber(peakDeltaNodes, 0)}</td>
+                <td className="num">{peakDeltaNodes == null ? "Not applicable" : nodeCount(peakDeltaNodes)}</td>
                 <td className="num">{formatNumber(peakResult.totalCpuRequestCores - result.totalCpuRequestCores, 2)}</td>
                 <td className="num">{formatNumber(peakResult.totalMemRequestGiB - result.totalMemRequestGiB, 2)}</td>
               </tr>

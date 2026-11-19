@@ -33,7 +33,13 @@ export function estimateK8sResources(opts: {
   const nodesByCpuRequest = allocatableCpu > 0 ? Math.ceil(totalCpuRequestCores / allocatableCpu) : 0;
   const nodesByMemRequest = allocatableMemGiB > 0 ? Math.ceil(totalMemRequestGiB / allocatableMemGiB) : 0;
   const nodesByPodLimit = maxPodsPerNode > 0 ? Math.ceil(pods / maxPodsPerNode) : 0;
-  const nodesNeededForRequests = Math.max(nodesByCpuRequest, nodesByMemRequest, nodesByPodLimit);
+  const podsByCpu = cpuRequestMillicores > 0 ? Math.floor(allocatableCpu * 1000 / cpuRequestMillicores) : Infinity;
+  const podsByMemory = memRequestMiB > 0 ? Math.floor(allocatableMemGiB * 1024 / memRequestMiB) : Infinity;
+  const podsPerNode = Math.min(podsByCpu, podsByMemory, maxPodsPerNode > 0 ? Math.floor(maxPodsPerNode) : Infinity);
+  const isSchedulable = pods === 0 || podsPerNode >= 1;
+  // null denotes impossible placement, not zero nodes or a numeric recommendation.
+  const nodesNeededForRequests = !isSchedulable ? null
+    : pods === 0 ? 0 : Number.isFinite(podsPerNode) ? Math.ceil(pods / podsPerNode) : 1;
 
   return {
     pods,
@@ -55,5 +61,7 @@ export function estimateK8sResources(opts: {
     nodesByMemRequest,
     nodesByPodLimit,
     nodesNeededForRequests,
+    isSchedulable,
+    podsPerNode,
   };
 }

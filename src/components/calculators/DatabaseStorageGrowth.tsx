@@ -11,9 +11,9 @@ export function DatabaseStorageGrowthCostCalculator() {
   const [storagePricePerGbMonthUsd, setStoragePricePerGbMonthUsd] = useNumberParamState("DatabaseStorageGrowth.storagePricePerGbMonthUsd", 0.12);
   const [showPeakScenario, setShowPeakScenario] = useBooleanParamState("DatabaseStorageGrowth.showPeakScenario", false);
   const [peakMultiplierPct, setPeakMultiplierPct] = useNumberParamState("DatabaseStorageGrowth.peakMultiplierPct", 180);
-  const startingTb = startingGb / 1024;
+  const startingTb = startingGb / 1000;
   const growthGbPerMonth = growthGbPerDay * 30.4;
-  const pricePerTbMonthUsd = storagePricePerGbMonthUsd * 1024;
+  const pricePerTbMonthUsd = storagePricePerGbMonthUsd * 1000;
 
   const result = useMemo(() => {
     return estimateDbStorageGrowth({

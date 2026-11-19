@@ -11,7 +11,7 @@ export function estimateApiTransfer(opts: {
 
   const requestsPerMonth = requestsPerDay * daysPerMonth;
   const totalKb = requestsPerMonth * avgResponseKb;
-  const totalGb = totalKb / 1024 / 1024;
+  const totalGb = totalKb / 1_000_000; // Decimal KB (1,000 bytes) to GB (1e9 bytes).
 
   return {
     daysPerMonth,

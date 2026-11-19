@@ -17,7 +17,28 @@ const mathUrl = `data:text/javascript;base64,${Buffer.from(ts.transpileModule(
 ).outputText).toString("base64")}`;
 const { estimateObjectStorageCost } = await import(moduleUrl("../src/lib/calc/storage.ts"));
 const { estimateComputeCost } = await import(moduleUrl("../src/lib/calc/compute.ts"));
+const { throughputToMonthlyTransferGb } = await import(moduleUrl("../src/lib/calc/units.ts"));
+const { estimateApiTransfer } = await import(moduleUrl("../src/lib/calc/apiTransfer.ts"));
+const { estimateK8sResources } = await import(moduleUrl("../src/lib/calc/k8s.ts"));
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} != ${expected}`);
+
+test("decimal throughput and API payload units reconcile", () => {
+  near(throughputToMonthlyTransferGb({ mbps: 8, utilizationPct: 100, hoursPerDay: 24, daysPerMonth: 30 }).gbTransferred, 2592);
+  near(estimateApiTransfer({ requestsPerDay: 1e6, avgResponseKb: 1, daysPerMonth: 30 }).totalGb, 30);
+  near(estimateApiTransfer({ requestsPerDay: 2e6, avgResponseKb: 15 }).totalGb, 912);
+});
+
+test("whole Pods cannot be split between nodes", () => {
+  const input = { pods: 3, cpuRequestMillicores: 2000, memRequestMiB: 512,
+    cpuLimitMillicores: 2000, memLimitMiB: 512, nodeCpuCores: 4, nodeMemGiB: 16, nodeAllocatablePct: 0.9 };
+  assert.equal(estimateK8sResources(input).nodesNeededForRequests, 3);
+  const impossible = estimateK8sResources({ ...input, pods: 1, cpuRequestMillicores: 8000 });
+  assert.equal(impossible.isSchedulable, false);
+  assert.equal(impossible.nodesNeededForRequests, null);
+  assert.equal(estimateK8sResources({ ...input, memRequestMiB: 32768 }).isSchedulable, false);
+  assert.equal(estimateK8sResources({ ...input, pods: 0, cpuRequestMillicores: 8000 }).nodesNeededForRequests, 0);
+  assert.equal(estimateK8sResources({ ...input, cpuRequestMillicores: 0, memRequestMiB: 0, maxPodsPerNode: 2 }).nodesNeededForRequests, 2);
+});
 
 test("storage worked example reconciles requests, egress and changed downloads", () => {
   const result = estimateObjectStorageCost({ averageStoredGb: 5000, storagePricePerGbMonthUsd: 0.023,

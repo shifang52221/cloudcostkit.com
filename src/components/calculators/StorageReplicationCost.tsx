@@ -15,7 +15,7 @@ export function StorageReplicationCostCalculator() {
   const gbPerDay = replicatedGbPerMonth / 30.4;
   const avgMbps = (replicatedGbPerMonth * 8000) / (30.4 * 24 * 3600);
   const estimatedReplicatedGbPerMonth = clamp(writeGbPerDay, 0, 1e12) * 30.4;
-  const estimatedWriteGbPerDayFromEvents = (clamp(eventsPerDay, 0, 1e12) * clamp(avgPayloadKb, 0, 1e6)) / (1024 * 1024);
+  const estimatedWriteGbPerDayFromEvents = (clamp(eventsPerDay, 0, 1e12) * clamp(avgPayloadKb, 0, 1e6)) / 1_000_000;
 
   const result = useMemo(() => {
     return estimateReplicationCost({
@@ -74,7 +74,7 @@ export function StorageReplicationCostCalculator() {
             />
           </div>
           <div className="field field-3">
-            <div className="label">Avg payload (KB)</div>
+            <div className="label">Avg payload (decimal KB)</div>
             <input
               type="number"
               inputMode="decimal"

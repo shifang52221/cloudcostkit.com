@@ -34,7 +34,10 @@ function parseString(value: string | null): string | null {
 
 export function useNumberParamState(key: string, defaultValue: number): [number, (v: number) => void] {
   const normalizedKey = useMemo(() => normalizeKey(key), [key]);
-  const [value, setValue] = useState<number>(() => {
+  const [value, setValue] = useState<number>(defaultValue);
+  const [restored, setRestored] = useState(false);
+  useEffect(() => {
+    setValue(() => {
     if (typeof window === "undefined") return defaultValue;
 
     try {
@@ -50,14 +53,16 @@ export function useNumberParamState(key: string, defaultValue: number): [number,
     } catch {}
 
     return defaultValue;
-  });
+    });
+    setRestored(true);
+  }, [normalizedKey, defaultValue]);
 
   const setSafeValue = useCallback((next: number) => {
     setValue((prev) => (Number.isFinite(next) ? next : prev));
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !restored) return;
 
     try {
       const storageKey = `cck:calc:${window.location.pathname}:${normalizedKey}`;
@@ -74,14 +79,17 @@ export function useNumberParamState(key: string, defaultValue: number): [number,
 
       window.history.replaceState({}, "", url.toString());
     } catch {}
-  }, [defaultValue, normalizedKey, value]);
+  }, [defaultValue, normalizedKey, value, restored]);
 
   return [value, setSafeValue];
 }
 
 export function useBooleanParamState(key: string, defaultValue: boolean): [boolean, (v: boolean) => void] {
   const normalizedKey = useMemo(() => normalizeKey(key), [key]);
-  const [value, setValue] = useState<boolean>(() => {
+  const [value, setValue] = useState<boolean>(defaultValue);
+  const [restored, setRestored] = useState(false);
+  useEffect(() => {
+    setValue(() => {
     if (typeof window === "undefined") return defaultValue;
 
     try {
@@ -97,10 +105,12 @@ export function useBooleanParamState(key: string, defaultValue: boolean): [boole
     } catch {}
 
     return defaultValue;
-  });
+    });
+    setRestored(true);
+  }, [normalizedKey, defaultValue]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !restored) return;
 
     try {
       const storageKey = `cck:calc:${window.location.pathname}:${normalizedKey}`;
@@ -117,7 +127,7 @@ export function useBooleanParamState(key: string, defaultValue: boolean): [boole
 
       window.history.replaceState({}, "", url.toString());
     } catch {}
-  }, [defaultValue, normalizedKey, value]);
+  }, [defaultValue, normalizedKey, value, restored]);
 
   return [value, setValue];
 }
@@ -128,7 +138,10 @@ export function useStringParamState(
   allowed?: readonly string[],
 ): [string, (v: string) => void] {
   const normalizedKey = useMemo(() => normalizeKey(key), [key]);
-  const [value, setValue] = useState<string>(() => {
+  const [value, setValue] = useState<string>(defaultValue);
+  const [restored, setRestored] = useState(false);
+  useEffect(() => {
+    setValue(() => {
     if (typeof window === "undefined") return defaultValue;
 
     const accept = (v: string | null) => {
@@ -150,10 +163,12 @@ export function useStringParamState(
     } catch {}
 
     return defaultValue;
-  });
+    });
+    setRestored(true);
+  }, [normalizedKey, defaultValue]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !restored) return;
 
     try {
       const storageKey = `cck:calc:${window.location.pathname}:${normalizedKey}`;
@@ -166,7 +181,7 @@ export function useStringParamState(
       else url.searchParams.set(normalizedKey, value);
       window.history.replaceState({}, "", url.toString());
     } catch {}
-  }, [defaultValue, normalizedKey, value]);
+  }, [defaultValue, normalizedKey, value, restored]);
 
   return [value, setValue];
 }
