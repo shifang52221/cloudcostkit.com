@@ -149,7 +149,7 @@ const calculatorSchema = {
   operatingSystem: "Any",
   creator: {
     "@type": "Organization",
-    name: SITE.editorial.teamName,
+    name: SITE.editorial.publisherName,
     url: SITE.url,
   },
   publisher: {
@@ -205,7 +205,7 @@ const schemas = [breadcrumbSchema, calculatorSchema, faqSchema, howToSchema].fil
     <h1>{title}</h1>
     <p>{intro}</p>
     <p class="muted" style="margin:8px 0 0; font-size:14px">
-      Maintained by {SITE.editorial.teamName}. Last updated: {lastUpdated}.{" "}
+      Maintained by {SITE.editorial.publisherName}. Page date: {lastUpdated}.{" "}
       <a href="/editorial-policy/">Editorial policy</a> and <a href="/methodology/">methodology</a>.
     </p>
     <section id="calc-toolbar" class="btn-row" style="margin-top:12px; align-items:center">

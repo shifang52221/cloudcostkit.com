@@ -23,8 +23,8 @@ test("base layout organization schema includes contact and policy identity signa
 });
 
 test("homepage explicitly explains who maintains and reviews the site", () => {
-  assert.match(homepage, /maintained by the CloudCostKit Editorial Team/i);
-  assert.match(homepage, /how pages are reviewed, challenged, and corrected/i);
+  assert.match(homepage, /maintained by one independent owner with AI assistance/i);
+  assert.match(homepage, /how selected pages are reviewed, challenged, and corrected/i);
 });
 
 test("about page explains why the site exists and how responsibility is bounded", () => {

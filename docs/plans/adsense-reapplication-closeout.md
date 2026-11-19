@@ -17,7 +17,7 @@ After the final effective-rate calculator release is deployed and live markers a
 - No proof of AI-detection rejection, guaranteed RPM, future traffic or approval probability.
 - No exhaustive provider pricing certification; sample/default rates remain inputs, not current quotes.
 - Default analytics consent remains denied in the observed session; audience counts are not complete/compliance-certified. The owner disabled history-based page views; initial clean page location and absence of a new request after an input change were observed. Final state of all other enhanced-measurement toggles is not confirmed.
-- Team identity/experience is not independently verified by this technical audit; do not fabricate credentials or reviewer identities. Reconsider it if the actual maintainer description is inaccurate.
+- Owner clarification: a single individual maintains the site with AI assistance and checks official sources on selected priority pages. Removed the staffed Editorial Team identity and universal current-document review claim. Brand authorship remains CloudCostKit; no private name or unverified credentials are introduced. About, editorial policy, methodology and shared bylines disclose the actual scope. This improves accuracy of representation, not proof of expertise or guaranteed approval.
 
 ## After requesting review
 

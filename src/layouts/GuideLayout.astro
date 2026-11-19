@@ -38,7 +38,7 @@ const articleSchema = {
   mainEntityOfPage: canonical,
   author: {
     "@type": "Organization",
-    name: SITE.editorial.teamName,
+    name: SITE.editorial.publisherName,
     url: SITE.url,
   },
   publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
@@ -191,7 +191,7 @@ const openingAssistMessage =
   <article class="card section prose">
     <h1 style="margin-top:0">{title}</h1>
     <div class="muted" style="margin:8px 0 12px; font-size:14px">
-      Reviewed by {SITE.editorial.teamName}. Last updated: {lastUpdated}.{" "}
+      Published by {SITE.editorial.publisherName}. Page date: {lastUpdated}.{" "}
       <a href="/editorial-policy/">Editorial policy</a> and <a href="/methodology/">methodology</a>.
     </div>
     {openingAssist !== false && openingAssistTools.length ? (

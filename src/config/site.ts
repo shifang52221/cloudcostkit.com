@@ -70,8 +70,8 @@ export const SITE = {
   },
   email: (import.meta.env.PUBLIC_CONTACT_EMAIL || "contact@cloudcostkit.com").trim(),
   editorial: {
-    teamName: "CloudCostKit Editorial Team",
-    reviewLabel: "Reviewed against CloudCostKit methodology and current provider documentation.",
+    publisherName: "CloudCostKit",
+    reviewLabel: "Independently maintained with AI assistance. Official-source checks prioritize selected pages; this is not a site-wide live pricing review.",
   },
 } as const;
 
