@@ -29,7 +29,7 @@ const description =
   how={[
     "Publish cost = (publishes per month / 1,000,000) x $ per 1M publishes.",
     "Delivery cost = (deliveries per month / 1,000,000) x $ per 1M deliveries.",
-    "Transfer GB/month ~= deliveries per month x avg payload KB / 1024 / 1024.",
+    "Transfer decimal GB/month = deliveries per month x average payload decimal KB / 1,000,000. Effective request rates must account for applicable payload chunks and protocol rules.",
     "Transfer cost = transfer GB/month x $ per GB.",
     "Total = publish + delivery + transfer.",
   ]}

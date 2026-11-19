@@ -20,7 +20,22 @@ const { estimateComputeCost } = await import(moduleUrl("../src/lib/calc/compute.
 const { throughputToMonthlyTransferGb } = await import(moduleUrl("../src/lib/calc/units.ts"));
 const { estimateApiTransfer } = await import(moduleUrl("../src/lib/calc/apiTransfer.ts"));
 const { estimateK8sResources } = await import(moduleUrl("../src/lib/calc/k8s.ts"));
+const { estimateApiGatewayCost } = await import(moduleUrl("../src/lib/calc/apiGateway.ts"));
+const { estimateSesCost } = await import(moduleUrl("../src/lib/calc/ses.ts"));
+const { estimateSnsCost } = await import(moduleUrl("../src/lib/calc/sns.ts"));
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} != ${expected}`);
+
+test("AWS effective-rate worksheets use explicit decimal payload units", () => {
+  const api = estimateApiGatewayCost({ requestsPerMonth: 1e6, avgResponseKb: 1, pricePerMillionRequestsUsd: 3.5, egressPricePerGbUsd: 0.09 });
+  near(api.transferGb, 1);
+  near(api.totalCostUsd, 3.59);
+  const ses = estimateSesCost({ emailsPerMonth: 2e6, avgEmailKb: 32, pricePer1000EmailsUsd: 0.1, egressPricePerGbUsd: 0.12 });
+  near(ses.transferGb, 64);
+  near(ses.totalCostUsd, 207.68);
+  const sns = estimateSnsCost({ publishesPerMonth: 1e6, deliveriesPerMonth: 2e6, avgPayloadKb: 10, pricePerMillionPublishesUsd: 0.5, pricePerMillionDeliveriesUsd: 0.6, egressPricePerGbUsd: 0.09 });
+  near(sns.transferGb, 20);
+  near(sns.totalCostUsd, 3.5);
+});
 
 test("decimal throughput and API payload units reconcile", () => {
   near(throughputToMonthlyTransferGb({ mbps: 8, utilizationPct: 100, hoursPerDay: 24, daysPerMonth: 30 }).gbTransferred, 2592);

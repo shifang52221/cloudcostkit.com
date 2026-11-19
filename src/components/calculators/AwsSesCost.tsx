@@ -14,7 +14,7 @@ export function AwsSesCostCalculator() {
   const [emailsPerDay, setEmailsPerDay] = useState(160_000);
   const emailsPerSecond = emailsPerMonth / (30.4 * 24 * 3600);
   const pricePerMillionEmailsUsd = pricePer1000EmailsUsd * 1000;
-  const estimatedTransferGb = (emailsPerMonth * avgEmailKb) / (1024 * 1024);
+  const estimatedTransferGb = (emailsPerMonth * avgEmailKb) / 1_000_000;
   const estimatedEmailsPerMonth = clamp(emailsPerDay, 0, 1e12) * 30.4;
 
   const result = useMemo(() => {
@@ -41,6 +41,7 @@ export function AwsSesCostCalculator() {
     <div className="calc-grid">
       <div className="panel">
         <h3>Inputs</h3>
+        <p className="muted">Effective-rate outbound budget, not a complete SES quote. Use billed outbound message/recipient volume and billed message size. Units are decimal: 1 KB = 1,000 bytes; 1 GB = 1,000,000 KB. Outgoing mail data charges differ from separate EC2/network charges. Plans, free credits, dedicated IPs and deliverability add-ons are not automatically applied.</p>
         <div className="form">
           <div className="field field-3">
             <div className="label">Emails sent (per month)</div>
@@ -90,7 +91,7 @@ export function AwsSesCostCalculator() {
             <div className="hint">~{formatCurrency2(pricePerMillionEmailsUsd)} per 1M emails.</div>
           </div>
           <div className="field field-3">
-            <div className="label">Avg email size (KB)</div>
+            <div className="label">Avg billed email size (decimal KB)</div>
             <input
               type="number"
               inputMode="decimal"
@@ -102,7 +103,7 @@ export function AwsSesCostCalculator() {
             <div className="hint">~{formatNumber(estimatedTransferGb, 2)} GB/month of outbound data.</div>
           </div>
           <div className="field field-3">
-            <div className="label">Egress price ($ / GB)</div>
+            <div className="label">Outgoing mail data rate ($ / GB)</div>
             <input
               type="number"
               inputMode="decimal"

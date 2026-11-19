@@ -12,7 +12,7 @@ export function estimateApiGatewayCost(opts: {
   const egressPricePerGbUsd = clamp(opts.egressPricePerGbUsd, 0, 1e6);
 
   const requestCostUsd = (requestsPerMonth / 1_000_000) * pricePerMillionRequestsUsd;
-  const transferGb = (requestsPerMonth * avgResponseKb) / 1024 / 1024;
+  const transferGb = (requestsPerMonth * avgResponseKb) / 1_000_000;
   const transferCostUsd = transferGb * egressPricePerGbUsd;
   const totalCostUsd = requestCostUsd + transferCostUsd;
 

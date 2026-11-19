@@ -18,7 +18,7 @@ export function estimateSnsCost(opts: {
   const publishCostUsd = (publishesPerMonth / 1_000_000) * pricePerMillionPublishesUsd;
   const deliveryCostUsd = (deliveriesPerMonth / 1_000_000) * pricePerMillionDeliveriesUsd;
 
-  const transferGb = (deliveriesPerMonth * avgPayloadKb) / 1024 / 1024;
+  const transferGb = (deliveriesPerMonth * avgPayloadKb) / 1_000_000;
   const transferCostUsd = transferGb * egressPricePerGbUsd;
 
   const totalCostUsd = publishCostUsd + deliveryCostUsd + transferCostUsd;

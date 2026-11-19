@@ -27,14 +27,14 @@ const description =
   ]}
   how={[
     "Send cost = (emails per month / 1,000) x $ per 1,000 emails.",
-    "Transfer GB/month ~= emails per month x avg email KB / 1024 / 1024.",
-    "Transfer cost = transfer GB/month x $ per GB.",
+    "Outgoing mail data in decimal GB/month = emails per month x average billed email decimal KB / 1,000,000.",
+    "Mail data cost = outgoing mail GB/month x applicable mail data rate; separate EC2/network charges are not included.",
     "Total = send + transfer.",
   ]}
   faqs={[
     {
       q: "Should I include transfer for SES?",
-      a: "It depends on your setup and what you want to approximate. If transfer is negligible or bundled for your path, set $/GB to 0 and model send charges only.",
+      a: "Check the applicable SES outgoing mail data charge, not just internet egress. This worksheet applies your entered data rate to billed email size. Set it to zero only when that charge is excluded or already accounted for; EC2/network charges and SES add-ons remain separate.",
     },
     {
       q: "What drives unexpected email costs?",

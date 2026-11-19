@@ -17,7 +17,7 @@ export function AwsSnsCostCalculator() {
   const estimatedDeliveriesPerMonth = publishesPerMonth * clamp(fanoutPerPublish, 0, 1e6);
   const publishesPerSecond = publishesPerMonth / (30.4 * 24 * 3600);
   const deliveriesPerSecond = deliveriesPerMonth / (30.4 * 24 * 3600);
-  const estimatedTransferGb = (deliveriesPerMonth * avgPayloadKb) / (1024 * 1024);
+  const estimatedTransferGb = (deliveriesPerMonth * avgPayloadKb) / 1_000_000;
   const estimatedTransferMbps = (estimatedTransferGb * 8000) / (30.4 * 24 * 3600);
 
   const result = useMemo(() => {
@@ -64,6 +64,7 @@ export function AwsSnsCostCalculator() {
     <div className="calc-grid">
       <div className="panel">
         <h3>Inputs</h3>
+        <p className="muted">Effective-rate budget, not a complete SNS quote. Use rates per million original publishes/deliveries that already account for applicable payload chunks, protocol and topic type; raw message counts are not always billable request units. Decimal payload units: 1 KB = 1,000 bytes; 1 GB = 1,000,000 KB. Set transfer rate to zero for exempt paths; SMS, FIFO-specific charges and add-ons need separate models.</p>
         <div className="form">
           <div className="field field-3">
             <div className="label">Publishes (per month)</div>
@@ -138,7 +139,7 @@ export function AwsSnsCostCalculator() {
           </div>
 
           <div className="field field-3">
-            <div className="label">Avg payload (KB)</div>
+            <div className="label">Avg payload (decimal KB)</div>
             <input
               type="number"
               inputMode="decimal"

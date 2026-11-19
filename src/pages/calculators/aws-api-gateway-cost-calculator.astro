@@ -29,7 +29,7 @@ const description =
   ]}
   how={[
     "Request cost = (requests per month / 1,000,000) x $ per 1M requests.",
-    "Transfer GB/month ~= requests per month x avg response KB / 1024 / 1024.",
+    "Transfer decimal GB/month = requests per month x average response decimal KB / 1,000,000. Convert KiB to KB first by multiplying by 1.024.",
     "Transfer cost = transfer GB/month x $ per GB.",
     "Total = request cost + transfer cost.",
   ]}

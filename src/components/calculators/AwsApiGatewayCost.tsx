@@ -36,12 +36,13 @@ export function AwsApiGatewayCostCalculator() {
     });
   }, [avgResponseKb, egressPricePerGbUsd, peakMultiplierPct, pricePerMillionRequestsUsd, requestsPerMonth, showPeakScenario]);
   const costPerMillionRequests = result.requestsPerMonth > 0 ? (result.totalCostUsd / result.requestsPerMonth) * 1_000_000 : 0;
-  const transferPerRequestKb = result.requestsPerMonth > 0 ? (result.transferGb * 1024 * 1024) / result.requestsPerMonth : 0;
+  const transferPerRequestKb = result.requestsPerMonth > 0 ? (result.transferGb * 1_000_000) / result.requestsPerMonth : 0;
 
   return (
     <div className="calc-grid">
       <div className="panel">
         <h3>Inputs</h3>
+        <p className="muted">Effective-rate budget, not a live AWS quote. Payload units are decimal: 1 KB = 1,000 bytes and 1 GB = 1,000,000 KB. Use a request rate matching your API type, region, tiers and size-based billing; WebSocket connection minutes, caching and other services are separate.</p>
         <div className="form">
           <div className="field field-3">
             <div className="label">Requests (per month)</div>
@@ -92,7 +93,7 @@ export function AwsApiGatewayCostCalculator() {
           </div>
 
           <div className="field field-3">
-            <div className="label">Avg response size (KB)</div>
+            <div className="label">Avg response size (decimal KB)</div>
             <input
               type="number"
               inputMode="decimal"

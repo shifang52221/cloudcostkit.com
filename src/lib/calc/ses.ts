@@ -12,7 +12,7 @@ export function estimateSesCost(opts: {
   const egressPricePerGbUsd = clamp(opts.egressPricePerGbUsd, 0, 1e9);
 
   const messageCostUsd = (emailsPerMonth / 1000) * pricePer1000EmailsUsd;
-  const transferGb = (emailsPerMonth * avgEmailKb) / 1024 / 1024;
+  const transferGb = (emailsPerMonth * avgEmailKb) / 1_000_000;
   const transferCostUsd = transferGb * egressPricePerGbUsd;
   const totalCostUsd = messageCostUsd + transferCostUsd;
 
