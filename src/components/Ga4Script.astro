@@ -1,31 +1,13 @@
 ---
 import { SITE } from "../config/site";
+import { buildAnalyticsBootstrap } from "../lib/analytics-bootstrap.js";
 
 const measurementId = (import.meta.env.SITE_GA4_MEASUREMENT_ID ||
   import.meta.env.PUBLIC_GA4_MEASUREMENT_ID ||
   SITE.ga4MeasurementId ||
   "").trim();
 
-const inline = measurementId
-  ? `(function () {
-  var MID = ${JSON.stringify(measurementId)};
-  var SCRIPT_ID = "ga4-gtag-js";
-  function load() {
-    if (document.getElementById(SCRIPT_ID)) return;
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){window.dataLayer.push(arguments);}
-    window.gtag = window.gtag || gtag;
-    gtag("js", new Date());
-    gtag("config", MID, { anonymize_ip: true });
-    var s = document.createElement("script");
-    s.id = SCRIPT_ID;
-    s.async = true;
-    s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(MID);
-    document.head.appendChild(s);
-  }
-  load();
-})();`
-  : "";
+const inline = measurementId ? buildAnalyticsBootstrap(measurementId) : "";
 ---
 {measurementId ? (
   <script is:inline type="text/javascript" set:html={inline}></script>
