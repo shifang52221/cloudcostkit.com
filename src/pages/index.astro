@@ -23,9 +23,19 @@ const slots = SITE.adsenseSlots;
 
 const demandPaths = [
   {
+    href: "/calculators/storage-pricing-calculator/",
+    title: "Budget storage and downloads",
+    desc: "Separate stored data, request fees, and egress before comparing a baseline with a busier month.",
+  },
+  {
+    href: "/calculators/log-ingestion-cost-calculator/",
+    title: "Estimate log ingestion",
+    desc: "Turn measured GB/day or event rate and event size into monthly ingestion volume and spend.",
+  },
+  {
     href: "/calculators/cdn-cost-calculator/",
     title: "CDN cost and pricing",
-    desc: "High search demand topic: compare bandwidth, requests, and origin-side spillover.",
+    desc: "Compare bandwidth, request fees, and origin egress to see which line item dominates.",
   },
   {
     href: "/calculators/ec2-cost-calculator/",
@@ -53,47 +63,18 @@ const demandPaths = [
       profile to compare scenarios, validate pricing, and plan budgets faster.
     </p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="/calculators/">Browse tools</a>
-      <a class="btn" href="/guides/">Start with guides</a>
+      <a class="btn btn-primary" href="/calculators/storage-pricing-calculator/">Estimate storage budget</a>
+      <a class="btn" href="/calculators/">Browse all tools</a>
       <a class="btn" href="/calculators/data-egress-cost-calculator/">Estimate egress</a>
       <a class="btn" href="/calculators/cdn-cost-calculator/">Compare CDN cost</a>
     </div>
   </section>
 
   <section class="card section prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Review how this site works</h2>
+    <h2 style="margin-top:0">Start with the cost you need to estimate</h2>
     <p class="muted" style="margin:10px 0 0">
-      CloudCostKit is designed to be reviewable, not mysterious. Use the trust path below to see what the site is for,
-      how pages are maintained, how estimates are validated, and where to report a correction.
-    </p>
-    <p class="muted" style="margin:10px 0 0">
-      The site is maintained by the CloudCostKit Editorial Team, and this path explains how pages are reviewed, challenged, and corrected before they keep strong placement.
-    </p>
-    <div class="grid" style="margin-top:12px">
-      <a class="card2 tool col-6" href="/about/">
-        <div class="tool-title">About the site</div>
-        <div class="tool-desc">Who the site serves, what decisions it supports, and what it does not replace.</div>
-      </a>
-      <a class="card2 tool col-6" href="/editorial-policy/">
-        <div class="tool-title">Editorial standards</div>
-        <div class="tool-desc">How topics qualify for publication, review, consolidation, or rewrite.</div>
-      </a>
-      <a class="card2 tool col-6" href="/methodology/">
-        <div class="tool-title">Methodology</div>
-        <div class="tool-desc">How calculator and guide workflows are built, validated, and challenged.</div>
-      </a>
-      <a class="card2 tool col-6" href="/contact/">
-        <div class="tool-title">Report a correction</div>
-        <div class="tool-desc">Send a bug report, estimate mismatch, or unclear boundary with the details needed to review it.</div>
-      </a>
-    </div>
-  </section>
-
-  <section class="card section prose" style="margin-top:18px">
-    <h2 style="margin-top:0">Best places to start right now</h2>
-    <p class="muted" style="margin:10px 0 0">
-      These are the workflows already showing live search demand, so they are strong entry points whether you are
-      budgeting, comparing providers, or investigating a spike.
+      Choose a task, enter your usage and applicable rates, then check the result against the included line items.
+      These are planning models, not live provider quotes or billing-account connections.
     </p>
     <div class="grid" style="margin-top:12px">
       {demandPaths.map((item) => (
@@ -154,6 +135,17 @@ const demandPaths = [
         <div class="tool-desc">Model requests, CPU, memory, cold starts, and egress with deployment-ready assumptions.</div>
       </a>
     </div>
+  </section>
+
+  <section class="card section prose" aria-labelledby="site-maintenance">
+    <h2 id="site-maintenance" style="margin-top:0">Assumptions, sources, and corrections</h2>
+    <p>
+      The site is maintained by the CloudCostKit Editorial Team. See the
+      <a href="/methodology/">methodology</a> for model boundaries and the
+      <a href="/editorial-policy/">editorial policy</a> for how pages are reviewed, challenged, and corrected.
+      <a href="/about/">About the site</a> explains its scope;
+      <a href="/contact/">report a correction</a> if a formula, unit, or explanation does not match your evidence.
+    </p>
   </section>
 
   <section class="grid" style="margin-top:18px">

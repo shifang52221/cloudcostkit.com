@@ -39,7 +39,7 @@ Action: audit top guides individually; explicitly disable or curate opening assi
 
 `src/pages/index.astro` places an extensive Review how this site works section before featured tools. It uses High search demand topic and live search demand to explain navigation. These phrases describe the publisher's acquisition strategy rather than visitor benefit.
 
-Action: lead with a small set of task entry points, using actual visitor outcomes; retain honest maintenance identity, policy/methodology links, and correction contact in a compact visible section. Do not invent a human team, credentials, review history, or testimonials. Homepage changes alone cannot resolve weak landing pages.
+Action: implemented a task-first homepage: storage budget primary CTA; storage and log ingestion join the first task group; search-demand/prominence language removed. Consolidated the large early review block into a maintenance/source/correction section after tools and guides, retaining policy links and existing identity. Existing deeper task links remain; this is not a wholesale homepage rewrite. Local suite: 334 tests passed, type check 517 files with zero errors/warnings and six hints, production build passed. Chrome desktop/390px confirmed no page overflow, task order, canonical and primary destination. Do not invent a human team, credentials, review history, or testimonials. Homepage changes alone cannot resolve weak landing pages or establish growth.
 
 ### F4: Measurement cannot yet distinguish task use from page arrival
 

@@ -10,8 +10,8 @@ const contactPage = readFileSync(new URL("../src/pages/contact.astro", import.me
 const baseLayout = readFileSync(new URL("../src/layouts/BaseLayout.astro", import.meta.url), "utf8");
 
 test("homepage exposes a visible trust path", () => {
-  assert.match(homepage, /Review how this site works/i);
-  assert.match(homepage, /Editorial standards/i);
+  assert.match(homepage, /Assumptions, sources, and corrections/i);
+  assert.match(homepage, /href="\/editorial-policy\/"/i);
   assert.match(homepage, /Report a correction/i);
 });
 
