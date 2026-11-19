@@ -34,6 +34,7 @@ const faqs = [
   canonicalPath="/guides/gcp-cloud-run-pricing"
   lastUpdated="2026-06-19"
   faqs={faqs}
+  openingAssist={false}
 >
   <p>
     This is the Cloud Run service behavior and pricing decision page. Use it when you are budgeting Cloud Run from the
@@ -95,6 +96,29 @@ const faqs = [
   </ul>
 
   <h2>Build the first estimate from service behavior, not from one average</h2>
+  <h3>Calculate billable instance time, not the sum of overlapping request durations</h3>
+  <p>
+    Google bills allocated vCPU-seconds and GiB-seconds, with usage rounded up to 100 milliseconds.
+    Concurrent requests can share the same instance's allocated CPU and memory. Requests × average latency is
+    therefore not automatically the number of billable instance-seconds. Dividing that number by configured maximum
+    concurrency is not reliable either: maximum concurrency is a limit, not measured average utilization.
+  </p>
+  <p>
+    <strong>Worked resource example:</strong> assume two instances, each allocated 1 vCPU and 0.5 GiB,
+    each accumulate 10,000 billable active seconds. Active usage is 20,000 vCPU-seconds and 10,000 GiB-seconds.
+    If they serve 1,000,000 billable requests under request-based billing, the active subtotal before allowances is
+    20,000 × CPU rate + 10,000 × memory rate + 1,000,000 / 1,000,000 × request rate per million.
+    Use rates for the same region and billing mode. Startup/shutdown time must already be included in those measured
+    billable seconds; minimum-instance idle usage, if present, needs its own applicable rates.
+  </p>
+  <p>
+    With instance-based billing, use the full running lifecycle instead. For the same two instance sizes kept running
+    throughout 30 days, usage is 5,184,000 vCPU-seconds and 2,592,000 GiB-seconds, with no separate per-request fee.
+    This is a different uptime assumption, not a price comparison or a recommendation that one mode is always cheaper.
+    Apply the relevant <a href="https://cloud.google.com/run/pricing">official regional rates</a>, then account for
+    remaining free-tier eligibility and discounts. Free-tier usage is aggregated by billing account, not granted
+    independently to every service or project. Add networking and observability separately.
+  </p>
   <p>
     A useful Cloud Run estimate starts with the inputs that map cleanly to how the service behaves under normal and
     stressed conditions. The goal is not to create a perfect finance model on day one. The goal is to capture the
@@ -104,7 +128,7 @@ const faqs = [
     <li><strong>Billing mode</strong>: decide whether the service is using request-based billing or instance-based billing, and keep that assumption visible in the estimate.</li>
     <li><strong>Requests per month</strong>: convert traffic into a monthly number, but keep baseline and peak separated instead of blending them.</li>
     <li><strong>Duration by percentile</strong>: use p50 and p95 so you can see what normal execution looks like and what the slow path costs.</li>
-    <li><strong>CPU and memory shape</strong>: capture what each request actually consumes while it is running, especially for handlers that are not purely I/O-bound.</li>
+    <li><strong>CPU and memory shape</strong>: capture allocated vCPU and GiB per instance and billable time, not just observed CPU utilization or application memory consumption.</li>
     <li><strong>Concurrency behavior</strong>: note whether higher concurrency improves efficiency or causes latency and contention that erase the savings.</li>
     <li><strong>Minimum instances</strong>: model warm capacity separately from live request processing so idle exposure is not mistaken for traffic-driven spend.</li>
     <li><strong>Response size and egress</strong>: isolate heavy endpoints, downloads, exports, or media responses so they do not disappear inside one blended average.</li>

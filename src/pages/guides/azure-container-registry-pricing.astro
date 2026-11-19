@@ -34,6 +34,7 @@ const faqs = [
   canonicalPath="/guides/azure-container-registry-pricing"
   lastUpdated="2026-06-19"
   faqs={faqs}
+  openingAssist={false}
 >
   <p>
     If you are evaluating Azure Container Registry for real production usage, the cleanest starting point is not the
@@ -96,6 +97,27 @@ const faqs = [
   </ul>
 
   <h2>Build the first estimate from registry behavior</h2>
+  <h3>A monthly worksheet that does not charge included storage twice</h3>
+  <p>
+    For a single-region registry, begin with daily tier fee × billing days. Add only storage above the included
+    allowance, using the storage billing unit and time basis shown in your quote. Microsoft lists included capacity
+    in GiB: 10 for Basic, 100 for Standard, and 500 for Premium.
+  </p>
+  <p>
+    <strong>Illustrative arithmetic, not an Azure price quote:</strong> suppose your selected tier costs $1/day,
+    includes 100 GiB, and your average usage stays at 80 GiB for a 30-day month. The tier line is $30 and excess
+    storage is zero, not 80 × a separate storage rate. If average usage rises to 130 GiB and your hypothetical
+    excess rate is $0.003/GiB-day, the additional line is 30 GiB × 30 days × $0.003 = $2.70, giving $32.70
+    before networking, replication, taxes, or discounts. These invented rates demonstrate the formula only;
+    replace them with your regional quote and its billing units. Varying daily usage requires summing daily excess,
+    not assuming the month-end snapshot was stored all month.
+  </p>
+  <p>
+    The <a href="https://learn.microsoft.com/azure/container-registry/container-registry-skus">official SKU limits</a>
+    describe included capacity and features; the <a href="https://azure.microsoft.com/pricing/details/container-registry/">official price selector</a>
+    supplies regional rates. Copy the region, currency, unit, and quote date into your worksheet. Premium enables
+    geo-replication; that does not make every additional replica free. Check replica charges separately.
+  </p>
   <p>
     A usable ACR estimate starts by defining the registry as an operating system component, not as a flat storage
     bucket. You need to know what is stored, who consumes it, where those consumers run, and which periods create the
@@ -109,9 +131,10 @@ const faqs = [
     <li><strong>Feature trigger</strong>: document whether the pressure is really about throughput, multi-region access, or Premium-only capabilities.</li>
   </ul>
   <p>
-    Two tools help anchor this first estimate: <a href="/calculators/object-storage-cost-calculator/">storage cost
-    (GB-month)</a> for retained data and <a href="/calculators/data-egress-cost-calculator/">data egress cost</a> for
-    billed outbound paths.
+    Two tools help with adjacent line items: <a href="/calculators/object-storage-cost-calculator/">storage cost
+    (GB-month)</a> is a generic multiplication worksheet, not an ACR tier calculator. Use only excess capacity with
+    matching units and rates, and add the tier fee separately; do not invent GET/PUT fees for registry pulls.
+    Use <a href="/calculators/data-egress-cost-calculator/">data egress cost</a> for separately billed outbound paths.
   </p>
 
   <h2>How storage, pull storms, and transfer shape the bill together</h2>
@@ -150,6 +173,7 @@ const faqs = [
   </ul>
 
   <h2>Tier snapshot for budgeting decisions</h2>
+  <div role="region" aria-label="ACR tier comparison" tabindex="0" style="overflow-x:auto">
   <table>
     <thead>
       <tr>
@@ -184,6 +208,7 @@ const faqs = [
       </tr>
     </tbody>
   </table>
+  </div>
 
   <h2>When a tier upgrade is justified, and when it is hiding another problem</h2>
   <p>
@@ -196,6 +221,7 @@ const faqs = [
     <li><strong>Standard to Premium</strong> makes sense when multi-region workloads, geo-replication, or enterprise access patterns are operationally necessary.</li>
     <li><strong>Do not upgrade blindly</strong> when the real issue is cross-region topology or pull inefficiency. In that case the architecture can keep the bill high even after the tier changes.</li>
   </ul>
+  <div role="region" aria-label="ACR upgrade decisions" tabindex="0" style="overflow-x:auto">
   <table>
     <thead>
       <tr>
@@ -222,6 +248,7 @@ const faqs = [
       </tr>
     </tbody>
   </table>
+  </div>
 
   <h2>What usually goes wrong, and how to validate the estimate</h2>
   <p>
