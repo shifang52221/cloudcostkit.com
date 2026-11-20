@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import vm from "node:vm";
+import { readFileSync } from "node:fs";
 import { buildAnalyticsBootstrap } from "../src/lib/analytics-bootstrap.js";
 
 test("analytics page metadata excludes scenario query and fragment without changing share URL", () => {
@@ -28,4 +29,11 @@ test("analytics page metadata excludes scenario query and fragment without chang
 
 test("measurement identifier cannot terminate the inline script", () => {
   assert.ok(!buildAnalyticsBootstrap("</script>").includes("</script>"));
+});
+
+test("privacy notice distinguishes browser calculations from URL sharing and hosting logs", () => {
+  const notice = readFileSync(new URL("../src/pages/privacy-policy.astro", import.meta.url), "utf8");
+  assert.match(notice, /Anyone with that\s+link can read those values/);
+  assert.match(notice, /may reach hosting logs/);
+  assert.match(notice, /confidential billing data/);
 });
